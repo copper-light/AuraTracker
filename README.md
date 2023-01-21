@@ -24,7 +24,7 @@
 # AuraTracker 로 이름 변경
 오라,스킬,토템,HP,MP,직업자원에 대한 쿨다운 및 수치를 별도의 아이콘(바)으로 만들어 표시
 
-![애드온 적용 모습](git_images/auratracker_ui.png))
+![애드온 적용 모습](git_images/running_image.png))
 ![UI 적용 모습](git_images/auratracker_ui.png))
 
 ## 주요 기능
