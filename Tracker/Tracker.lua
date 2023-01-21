@@ -512,6 +512,7 @@ function HDH_TRACKER:Modify(newName, newType, newUnit)
 	
 	if newType ~= self.type then
 		self:Release() -- 프레임 관련 메모리 삭제하고
+		DB:TrancateTrackerElements(self.id)
 		setmetatable(self, HDH_TRACKER.GetClass(newType)) -- 클래스 변경하고
 	end
 	self:Init(self.id, newName, newType, newUnit) -- 프레임 초기화 + DB 로드
@@ -694,7 +695,7 @@ function HDH_TRACKER:UpdateBarValue(f, isEnding)
 				end
 				local maxV = f.spell.endTime - f.spell.startTime;
 				f.bar:SetMinMaxValues(0, maxV); 
-				f.bar:SetValue(maxV-f.spell.remaining); 
+				f.bar:SetValue(maxV-f.spell.remaining);
 				f.name:SetTextColor(unpack(self.ui.font.name_color));
 				if self.ui.bar.show_spark and f.spell.duration > 0 then f.bar.spark:Show(); 
 				else f.bar.spark:Hide(); end
@@ -1059,6 +1060,8 @@ local function ChangeFontLocation(f, fontf, location, op_font)
 		fontf:SetWidth(parent:GetWidth()+200);
 		fontf:SetJustifyH('RIGHT')
 		fontf:SetJustifyV('CENTER')
+	else
+		fontf:Hide()
 	end
 end
 

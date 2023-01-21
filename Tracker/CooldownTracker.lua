@@ -638,14 +638,14 @@ function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_HIDE(f, id)
 	end
 end
 
-function HDH_C_TRACKER:InitVariblesOption() -- HDH_TRACKER override
-	super.InitVariblesOption(self)
+-- function HDH_C_TRACKER:InitVariblesOption() -- HDH_TRACKER override
+-- 	super.InitVariblesOption(self)
 	
-	HDH_AT_UTIL.CheckToUpdateDB(DefaultCooldownDB, DB_OPTION);
-	if DB_OPTION[self.name].use_each then
-		HDH_AT_UTIL.CheckToUpdateDB(DefaultCooldownDB, DB_OPTION[self.name]);
-	end
-end
+-- 	HDH_AT_UTIL.CheckToUpdateDB(DefaultCooldownDB, DB_OPTION);
+-- 	if DB_OPTION[self.name].use_each then
+-- 		HDH_AT_UTIL.CheckToUpdateDB(DefaultCooldownDB, DB_OPTION[self.name]);
+-- 	end
+-- end
 
 function HDH_C_TRACKER:Release() -- HDH_TRACKER override
 	super.Release(self)

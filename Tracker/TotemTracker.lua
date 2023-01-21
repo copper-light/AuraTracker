@@ -1,15 +1,6 @@
 ﻿local DB = HDH_AT_ConfigDB
 HDH_TT_TRACKER = {}
 
-
-
-
--- HDH_OLD_TRACKER["토템류:마력의룬/비전전령"] = TrackerTypeName;
-
--- 드루
---id[145205] = true
-
--- 수도사
 local AdjustName= {}
 ------------------------------------
 -- HDH_T_TRACKER class

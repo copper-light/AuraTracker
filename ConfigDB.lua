@@ -32,6 +32,8 @@ CONFIG.FONT_LOCATION_OR = 9
 CONFIG.FONT_LOCATION_BAR_L = 10
 CONFIG.FONT_LOCATION_BAR_C = 11
 CONFIG.FONT_LOCATION_BAR_R = 12
+CONFIG.FONT_LOCATION_HIDE = 13
+
 --HDH_AT_DB.FONT_LOCATION_OT2 = 7
 --HDH_AT_DB.FONT_LOCATION_OB2 = 9
 
@@ -154,7 +156,7 @@ local DEFAULT_DISPLAY = {
         
         count_size = 15, 
         count_location = CONFIG.FONT_LOCATION_BL, 
-        count_color={1,1,1, 1}, -- 중첩
+        count_color={1, 1, 1, 1}, -- 중첩
 
         v1_size = 15, 
         v1_location = CONFIG.FONT_LOCATION_BR, 
@@ -350,6 +352,10 @@ function HDH_AT_ConfigDB:SwapTrackerElement(trackerId, eidx_1, eidx_2)
     end
 end
 
+function HDH_AT_ConfigDB:TrancateTrackerElements(trackerId)
+    HDH_AT_DB.tracker[trackerId].element = {}
+end
+
 function HDH_AT_ConfigDB:DeleteTrackerElement(trackerId, elementIndex)
     if not HDH_AT_DB.tracker[trackerId].element[elementIndex] then
         return false
@@ -359,6 +365,19 @@ function HDH_AT_ConfigDB:DeleteTrackerElement(trackerId, elementIndex)
     end
     local size = #HDH_AT_DB.tracker[trackerId].element
     HDH_AT_DB.tracker[trackerId].element[size] = nil
+end
+
+function HDH_AT_ConfigDB:SetLockTrackerElement(trackerId, elementIndex, lock)
+    if HDH_AT_DB.tracker[trackerId].element[elementIndex] then
+        HDH_AT_DB.tracker[trackerId].element[elementIndex].lock = lock or true
+    end
+end
+
+function HDH_AT_ConfigDB:IsLockedTrackerElement(trackerId, elementIndex)
+    if HDH_AT_DB.tracker[trackerId].element[elementIndex] then
+        return HDH_AT_DB.tracker[trackerId].element[elementIndex].lock or false
+    end
+    return false
 end
 
 function HDH_AT_ConfigDB:AddTrackerElement(trackerId, key, id, name, texture, isAlways, isValue, isItem)

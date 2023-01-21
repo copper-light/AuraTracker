@@ -445,19 +445,6 @@ do
 				-- f.border:SetAlpha(self.ui.icon.off_alpha)
 				self:ChangeCooldownType(f, self.ui.icon.cooldown)
 				self:SetGlow(f, false)
-				
-				-- spell.startSound = auraList[i].StartSound
-				-- spell.endSound = auraList[i].EndSound
-				-- spell.conditionSound = auraList[i].ConditionSound
-				-- if spell.startSound then
-				-- 	f.cooldown2:SetScript("OnShow", HDH_OnShowCooldown)
-				-- 	f.cooldown1:SetScript("OnShow", HDH_OnShowCooldown)
-				-- end
-				-- if spell.endSound then
-				-- 	f.cooldown1:SetScript("OnHide", HDH_OnHideCooldown)
-				-- 	f.cooldown2:SetScript("OnHide", HDH_OnHideCooldown)
-				-- end
-				-- end
 			end
 			self.GetAurasFunc = HDH_AURA_TRACKER.GetAuras
 			for i = #(self.frame.icon) , iconIdx+1, -1  do

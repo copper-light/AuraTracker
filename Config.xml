@@ -85,7 +85,7 @@
 									<OnClick function="HDH_AT_OnClick_Button"/>
 									<OnLoad>
 										self.isAddBtn = true
-										_G[self:GetName().."Text"]:SetText("Add Tracker")
+										_G[self:GetName().."Text"]:SetText("   Add Tracker")
 									</OnLoad> 
 								</Scripts>
 							</Button>
@@ -356,7 +356,7 @@
 											</Anchors>
 										</FontString>
 
-										<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT" text="※ TIP : 주문과 추적창의 화면 표시 순서 변경하려면 리스트 드래그하세요.">											<Color r="1" g="0.8" b="0" />
+										<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT" text="※ TIP : 주문과 추적창의 화면 출력 순서 변경하려면 리스트 드래그하세요.">											<Color r="1" g="0.8" b="0" />
 											<Size>
 												<AbsDimension x="400" y="25"/>
 											</Size>

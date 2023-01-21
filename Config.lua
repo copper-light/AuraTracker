@@ -66,31 +66,56 @@ local UI_TabData= {
 	{name=L.SHARE, type="BUTTON"},         --12
 }
 
-
-
 local MyClassKor, MyClass = UnitClass("player");
-local totemName = L.TOTEM
-
-if MyClass == "MAGE" then totemName = L.MAGE_TOTEM
--- elseif MyClass == "PALADIN" then TrackerTypeName = "자원:마나";
--- elseif MyClass == "WARRIOR" then TrackerTypeName = "자원:분노";
-elseif MyClass == "DRUID" then totemName = L.DRUID_TOTEM
-elseif MyClass == "DEATHKNIGHT" then totemName = L.DK_TOTEM
--- elseif MyClass == "HUNTER" then TrackerTypeName = "자원:집중";
--- elseif MyClass == "PRIEST" then TrackerTypeName = "자원:마나";
--- elseif MyClass == "ROGUE" then TrackerTypeName = "자원:기력";
--- elseif MyClass == "SHAMAN" then TrackerTypeName = "자원:마나,소용돌이";
--- elseif MyClass == "WARLOCK" then TrackerTypeName = "자원:마나";
-elseif MyClass == "MONK" then totemName = L.MONK_TOTEM
--- elseif MyClass == "DEMONHUNTER" then TrackerTypeName = "자원:격노,고통";
-end
-
 local DDP_TRACKER_LIST = {
 	{HDH_TRACKER.TYPE.BUFF, L.BUFF},
 	{HDH_TRACKER.TYPE.DEBUFF, L.DEBUFF},
-	{HDH_TRACKER.TYPE.COOLDOWN, L.SKILL_COOLDOWN},
-	{HDH_TRACKER.TYPE.TOTEM, totemName}
+	{HDH_TRACKER.TYPE.COOLDOWN, L.SKILL_COOLDOWN}
 }
+
+local powerList = {}
+local totemName = L.TOTEM
+if MyClass == "MAGE" then 
+	totemName = L.MAGE_TOTEM
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
+elseif MyClass == "PALADIN" then 
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
+elseif MyClass == "WARRIOR" then 
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE})
+elseif MyClass == "DRUID" then 
+	totemName = L.DRUID_TOTEM
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_LUNAR, L.POWER_LUNAR})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE})
+elseif MyClass == "DEATHKNIGHT" then 
+	totemName = L.DK_TOTEM
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_RUNIC, L.POWER_RUNIC})
+elseif MyClass == "HUNTER" then 
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_FOCUS, L.POWER_FOCUS})
+elseif MyClass == "PRIEST" then 
+	totemName = L.PRIEST_TOTEM
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_INSANITY, L.POWER_INSANITY})
+elseif MyClass == "ROGUE" then
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY})
+elseif MyClass == "SHAMAN" then 
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MAELSTROM, L.POWER_MAELSTROM})
+elseif MyClass == "WARLOCK" then 
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
+elseif MyClass == "MONK" then 
+	totemName = L.MONK_TOTEM
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY})
+elseif MyClass == "DEMONHUNTER" then 
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_FURY, L.POWER_FURY})
+	-- table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_PAIN, L.POWER_PAIN}) -- 삭제됨
+elseif MyClass == "EVOKER" then
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
+end
+
+table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.TOTEM, totemName})
 
 local UNIT_TO_LABEL = {
 	player = L.UNIT_PLAYER,
@@ -161,7 +186,8 @@ local DDP_FONT_CD_LOC_LIST = {
 	{DB.FONT_LOCATION_OR, L.FONT_LOCATION_OR},
 	{DB.FONT_LOCATION_BAR_L, L.FONT_LOCATION_BAR_L},
 	{DB.FONT_LOCATION_BAR_C, L.FONT_LOCATION_BAR_C},	
-	{DB.FONT_LOCATION_BAR_R, L.FONT_LOCATION_BAR_R}
+	{DB.FONT_LOCATION_BAR_R, L.FONT_LOCATION_BAR_R},
+	{DB.FONT_LOCATION_HIDE, L.HIDE},
 }
 
 local DDP_FONT_NAME_ALIGN_LIST = {
@@ -1275,7 +1301,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerConfig(value)
 
 			end
 
-			F.DD_TRACKER_TYPE:SetSelectIdx(type)
+			F.DD_TRACKER_TYPE:SetSelectValue(type)
 			-- F.DD_TRACKER_UNIT:SetSelectValue(unit)
 			
 			F.DD_TRACKER_TRANSIT:SetSelectValue(transit)
@@ -1381,6 +1407,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(transitId)
 	local MARGIN_Y = 0
 	local trackerIds
 	local id, name, type, unit
+	local typeName
 
 	if not transitId or transitId == DDM_TRACKER_ALL then
 		trackerIds = DB:GetTrackerIds()
@@ -1422,7 +1449,13 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(transitId)
 			unitName = ": " .. UNIT_TO_LABEL[unit]
 		end
 
-		component:SetText(STR_TRACKER_FORMAT:format(name, DDP_TRACKER_LIST[type][2], unitName))
+		for i, label in ipairs(DDP_TRACKER_LIST) do
+			if label[1] == type then
+				typeName = label[2]
+			end
+		end
+
+		component:SetText(STR_TRACKER_FORMAT:format(name, typeName, unitName))
 		component:SetActivate(false)
 	end
 
@@ -1790,7 +1823,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.DROPDOWN,       L.NAME_ALIGN,         "ui.%s.font.name_align")
 	HDH_AT_DropDown_Init(comp, DDP_FONT_NAME_ALIGN_LIST, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.CHECK_BOX,     L.DISPLAY_NAME,       "ui.%s.font.show_name")
-	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.COLOR_PICKER, L.FONT_COLOR,          "ui.%s.font.name_color")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.COLOR_PICKER, L.FONT_ON_COLOR,          "ui.%s.font.name_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.COLOR_PICKER, L.FONT_OFF_COLOR,      "ui.%s.font.name_color_off")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.SLIDER,       L.FONT_SIZE,           "ui.%s.font.name_size")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.SLIDER,       L.MARGIN_LEFT,           "ui.%s.font.name_margin_left")
