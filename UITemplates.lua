@@ -80,7 +80,7 @@ function HDH_AT_AuraRowMixin:Set(no, key, id, name, texture, always, glow, value
     _G[self:GetName().."CheckButtonAlways"]:Show()
     _G[self:GetName().."CheckButtonGlow"]:Show()
     _G[self:GetName().."CheckButtonValue"]:Show()
-    _G[self:GetName().."ButtonSet"]:Show()
+    _G[self:GetName().."ButtonSet"]:Hide()
     self.mode = HDH_AT_AuraRowMixin.MODE.DATA
 end
 
@@ -124,6 +124,8 @@ function HDH_AT_AuraRowMixin:Clear()
     
     _G[self:GetName().."ButtonSet"]:Hide()
     self.mode = HDH_AT_AuraRowMixin.MODE.EMPTY
+    self.tmp_id = nil
+	self.tmp_chk = false
 end
 -- function HDH_AT_AuraRowMixin:SetHandler(func_OnEnterPressed, func_OnClick)
 --     _G[self:GetName().."ButtonAdd"]:SetScript("OnClick", func_OnClick)
@@ -145,7 +147,7 @@ function HDH_AT_AuraRowMixin:ChangeReadMode()
         _G[self:GetName().."CheckButtonAlways"]:Show()
         _G[self:GetName().."CheckButtonGlow"]:Show()
         _G[self:GetName().."CheckButtonValue"]:Show()
-        _G[self:GetName().."ButtonSet"]:Show()
+        _G[self:GetName().."ButtonSet"]:Hide()
         _G[self:GetName().."TextName"]:Show()
     else
         self:SetText("")

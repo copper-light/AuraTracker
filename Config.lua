@@ -464,7 +464,7 @@ local function HDH_AT_OnChangedSlider(self, value)
 	local trackerId = GetMainFrame():GetCurTrackerId()
 	if value ~= nil and self.dbKey ~= nil then
 		DB:SetTrackerValue(trackerId, self.dbKey, value)
-		HDH_TRACKER.UpdateSetting(trackerId)
+		HDH_TRACKER.UpdateSettings(trackerId)
 	end
 end
 
@@ -473,7 +473,7 @@ local function HDH_AT_OnSeletedColor(self, r, g, b, a)
 	
 	if r ~= nil and g ~=nil and b ~= nil and a ~=nil and self.dbKey ~= nil then
 		DB:SetTrackerValue(trackerId, self.dbKey, {r, g, b, a})		
-		HDH_TRACKER.UpdateSetting(trackerId)
+		HDH_TRACKER.UpdateSettings(trackerId)
 	end
 end
 
@@ -500,7 +500,7 @@ function HDH_AT_UI_OnCheck(self)
 	else
 		if value ~= nil and self.dbKey ~= nil then
 			DB:SetTrackerValue(trackerId, self.dbKey, value)
-			HDH_TRACKER.UpdateSetting(trackerId)
+			HDH_TRACKER.UpdateSettings(trackerId)
 		end
 	end
 end
@@ -695,7 +695,7 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 
 	elseif self == F.BODY.CONFIG_UI.DD_DISPLAY_MODE then
 		main:UpdateAbleConfigs(value)
-		HDH_TRACKER.UpdateSetting(main:GetCurTrackerId())
+		HDH_TRACKER.UpdateSettings(main:GetCurTrackerId())
 
 	elseif self == F.DD_TRACKER_TRANSIT then
 		main:UpdateTransitInTrackerConfig(idx)
@@ -737,7 +737,7 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 		local seletedTransitValue = self:GetSelectedValue()
 		if seletedTransitValue ~= nil and  self.dbKey ~= nil then
 			DB:SetTrackerValue(trackerId, self.dbKey, seletedTransitValue)
-			HDH_TRACKER.UpdateSetting(trackerId)
+			HDH_TRACKER.UpdateSettings(trackerId)
 		end
 	end
 end
@@ -1419,7 +1419,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(transitId)
 
 		local unitName = ""
 		if type == HDH_TRACKER.TYPE.BUFF or type == HDH_TRACKER.TYPE.DEBUFF then
-			unitName = ":" .. UNIT_TO_LABEL[unit]
+			unitName = ": " .. UNIT_TO_LABEL[unit]
 		end
 
 		component:SetText(STR_TRACKER_FORMAT:format(name, DDP_TRACKER_LIST[type][2], unitName))
