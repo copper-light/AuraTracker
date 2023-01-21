@@ -1,0 +1,869 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="Config.lua"/>
+
+
+	<!-- <Button name="HDH_AT_ConfigFrame222" parent="UIParent" toplevel="true" frameStrata="FULLSCREEN_DIALOG" inherits="SecureHandlerClickTemplate">
+		<Anchors>
+			<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+			<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+		</Anchors>
+		<Scripts>
+			<OnLoad>self:SetAttribute("_onClick", [=[
+				print("asdfasdfasdf")
+			]=])</OnLoad>
+		</Scripts>
+	</Button> -->
+
+    <!-- 설정 프레임 시작 -->
+    <Frame name="HDH_AT_ConfigFrame" mixin="HDH_AT_ConfigFrameMixin" movable="true" toplevel="true" parent="UIParent" frameStrata="HIGH" hidden="true" enableMouse="true" resizable="true" inherits="HDH_AT_ConfigFrameTemplate">
+		<Size><AbsDimension x="410" y="500"/></Size>
+		<Anchors>
+            <Anchor point="CENTER" x="0" y="0"/>
+        </Anchors>
+	
+        <Frames>
+
+            <Button name="$parentDropDownTalent" inherits="HDH_AT_DropDownTrackerTemplate">
+				<Size><AbsDimension x="112" y="40" /></Size>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" x="-4" y="1" />
+                    <!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+                </Anchors>
+            </Button>
+
+			<Button name="$parentDropDownTransit" hidden="true" inherits="HDH_AT_DropDownTrackerTemplate">
+				<Size x="134" y="40" />
+                <Anchors>
+                    <Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentDropDownTalent" x="1" y="0" />
+                    <!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+                </Anchors>
+            </Button>
+
+			<ScrollFrame name="$parentTrackerSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate">
+				<Size x="120" />
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentDropDownTalent" x="0" y="0" />
+					<!-- <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDropDownTalent" x="6" y="0" /> -->
+					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parentDropDownTalent" x="5" y="0" />
+					<Anchor point="BOTTOM" relativePoint="BOTTOM" x="0" y="0" />
+				</Anchors>
+				<Frames>
+					<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="-10" y="-18"/>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="-10" y="18"/>
+						</Anchors>
+					</Slider>
+				</Frames>
+
+				<ScrollChild>
+					<Frame name="$parentContents" hidden="false">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+						</Anchors>
+						
+						<Frames>
+							<Button name="$parentBtnAddTracker" inherits="HDH_AT_TrackerTapBtnTemplate">
+								<Size x="120" y="40" />
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" x="2" y="0" />
+									<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+								</Anchors>
+								<Layers> 
+									<Layer level="ARTWORK">
+										<Texture atlas="ui-hud-minimap-zoom-in" alphaMode="ADD" hidden="true">
+											<Size x="17" y="17"/>
+											<Anchors>
+												<Anchor point="LEFT" x="10" y="-1" />
+											</Anchors>
+										</Texture>
+									</Layer>
+								</Layers>
+								<Scripts>
+									<OnClick function="HDH_AT_OnClick_Button"/>
+									<OnLoad>
+										self.isAddBtn = true
+										_G[self:GetName().."Text"]:SetText("Add Tracker")
+									</OnLoad> 
+								</Scripts>
+							</Button>
+						</Frames>
+					</Frame>
+				</ScrollChild>
+				<Scripts>
+					<OnShow>
+						self.scrollBarHideable = true
+					</OnShow>
+				</Scripts>
+			</ScrollFrame>
+
+			<Frame name="$parentBody" hidden="false">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+				</Anchors>
+				<Frames>
+					<Frame name="$parentTracker" hidden="true">
+						<!-- <Size><AbsDimension x="400" y="35"/></Size> -->
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+						</Anchors>
+
+						<Frames>
+							<Frame name="$parentLabel" inherits="HDH_AT_BackgroundTemplate">
+								<Size><AbsDimension x="135" y="30"/></Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT" x="0" y="0" />
+								</Anchors>
+								<Layers>
+									<Layer level="artwork">
+										<FontString name="$parentText" inherits="Font_Yellow_M" text="사용 특성" justifyH="CENTER">
+											<Size x="200" y="20" />
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="0"/>
+												<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-20" y="0"/>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+							</Frame>
+
+							<Frame name="$parentTop" inherits="HDH_AT_BackgroundTemplate">
+								<Size y="30" />
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+									<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentLabel" x="0" y="0" />
+								</Anchors>
+									<Layers>
+										<Layer level="artwork">
+											<FontString name="$parentText" inherits="Font_Yellow_M" text="추적창 추가" justifyH="CENTER">
+												<Size x="200" y="20" />
+												<Anchors>
+													<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="0"/>
+													<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-20" y="0"/>
+												</Anchors>
+											</FontString>
+										</Layer>
+									</Layers>
+								<Frames>
+								</Frames>
+							</Frame>
+
+							<Frame name="$parentBottom" inherits="HDH_AT_BackgroundTemplate">
+								<Size y="40" />
+								<Anchors>
+									<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="0" y="0" />
+									<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+								</Anchors>
+								<Frames>
+									<Button name="$parentBtnSaveTracker" inherits="HDH_AT_ButtonTemplate" text="적용">
+										<Anchors>
+											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="20" y="10" />
+										</Anchors>
+										<Scripts>
+											<OnClick function="HDH_AT_OnClick_Button" />
+										</Scripts>
+									</Button>
+
+									<Button name="$parentBtnCancel" inherits="HDH_AT_ButtonTemplate" text="취소">
+										<Anchors>
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBtnSaveTracker" x="2" y="0" />
+										</Anchors>
+										<Scripts>
+											<OnClick function="HDH_AT_OnClick_Button" />
+										</Scripts>
+									</Button>
+
+									<Button name="$parentBtnCopy" inherits="HDH_AT_ButtonTemplate" text="복사">
+										<Anchors>
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBtnCancel" x="2" y="0" />
+										</Anchors>
+										<Scripts>
+											<OnClick function="HDH_AT_OnClick_Button" />
+										</Scripts>
+									</Button>
+
+									<Button name="$parentBtnDelete" inherits="HDH_AT_ButtonTemplate" text="삭제">
+										<Anchors>
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBtnCopy" x="2" y="0" />
+										</Anchors>
+										<Scripts>
+											<OnClick function="HDH_AT_OnClick_Button" />
+										</Scripts>
+									</Button>
+
+								</Frames>
+							</Frame>
+
+							<ScrollFrame name="$parentTransitSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+								<Size><AbsDimension x="135" y="200"/></Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLabel" x="1" y="0" />
+									<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$parentBottom" x="0" y="0" />
+								</Anchors>
+
+								<Frames>
+									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-19" y="-20"/>
+											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-19" y="20"/>
+										</Anchors>
+									</Slider>
+								</Frames>
+
+								<ScrollChild>
+									<Frame name="$parentContents" hidden="false">
+										<Size><AbsDimension x="135" y="1"/></Size>
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+											<Anchor point="BOTTOMRIGHT" relativePoint="" x="0" y="0" />
+										</Anchors>
+
+										<Frames>
+											<Button name="$parentTransit" inherits="HDH_AT_DropDownMultiSeletorAlwayShowTemplate">
+												<Size><AbsDimension x="135" y="1"/></Size>
+												<Anchors>
+													<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+													<Anchor point="RIGHT" relativePoint="RIGHT" x="-21" y="0" />
+												</Anchors>
+											</Button>
+										</Frames>
+									</Frame>
+								</ScrollChild>
+							</ScrollFrame>
+
+							<ScrollFrame name="$parentConfigSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentTop" x="0" y="0" />
+									<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parentTop" x="0" y="0" />
+									<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$parentBottom" x="0" y="0" />
+								</Anchors>
+
+								<Frames>
+									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
+											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
+										</Anchors>
+									</Slider>
+								</Frames>
+
+								<ScrollChild>
+									<Frame name="$parentContents" hidden="false">
+										<Size><AbsDimension x="150" y="200"/></Size>
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+										</Anchors>
+									</Frame>
+								</ScrollChild>
+							</ScrollFrame>
+
+						</Frames>
+					</Frame>
+
+					<Frame name="$parentTrackerElements" hidden = "true" inherits="HDH_AT_BackgroundTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+							<Anchor point="BOTTOMRIGHT" relativeTo="$parent" >
+							<Offset><AbsDimension x="0" y="0"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+							</Layer>
+						</Layers>
+						<!--Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+							<TileSize><AbsValue val="20"/></TileSize>
+							<EdgeSize><AbsValue val="20"/></EdgeSize>
+						</Backdrop-->
+						<Frames>
+							<ScrollFrame name="$parentSF" inherits="UIPanelScrollFrameTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+										<Offset><AbsDimension x="10" y="-30"/></Offset>
+									</Anchor>
+									<Anchor point="BOTTOMRIGHT"  relativePoint="BOTTOMRIGHT">
+										<Offset><AbsDimension x="-25" y="25"/></Offset>
+									</Anchor>
+								</Anchors>
+								
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture>
+											<Size><AbsDimension x="0" y="0"/></Size>
+											<Color r="0" g="0" b="0" a="0.2"/>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativeTo="$parentScrollBar" relativePoint="TOPLEFT">
+													<Offset><AbsDimension x="0" y="0"/></Offset>
+												</Anchor>
+												<Anchor point="BOTTOMRIGHT"  relativeTo="$parentScrollBar" relativePoint="BOTTOMRIGHT">
+													<Offset><AbsDimension x="0" y="0"/></Offset>
+												</Anchor>
+											</Anchors>
+										</Texture>
+									</Layer>
+									
+									<Layer level="ARTWORK">
+										<FontString name="$parentText1" inherits="Font_Yellow_S" justifyH ="LEFT" text="No">
+											<Size><AbsDimension x="20" y="25"/></Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent">
+													<Offset><AbsDimension x="2" y="25"/></Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString  name="$parentText2" inherits="Font_Yellow_S" justifyH ="LEFT" text="Element Name">
+											<Size><AbsDimension x="100" y="25"/></Size>
+											<Anchors>
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText1">
+													<Offset><AbsDimension x="40" y="0"/></Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parentText3" inherits="Font_Yellow_S" justifyH ="LEFT" text="ID" hidden="true">
+											<Size><AbsDimension x="20" y="25"/></Size>
+											<Anchors>
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText2">
+													<Offset><AbsDimension x="47" y="0"/></Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+
+										<FontString name="$parentText4" inherits="Font_Yellow_S" justifyH ="LEFT" text="항상표시" hidden="false">
+											<Size><AbsDimension x="50" y="25"/></Size>
+											<Anchors>
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText3" x="-38" y="0" />
+											</Anchors>	
+										</FontString>
+
+										<FontString name="$parentText5" inherits="Font_Yellow_S" justifyH ="LEFT" text="반짝효과" hidden="false">
+											<Size><AbsDimension x="50" y="25"/></Size>
+											<Anchors>
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText4" x="1" y="0" />
+											</Anchors>
+										</FontString>
+
+										<FontString name="$parentText6" inherits="Font_Yellow_S" justifyH ="LEFT" text="수치표시" hidden="false">
+											<Size><AbsDimension x="50" y="25"/></Size>
+											<Anchors>
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText5" x="1" y="0" />
+											</Anchors>
+										</FontString>
+
+										<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT" text="※ TIP : 주문과 추적창의 화면 표시 순서 변경하려면 리스트 드래그하세요.">											<Color r="1" g="0.8" b="0" />
+											<Size>
+												<AbsDimension x="400" y="25"/>
+											</Size>
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent" x="5" y="5"/>
+												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-5" y="5"/>
+											</Anchors>
+										</FontString>
+
+										<FontString name="$parentNoticeAllTracker" inherits="Font_Yellow_S" text="모든 주문 추적 기능이 활성화 되었습니다. 주문을 등록할 수 없습니다." hidden="true">
+											<Size x="260" y="70"/>
+											<Anchors>
+												<Anchor point="TOP">
+												<Offset><AbsDimension x="0" y="-20"/></Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+										<FontString name="$parentNoticeBossTracker" inherits="Font_Yellow_S" text="보스 주문 추적 기능이 활성화 되었습니다. 주문을 등록할 수 없습니다." hidden="true">
+											<Size x="260" y="70"/>
+											<Anchors>
+												<Anchor point="TOP">
+												<Offset><AbsDimension x="0" y="-20"/></Offset>
+												</Anchor>
+											</Anchors>
+										</FontString>
+
+									</Layer>
+								</Layers>
+								
+								<ScrollChild>
+									<Frame name="$parentContents">
+										<Size x="10" y="100"/>
+										<Anchors>
+											<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+												<Offset><AbsDimension x="0" y="0"/></Offset>
+											</Anchor>
+											<Anchor point="BOTTOMRIGHT"  relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+												<Offset><AbsDimension x="0" y="0"/></Offset>
+											</Anchor>
+										</Anchors>
+										<Layers><Layer>
+										</Layer></Layers>
+										<Scripts>
+											<OnShow>self:SetAttribute("unit",self:GetParent():GetParent():GetAttribute("unit"))</OnShow>
+										</Scripts>
+									</Frame>
+								</ScrollChild>
+							</ScrollFrame>
+							
+						</Frames>
+						
+						<Scripts>
+							<OnLoad></OnLoad>
+						</Scripts>
+					</Frame>	
+				
+					<Frame name="$parentUI" hidden="true">
+						<!-- <Size><AbsDimension x="400" y="35"/></Size> -->
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+						</Anchors>
+
+						<Frames>
+							<Frame name="$parentTop" inherits="HDH_AT_BackgroundTemplate">
+								<Size y="40" />
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+									<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" />
+								</Anchors>
+								<Frames>
+
+									<Button name="$parentDDLConfigMode" inherits="HDH_AT_DropDownOptionTemplate">
+										<Size x="125" y="22" />
+										<Anchors>
+											<Anchor point="LEFT" relativePoint="LEFT" x="70" y="0" />
+											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+										</Anchors>
+										<Layers>
+											<Layer level="artwork">
+												<FontString parentKey="ConfigNmae" inherits="Font_Yellow_S" text="사용 설정" justifyH="LEFT">
+													<Size><AbsDimension x="58" y="22" /></Size>
+													<Anchors>
+														<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parent" x="0" y="0"/>
+													</Anchors>
+												</FontString>
+											</Layer>
+										</Layers>
+									</Button>
+
+									<Button name="$parentDDLDisplayType" inherits="HDH_AT_DropDownOptionTemplate">
+										<Size x="125" y="22" />
+										<Anchors>
+											<!-- <Anchor point="LEFT" relativePoint="LEFT" x="120" y="0" /> -->
+											<Anchor point="RIGHT" relativePoint="RIGHT" x="-10" y="0" />
+										</Anchors>
+										<Layers>
+											<Layer level="artwork">
+												<FontString parentKey="ConfigNmae" inherits="Font_Yellow_S" text="출력 모드" justifyH="LEFT">
+													<Size><AbsDimension x="58" y="22" /></Size>
+													<Anchors>
+														<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parent" x="0" y="0"/>
+													</Anchors>
+												</FontString>
+											</Layer>
+										</Layers>
+									</Button>
+								</Frames>
+							</Frame>
+
+							<Frame name="$parentBottom" inherits="HDH_AT_BackgroundTemplate">
+								<Size y="40" />
+								<Anchors>
+									<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="0" y="0" />
+									<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+								</Anchors>
+								<Frames>
+									<CheckButton name="$parentCBMove" inherits="HDH_AT_CheckButtonTemplate">
+										<Anchors>
+											<Anchor point="LEFT" relativePoint="LEFT" x="225" y="0" />
+											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+										</Anchors>
+										<Scripts>
+											<OnLoad>self.Text:SetText(HDH_AT_L.MOVE_UI)</OnLoad>
+											<OnClick function="HDH_AT_UI_OnCheck" />
+										</Scripts>
+									</CheckButton>
+
+									<CheckButton name="$parentCBShowIdInTooltip" inherits="HDH_AT_CheckButtonTemplate">
+										<Anchors>
+											<Anchor point="LEFT" relativePoint="LEFT" x="295" y="0" />
+											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+										</Anchors>
+										<Scripts>
+											<OnLoad>self.Text:SetText(HDH_AT_L.DISPLAY_ID_IN_TOOPTIP)</OnLoad>
+											<OnClick function="HDH_AT_UI_OnCheck" />
+										</Scripts>
+									</CheckButton>
+								</Frames>
+							</Frame>
+
+							<ScrollFrame name="$parentMenuSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+								<Size><AbsDimension x="135" y="35"/></Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentTop" x="0" y="0" />
+									<Anchor point="BOTTOM" relativePoint="TOP"  relativeTo="$parentBottom" x="0" y="0" />
+								</Anchors>
+
+								<Frames>
+									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-19" y="-18"/>
+											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-19" y="18"/>
+										</Anchors>
+									</Slider>
+								</Frames>
+
+								<ScrollChild>
+									<Frame name="$parentContents" hidden="false">
+										<Size><AbsDimension x="135" y="200"/></Size>
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+										</Anchors>
+										<Frames>
+										</Frames>
+									</Frame>
+								</ScrollChild>
+							</ScrollFrame>
+
+							<ScrollFrame name="$parentConfigSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentMenuSF" x="0" y="0" />
+									<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" relativeTo="$parentBottom"  x="0" y="0" />
+								</Anchors>
+
+								<Frames>
+									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
+											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
+										</Anchors>
+									</Slider>
+								</Frames>
+
+								<ScrollChild>
+									<Frame name="$parentContents" hidden="false">
+										<Size><AbsDimension x="150" y="200"/></Size>
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+										</Anchors>
+									</Frame>
+								</ScrollChild>
+							</ScrollFrame>
+
+						</Frames>
+					</Frame>
+
+				</Frames>
+			</Frame>
+
+			<Button name="$parentTabElements" inherits="HDH_AT_BottomTapTemplate" id="1" hidden="false">
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="10" y="-3" />
+				</Anchors>
+				<!-- <NormalTexture/> -->
+				<!-- <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/> -->
+				<Scripts>
+					<OnLoad>self:SetText(HDH_AT_L.CONFIG_TRACKER_ELEMENTS) self:SetActivate(true)</OnLoad>
+					<OnClick function="HDH_AT_OnClick_TapButton" />
+				</Scripts>
+			</Button>
+
+			<Button name="$parentTabUI" inherits="HDH_AT_BottomTapTemplate" id="2"  hidden="false">
+				<Size x="32" y="32"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentTabElements" x="3" y="0" />
+				</Anchors>
+				<!-- <NormalTexture/> -->
+				<!-- <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/> -->
+				<Scripts>
+					<OnLoad>self:SetText(HDH_AT_L.CONFIG_UI) self:SetActivate(false)</OnLoad>
+					<OnClick function="HDH_AT_OnClick_TapButton" />
+				</Scripts>
+			</Button>
+
+			<Button name="$parentBtnSize" >
+				<Size><AbsDimension x="15" y="15"/></Size>
+				<HitRectInsets>
+					<AbsInset left="0" right="-6" top="0" bottom="-6"/>
+				</HitRectInsets>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" x="-2" y="2" />
+				</Anchors>
+				<Scripts>
+					<OnMouseDown>self:GetParent():StartSizing()</OnMouseDown>
+					<OnMouseUp>self:GetParent():StopMovingOrSizing()</OnMouseUp>
+				</Scripts>
+				<NormalTexture file="Interface\CHATFRAME\UI-ChatIM-SizeGrabber-Down" />
+				<HighlightTexture file="Interface\CHATFRAME\UI-ChatIM-SizeGrabber-Highlight" alphaMode="ADD"/>
+			</Button>
+
+			<Button name="$parentBtnClose" inherits="UIPanelButtonTemplate" text="X">
+				<Size><AbsDimension x="50" y="25"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" x="-6" y="23" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						self:GetParent():Hide(); 
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentBtnMinMaxFrame" inherits="UIPanelButtonTemplate" text="최소화">
+				<Size><AbsDimension x="50" y="25"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnClose" x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HDH_AT_MinimumFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
+						HDH_AT_MinimumFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
+						HDH_AT_MinimumFrame:Show(); self:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+				
+			<Frame name="$parentDetailConfig" inherits="HDH_AT_DialogFrame" frameStrata="DIALOG"  hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" x="0" y="0" />
+					<Anchor point="BOTTOMRIGHT" x="0" y="0" />
+				</Anchors>
+				<Layers>
+					<Layer level="artwork">
+						<FontString name="$parentText" inherits="Font_Yellow_M" text="반짝효과 설정 (택1)" justifyH="LEFT">
+							<Size x="200" y="25" />
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-10"/>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<CheckButton name="$parentCBCondition1" inherits="HDH_AT_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-50" />
+							<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="-50" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Scripts>
+							<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_ACTIVE)</OnLoad>
+							<OnClick function="HDH_AT_UI_OnCheck" />
+						</Scripts>
+					</CheckButton>
+
+					<CheckButton name="$parentCBCondition2" inherits="HDH_AT_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition1" x="0" y="0" />
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="-50" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Scripts>
+							<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_TIME)</OnLoad>
+							<OnClick function="HDH_AT_UI_OnCheck" />
+						</Scripts>
+					</CheckButton>
+
+					<CheckButton name="$parentCBCondition3" inherits="HDH_AT_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition2" x="0" y="0" />
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="-50" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Scripts>
+							<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_COUNT)</OnLoad>
+							<OnClick function="HDH_AT_UI_OnCheck" />
+						</Scripts>
+					</CheckButton>
+
+					<CheckButton name="$parentCBCondition4" inherits="HDH_AT_CheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition3" x="0" y="0" />
+						</Anchors>
+						<HitRectInsets>
+							<AbsInset left="0" right="-50" top="0" bottom="0"/>
+						</HitRectInsets>
+						<Scripts>
+							<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_VALUE)</OnLoad>
+							<OnClick function="HDH_AT_UI_OnCheck" />
+						</Scripts>
+					</CheckButton>
+
+					<Button name="$parentDDCondition2" inherits="HDH_AT_DropDownOptionTemplate">
+						<Size x="50" y="22" />
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="90" y="0" />
+						</Anchors>
+					</Button>
+
+					<Button name="$parentDDCondition3" inherits="HDH_AT_DropDownOptionTemplate">
+						<Size x="50" y="22" />
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition3" x="90" y="0" />
+						</Anchors>
+					</Button>
+
+					<Button name="$parentDDCondition4" inherits="HDH_AT_DropDownOptionTemplate">
+						<Size x="50" y="22" />
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition4" x="90" y="0" />
+						</Anchors>
+					</Button>
+
+					<EditBox name="$parentEBCondition2" inherits="InputBoxTemplate" enableMouse="true" numeric="true" autoFocus="false">
+						<Size>
+							<AbsDimension x="70" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentDDCondition2" relativePoint="RIGHT" x="25" y="0" />
+						</Anchors>
+						<Layers>
+							<Layer level="artwork">
+								<FontString name="$parentText" inherits="Font_Yellow_M" text="초" justifyH="LEFT">
+									<Size x="20" y="25" />
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT" x="2" y="0"/>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+						</Scripts>
+					</EditBox>
+
+					<EditBox name="$parentEBCondition3" inherits="InputBoxTemplate" enableMouse="true" numeric="true" autoFocus="false">
+						<Size>
+							<AbsDimension x="70" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentDDCondition3" relativePoint="RIGHT" x="25" y="0" />
+						</Anchors>
+						<Scripts>
+						</Scripts>
+					</EditBox>
+
+					<EditBox name="$parentEBCondition4" inherits="InputBoxTemplate" enableMouse="true" numeric="true" autoFocus="false">
+						<Size>
+							<AbsDimension x="70" y="26"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentDDCondition4" relativePoint="RIGHT" x="25" y="0" />
+						</Anchors>
+						<Scripts>
+						</Scripts>
+					</EditBox>
+
+
+
+					<Button name="$parentButtonApply" inherits="HDH_AT_ButtonTemplate" text="적용">
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="-5" y="5"/></Offset>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>self:SetText(HDH_AT_L.APPLY)</OnLoad>
+							<OnClick> 
+								HDH_AT_OnClick_Button(self)
+							</OnClick>
+						</Scripts>
+					</Button>	
+					<Button name="$parentButtonClose" inherits="HDH_AT_ButtonTemplate" text="취소">
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOM">
+							<Offset><AbsDimension x="5" y="5"/></Offset>
+							</Anchor>
+						</Anchors>
+
+						<Scripts>
+							<OnLoad>self:SetText(HDH_AT_L.CLOSE)</OnLoad>
+							<OnClick> HDH_AT_OnClick_Button(self)	
+							</OnClick>
+						</Scripts>
+					</Button>		
+				</Frames>
+			</Frame>
+
+			<Frame name="$parentAlertDialog" parentKey="Dialog" inherits="HDH_AT_DialogFrameTemplate"/>
+
+			
+
+        </Frames>
+
+        <Scripts>
+			<OnLoad function="HDH_AT_ConfigFrame_OnLoad"/>
+            <OnShow function="HDH_AT_ConfigFrame_OnShow"/>
+            <OnMouseDown>self:StartMoving()</OnMouseDown>
+			<OnMouseUp>self:StopMovingOrSizing()</OnMouseUp>
+        </Scripts>
+    </Frame>
+
+	<Frame name="HDH_AT_MinimumFrame" movable="true" toplevel="true" parent="UIParent" frameStrata="HIGH" hidden="true" enableMouse="true" inherits="HDH_AT_ConfigFrameTemplate">
+		<Size><AbsDimension x="160" y="30"/></Size>
+		<Anchors>
+			<Anchor point="CENTER" x="0" y="0"/>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBG">
+					<Color r="0" g="0" b="0" a="0.5" />
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" />
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" inherits="GAMEFONTNORMAL" justifyH ="CENTER" text="Auratracking :D">
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="0" />
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentBtnClose" inherits="UIPanelButtonTemplate" text="X">
+				<Size><AbsDimension x="50" y="25"/></Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT">
+					<Offset><AbsDimension x="-6" y="23"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts><OnClick>
+					HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
+					HDH_AT_ConfigFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
+					self:GetParent():Hide(); 
+				</OnClick></Scripts>
+			</Button>
+			
+			<Button name="$parentBtnMinimum" inherits="UIPanelButtonTemplate" text="최대화">
+				<Size><AbsDimension x="50" y="25"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentBtnClose" relativePoint="LEFT">
+					<Offset><AbsDimension x="0" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts><OnClick>
+					HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
+					HDH_AT_ConfigFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
+					HDH_AT_ConfigFrame:Show(); self:GetParent():Hide(); </OnClick></Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnShow>_G[self:GetName().."Text"]:SetText("AuraTracker v"..GetAddOnMetadata("HDH_AuraTracker", "Version")) </OnShow>
+			<OnMouseDown>self:StartMoving()</OnMouseDown>
+			<OnMouseUp>self:StopMovingOrSizing()</OnMouseUp>
+		</Scripts>
+	</Frame>
+
+</Ui>

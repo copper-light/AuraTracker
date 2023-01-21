@@ -1,0 +1,30 @@
+﻿## Interface: 100005
+## Title: HDH_AuraTracker
+## Author: hdh
+## Notes: 설정창 명령어 /at, /auratracker
+## Version: 10.0.2.01_Beta
+## SavedVariables: DB_PROFILE, HDH_AT_PROFILE
+## SavedVariablesPerCharacter: HDH_AT_DB
+
+Utils.lua
+
+locale\locale.lua
+locale\locale_koKR.lua
+
+UITemplates.xml
+
+Tooltip.lua
+
+ConfigDB.lua
+
+Tracker\Tracker.lua
+Tracker\AuraTracker.lua
+Tracker\CooldownTracker.lua
+Tracker\TotemTracker.lua
+
+lib\LibCompress\LibStub.lua
+lib\LibCompress\LibCompress.lua
+lib\AceSerializer-3.0\AceSerializer-3.0.xml
+lib\WeakAuraLib\Transmission.lua
+
+Config.xml
