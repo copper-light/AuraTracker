@@ -21,6 +21,7 @@ HDH_TRACKER.ANI_SHOW = 1
 HDH_TRACKER.ANI_HIDE = 2
 HDH_TRACKER.FONT_STYLE = "fonts\\2002.ttf";
 HDH_TRACKER.MAX_ICONS_COUNT = 10
+HDH_TRACKER.BAR_ANI_TERM = 0.1 -- second
 
 
 -------------------------------------------
@@ -46,8 +47,8 @@ local function UpdateCooldown(f, elapsed)
 		end
 		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 			local minV, maxV = f.bar:GetMinMaxValues();
-			f.bar:SetValue(tracker.ui.bar.fill_bar and (maxV-spell.remaining) or (spell.remaining));
-			tracker:moveSpark(tracker, f, spell);
+			f.bar:SetValue(tracker.ui.bar.reverse_fill and (maxV-spell.remaining) or (spell.remaining));
+			tracker:MoveSpark(tracker, f, spell);
 		end
 
 		if tracker.ui.common.display_mode ~= DB.DISPLAY_BAR then
@@ -236,6 +237,7 @@ local function frameBaseSettings(f)
 
 	f.iconSatCooldown.spark = f.iconframe:CreateTexture(nil, "OVERLAY");
 	f.iconSatCooldown.spark:SetBlendMode("ADD");
+	f.iconSatCooldown.spark:Hide()
 	
 	f.border = CreateFrame("Frame", nil, f.iconframe):CreateTexture(nil, 'OVERLAY')
 	f.border:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/border.blp]])
@@ -306,6 +308,7 @@ function HDH_TRACKER.Updates(trackerId)
 	if trackerId then
 		local t= HDH_TRACKER.Get(trackerId)
 		if t then
+			print(t.name)
 			t:Update()
 		end
 	else
@@ -567,6 +570,52 @@ function HDH_TRACKER:UpdateSetting()
 	self.location.y = self.frame:GetBottom()
 end
 
+
+function HDH_TRACKER:GetAnimatedValue(bar, v) -- v:target value
+	if bar.targetValue ~= v then
+		bar.animatedStartTime = bar.preTime or GetTime();
+		bar.targetValue = v;
+	end
+	local gap = bar.targetValue - bar:GetValue();
+	local gapTime;
+	if gap ~= 0 then
+		gapTime = (GetTime() - bar.animatedStartTime);
+		if gapTime < HDH_TRACKER.BAR_ANI_TERM then
+			v = gap * (gapTime/HDH_TRACKER.BAR_ANI_TERM);
+		else
+			v = gap;
+		end
+	else
+		v = 0;
+	end
+	bar.preTime = GetTime();
+	return bar:GetValue()+ v;
+end
+
+function HDH_TRACKER:MoveSpark(tracker, f, spell)
+	if not tracker.ui.bar.show_spark then return end
+	spell.per = max((spell.remaining/(spell.endTime-spell.startTime)), 0)
+	if spell.per > 1 then
+		spell.per = 1
+		f.bar.spark:Hide()
+	else
+		f.bar.spark:Show()
+	end
+	if tracker.ui.bar.reverse_fill == tracker.ui.bar.reverse_progress then
+		if f.bar:GetOrientation() == "HORIZONTAL" then
+			f.bar.spark:SetPoint("CENTER", f.bar,"LEFT", f.bar:GetWidth() * spell.per, 0);
+		else
+			f.bar.spark:SetPoint("CENTER", f.bar,"BOTTOM", 0, f.bar:GetHeight() * spell.per);
+		end
+	else
+		if f.bar:GetOrientation() == "HORIZONTAL" then
+			f.bar.spark:SetPoint("CENTER", f.bar,"RIGHT", -f.bar:GetWidth() * spell.per, 0);
+		else
+			f.bar.spark:SetPoint("CENTER", f.bar,"TOP", 0, -f.bar:GetHeight() * spell.per);
+		end
+	end
+end
+
 function HDH_TRACKER:ConnectMoveHandler(count)
 	if not count then return end
 	for i=1, count do
@@ -672,7 +721,7 @@ end
 
 function HDH_TRACKER:UpdateBarValue(f, isEnding)
 	if f.bar and f.name then
-		if self.ui.bar.fill_bar then
+		if self.ui.bar.reverse_fill then
 			if isEnding then
 				f.bar:SetMinMaxValues(0,1); 
 				f.bar:SetValue(1); 
@@ -1208,17 +1257,17 @@ function HDH_TRACKER:UpdateArtBar(f)
 		else f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture); end
 		f.bar:ClearAllPoints();
 		if op.location == DB.BAR_LOCATION_T then     
-			f.bar:SetSize(op.height,op.width);
+			f.bar:SetSize(op.width, op.height);
 			f.bar:SetPoint("BOTTOM",f, hide_icon and "BOTTOM" or "TOP",0,1); 
 			f.bar:SetOrientation("Vertical"); f.bar:SetRotatesTexture(true);
 			f.bar.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark_v");
-			f.bar.spark:SetSize(op.height*1.3, 19);
+			f.bar.spark:SetSize(op.width*1.3, 19);
 		elseif op.location == DB.BAR_LOCATION_B then 
-			f.bar:SetSize(op.height,op.width);
+			f.bar:SetSize(op.width,op.height);
 			f.bar:SetPoint("TOP",f, hide_icon and "TOP" or "BOTTOM",0,-1); 
 			f.bar:SetOrientation("Vertical"); f.bar:SetRotatesTexture(true);
 			f.bar.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark_v");
-			f.bar.spark:SetSize(op.height*1.3, 19);
+			f.bar.spark:SetSize(op.width*1.3, 19);
 		elseif op.location == DB.BAR_LOCATION_L then 
 			f.bar:SetSize(op.width,op.height);
 			f.bar:SetPoint("RIGHT",f, hide_icon and "RIGHT" or "LEFT",-1,0); 
@@ -1491,6 +1540,21 @@ local function VersionUpdateDB()
 			DB:UpdateTracker(id, name, type, unit, aura_filter, aura_caster, transit)
 		end
 		DB:SetVersion(2.1)
+	end
+	-- reverse_fill -> reverse_fill
+	if DB:GetVersion() == 2.1 then
+		local ui = DB:GetTrackerUI()
+		ui.bar.reverse_fill = ui.bar.reverse_fill
+		ui.bar.reverse_fill = nil
+		local ui
+		for _, id in ipairs(DB:GetTrackerIds()) do
+			if DB:hasTrackerUI(id) then
+				ui = DB:GetTrackerUI(id)
+				ui.bar.reverse_fill = ui.bar.reverse_fill
+				ui.bar.reverse_fill = nil
+			end
+		end
+		DB:SetVersion(2.2)
 	end
 end
 

@@ -73,13 +73,32 @@ local DDP_TRACKER_LIST = {
 	{HDH_TRACKER.TYPE.COOLDOWN, L.SKILL_COOLDOWN}
 }
 
+
+-- local TrackerTypeName;
+-- if MyClass == "MAGE" then TrackerTypeName = L_POWRE_ARCANE_CHARGES;
+-- elseif MyClass == "PALADIN" then TrackerTypeName = L_POWRE_HOLY_POWER;
+-- elseif MyClass == "WARRIOR" then
+-- elseif MyClass == "DRUID" then TrackerTypeName = L_POWRE_COMBO_POINTS;
+-- elseif MyClass == "DEATHKNIGHT" then
+-- elseif MyClass == "HUNTER" then
+-- elseif MyClass == "PRIEST" then
+-- elseif MyClass == "ROGUE" then TrackerTypeName = L_POWRE_COMBO_POINTS;
+-- elseif MyClass == "SHAMAN" then
+-- elseif MyClass == "WARLOCK" then TrackerTypeName = L_POWRE_SOUL_SHARDS;
+-- elseif MyClass == "MONK" then TrackerTypeName = L_POWRE_CHI;
+-- elseif MyClass == "DEMONHUNTER" then
+-- else TrackerTypeName = "2차 자원(콤보)"; end
+
 local powerList = {}
 local totemName = L.TOTEM
 if MyClass == "MAGE" then 
 	totemName = L.MAGE_TOTEM
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, L.POWER_ARCANE_CHARGES})
 elseif MyClass == "PALADIN" then 
+	totemName = L.PALADIN_TOTEM
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_HOLY_POWER, L.POWER_HOLY_POWER})
 elseif MyClass == "WARRIOR" then 
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE})
 elseif MyClass == "DRUID" then 
@@ -88,9 +107,11 @@ elseif MyClass == "DRUID" then
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY})
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_LUNAR, L.POWER_LUNAR})
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_COMBO_POINTS, L.POWER_COMBO_POINTS})
 elseif MyClass == "DEATHKNIGHT" then 
 	totemName = L.DK_TOTEM
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_RUNIC, L.POWER_RUNIC})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_RUNE, L.POWER_RUNE})
 elseif MyClass == "HUNTER" then 
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_FOCUS, L.POWER_FOCUS})
 elseif MyClass == "PRIEST" then 
@@ -99,15 +120,18 @@ elseif MyClass == "PRIEST" then
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_INSANITY, L.POWER_INSANITY})
 elseif MyClass == "ROGUE" then
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_COMBO_POINTS, L.POWER_COMBO_POINTS})
 elseif MyClass == "SHAMAN" then 
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MAELSTROM, L.POWER_MAELSTROM})
 elseif MyClass == "WARLOCK" then 
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_SOUL_SHARDS, L.POWER_SOUL_SHARDS})
 elseif MyClass == "MONK" then 
 	totemName = L.MONK_TOTEM
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_CHI, L.POWER_CHI})
 elseif MyClass == "DEMONHUNTER" then 
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_FURY, L.POWER_FURY})
 	-- table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_PAIN, L.POWER_PAIN}) -- 삭제됨
@@ -175,6 +199,7 @@ local DDP_FONT_CD_FORMAT_LIST = {
 }
 
 local DDP_FONT_CD_LOC_LIST = {
+	{DB.FONT_LOCATION_HIDE, L.HIDE},
 	{DB.FONT_LOCATION_TL, L.FONT_LOCATION_TL},
 	{DB.FONT_LOCATION_BL, L.FONT_LOCATION_BL},
 	{DB.FONT_LOCATION_TR, L.FONT_LOCATION_TR},
@@ -187,7 +212,6 @@ local DDP_FONT_CD_LOC_LIST = {
 	{DB.FONT_LOCATION_BAR_L, L.FONT_LOCATION_BAR_L},
 	{DB.FONT_LOCATION_BAR_C, L.FONT_LOCATION_BAR_C},	
 	{DB.FONT_LOCATION_BAR_R, L.FONT_LOCATION_BAR_R},
-	{DB.FONT_LOCATION_HIDE, L.HIDE},
 }
 
 local DDP_FONT_NAME_ALIGN_LIST = {
@@ -215,10 +239,10 @@ local DDP_ICON_ORDER_LIST = {
 }
 
 local DDP_BAR_LOC_LIST = {
-	{DB.BAR_LOCATION_T, L.TOP},
-	{DB.BAR_LOCATION_B, L.BOTTOM},
-	{DB.BAR_LOCATION_L, L.LEFT},
-	{DB.BAR_LOCATION_R, L.RIGHT}
+	{DB.BAR_LOCATION_T, L.TOP_AND_UPWARD},
+	{DB.BAR_LOCATION_B, L.BOTTOM_AND_DOWNWARD},
+	{DB.BAR_LOCATION_L, L.LEFT_AND_TORIGHT},
+	{DB.BAR_LOCATION_R, L.RIGHT_AND_TOLEFT}
 }
 
 local DDP_CONFIG_MODE_LIST = {
@@ -239,8 +263,8 @@ local DDP_AURA_FILTER_LIST = {
 }
 
 local DDP_AURA_CASTER_LIST = {
-	{DB.AURA_CASTER_ALL , L.ALL_UNIT},
 	{DB.AURA_CASTER_ONLY_MINE, L.ONLY_MINE_AURA},
+	{DB.AURA_CASTER_ALL , L.ALL_UNIT},
 }
 
 local DDP_BAR_TEXTURE_LIST = {}
@@ -1276,8 +1300,8 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerConfig(value)
 
 			if type == HDH_TRACKER.TYPE.BUFF or type == HDH_TRACKER.TYPE.DEBUFF then
 				F.DD_TRACKER_UNIT:SetSelectValue(unit)
-				F.DD_TRACKER_AURA_CASTER:SetSelectIdx(aura_caster)
-				F.DD_TRACKER_AURA_FILTER:SetSelectIdx(aura_filter)
+				F.DD_TRACKER_AURA_CASTER:SetSelectValue(aura_caster)
+				F.DD_TRACKER_AURA_FILTER:SetSelectValue(aura_filter)
 				F.DD_TRACKER_AURA_CASTER:Enable()
 				F.DD_TRACKER_AURA_FILTER:Enable()
 				F.DD_TRACKER_UNIT:Enable()
@@ -1862,7 +1886,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.USE_DEFAULT_BORDER_COLOR,           "ui.%s.common.default_color")
 
 	-- BAR DEFAULT
-	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.CHECK_BOX,       L.FILL_BAR,         "ui.%s.bar.fill_bar")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.CHECK_BOX,       L.FILL_BAR,         "ui.%s.bar.reverse_fill")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.CHECK_BOX,       L.REVERSE_PROGRESS,         "ui.%s.bar.reverse_progress")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.CHECK_BOX,       L.DISPLAY_SPARK,         "ui.%s.bar.show_spark")
 
@@ -2038,6 +2062,7 @@ end
 -- 	-- 	end
 -- 	-- end
 -- end
+
 
 
 

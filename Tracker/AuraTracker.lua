@@ -13,23 +13,6 @@ local PLAY_SOUND = false
 	-- self:SetGlow(f, true);
 -- end
 
-function HDH_AURA_TRACKER:moveSpark(tracker,f, spell)
-	if not tracker.ui.bar.show_spark then return end
-	if tracker.ui.bar.fill_bar == tracker.ui.bar.reverse_progress then
-		if f.bar:GetOrientation() == "HORIZONTAL" then
-			f.bar.spark:SetPoint("CENTER", f.bar,"LEFT", f.bar:GetWidth() * (spell.remaining/(spell.endTime-spell.startTime)), 0);
-		else
-			f.bar.spark:SetPoint("CENTER", f.bar,"BOTTOM", 0, f.bar:GetHeight() * (spell.remaining/(spell.endTime-spell.startTime)));
-		end
-	else
-		if f.bar:GetOrientation() == "HORIZONTAL" then
-			f.bar.spark:SetPoint("CENTER", f.bar,"RIGHT", -f.bar:GetWidth() * (spell.remaining/(spell.endTime-spell.startTime)), 0);
-		else
-			f.bar.spark:SetPoint("CENTER", f.bar,"TOP", 0, -f.bar:GetHeight() * (spell.remaining/(spell.endTime-spell.startTime)));
-		end
-	end
-end
-
 -------------------------------------------
 -- sound
 -------------------------------------------
@@ -203,7 +186,7 @@ do
 		local column_count = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
 		local margin_h = self.ui.common.margin_h
 		local margin_v = self.ui.common.margin_v
-		local size = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
+		-- local size = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
 		local reverse_v = self.ui.common.reverse_v -- 상하반전
 		local reverse_h = self.ui.common.reverse_h -- 좌우반전
 		local icons = self.frame.icon
@@ -215,6 +198,25 @@ do
 		local col = 0  -- 열에 대한 위치 좌표값 = x
 		local row = 0  -- 행에 대한 위치 좌표값 = y
 		if self.OrderFunc then self.OrderFunc(self) end 
+
+		local size_w, size_h
+		if self.ui.common.display_mode == DB.DISPLAY_BAR then
+			size_w = self.ui.bar.width
+			size_h = self.ui.bar.height
+		elseif self.ui.common.display_mode == DB.DISPLAY_ICON_AND_BAR then
+			if self.ui.bar.location == DB.BAR_LOCATION_R or self.ui.bar.location == DB.BAR_LOCATION_L then
+				size_w = self.ui.bar.width + self.ui.icon.size
+				size_h = max(self.ui.bar.height, self.ui.icon.size)
+			else
+				size_h = self.ui.bar.height + self.ui.icon.size
+				size_w = max(self.ui.bar.width, self.ui.icon.size)
+			end
+			
+		else
+			size_w = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
+			size_h = self.ui.icon.size
+		end
+		
 		for k,f in ipairs(icons) do
 			if not f.spell then break end
 			if f.spell.isUpdate then
@@ -303,8 +305,8 @@ do
 				end
 				f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
 				i = i + 1
-				if i % column_count == 0 then row = row + size + margin_v; col = 0
-								         else col = col + size + margin_h end
+				if i % column_count == 0 then row = row + size_h + margin_v; col = 0
+								         else col = col + size_w + margin_h end
 				ret = ret + 1
 				f:Show()
 				self:SetGlow(f, true)
@@ -334,16 +336,16 @@ do
 					end--f.bar:Hide();
 					f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
 					i = i + 1
-					if i % column_count == 0 then row = row + size + margin_v; col = 0
-								     else col = col + size + margin_h end
+					if i % column_count == 0 then row = row + size_h + margin_v; col = 0
+								     else col = col + size_w + margin_h end
 					f:Show()
 					
 					self:SetGlow(f, f.spell.glow == DB.GLOW_CONDITION_TIME)
 				else
 					if self.ui.common.location_fix then
 						i = i + 1
-						if i % column_count == 0 then row = row + size + margin_v; col = 0
-										 else col = col + size + margin_h end
+						if i % column_count == 0 then row = row + size_h + margin_v; col = 0
+										 else col = col + size_w + margin_h end
 					end
 					f:Hide()
 				end

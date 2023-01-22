@@ -125,7 +125,14 @@ local function CT_UpdateSatIcon(tracker, f, spell)
 		end
 	end
 	
-	f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * spell.per * 10) /10 
+	if spell.per > 0 then 
+		f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * spell.per * 10) /10 
+		f.iconSatCooldown:Show()
+	else
+		spell.per = 0.1
+		f.iconSatCooldown.curSize = 1
+		f.iconSatCooldown:Hide()
+	end
 	if (f.iconSatCooldown.curSize ~= f.iconSatCooldown.preSize) then
 		if (f.iconSatCooldown.curSize == 0) then f.iconSatCooldown:Hide() end
 		if tracker.ui.icon.cooldown == DB.COOLDOWN_LEFT then
@@ -175,8 +182,8 @@ local function CT_UpdateCooldown(f, elapsed)
 		end
 		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and spell.duration > HDH_C_TRACKER.GlobalCooldown then
 			local minV, maxV = f.bar:GetMinMaxValues();
-			f.bar:SetValue(tracker.ui.bar.fill_bar and (maxV-spell.remaining) or (spell.remaining));
-			tracker:moveSpark(tracker, f, spell);
+			f.bar:SetValue(tracker.ui.bar.reverse_fill and (maxV-spell.remaining) or (spell.remaining));
+			tracker:MoveSpark(tracker, f, spell);
 		end
 	elseif tracker.type == HDH_TRACKER.TYPE.COOLDOWN then
 		if( tracker:Update_Icon(f)) or (not tracker.ui.common.always_show and not UnitAffectingCombat("player")) then
@@ -509,7 +516,7 @@ function HDH_C_TRACKER:Update_Layout()
 	local f, spell
 	local ret = 0 -- 쿨이 도는 스킬의 갯수를 체크하는것
 	local line = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
-	local size = self.ui.icon.size-- 아이콘 간격 띄우는 기본값
+	-- local size = self.ui.icon.size-- 아이콘 간격 띄우는 기본값
 	local margin_h = self.ui.common.margin_h
 	local margin_v = self.ui.common.margin_v
 	local reverse_v = self.ui.common.reverse_v -- 상하반전
@@ -518,6 +525,23 @@ function HDH_C_TRACKER:Update_Layout()
 	local col = 0  -- 열에 대한 위치 좌표값 = x
 	local row = 0  -- 행에 대한 위치 좌표값 = y
 	local always_show = self.ui.common.always_show
+	local size_w, size_h
+	if self.ui.common.display_mode == DB.DISPLAY_BAR then
+		size_w = self.ui.bar.width
+		size_h = self.ui.bar.height
+	elseif self.ui.common.display_mode == DB.DISPLAY_ICON_AND_BAR then
+		if self.ui.bar.location == DB.BAR_LOCATION_R or self.ui.bar.location == DB.BAR_LOCATION_L then
+			size_w = self.ui.bar.width + self.ui.icon.size
+			size_h = max(self.ui.bar.height, self.ui.icon.size)
+		else
+			size_h = self.ui.bar.height + self.ui.icon.size
+			size_w = max(self.ui.bar.width, self.ui.icon.size)
+		end
+		
+	else
+		size_w = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
+		size_h = self.ui.icon.size
+	end
 	
 	for i = 1 , #self.frame.icon do
 		f = self.frame.icon[i]
@@ -526,16 +550,16 @@ function HDH_C_TRACKER:Update_Layout()
 				f:ClearAllPoints()
 				f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
 				show_index = show_index + 1
-				if i % line == 0 then row = row + size + margin_v; col = 0
-								else col = col + size + margin_h end
+				if i % line == 0 then row = row + size_h + margin_v; col = 0
+								else col = col + size_h + margin_h end
 				if (f.spell.duration > 2 and f.spell.remaining > 0.5) or (f.spell.charges and f.spell.charges.remaining and f.spell.charges.remaining > 0) then ret = ret + 1 end -- 비전투라도 쿨이 돌고 잇는 스킬이 있으면 화면에 출력하기 위해서 체크함
 			else
 				if self.ui.common.location_fix then
 					f:ClearAllPoints()
 					f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
 					show_index = show_index + 1
-					if i % line == 0 then row = row + size + margin_v; col = 0
-								else col = col + size + margin_h end
+					if i % line == 0 then row = row + size_h + margin_v; col = 0
+								else col = col + size_w + margin_h end
 				end
 			end
 		end
@@ -723,7 +747,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown:SetWidth(self.ui.icon.size)
 		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
 		f.iconSatCooldown.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark");
-		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"TOP",0,0)
+		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"RIGHT",0,0)
 
 	else 
 		f.cd = f.cooldown2

@@ -9,7 +9,7 @@ CONFIG.NAME_ALIGN_CENTER = "CENTER"
 CONFIG.NAME_ALIGN_TOP = "TOP"
 CONFIG.NAME_ALIGN_BOTTOM = "BOTTOM"
 
-CONFIG.VERSION = 2.1
+CONFIG.VERSION = 2.2
 
 CONFIG.ANI_HIDE = 1
 CONFIG.ANI_SHOW = 2
@@ -130,7 +130,7 @@ local DEFAULT_DISPLAY = {
 
     -- 바 설정
     bar = { 
-        fill_bar = false, 
+        reverse_fill = false, 
         reverse_progress = false, 
         show_spark = true,
 
@@ -222,11 +222,11 @@ function HDH_AT_ConfigDB:GetUI(trackerId)
 end
 
 function HDH_AT_ConfigDB:DeleteTracker(deleteId)
-    for idx = deleteId, #(HDH_AT_DB.tracker) - 1 do
+    for idx = deleteId, #(HDH_AT_DB.tracker)  do
+        HDH_AT_DB.tracker[idx].id = HDH_AT_DB.tracker[idx].id -1
         HDH_AT_DB.tracker[idx] = HDH_AT_DB.tracker[idx+1]
-        HDH_AT_DB.tracker[idx].id = HDH_AT_DB.tracker[idx].id - 1
+        HDH_AT_DB.ui[idx] = HDH_AT_DB.ui[idx+1]
     end
-    HDH_AT_DB.tracker[#(HDH_AT_DB.tracker)] = nil
 end
 
 function HDH_AT_ConfigDB:IsExistsTracker(id)

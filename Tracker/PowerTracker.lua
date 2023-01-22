@@ -8,16 +8,16 @@ local POWRE_BAR_SPLIT_MARGIN = 5;
 local MyClassKor, MyClass = UnitClass("player");
 
 -- local POWRE_NAME = {}
-local L_POWER_MANA = "자원:마나";
-local L_POWER_RAGE = "자원:분노"
-local L_POWER_FOCUS = "자원:집중"
-local L_POWER_ENERGY = "자원:기력"
-local L_POWER_RUNIC_POWER = "자원:룬마력"
-local L_POWER_LUNAR_POWER = "자원:천공의힘"
-local L_POWER_MAELSTROM = "자원:소용돌이"
-local L_POWER_INSANITY = "자원:광기"
-local L_POWER_FURY = "자원:격노"
-local L_POWER_PAIN = "자원:고통"
+-- local L_POWER_MANA = "자원:마나";
+-- local L_POWER_RAGE = "자원:분노"
+-- local L_POWER_FOCUS = "자원:집중"
+-- local L_POWER_ENERGY = "자원:기력"
+-- local L_POWER_RUNIC_POWER = "자원:룬마력"
+-- local L_POWER_LUNAR_POWER = "자원:천공의힘"
+-- local L_POWER_MAELSTROM = "자원:소용돌이"
+-- local L_POWER_INSANITY = "자원:광기"
+-- local L_POWER_FURY = "자원:격노"
+-- local L_POWER_PAIN = "자원:고통"
 
 local POWER_INFO = {}
 local IS_REGEN_POWER = {} -- 자동으로 리젠되는 자원인가? 비전투중일때 자원바를 보이게 할것인가 판단하는 기준이됨
@@ -119,7 +119,7 @@ HDH_TRACKER.TYPE.POWER_LUNAR = 10
 HDH_TRACKER.TYPE.POWER_MAELSTROM = 11
 HDH_TRACKER.TYPE.POWER_INSANITY = 12
 HDH_TRACKER.TYPE.POWER_FURY = 13
-HDH_TRACKER.TYPE.POWER_PAIN = 14
+HDH_TRACKER.TYPE.POWER_PAIN = 14  -- 용군단에서 삭제됨
 
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_MANA,      HDH_POWER_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_RAGE,      HDH_POWER_TRACKER)
@@ -153,7 +153,7 @@ local function HDH_POWER_OnUpdate(self)
 	local maxValue = UnitPowerMax('player', self.spell.power_index);
 	self.spell.v1 = curValue;
 	self.spell.count = math.ceil(self.spell.v1 / maxValue * 100);
-	if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
+	-- if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
 	self.counttext:SetText(format("%d%%", self.spell.count)); 
 	-- else self.counttext:SetText(nil) end
 	if self.spell.showValue then self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1)); else self.v1:SetText(nil) end
@@ -195,7 +195,7 @@ function HDH_POWER_TRACKER:UpdateBarValue(f)
 			bar = f.bar.bar[i];
 			-- bar:SetMinMaxValues(bar.mpMin, bar.mpMax);
 			if bar then 
-				bar:SetValue(self:GetAnimatedValue(bar,f.spell.v1,i)); 
+				bar:SetValue(self:GetAnimatedValue(bar, f.spell.v1, i)); 
 				-- bar:SetValue(f.spell.v1); 
 				if f:GetParent().parent.ui.bar.use_full_color then
 					if f.spell.v1 >= (bar.mpMax) then
@@ -230,28 +230,6 @@ function HDH_POWER_TRACKER:UpdateBarValue(f)
 		end
 	end
 end
-	
-local ANI_TERM = 0.2 -- second
-function HDH_POWER_TRACKER:GetAnimatedValue(bar, v) -- v:target value
-	if bar.targetValue ~= v then
-		bar.animatedStartTime = bar.preTime or GetTime();
-		bar.targetValue = v;
-	end
-	local gap = bar.targetValue - bar:GetValue();
-	local gapTime;
-	if gap ~= 0 then
-		gapTime = (GetTime() - bar.animatedStartTime);
-		if gapTime < ANI_TERM then
-			v = gap * (gapTime/ANI_TERM);
-		else
-			v = gap;
-		end
-	else
-		v = 0;
-	end
-	bar.preTime = GetTime();
-	return bar:GetValue()+ v;
-end
 
 
 function HDH_POWER_TRACKER:CreateData()
@@ -279,7 +257,7 @@ function HDH_POWER_TRACKER:CreateData()
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.location', DB.BAR_LOCATION_R)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 200)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 40)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.fill_bar', false)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_fill', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_progress', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)
 
@@ -379,9 +357,9 @@ function HDH_POWER_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
 	self.frame.icon[idx] = nil
 end
 
-function HDH_POWER_TRACKER:UpdateSetting() -- HDH_TRACKER override
-	super.UpdateSetting(self)
-end
+-- function HDH_POWER_TRACKER:UpdateSetting() -- HDH_TRACKER override
+-- 	super.UpdateSetting(self)
+-- end
 
 function HDH_POWER_TRACKER:UpdateArtBar(f) -- HDH_TRACKER override
 	local ui = self.ui
