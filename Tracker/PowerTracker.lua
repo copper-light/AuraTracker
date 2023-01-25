@@ -204,28 +204,7 @@ function HDH_POWER_TRACKER:UpdateBarValue(f)
 						bar:SetStatusBarColor(unpack(f:GetParent().parent.ui.bar.color));
 					end
 				end
-				if self.ui.bar.show_spark then
-					if bar:GetValue() >= bar.mpMax then value = 1; if bar.spark:IsShown() then bar.spark:Hide(); end
-					elseif bar:GetValue()<= bar.mpMin then value = 0; if bar.spark:IsShown() then bar.spark:Hide(); end
-					else
-						value = (bar:GetValue()-bar.mpMin)/(bar.mpMax - bar.mpMin);
-						if not bar.spark:IsShown() then bar.spark:Show(); end
-					end
-
-					if bar:GetOrientation() == "HORIZONTAL" then
-						if self.ui.bar.reverse_progress then
-							bar.spark:SetPoint("CENTER", bar,"RIGHT", -bar:GetWidth() * value, 0);
-						else
-							bar.spark:SetPoint("CENTER", bar,"LEFT", bar:GetWidth() * value, 0);
-						end
-					else
-						if self.ui.bar.reverse_progress then
-							bar.spark:SetPoint("CENTER", bar,"TOP", 0, -bar:GetHeight() * value);
-						else
-							bar.spark:SetPoint("CENTER", bar,"BOTTOM", 0, bar:GetHeight() * value);
-						end
-					end
-				end
+				self:MoveSpark(bar)
 			end
 		end
 	end
@@ -246,7 +225,7 @@ function HDH_POWER_TRACKER:CreateData()
 		DB:TrancateTrackerElements(trackerId)
 	end
 	local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, isAlways, isValue, isItem)
-	DB:SetLockTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
+	DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 
 	local maxValue = UnitPowerMax('player', POWER_INFO[self.type].power_index)
 
@@ -586,12 +565,8 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.glow = glowType
 			spell.glowCondtion = glowCondition
 			spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-
 			spell.showValue = isValue
-			-- spell.glowV1= auraList[i].GlowV1
 			spell.always = isAlways
-			-- spell.showValue = auraList[i].ShowValue -- 수치표시
-			-- spell.v1_hp =  auraList[i].v1_hp -- 수치 체력 단위표시
 			spell.v1 = 0 -- 수치를 저장할 변수
 			spell.aniEnable = true;
 			spell.aniTime = 8;
@@ -608,6 +583,7 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.remaining = 0
 			spell.overlay = 0
 			spell.endTime = 0
+			spell.startTime = 0
 			spell.is_buff = isBuff;
 			spell.isUpdate = false
 			spell.isItem =  isItem
@@ -615,9 +591,6 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 			f.icon:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
 			f.iconSatCooldown:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
 			f.iconSatCooldown:SetDesaturated(nil)
-			-- f.icon:SetDesaturated(1)
-			-- f.icon:SetAlpha(self.ui.icon.off_alpha)
-			-- f.border:SetAlpha(self.ui.icon.off_alpha)
 			self:ChangeCooldownType(f, self.ui.icon.cooldown)
 			self:SetGlow(f, false)
 			
@@ -628,8 +601,6 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 		end
 		self.frame:SetScript("OnEvent", self.OnEvent)
 		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE',"player")
-		-- self.frame:RegisterUnitEvent('UNIT_MAXPOWER',"player")
-		-- GetPowerRegen
 		self:Update()
 	else
 		self.frame:UnregisterAllEvents()

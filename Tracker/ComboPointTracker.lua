@@ -64,7 +64,8 @@ POWER_INFO[HDH_TRACKER.TYPE.POWER_COMBO_POINTS] 	= {power_type="COMBO_POINTS", 	
 POWER_INFO[HDH_TRACKER.TYPE.POWER_SOUL_SHARDS]		= {power_type="SOUL_SHARDS",	power_index = 7, 	color={201/255, 34/255, 1, 	 1}, texture = "Interface\\Icons\\inv_misc_enchantedpearlE"};
 POWER_INFO[HDH_TRACKER.TYPE.POWER_HOLY_POWER]		= {power_type="HOLY_POWER", 	power_index = 9,	color={1, 216/255, 47/255, 1}, texture = "Interface\\Icons\\INV_Misc_Gem_Pearl_04"}; -- Ability_Priest_SpiritOfTheRedeemer
 POWER_INFO[HDH_TRACKER.TYPE.POWER_CHI]				= {power_type="CHI", 			power_index = 12,	color={0, 196/255, 117/255, 1}, texture = "Interface\\Icons\\INV_Misc_Gem_Pearl_06"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES]	= {power_type="ARCANE_CHARGES",	power_index = 16,	color={0.25, 0.78, 0.92, 1}, texture = "Interface\\Icons\\Spell_Nature_WispSplode"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES]	= {power_type="ARCANE_CHARGES",	power_index = 16,	color={2/255, 60/255, 189/255, 1}, texture = "Interface\\Icons\\Spell_Nature_WispSplode"};
+
 HDH_COMBO_POINT_TRACKER.POWER = POWER_INFO;
 
 
@@ -76,20 +77,10 @@ HDH_COMBO_POINT_TRACKER.POWER = POWER_INFO;
 --PALADIN_HOLY
 --Spell_Holy_Rune
 
--- function HDH_COMBO_POINT_TRACKER:InitVariblesOption() -- HDH_TRACKER override
-	-- super.InitVariblesOption(self)
--- end
-
 local function OnUpdateBar(self)
 	if self.bar then
-		-- if self.spell.v1 > 0 then
 		self.bar:SetValue(self:GetParent().parent:GetAnimatedValue(self.bar, self:GetParent().parent.ui.bar.reverse_fill and 1 - self.spell.v1 or self.spell.v1))
-		-- else
-		-- 	self.bar:SetValue(0)
-		-- 	self.bar.targetValue = 0
-		-- end
-		self:GetParent().parent:MoveSpark(self, self.spell)
-
+		self:GetParent().parent:MoveSpark(self.bar)
 		if self:GetParent().parent.ui.bar.use_full_color then 
 			if self.bar:GetValue() == 1 then
 				self.bar:SetStatusBarColor(unpack(self:GetParent().parent.ui.bar.full_color))
@@ -98,66 +89,14 @@ local function OnUpdateBar(self)
 			end
 		end
 	end
-	-- self:MoveSpark(f, f.spell)
-	-- value = self:GetAnimatedValue(self.bar, reverse_fill and 1- f.spell.v1 or f.spell.v1)
-	-- f.bar:SetValue(value)
 end
-
-function HDH_COMBO_POINT_TRACKER:MoveSpark(f, spell)
-	if not self.ui.bar.show_spark then f.bar.spark:Hide() return end
-	-- f.bar.spark:Show()
-
-	if self.ui.bar.reverse_progress then
-		if f.bar:GetOrientation() == "HORIZONTAL" then
-			f.bar.spark:SetPoint("CENTER", f.bar,"RIGHT", -f.bar:GetWidth() * f.bar:GetValue(), 0);
-		else
-			f.bar.spark:SetPoint("CENTER", f.bar,"TOP", 0, -f.bar:GetHeight() * f.bar:GetValue())
-		end
-
-	elseif not self.ui.bar.reverse_progress then
-		if f.bar:GetOrientation() == "HORIZONTAL" then
-			f.bar.spark:SetPoint("CENTER", f.bar,"LEFT", f.bar:GetWidth() * f.bar:GetValue(), 0);
-		else
-			f.bar.spark:SetPoint("CENTER", f.bar,"BOTTOM", 0, f.bar:GetHeight() * f.bar:GetValue())
-		end
-	end
-	-- elseif self.ui.bar.reverse_progress and self.ui.bar.reverse_fill then
-	-- 	if f.bar:GetOrientation() == "HORIZONTAL" then
-	-- 		f.bar.spark:SetPoint("CENTER", f.bar,"RIGHT", -f.bar:GetWidth() * f.bar:GetValue(), 0);
-	-- 	else
-	-- 		f.bar.spark:SetPoint("CENTER", f.bar,"TOP", 0, -f.bar:GetHeight() * f.bar:GetValue())
-	-- 	end
-
-	-- else
-
-	-- end
-
-	-- if f.bar:GetOrientation() == "HORIZONTAL" then
-	-- 	f.bar.spark:SetPoint("CENTER", f.bar, 
-	-- 		self.ui.bar.reverse_progress and "RIGHT" or "LEFT", 
-	-- 		- f.bar:GetWidth() * f.bar:GetValue(), 
-	-- 		0);
-	-- else
-	-- 	f.bar.spark:SetPoint("CENTER", f.bar,"TOP", 0, -f.bar:GetHeight() * f.bar:GetValue());
-	-- end
-	
-	
-	-- else
-	-- 	if f.bar:GetOrientation() == "HORIZONTAL" then
-	-- 		f.bar.spark:SetPoint("CENTER", f.bar,"LEFT", f.bar:GetWidth() * f.bar:GetValue(), 0);
-	-- 	else
-	-- 		f.bar.spark:SetPoint("CENTER", f.bar,"BOTTOM", 0, f.bar:GetHeight() * f.bar:GetValue())
-	-- 	end
-	-- end
-end
-
 
 function HDH_COMBO_POINT_TRACKER:CreateData(elemIdx)
 	local trackerId = self.id
-	local key = POWER_INFO[self.type].power_type .. elemIdx
+	local key = self.POWER_INFO[self.type].power_type .. elemIdx
 	local id = 0
-	local name = POWER_INFO[self.type].power_type .. elemIdx
-	local texture = POWER_INFO[self.type].texture;
+	local name = self.POWER_INFO[self.type].power_type .. elemIdx
+	local texture = self.POWER_INFO[self.type].texture;
 	local isAlways = true
 	local isValue = HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type
 	local isItem = false
@@ -166,11 +105,11 @@ function HDH_COMBO_POINT_TRACKER:CreateData(elemIdx)
 	-- 	DB:TrancateTrackerElements(trackerId)
 	-- end
 	DB:SetTrackerElement(trackerId, elemIdx, key, id, name, texture, isAlways, isValue, isItem)
-	DB:SetLockTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
+	DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 10)
-	-- DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', POWER_INFO[self.type].color)
+	-- DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', self.POWER_INFO[self.type].color)
 	-- DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', false)
 	-- DB:SetTrackerValue(trackerId, 'ui.%s.bar.location', DB.BAR_LOCATION_R)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 40)
@@ -178,21 +117,21 @@ function HDH_COMBO_POINT_TRACKER:CreateData(elemIdx)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_fill', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_progress', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', POWER_INFO[self.type].color)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', self.POWER_INFO[self.type].color)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.show_spark', true)
 
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.show_name', false)
 	-- DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_BAR_L)
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_BAR_R)
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 40)
-	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', POWER_INFO[self.type].color)
+	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', self.POWER_INFO[self.type].color)
 
 	if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type then
 		DB:SetTrackerValue(trackerId, 'ui.%s.icon.cooldown', DB.COOLDOWN_RIGHT)
 		DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', true)
-		local r,g,b = unpack(POWER_INFO[self.type].color)
+		local r,g,b = unpack(self.POWER_INFO[self.type].color)
 		DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', {r,g,b, 0.35})
-		DB:SetTrackerValue(trackerId, 'ui.%s.bar.full_color', POWER_INFO[self.type].color)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.full_color', self.POWER_INFO[self.type].color)
 	end
 
 	self:UpdateSetting();
@@ -201,7 +140,7 @@ end
 function HDH_COMBO_POINT_TRACKER:IsHaveData(idx)
 	idx = idx or 1
 	local key = DB:GetTrackerElement(self.id, idx)
-	if (POWER_INFO[self.type].power_type .. idx) == key then
+	if (self.POWER_INFO[self.type].power_type .. idx) == key then
 		return true
 	else
 		return false
@@ -225,7 +164,7 @@ function HDH_COMBO_POINT_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
 end
 
 function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
-	local power_max = UnitPowerMax('player', POWER_INFO[self.type].power_index)
+	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
 	-- local max = 1;
 	-- if not self.option.base.merge_power_icon then
 	-- 	max = power_max;
@@ -246,14 +185,14 @@ function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 			iconf.spell.id = 0
 			iconf.spell.happenTime = 0;
 			iconf.spell.no = 1
-			iconf.spell.name = POWER_INFO[self.type].power_type .. i
-			iconf.spell.icon = POWER_INFO[self.type].texture
+			iconf.spell.name = self.POWER_INFO[self.type].power_type .. i
+			iconf.spell.icon = self.POWER_INFO[self.type].texture
 			iconf.spell.glow = false
 			iconf.spell.glowCount = 0
 			iconf.spell.glowV1= 0
 			iconf.spell.always = true
 			iconf.spell.showValue = true;
-			iconf.icon:SetTexture(POWER_INFO[self.type].texture);
+			iconf.icon:SetTexture(self.POWER_INFO[self.type].texture);
 			
 			iconf.spell.v1 = power_max;	
 			if (power_max) == i then
@@ -478,7 +417,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 			-- f.v1:SetText("");
 			-- end
 		else
-			if k <= UnitPowerMax('player', POWER_INFO[self.type].power_index) then 
+			if k <= UnitPowerMax('player', self.POWER_INFO[self.type].power_index) then 
 				if f.spell.always then 
 					if not f.icon:IsDesaturated() then f.icon:SetDesaturated(1) end
 					f.icon:SetAlpha(self.ui.icon.off_alpha)
@@ -524,8 +463,8 @@ function HDH_COMBO_POINT_TRACKER:Update() -- HDH_TRACKER override
 	local spell;
 	local ret = 0;
 	
-	local power = UnitPower('player', POWER_INFO[self.type].power_index, true);
-	local power_max = UnitPowerMax('player', POWER_INFO[self.type].power_index);
+	local power = UnitPower('player', self.POWER_INFO[self.type].power_index, true);
+	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index);
 
 	if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type then
 		power = power / 10
@@ -596,7 +535,7 @@ end
 function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 	if HDH_TRACKER.ENABLE_MOVE then return end
 	local ret = 0
-	local power_max = UnitPowerMax('player', POWER_INFO[self.type].power_index)
+	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
 	local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue
 	local trackerId = self.id
 	for i = 1, power_max do
@@ -625,7 +564,7 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 		spell.no = i
 		spell.name = elemName
 		spell.icon = texture
-		spell.power_index = POWER_INFO[self.type].power_index
+		spell.power_index = self.POWER_INFO[self.type].power_index
 		-- if not auraList[i].defaultImg then auraList[i].defaultImg = texture; 
 		-- elseif auraList[i].defaultImg ~= auraList[i].texture then spell.fix_icon = true end
 		spell.id = tonumber(elemId)
@@ -675,11 +614,11 @@ end
 
 function HDH_COMBO_POINT_TRACKER:OnEvent(event, unit, powerType)
 	if self == nil or self.parent == nil then return end
-	if (event == "UNIT_POWER_UPDATE" ) and (POWER_INFO[self.parent.type].power_type == powerType) then 
+	if (event == "UNIT_POWER_UPDATE" ) and (self.parent.POWER_INFO[self.parent.type].power_type == powerType) then 
 		if not HDH_TRACKER.ENABLE_MOVE then
 			self.parent:Update()
 		end
-	elseif (event == 'UNIT_MAXPOWER') and (POWER_INFO[self.parent.type].power_type == powerType) then
+	elseif (event == 'UNIT_MAXPOWER') and (self.parent.POWER_INFO[self.parent.type].power_type == powerType) then
 		if not HDH_TRACKER.ENABLE_MOVE then
 			self.parent:InitIcons()
 		end

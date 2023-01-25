@@ -233,7 +233,7 @@ function HDH_AT_ConfigDB:IsExistsTracker(id)
     return HDH_AT_DB.tracker[id] and true or false
 end
 
-function HDH_AT_ConfigDB:HasTransit(transitId)
+function HDH_AT_ConfigDB:HasTraits(transitId)
     for i, tracker in ipairs(HDH_AT_DB.tracker) do
         if UTIL.HasValue(tracker.transit, transitId) then
             return true
@@ -304,7 +304,7 @@ function HDH_AT_ConfigDB:GetUnusedTrackerIds()
     return ret --tracker.id, tracker.name, tracker.type, tracker.unit, tracker.aura_type
 end
 
-function HDH_AT_ConfigDB:GetTrackerIdsByTransits(talentId, transitId)
+function HDH_AT_ConfigDB:GetTrackerIdsByTraitss(talentId, transitId)
     local ret = {}
     for i, tracker in ipairs(HDH_AT_DB.tracker) do
         if UTIL.HasValue(tracker.transit, talentId) or UTIL.HasValue(tracker.transit, transitId) then
@@ -367,15 +367,15 @@ function HDH_AT_ConfigDB:DeleteTrackerElement(trackerId, elementIndex)
     HDH_AT_DB.tracker[trackerId].element[size] = nil
 end
 
-function HDH_AT_ConfigDB:SetLockTrackerElement(trackerId, elementIndex, lock)
+function HDH_AT_ConfigDB:SetReadOnlyTrackerElement(trackerId, elementIndex, readOnly)
     if HDH_AT_DB.tracker[trackerId].element[elementIndex] then
-        HDH_AT_DB.tracker[trackerId].element[elementIndex].lock = lock or true
+        HDH_AT_DB.tracker[trackerId].element[elementIndex].readOnly = readOnly or true
     end
 end
 
-function HDH_AT_ConfigDB:IsLockedTrackerElement(trackerId, elementIndex)
+function HDH_AT_ConfigDB:IsReadOnlyTrackerElement(trackerId, elementIndex)
     if HDH_AT_DB.tracker[trackerId].element[elementIndex] then
-        return HDH_AT_DB.tracker[trackerId].element[elementIndex].lock or false
+        return HDH_AT_DB.tracker[trackerId].element[elementIndex].readOnly or false
     end
     return false
 end
@@ -504,7 +504,7 @@ function HDH_AT_ConfigDB:ClearTracker(trackerId)
     HDH_AT_DB.ui[trackerId] = nil
 end
 
-function HDH_AT_ConfigDB:CheckTransitDB()
+function HDH_AT_ConfigDB:CheckTraitsDB()
 	local idx = 1
     local ids = self:GetTrackerIds()
     for _, id in ipairs(ids) do

@@ -1,4 +1,5 @@
 HDH_AT_UTIL = {}
+
 do 
 	HDH_AT_UTIL.SpellCache = setmetatable({}, {
 		__index=function(t,v) 
@@ -19,6 +20,22 @@ do
 		end
 	
 		return false
+	end
+
+
+	function HDH_AT_UTIL.GetTraitsName(id)
+		local transitName = nil
+		if id then
+			local info = C_Traits.GetConfigInfo(id)
+			if not info then
+				if GetSpecializationInfoByID(id) then
+					transitName = HDH_AT_L.ALWAYS_USE
+				end
+			else
+				transitName = info.name
+			end
+		end
+		return transitName
 	end
 
 	function HDH_AT_UTIL.GetInfo(value, isItem)

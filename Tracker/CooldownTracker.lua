@@ -181,9 +181,8 @@ local function CT_UpdateCooldown(f, elapsed)
 			end
 		end
 		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and spell.duration > HDH_C_TRACKER.GlobalCooldown then
-			local minV, maxV = f.bar:GetMinMaxValues();
-			f.bar:SetValue(tracker.ui.bar.reverse_fill and (maxV-spell.remaining) or (spell.remaining));
-			tracker:MoveSpark(tracker, f, spell);
+			f.bar:SetValue(tracker.ui.bar.reverse_fill and (select(2,f.bar:GetMinMaxValues())-spell.remaining) or (spell.remaining));
+			tracker:MoveSpark(f.bar);
 		end
 	elseif tracker.type == HDH_TRACKER.TYPE.COOLDOWN then
 		if( tracker:Update_Icon(f)) or (not tracker.ui.common.always_show and not UnitAffectingCombat("player")) then
@@ -397,7 +396,7 @@ function HDH_C_TRACKER:Update_Usable(f)
 			if not desaturation_not_mana then
 				f.icon:SetVertexColor(unpack(not_enough_mana_color))
 				f.iconSatCooldown:SetVertexColor(unpack(not_enough_mana_color))
-				f.icon:SetDesaturated(nil);
+				f.icon:SetDesaturated(nil)
 			else
 				f.icon:SetDesaturated(1);
 			end
@@ -430,6 +429,9 @@ function HDH_C_TRACKER:Update_Usable(f)
 			f.icon:SetAlpha(self.ui.icon.on_alpha)
 			f.border:SetAlpha(self.ui.icon.on_alpha)
 			f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
+		else
+			f.icon:SetAlpha(self.ui.icon.off_alpha)
+			f.border:SetAlpha(self.ui.icon.off_alpha)
 		end
 	end
 	return isUpdate
@@ -831,7 +833,7 @@ end
 
 function HDH_C_TRACKER:UpdateIcons() -- HDH_TRACKER override
 	local isUpdateLayout = false
-	if not self.frame.icon then return end
+	if not self.frame or not self.frame.icon then return end
 	for i = 1 , #self.frame.icon do
 		isUpdateLayout = self:Update_Icon(self.frame.icon[i]) -- icon frame
 	end

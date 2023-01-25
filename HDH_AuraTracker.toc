@@ -24,6 +24,8 @@ Tracker\TotemTracker.lua
 Tracker\PowerTracker.lua
 Tracker\ComboPointTracker.lua
 Tracker\DKRuneTracker.lua
+Tracker\EssenceTracker.lua
+#Tracker\StaggerTracker.lua
 
 lib\LibCompress\LibStub.lua
 lib\LibCompress\LibCompress.lua

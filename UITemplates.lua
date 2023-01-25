@@ -60,7 +60,7 @@ HDH_AT_AuraRowMixin.MODE = {}
 HDH_AT_AuraRowMixin.MODE.EMPTY = 1
 HDH_AT_AuraRowMixin.MODE.DATA = 2
 
-function HDH_AT_AuraRowMixin:Set(no, key, id, name, texture, always, glow, value, isItem)
+function HDH_AT_AuraRowMixin:Set(no, key, id, name, texture, always, glow, value, isItem, readOnly)
 	_G[self:GetName().."ButtonIcon"]:SetNormalTexture(texture or 0)
 	_G[self:GetName().."ButtonIcon"]:GetNormalTexture():SetTexCoord(0.08, 0.92, 0.08, 0.92);
 	_G[self:GetName().."TextNum"]:SetText(no)
@@ -71,8 +71,8 @@ function HDH_AT_AuraRowMixin:Set(no, key, id, name, texture, always, glow, value
     _G[self:GetName().."CheckButtonGlow"]:SetChecked(glow)
 	_G[self:GetName().."EditBoxID"]:SetText(id or key or "")
 	_G[self:GetName().."CheckButtonIsItem"]:SetChecked(isItem)
-    self.id = id
-    self.isItem = isItem
+    self.tmp_id = id
+	self.tmp_chk = isItem
 	-- _G[rowFrame:GetName().."ButtonAdd"]:SetText("삭제")
 	-- _G[rowFrame:GetName().."ButtonAddAndDel"]:SetText("등록")
 	_G[self:GetName().."EditBoxID"]:ClearFocus() -- ButtonAddAndDel 의 값때문에 순서 굉장히 중요함
@@ -80,7 +80,8 @@ function HDH_AT_AuraRowMixin:Set(no, key, id, name, texture, always, glow, value
     _G[self:GetName().."CheckButtonAlways"]:Show()
     _G[self:GetName().."CheckButtonGlow"]:Show()
     _G[self:GetName().."CheckButtonValue"]:Show()
-    _G[self:GetName().."ButtonSet"]:Hide()
+    _G[self:GetName().."ButtonSet"]:Show()
+    self.readOnly = readOnly or false
     self.mode = HDH_AT_AuraRowMixin.MODE.DATA
 end
 
@@ -121,11 +122,11 @@ function HDH_AT_AuraRowMixin:Clear()
     _G[self:GetName().."CheckButtonAlways"]:Hide()
     _G[self:GetName().."CheckButtonGlow"]:Hide()
     _G[self:GetName().."CheckButtonValue"]:Hide()
-    
     _G[self:GetName().."ButtonSet"]:Hide()
     self.mode = HDH_AT_AuraRowMixin.MODE.EMPTY
     self.tmp_id = nil
 	self.tmp_chk = false
+    self.readOnly = false
 end
 -- function HDH_AT_AuraRowMixin:SetHandler(func_OnEnterPressed, func_OnClick)
 --     _G[self:GetName().."ButtonAdd"]:SetScript("OnClick", func_OnClick)
@@ -136,10 +137,6 @@ function HDH_AT_AuraRowMixin:ChangeReadMode()
     if self.timer then
         self.timer:Cancel()
     end
-
-    self.tmp_id = nil
-	self.tmp_chk = false
-
     _G[self:GetName().."EditBoxID"]:Hide()
     _G[self:GetName().."TextID"]:Hide()
 
@@ -147,7 +144,7 @@ function HDH_AT_AuraRowMixin:ChangeReadMode()
         _G[self:GetName().."CheckButtonAlways"]:Show()
         _G[self:GetName().."CheckButtonGlow"]:Show()
         _G[self:GetName().."CheckButtonValue"]:Show()
-        _G[self:GetName().."ButtonSet"]:Hide()
+        _G[self:GetName().."ButtonSet"]:Show()
         _G[self:GetName().."TextName"]:Show()
     else
         self:SetText("")
@@ -157,8 +154,8 @@ function HDH_AT_AuraRowMixin:ChangeReadMode()
     _G[self:GetName().."ButtonAdd"]:Hide()
     _G[self:GetName().."ButtonDel"]:Hide()
     _G[self:GetName().."ButtonCancel"]:Hide()
-    _G[self:GetName().."CheckButtonIsItem"]:SetChecked(self.isItem)
-    _G[self:GetName().."EditBoxID"]:SetText(self.id or "")
+    _G[self:GetName().."CheckButtonIsItem"]:SetChecked(self.tmp_chk)
+    _G[self:GetName().."EditBoxID"]:SetText(self.tmp_id or "")
 end
 
 function HDH_AT_OnClickIsItem(self)
@@ -180,8 +177,6 @@ function HDH_AT_OnEditFocusGained(self)
 	else
 		btn:SetText(L.EDIT)
 	end
-	self.tmp_id = self:GetText()
-	self.tmp_chk = chk:GetChecked()
 	--self:SetWidth(EDIT_WIDTH_L)
     
     if self:GetParent().mode == HDH_AT_AuraRowMixin.MODE.DATA then
@@ -216,6 +211,16 @@ function HDH_AT_OnEditEscape(self)
 	self:SetText(self.tmp_id or "")
 	self:ClearFocus()
     self:GetParent():ChangeReadMode()
+end
+
+function HDH_AT_OnClickRowFrame(self)
+    if not self.readOnly then
+        _G[self:GetName().."TextID"]:Hide()
+        _G[self:GetName().."TextName"]:Hide()
+        _G[self:GetName().."CheckButtonIsItem"]:Show()
+        _G[self:GetName().."EditBoxID"]:Show()
+        _G[self:GetName().."EditBoxID"]:SetFocus()
+    end
 end
 
 -- function HDH_OnEnterPressed(self)
@@ -325,13 +330,13 @@ HDH_AT_DropDownMixin = {
 
 function HDH_AT_DropDown_OnEnteredItem(self)
     local dropdownBtn = self:GetParent():GetParent()
-    -- dropdownBtn:SetSelectIdx(self.idx, true)
+    -- dropdownBtn:SetSelectedIndex(self.idx, true)
     dropdownBtn.onEnterHandler(dropdownBtn, self, self.idx, self.value)
 end
 
 function HDH_AT_DropDown_OnSelectedItem(self)
     local dropdownBtn = self:GetParent():GetParent()
-    dropdownBtn:SetSelectIdx(self.idx)
+    dropdownBtn:SetSelectedIndex(self.idx)
     dropdownBtn.onClickHandler(dropdownBtn, self, self.idx, self.value)
 end
 
@@ -348,6 +353,31 @@ function HDH_AT_DropDown_OnCheckButon(self)
 
     dropdownBtn.onClickHandler(dropdownBtn, self:GetParent(), self:GetParent().idx, self:GetParent().value)
 end
+
+function HDH_AT_DropDownMixin:GetIndex(value)
+    local listFrame = _G[self:GetName().."List"]
+    local items = self.item
+    local ret
+    if self.multiSelector then
+        ret = {}
+        for i, item in ipairs(items) do
+            if item.CheckButton and item.CheckButton:GetChecked() then
+                if item.value == value then
+                    ret[#ret + 1] = i
+                end
+            end
+        end
+        return ret
+    else
+        for i, item in ipairs(items) do
+            if item.value == value then
+                return i
+            end
+        end
+    end
+    return nil
+end
+
 
 function HDH_AT_DropDownMixin:GetSelectedValue()
 
@@ -429,17 +459,7 @@ function HDH_AT_DropDownMixin:SelectClear()
     end
 end
 
-function HDH_AT_DropDownMixin:GetValue(idx)
-    local items = self.item
-    print(items[idx], "idx", idx, items[idx].value)
-    if items[idx] then
-        return items[idx].value
-    else
-        return nil
-    end
-end
-
-function HDH_AT_DropDownMixin:SetSelectValue(value)
+function HDH_AT_DropDownMixin:SetSelectedValue(value)
     local listFrame = _G[self:GetName().."List"]
     local items = self.item
     if self.multiSelector then
@@ -461,7 +481,7 @@ function HDH_AT_DropDownMixin:SetSelectValue(value)
         local idx = nil
         for i, item in ipairs(items) do
             if item.value == value then
-                self:SetSelectIdx(i)
+                self:SetSelectedIndex(i)
                 idx = i
                 break
             end
@@ -471,7 +491,7 @@ function HDH_AT_DropDownMixin:SetSelectValue(value)
     end
 end
 
-function HDH_AT_DropDownMixin:SetSelectIdx(idx, show)
+function HDH_AT_DropDownMixin:SetSelectedIndex(idx, show)
     local listFrame = _G[self:GetName().."List"]
     local items = self.item
     show = show or false

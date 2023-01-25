@@ -404,7 +404,7 @@ do
 				elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 				glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
 
-				-- if not self:IsIgnoreSpellByTalentSpell(auraList[i]) then
+				-- if not self:IsIgnoreSpellByTalentSpell(elemId) then
 				iconIdx = iconIdx + 1
 				f = self.frame.icon[iconIdx]
 				if f:GetParent() == nil then f:SetParent(self.frame) end
@@ -484,22 +484,6 @@ do
 		
 		self:Update()
 		return iconIdx;
-	end
-
-	function HDH_AURA_TRACKER:IsIgnoreSpellByTalentSpell(DB_Spell)
-		local ret = false;
-		if not DB_Spell then return true end
-		if DB_Spell.Ignore and DB_Spell.Ignore[1] then
-			local name = DB_Spell.Ignore[1].Spell;
-			local show = DB_Spell.Ignore[1].Show;
-			local selected = HDH_AT_UTIL.IsTalentSpell(name); -- true / false / nil: not found talent
-			if selected == true then
-				ret = (not show);
-			elseif selected == false then
-				ret = show;
-			end
-		end
-		return ret;
 	end
 
 	function HDH_AURA_TRACKER:PLAYER_ENTERING_WORLD()

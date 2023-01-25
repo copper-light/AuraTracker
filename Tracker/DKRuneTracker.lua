@@ -12,10 +12,12 @@ HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_RUNE, HDH_DK_RUNE_TRACKER)
 local POWER_INFO = {}
 POWER_INFO[HDH_TRACKER.TYPE.POWER_RUNE] 	= {power_type="RUNE", 	power_index = 5,	color={1.00, 0.50, 0.25}, texture = "Interface\\Icons\\Spell_Deathknight_FrostPresence"};
 
+
 local super = HDH_C_TRACKER
 setmetatable(HDH_DK_RUNE_TRACKER, super) -- 상속
 HDH_DK_RUNE_TRACKER.__index = HDH_DK_RUNE_TRACKER
 HDH_DK_RUNE_TRACKER.className = "HDH_DK_RUNE_TRACKER"
+HDH_DK_RUNE_TRACKER.POWER_INFO = POWER_INFO
 	
 -- 매 프레임마다 bar frame 그려줌, 콜백 함수
 local function DK_OnUpdateCooldown(self)
@@ -40,21 +42,22 @@ end
 
 function HDH_DK_RUNE_TRACKER:CreateData()
 	local trackerId = self.id
-	local key = POWER_INFO[self.type].power_type
+	local key = self.POWER_INFO[self.type].power_type
 	local id = 0
-	local name = POWER_INFO[self.type].power_type
-	local texture = POWER_INFO[self.type].texture;
+	local name = self.POWER_INFO[self.type].power_type
+	local texture = self.POWER_INFO[self.type].texture;
 	local isAlways = true
 	local isValue = false
 	local isItem = false
-	
+	local r,g,b,a = unpack(self.POWER_INFO[self.type].color)
+
 	if DB:GetTrackerElementSize(trackerId) > MAX_RUNES then
 		DB:TrancateTrackerElements(trackerId)
 	end
 
 	for i = 1 , MAX_RUNES do
 		local elemIdx = DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, isAlways, isValue, isItem)
-		DB:SetLockTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
+		DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 	end 
 
 	DB:CopyGlobelToTracker(trackerId)
@@ -64,18 +67,16 @@ function HDH_DK_RUNE_TRACKER:CreateData()
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 40)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_fill', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_progress', false)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)	
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.show_spark', true)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', true)
-	local r,g,b = unpack(POWER_INFO[self.type].color)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', {r,g,b, 0.35})
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.full_color', POWER_INFO[self.type].color)
-
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.full_color', self.POWER_INFO[self.type].color)
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.show_name', false)
 	-- DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_BAR_L)
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_BAR_R)
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 40)
-	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', POWER_INFO[self.type].color)
+	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', self.POWER_INFO[self.type].color)
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.cooldown', DB.COOLDOWN_RIGHT)
 
 	self:UpdateSetting();
@@ -84,7 +85,7 @@ end
 function HDH_DK_RUNE_TRACKER:IsHaveData()
 	for i = 1 , MAX_RUNES do
 		local key = DB:GetTrackerElement(self.id, i)
-		if (POWER_INFO[self.type].power_type .. i) ~= key then
+		if (self.POWER_INFO[self.type].power_type .. i) ~= key then
 			return false
 		end
 	end 
@@ -248,19 +249,16 @@ function HDH_DK_RUNE_TRACKER:UpdateRune(runeIndex, isEnergize)
 			spell.endTime = 0
 			spell.remaining = 0 
 		end
-		if spell.startTime > spell.endTime then
-			print("!!!!!!!!!!!", spell.startTime , spell.endTime)
-		end
 	end
 	return ret;
 end
 
-function HDH_DK_RUNE_TRACKER:UpdateRuneType(runeIndex)
-	local runeType = GetRuneType(runeIndex)
-	local iconf = self.frame.pointer[runeIndex]
-	if not iconf then return end
-	iconf.spell.type = runeType
-end
+-- function HDH_DK_RUNE_TRACKER:UpdateRuneType(runeIndex)
+-- 	local runeType = GetRuneType(runeIndex)
+-- 	local iconf = self.frame.pointer[runeIndex]
+-- 	if not iconf then return end
+-- 	iconf.spell.type = runeType
+-- end
 
 function HDH_DK_RUNE_TRACKER:Update() -- HDH_TRACKER override
 	if not self.frame or HDH_TRACKER.ENABLE_MOVE then return end
@@ -321,7 +319,7 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 		spell.no = i
 		spell.name = elemName
 		spell.icon = texture
-		spell.power_index = POWER_INFO[self.type].power_index
+		spell.power_index = self.POWER_INFO[self.type].power_index
 		-- if not auraList[i].defaultImg then auraList[i].defaultImg = texture; 
 		-- elseif auraList[i].defaultImg ~= auraList[i].texture then spell.fix_icon = true end
 		spell.id = tonumber(elemId)
@@ -364,7 +362,7 @@ end
 
 function HDH_DK_RUNE_TRACKER:OnEvent(event, ...)
 	if not self.parent then return end
-	if ( event == "RUNE_POWER_UPDATE" ) then
+	if ( event == "RUNE_POWER_UPDATE" ) then	
 		local runeIndex, isEnergize = ...;
 		if runeIndex and runeIndex >= 1 and runeIndex <= MAX_RUNES then
 			-- self.parent:UpdateRune(runeIndex, isEnergize)

@@ -746,14 +746,7 @@
 			<OnLoad>
 				_G[self:GetName().."RowDesc"]:SetText(HDH_AT_L.CLICK_TO_ADD)
 			</OnLoad>
-			<OnClick>
-				_G[self:GetName().."TextID"]:Hide()
-				_G[self:GetName().."TextName"]:Hide()
-				_G[self:GetName().."CheckButtonIsItem"]:Show()
-				_G[self:GetName().."EditBoxID"]:Show()
-				_G[self:GetName().."EditBoxID"]:SetFocus()
-				
-			</OnClick>
+			<OnClick function="HDH_AT_OnClickRowFrame" />
 			<OnEnter>
 				<!-- if _G[self:GetName().."TextID"]:GetText() then
 					local c = _G[self:GetName().."CheckButtonIsItem"]:GetChecked()
