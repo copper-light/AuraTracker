@@ -1131,7 +1131,6 @@ function HDH_AT_SwitchFrameTemplateMixin:Init(itemList, onChangedHandler)
             self.list[index] = CreateFrame("Button", self:GetName()..index, self, "HDH_AT_SwitchItemFrameTemplate")
             self.list[index]:SetScript("OnClick", function(btn)
                 btn:GetParent():SetSelectedIndex(btn.index)
-                print(btn:GetParent().onChangedHandler)
                 if btn:GetParent().onChangedHandler then
                     btn:GetParent().onChangedHandler(btn:GetParent(), btn, btn.index, btn.index)
                 end

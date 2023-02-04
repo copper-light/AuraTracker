@@ -900,7 +900,6 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 		end
 
 	elseif self == F.BODY.CONFIG_UI.SW_DISPLAY_MODE then
-		print("HI")
 		main:UpdateAbleConfigs(value)
 		HDH_TRACKER.UpdateSettings(main:GetCurTrackerId())
 

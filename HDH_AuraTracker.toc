@@ -2,7 +2,7 @@
 ## Title: HDH_AuraTracker
 ## Author: hdh
 ## Notes: 설정창 명령어 /at, /auratracker
-## Version: 10.0.5.01
+## Version: 10.0.5.02
 ## SavedVariables: DB_PROFILE, HDH_AT_PROFILE
 ## SavedVariablesPerCharacter: HDH_AT_DB
 
