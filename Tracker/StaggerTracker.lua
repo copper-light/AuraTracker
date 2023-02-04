@@ -3,12 +3,14 @@ local DB = HDH_AT_ConfigDB
 local STAGGER_KEY = "STAGGER"
 local STAGGER_RED_TRANSITION = _G.STAGGER_RED_TRANSITION   -- wow global var : 0.6
 local STAGGER_YELLOW_TRANSITION = _G.STAGGER_YELLOW_TRANSITION -- wow global var : 0.3
-local STAGGER_INFO = {
-	green_texture = "Interface\\Icons\\Priest_icon_Chakra_green", green_color  = {info[STAGGER_GREEN_INDEX].r, info[STAGGER_GREEN_INDEX].g, info[STAGGER_GREEN_INDEX].b},
-	yellow_texture = "Interface\\Icons\\Priest_icon_Chakra", 	 yellow_color = {info[STAGGER_YELLOW_INDEX].r, info[STAGGER_YELLOW_INDEX].g, info[STAGGER_YELLOW_INDEX].b},
-	red_texture = "Interface\\Icons\\Priest_icon_Chakra_red",     red_color    = {info[STAGGER_RED_INDEX].r, info[STAGGER_RED_INDEX].g, info[STAGGER_RED_INDEX].b},
+local info = PowerBarColor[STAGGER_KEY]
+HDH_STAGGER_TRACKER.POWER_INFO = {
+	{ texture = "Interface/Icons/Priest_icon_Chakra_green", color = {info[STAGGER_GREEN_INDEX].r, info[STAGGER_GREEN_INDEX].g, info[STAGGER_GREEN_INDEX].b, 1}},
+	{ texture = "Interface/Icons/Priest_icon_Chakra", 	    color = {info[STAGGER_YELLOW_INDEX].r, info[STAGGER_YELLOW_INDEX].g, info[STAGGER_YELLOW_INDEX].b, 1}},
+	{ texture = "Interface/Icons/Priest_icon_Chakra_red",   color = {info[STAGGER_RED_INDEX].r, info[STAGGER_RED_INDEX].g, info[STAGGER_RED_INDEX].b, 1},}
 }
 
+ 
 ------------------------------------
 -- HDH_STAGGER_TRACKER class
 ------------------------------------
@@ -23,7 +25,7 @@ HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.STAGGER, HDH_STAGGER_TRACKER)
 local function STAGGER_TRACKER_OnUpdate(self)
 	self.spell.curTime = GetTime()
 	
-	if self.spell.curTime - (self.spell.delay or 0) < 0.02  then return end 
+	if self.spell.curTime - (self.spell.delay or 0) < HDH_TRACKER.BAR_UP_ANI_TERM then return end 
 	self.spell.delay = self.spell.curTime
 	local curValue = UnitStagger('player') or 0;
 	local health_max = UnitHealthMax("player");
@@ -32,17 +34,17 @@ local function STAGGER_TRACKER_OnUpdate(self)
 	-- if (tonumber(self.v1:GetText()) or 0) == curValue then return; end
 	self.spell.v1 = curValue;
 	self.spell.count = (per * 100)
-	self.counttext:SetText(format("%d%%", math.ceil(self.spell.count))); 
+	self.counttext:SetText(format("%d%%", math.ceil(self.spell.count or 0))); 
 	
 	if per > STAGGER_RED_TRANSITION then
-		self.icon:SetTexture(HDH_STAGGER_TRACKER.STAGGER.red_texture);
+		self.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[3].texture);
 	elseif per > STAGGER_YELLOW_TRANSITION then
-		self.icon:SetTexture(HDH_STAGGER_TRACKER.STAGGER.yellow_texture);
+		self.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[2].texture);
 	else
-		self.icon:SetTexture(HDH_STAGGER_TRACKER.STAGGER.green_texture);
+		self.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[1].texture);
 	end
 	
-	if self.spell.showValue then self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1,true)); else self.v1:SetText(nil) end
+	if self.spell.showValue then self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1, self:GetParent().parent.ui.font.v1_abbreviate)); else self.v1:SetText(nil) end
 	
 	-- if self.bar then self.bar:SetValue(self.spell.v1); end
 	
@@ -57,13 +59,18 @@ local function STAGGER_TRACKER_OnUpdate(self)
 			self.spell.isOn = false;
 		end
 	end
-	
-	self:GetParent().parent:SetGlow(self, true);
-	
 	if self.bar and self.bar.max ~= health_max then
-		self:GetParent().parent:UpdateBar(self, health_max);
+		for i = 1, #self.spell.splitValues do
+			self.bar.bar[i].mpMax = self.spell.splitValues[i] or health_max;
+			self.bar.bar[i].mpMin = self.spell.splitValues[i-1] or 0;
+			-- local gap = self.bar.bar[i].mpMax - self.bar.bar[i].mpMin;
+			self.bar.bar[i]:SetMinMaxValues(self.bar.bar[i].mpMin, self.bar.bar[i].mpMax);
+		end
+		self:GetParent().parent:UpdateBarValue(self, true);	
+	else
+		self:GetParent().parent:UpdateBarValue(self, false);
 	end
-	self:GetParent().parent:UpdateBarValue(self);
+	self:GetParent().parent:SetGlow(self, true);
 end
 
 -- STAGGER_YELLOW_TRANSITION = .30
@@ -109,60 +116,61 @@ end
 -- end
 
 function HDH_STAGGER_TRACKER:UpdateBar(f, barMax)
-	local value = math.floor((barMax or UnitHealthMax("player"))*0.3);
-	if not self:IsHaveData(self:GetSpec()) or not f.bar or not DB_AURA.Talent[self:GetSpec()][self.name][1] then return end
-	DB_AURA.Talent[self:GetSpec()][self.name][1].split_bar = {value, value*2};
-	super.UpdateBar(self, f, UnitHealthMax("player"));
+	if f.spell then
+		local value = math.floor((barMax or UnitHealthMax("player")) * 0.3);
+		f.spell.split_bar = {value, value*2};
+		super.UpdateBar(self, f, UnitHealthMax("player"));
+	end
 end
 
-function HDH_STAGGER_TRACKER:CreateData(spec)
-	if spec and DB_AURA.Talent[spec] then
-		local new = {}		
-		new.Key = HDH_STAGGER_KEY;
-		new.Name = TrackerTypeName;
-		new.Texture = self.STAGGER.green_texture;
-		new.defaultImg = new.Texture;
-		new.ShowValue = true;
-		new.No = 1
-		new.ID = 0
-		new.Always = true;
-		new.Glow = false;
-		new.IsItem = false;
-		DB_AURA.Talent[spec][self.name][1] = new;
-		
-		if not DB_OPTION[self.name].use_each then
-			DB_OPTION[self.name].icon = HDH_AT_UTIL.CheckToUpdateDB(DB_OPTION.icon, DB_OPTION[self.name].icon);
-			DB_OPTION[self.name].font = HDH_AT_UTIL.CheckToUpdateDB(DB_OPTION.font, DB_OPTION[self.name].font);
-			DB_OPTION[self.name].bar = HDH_AT_UTIL.CheckToUpdateDB(DB_OPTION.bar, DB_OPTION[self.name].bar);
-			self.option.icon = DB_OPTION[self.name].icon
-			self.option.font = DB_OPTION[self.name].font
-			self.option.bar = DB_OPTION[self.name].bar;
-		end
-		DB_OPTION[self.name].use_each = true;
-		DB_OPTION[self.name].bar.enable = true;
-		DB_OPTION[self.name].bar.color = {unpack(self.STAGGER.green_color)};
-		DB_OPTION[self.name].bar.full_color = {unpack(self.STAGGER.red_color)};
-		DB_OPTION[self.name].bar.use_full_color = true;
-		DB_OPTION[self.name].bar.location = HDH_TRACKER.BAR_LOCATION_R;
-		DB_OPTION[self.name].bar.height = 30
-		DB_OPTION[self.name].bar.width = 200
-		DB_OPTION[self.name].bar.show_name = false;
-		DB_OPTION[self.name].icon.hide_icon = false;
-		DB_OPTION[self.name].icon.size = 30;
-		DB_OPTION[self.name].font.count_location = HDH_TRACKER.FONT_LOCATION_BAR_L;
-		DB_OPTION[self.name].font.v1_location = HDH_TRACKER.FONT_LOCATION_BAR_R;
+function HDH_STAGGER_TRACKER:CreateData()
+	local trackerId = self.id
+	local key = STAGGER_KEY 
+	local id = 0
+	local name = STAGGER_KEY
+	local texture = HDH_STAGGER_TRACKER.POWER_INFO[1].texture;
+	local isAlways = true
+	local isValue = true
+	local isItem = false
+
+	if DB:GetTrackerElementSize(trackerId) > 0 then
+		DB:TrancateTrackerElements(trackerId)
 	end
+	local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, isAlways, isValue, isItem)
+	DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
+	DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_COUNT, DB.CONDITION_GT, 59)
+
+	DB:CopyGlobelToTracker(trackerId)
+	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON_AND_BAR)
+	-- DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', HDH_STAGGER_TRACKER.POWER_INFO[self.type].color)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', true)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.location', DB.BAR_LOCATION_R)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 200)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_fill', false)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_progress', false)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', HDH_STAGGER_TRACKER.POWER_INFO[1].color)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.full_color', HDH_STAGGER_TRACKER.POWER_INFO[3].color)
+
+	DB:SetTrackerValue(trackerId, 'ui.%s.font.show_name', false)
+	DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_BAR_L)
+	DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_BAR_R)
+	DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_abbreviate', false)
+
+	DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 30)
+	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', {0, 0, 0, 1})
+	-- DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', HDH_STAGGER_TRACKER.POWER_INFO[self.type].color)
 	self:UpdateSetting();
 end
 
 function HDH_STAGGER_TRACKER:IsHaveData(spec)
-	if spec and DB_AURA.Talent[spec] then
-		local data = DB_AURA.Talent[spec][self.name][1];
-		if data and string.find(data.Key, HDH_STAGGER_KEY) then
-			return 1;
-		end
+	local key = DB:GetTrackerElement(self.id, 1)
+	if (STAGGER_KEY) == key then
+		return true
+	else
+		return false
 	end
-	return false;
 end
 
 function HDH_STAGGER_TRACKER:CreateDummySpell(count)
@@ -191,6 +199,8 @@ function HDH_STAGGER_TRACKER:CreateDummySpell(count)
 	spell.showValue = true
 	spell.v1 = health_max
 	spell.max = health_max;
+	spell.splitValues = f.spell.splitValues
+
 	f.cd:Hide();
 	if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 		f:SetScript("OnUpdate",nil);
@@ -260,7 +270,7 @@ function HDH_STAGGER_TRACKER:Update() -- HDH_TRACKER override
 		self:UpdateIcons()
 		if f.spell.v1 > 0 then show = true end
 	end
-	if HDH_TRACKER.ENABLE_MOVE or UnitAffectingCombat("player") or show then
+	if HDH_TRACKER.ENABLE_MOVE or UnitAffectingCombat("player") or show or self.ui.common.always_show then
 		self:ShowTracker();
 	else
 		self:HideTracker();
@@ -277,7 +287,7 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 		return 
 	end
 
-	local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue
+	local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue, splitValues
 	local elemSize = DB:GetTrackerElementSize(trackerId)
 	local spell 
 	local f
@@ -296,7 +306,8 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 		for i = 1 , elemSize do
 			elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 			glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
-			
+			splitValues = DB:GetTrackerElementSplitValues(trackerId, i)
+
 			iconIdx = iconIdx + 1
 			f = self.frame.icon[iconIdx]
 			if f:GetParent() == nil then f:SetParent(self.frame) end
@@ -314,7 +325,7 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.no = i
 			spell.name = elemName
 			spell.icon = texture
-			spell.power_index = POWER_INFO[self.type].power_index
+			-- spell.power_index = POWER_INFO[self.type].power_index
 			-- if not auraList[i].defaultImg then auraList[i].defaultImg = texture; 
 			-- elseif auraList[i].defaultImg ~= auraList[i].texture then spell.fix_icon = true end
 			spell.id = tonumber(elemId)
@@ -328,13 +339,13 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.isUpdate = false
 			spell.isItem =  isItem
 			spell.showPer = true;
-
-
 			spell.max = UnitHealthMax("player");
 			if f.bar then
 				f.bar.max = UnitHealthMax("player");
 				self:UpdateBar(f, f.bar.max);
 			end
+
+			spell.splitValues = { spell.max * STAGGER_YELLOW_TRANSITION, spell.max * STAGGER_RED_TRANSITION }
 		
 			f.cooldown1:Hide()
 			f.cooldown2:Hide()
@@ -344,12 +355,12 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 			f:SetScript("OnUpdate", STAGGER_TRACKER_OnUpdate)
 			f:Hide();
 			self:SetGlow(f, false)
+			self:UpdateArtBar(f)
+		end
 		
 		-- self.frame:SetScript("OnEvent", self.OnEvent)
-		-- self.frame:RegisterUnitEvent('UNIT_POWER',"player")
+		-- self.frame:RegisterUnitEvent('UNIT_DISPLAYPOWER',"player")
 		-- self.frame:RegisterUnitEvent('UNIT_MAXPOWER',"player")
-			self:Update()
-		end
 	else
 		self.frame:UnregisterAllEvents()
 	end
@@ -357,6 +368,7 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 	for i = #self.frame.icon, iconIdx+1 , -1 do
 		self:ReleaseIcon(i)
 	end
+	self:Update()
 	return iconIdx
 end
 
@@ -368,13 +380,13 @@ function HDH_STAGGER_TRACKER:PLAYER_ENTERING_WORLD()
 end
 
 -- function HDH_STAGGER_TRACKER:OnEvent(event, unit, powerType)
-	-- if self == nil or self.parent == nil then return end
-	-- if ((event == 'UNIT_MAXPOWER')) and (HDH_POWER[self.parent.unit].power_type == powerType) then  -- (event == "UNIT_POWER")
-		-- if not UI_LOCK then
-			-- self.parent:Update(powerType)
-			-- self.parent:UpdateBar(self.parent.frame.icon[1]);
-		-- end
-	-- end
+-- 	if self == nil or self.parent == nil then return end
+-- 	if ((event == 'UNIT_DISPLAYPOWER') or (event == 'UNIT_MAXPOWER')) then  -- (event == "UNIT_POWER")
+-- 		if not HDH_TRACKER.ENABLE_MOVE then
+-- 			self.parent:Update()
+-- 			self.parent:UpdateBar(self.parent.frame.icon[1]);
+-- 		end
+-- 	end
 -- end
 ------------------------------------
 -- HDH_STAGGER_TRACKER class

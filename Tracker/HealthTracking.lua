@@ -8,7 +8,7 @@ local MyClassKor, MyClass = UnitClass("player");
 local L_HEALTH = "체력";
 
 local HDH_POWER = {}
-HDH_HEALTH_TRACKER.DATA = {type_name="HEALTH", bar_color={0, 1, 0}, texture = "Interface\\Icons\\Ability_Malkorok_BlightofYshaarj_Green"};
+HDH_HEALTH_TRACKER.DATA = {type_name="HEALTH", bar_color={0, 1, 0}, texture = "Interface/Icons/Ability_Malkorok_BlightofYshaarj_Green"};
 
 HDH_TRACKER_LIST[#HDH_TRACKER_LIST+1] = L_HEALTH -- 유닛은 명확하게는 추적 타입으로 보는게 맞지만 at 에서 이미 그렇게 사용하기 때문에 그냥 유닛 리스트로 넣어서 사용함
 HDH_GET_CLASS[L_HEALTH] = HDH_HEALTH_TRACKER -- 
@@ -250,13 +250,13 @@ do -- HDH_HEALTH_TRACKER class
 				
 				absorb:SetVertexColor(1,1,1);
 				local overlay = healthBar:CreateTexture(nil, "OVERLAY",nil,1); 
-				overlay:SetTexture("Interface\\RaidFrame\\Shield-Overlay",true,true);
+				overlay:SetTexture("Interface/RaidFrame/Shield-Overlay",true,true);
 				overlay:SetVertTile(true) 
 				overlay:SetHorizTile(true)
 				overlay:SetAllPoints(absorb);
 				f.bar.absorb = absorb; 
 				f.bar.absorb.overlay = overlay; 
-				f.bar.absorb:SetTexture("Interface\\RaidFrame\\Shield-fill");
+				f.bar.absorb:SetTexture("Interface/RaidFrame/Shield-fill");
 			end
 			-- f.bar.absorb:SetTexture(HDH_TRACKER.BAR_TEXTURE[self.option.bar.texture].texture);
 			self:UpdateAbsorb(f, barMax);
@@ -362,7 +362,7 @@ do -- HDH_HEALTH_TRACKER class
 				spell.isUpdate = false
 				spell.isItem =  auraList[i].IsItem
 				f.spell = spell
-				f.icon:SetTexture(auraList[i].Texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
+				f.icon:SetTexture(auraList[i].Texture or "Interface/ICONS/INV_Misc_QuestionMark")
 				self:ChangeCooldownType(f, self.option.base.cooldown)
 				self:SetGlow(f, false)
 				

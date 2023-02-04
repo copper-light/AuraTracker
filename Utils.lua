@@ -143,49 +143,77 @@ do
 		lengType = lengType or HDH_TRACKER.LOCALE;
 		if amount == nil then return nil end
 		if lengType == "koKR" then
-			if amount < 1000000 then
-				if isShort then
-					if amount < 10000 then
-						return HDH_AT_UTIL.CommaValue(amount);
-					elseif amount < 100000 then
-						return format("%.1f만",amount/10000);
-					else
-						return format("%d만",amount/10000);
-					end
-				else
+			if isShort then
+				if amount < 10000 then
 					return HDH_AT_UTIL.CommaValue(amount);
+				elseif amount < 100000 then
+					return format("%.1f만",amount/10000);
+				elseif  amount <= 100000000 then
+					return format("%d만",amount/10000);
+				elseif amount <= 1000000000 then
+					return format("%.1f억",amount/1000000000);
+				else
+					return format("%d억",amount/100000000);
 				end
-			elseif  amount <= 100000000 then
-				return format("%d만",amount/10000);
-			elseif amount <= 100000000 then
-				return format("%.1f억",amount/100000000);
 			else
-				return format("%d억",amount/100000000);
+				return HDH_AT_UTIL.CommaValue(amount);
 			end
 		else
-			if amount < 1000000 then
-				if isShort and amount >= 1000 then
-					return format("%.1fk",amount/1000);
+			if isShort then
+				if amount < 1000 then
+					return amount
+				elseif amount < 10000 then
+					return format("%.1fk", amount/1000);
+				elseif amount < 1000000 then
+					return format("%dk", amount/1000);
+				elseif amount <= 10000000 then
+					return format("%.1fm",amount/1000000);
+				elseif amount <= 100000000 then
+					return format("%dm",amount/1000000);
+				elseif amount <= 10000000000 then
+					return format("%.1fg",amount/1000000000);
 				else
-					return HDH_AT_UTIL.CommaValue(amount);
+					return format("%dg",amount/1000000000);
 				end
-			elseif  amount <= 100000000 then
-				return format("%.1fm",amount/1000000);
 			else
-				return format("%.1fg",amount/1000000000);
+				return HDH_AT_UTIL.CommaValue(amount);
 			end
 		end
 	end
 
 	
 
-	function HDH_AT_UTIL.GetTimef()
-		local cur = math.floor(GetTime())
-		local s= cur%60;
-		local m= (cur/60) % 60;
-		local h= cur/360;
-		
-		return string.format("%d:%d %s", h, m, s)
+	function HDH_AT_UTIL.AbbreviateTime(time, isShort, lengType)
+		local lengType = lengType or HDH_TRACKER.LOCALE;
+		if lengType == "koKR" then
+			if isShort then
+				if time < 60 then 
+					return ('%d'):format(time)
+				else
+					return ('%d분'):format(math.ceil((time)/60))
+				end
+			else
+				if time < 60 then 
+					return ('%d'):format(time)
+				else
+					return ('%d:%02d'):format((time)/60, (time)%60) 
+				end
+			end
+		else
+			if isShort then
+				if time < 60 then 
+					return ('%d'):format(time)
+				else
+					return ('%dm'):format(math.ceil((time)/60))
+				end
+			else
+				if time < 60 then 
+					return ('%d'):format(time)
+				else
+					return ('%d:%02d'):format((time)/60, (time)%60) 
+				end
+			end
+		end
 	end
     
 end

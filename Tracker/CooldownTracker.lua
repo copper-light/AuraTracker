@@ -126,7 +126,7 @@ local function CT_UpdateSatIcon(tracker, f, spell)
 	end
 	
 	if spell.per > 0 then 
-		f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * spell.per * 10) /10 
+		f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * spell.per * 100) /100
 		f.iconSatCooldown:Show()
 	else
 		spell.per = 0.1
@@ -154,7 +154,6 @@ local function CT_UpdateSatIcon(tracker, f, spell)
 			f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
 			f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, spell.texcoord)
 		end
-		-- print(spell.per, spell.texcoord, f.iconSatCooldown.curSize)
 		f.iconSatCooldown.preSize = f.iconSatCooldown.curSize
 	end
 end
@@ -491,6 +490,7 @@ function HDH_C_TRACKER:Update_Icon(f) -- f == f
 			f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
 			f.iconSatCooldown:Show()
 			-- f.iconSatCooldown.spark:Show()
+			
 		end
 	else -- 쿨 안도는 중
 		if f.cd:IsShown() then f.cd:Hide() end
@@ -706,7 +706,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown:SetPoint("BOTTOMRIGHT", f.iconframe,"BOTTOMRIGHT",0,0)
 		f.iconSatCooldown:SetHeight(self.ui.icon.size)
 		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
-		f.iconSatCooldown.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark_v");
+		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"TOP",0,0)
 
 	elseif cooldown_type == DB.COOLDOWN_DOWN  then 
@@ -720,7 +720,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown:SetPoint("TOPRIGHT", f.iconframe,"TOPRIGHT",0,0)
 		f.iconSatCooldown:SetHeight(self.ui.icon.size)
 		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
-		f.iconSatCooldown.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark_v");
+		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"BOTTOM",0,0)
 
 	elseif cooldown_type == DB.COOLDOWN_LEFT  then 
@@ -734,7 +734,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown:SetPoint("BOTTOMRIGHT", f.iconframe,"BOTTOMRIGHT",0,0)
 		f.iconSatCooldown:SetWidth(self.ui.icon.size)
 		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
-		f.iconSatCooldown.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark");
+		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"LEFT",0,0)
 
 	elseif cooldown_type == DB.COOLDOWN_RIGHT then 
@@ -748,7 +748,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown:SetPoint("BOTTOMLEFT", f.iconframe,"BOTTOMLEFT",0,0)
 		f.iconSatCooldown:SetWidth(self.ui.icon.size)
 		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
-		f.iconSatCooldown.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark");
+		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"RIGHT",0,0)
 
 	else 
@@ -774,8 +774,8 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 		f = icons[i]
 		if not f:GetParent() then f:SetParent(self.frame) end
 		if not f.icon:GetTexture() then
-			f.icon:SetTexture("Interface\\ICONS\\TEMP")
-			f.iconSatCooldown:SetTexture("Interface\\ICONS\\TEMP")
+			f.icon:SetTexture("Interface/ICONS/TEMP")
+			f.iconSatCooldown:SetTexture("Interface/ICONS/TEMP")
 		end
 		f:ClearAllPoints()
 		prevf = f
@@ -967,8 +967,8 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			f.spell = spell
 
 			if self.ui.common.display_mode ~= DB.DISPLAY_ICON then f.name:SetText(spell.name); end
-			f.icon:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
-			f.iconSatCooldown:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
+			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+			f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 			f.iconSatCooldown:SetDesaturated(nil)
 			f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
 			self:ChangeCooldownType(f, self.ui.icon.cooldown)

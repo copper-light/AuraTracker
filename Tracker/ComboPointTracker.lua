@@ -60,13 +60,13 @@ HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_HOLY_POWER,     HDH_COMBO_POINT_TRAC
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_CHI,      		HDH_COMBO_POINT_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, HDH_COMBO_POINT_TRACKER)
 
-POWER_INFO[HDH_TRACKER.TYPE.POWER_COMBO_POINTS] 	= {power_type="COMBO_POINTS", 	power_index = 4,	color={207/255, 44/255, 122/255, 1}, texture = "Interface\\Icons\\INV_Misc_Gem_Pearl_05"}; -- INV_Misc_Gem_Pearl_04 INV_chaos_orb INV_Misc_Gem_Pearl_04 Spell_AnimaRevendreth_Orb
-POWER_INFO[HDH_TRACKER.TYPE.POWER_SOUL_SHARDS]		= {power_type="SOUL_SHARDS",	power_index = 7, 	color={201/255, 34/255, 1, 	 1}, texture = "Interface\\Icons\\inv_misc_enchantedpearlE"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_HOLY_POWER]		= {power_type="HOLY_POWER", 	power_index = 9,	color={1, 216/255, 47/255, 1}, texture = "Interface\\Icons\\INV_Misc_Gem_Pearl_04"}; -- Ability_Priest_SpiritOfTheRedeemer
-POWER_INFO[HDH_TRACKER.TYPE.POWER_CHI]				= {power_type="CHI", 			power_index = 12,	color={0, 196/255, 117/255, 1}, texture = "Interface\\Icons\\INV_Misc_Gem_Pearl_06"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES]	= {power_type="ARCANE_CHARGES",	power_index = 16,	color={2/255, 60/255, 189/255, 1}, texture = "Interface\\Icons\\Spell_Nature_WispSplode"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_COMBO_POINTS] 	= {power_type="COMBO_POINTS", 	power_index = 4,	color={0.77, 0.12, 0.23, 1}, texture = "Interface/Icons/INV_Misc_Gem_Pearl_05"}; -- INV_Misc_Gem_Pearl_04 INV_chaos_orb INV_Misc_Gem_Pearl_04 Spell_AnimaRevendreth_Orb
+POWER_INFO[HDH_TRACKER.TYPE.POWER_SOUL_SHARDS]		= {power_type="SOUL_SHARDS",	power_index = 7, 	color={201/255, 34/255, 1, 	 1}, texture = "Interface/Icons/inv_misc_enchantedpearlE"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_HOLY_POWER]		= {power_type="HOLY_POWER", 	power_index = 9,	color={1, 216/255, 47/255, 1}, texture = "Interface/Icons/Spell_Holy_SealOfWrath"}; -- Ability_Priest_SpiritOfTheRedeemer
+POWER_INFO[HDH_TRACKER.TYPE.POWER_CHI]				= {power_type="CHI", 			power_index = 12,	color={0, 196/255, 117/255, 1}, texture = "Interface/Icons/INV_Misc_Gem_Pearl_06"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES]	= {power_type="ARCANE_CHARGES",	power_index = 16,	color={2/255, 60/255, 189/255, 1}, texture = "Interface/Icons/Spell_Nature_WispSplode"};
 
-HDH_COMBO_POINT_TRACKER.POWER = POWER_INFO;
+HDH_COMBO_POINT_TRACKER.POWER_INFO = POWER_INFO;
 
 
 -- INV_Misc_Gem_Pearl_04 214 208 57
@@ -109,29 +109,27 @@ function HDH_COMBO_POINT_TRACKER:CreateData(elemIdx)
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 10)
-	-- DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', self.POWER_INFO[self.type].color)
-	-- DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', false)
-	-- DB:SetTrackerValue(trackerId, 'ui.%s.bar.location', DB.BAR_LOCATION_R)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 40)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 40)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_fill', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_progress', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', self.POWER_INFO[self.type].color)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.show_spark', true)
-
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.show_name', false)
-	-- DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_BAR_L)
-	DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_BAR_R)
+	DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_HIDE)
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 40)
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', self.POWER_INFO[self.type].color)
 
 	if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type then
+		DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_BAR_R)
 		DB:SetTrackerValue(trackerId, 'ui.%s.icon.cooldown', DB.COOLDOWN_RIGHT)
 		DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', true)
 		local r,g,b = unpack(self.POWER_INFO[self.type].color)
 		DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', {r,g,b, 0.35})
 		DB:SetTrackerValue(trackerId, 'ui.%s.bar.full_color', self.POWER_INFO[self.type].color)
+	else
+		DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_C)
 	end
 
 	self:UpdateSetting();
@@ -210,49 +208,47 @@ end
 function HDH_COMBO_POINT_TRACKER:ChangeCooldownType(f, cooldown_type)
 	if cooldown_type == DB.COOLDOWN_UP then 
 		f.cooldown2:Hide()
-
 		f.iconSatCooldown:ClearAllPoints()
 		f.iconSatCooldown:SetPoint("BOTTOMLEFT", f.iconframe,"BOTTOMLEFT",0,0)
 		f.iconSatCooldown:SetPoint("BOTTOMRIGHT", f.iconframe,"BOTTOMRIGHT",0,0)
 		f.iconSatCooldown:SetHeight(self.ui.icon.size)
 		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
-		f.iconSatCooldown.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark_v");
+		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"TOP",0,0)
 
 	elseif cooldown_type == DB.COOLDOWN_DOWN  then 
 		f.cooldown2:Hide()
-
 		f.iconSatCooldown:ClearAllPoints()
 		f.iconSatCooldown:SetPoint("TOPLEFT", f.iconframe,"TOPLEFT",0,0)
 		f.iconSatCooldown:SetPoint("TOPRIGHT", f.iconframe,"TOPRIGHT",0,0)
 		f.iconSatCooldown:SetHeight(self.ui.icon.size)
 		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
-		f.iconSatCooldown.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark_v");
+		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"BOTTOM",0,0)
 
 	elseif cooldown_type == DB.COOLDOWN_LEFT  then 
 		f.cooldown2:Hide()
-
 		f.iconSatCooldown:ClearAllPoints()
 		f.iconSatCooldown:SetPoint("TOPRIGHT", f.iconframe,"TOPRIGHT",0,0)
 		f.iconSatCooldown:SetPoint("BOTTOMRIGHT", f.iconframe,"BOTTOMRIGHT",0,0)
 		f.iconSatCooldown:SetWidth(self.ui.icon.size)
 		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
-		f.iconSatCooldown.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark");
+		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"LEFT",0,0)
 
 	elseif cooldown_type == DB.COOLDOWN_RIGHT then 
 		f.cooldown2:Hide()
-
 		f.iconSatCooldown:ClearAllPoints()
 		f.iconSatCooldown:SetPoint("TOPLEFT", f.iconframe,"TOPLEFT",0,0)
 		f.iconSatCooldown:SetPoint("BOTTOMLEFT", f.iconframe,"BOTTOMLEFT",0,0)
 		f.iconSatCooldown:SetWidth(self.ui.icon.size)
 		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
-		f.iconSatCooldown.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark");
+		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"RIGHT",0,0)
 
 	else 
+		f.cd = f.cooldown2
+		f.cd:SetReverse(false)
 		f.cooldown1:Hide()
 		f.iconSatCooldown:Hide()
 		f.iconSatCooldown.spark:Hide()
@@ -308,27 +304,38 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 	
 	for k,f in ipairs(icons) do
 		if not f.spell then break end
-		f.cd:Hide();
 		f.counttext:SetText(nil)
 		if f.spell.isUpdate then
 			f.spell.isUpdate = false
 
-			if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS ~= self.type then
+			if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS ~= self.type and HDH_TRACKER.TYPE.POWER_ESSENCE ~= self.type then
 				f.icon:SetDesaturated(nil)
 				f.icon:SetAlpha(self.ui.icon.on_alpha)
-				f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
-				f.iconSatCooldown:Show()
+				-- f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
+				-- f.iconSatCooldown:Show()
 				f.border:SetAlpha(self.ui.icon.on_alpha)
 				f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
 
+				if f.spell.showValue and f.spell.v1 < 1 then
+					f.v1:SetText(string.format('%.1f', f.spell.v1))
+					f.v1:Show()
+				else
+					f.v1:SetText("")
+				end
+
 				if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 					f.bar:SetMinMaxValues(0,1);
-					-- f.bar:SetValue((reverse_fill and 0) or 1)
+					f.bar:SetValue((reverse_fill and 0) or 1)
 				end
+
+				if f.spell.count < 1 then f.counttext:SetText(nil)
+				else f.counttext:SetText(f.spell.count) end
+				f.cd:Hide()
+				self:SetGlow(f, true)
 			else
-				if f.spell.v1 < 1 then
-					if spell.showValue then
-						f.v1:SetText(f.spell.v1)
+				if f.spell.v1 < 1.0 then
+					if f.spell.showValue and f.spell.v1 < 1 then
+						f.v1:SetText(string.format('%.1f', f.spell.v1))
 					else
 						f.v1:SetText("")
 					end
@@ -337,51 +344,86 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 						f.icon:SetDesaturated(1)
 						f.icon:SetAlpha(self.ui.icon.off_alpha)
 						f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
-						f.iconSatCooldown:Show()
-						f.iconSatCooldown.spark:Show()
 						f.border:SetAlpha(self.ui.icon.off_alpha)
 						f.border:SetVertexColor(0,0,0) 
-						f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * f.spell.v1 * 10) /10 
-						if self.ui.icon.cooldown == DB.COOLDOWN_LEFT then
-							f.spell.texcoord = 0.93 - (0.86 * f.spell.v1)
-							f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
-							f.iconSatCooldown:SetTexCoord(f.spell.texcoord, 0.93, 0.07, 0.93)
-				
-						elseif self.ui.icon.cooldown == DB.COOLDOWN_RIGHT then
-							f.spell.texcoord = 0.07 + (0.86 * f.spell.v1)
-							f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
-							f.iconSatCooldown:SetTexCoord(0.07, f.spell.texcoord, 0.07, 0.93)
-				
-						elseif self.ui.icon.cooldown == DB.COOLDOWN_UP then
-							f.spell.texcoord = 0.93 - (0.86 * f.spell.v1)
-							f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
-							f.iconSatCooldown:SetTexCoord(0.07, 0.93, spell.texcoord, 0.93)
+						
+						if f.spell.v1 > 0 then
+							f.iconSatCooldown:Show()
+							f.iconSatCooldown.spark:Show()
 
-						elseif self.ui.icon.cooldown == DB.COOLDOWN_DOWN then
-							f.spell.texcoord = 0.07 + (0.86 * f.spell.v1)
-							f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
-							f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, f.spell.texcoord)
+							f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * f.spell.v1 * 1000) /1000
+							if self.ui.icon.cooldown == DB.COOLDOWN_LEFT then
+								f.spell.texcoord = 0.93 - (0.86 * f.spell.v1)
+								f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
+								f.iconSatCooldown:SetTexCoord(f.spell.texcoord, 0.93, 0.07, 0.93)
+					
+							elseif self.ui.icon.cooldown == DB.COOLDOWN_RIGHT then
+								f.spell.texcoord = 0.07 + (0.86 * f.spell.v1)
+								f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
+								f.iconSatCooldown:SetTexCoord(0.07, f.spell.texcoord, 0.07, 0.93)
+					
+							elseif self.ui.icon.cooldown == DB.COOLDOWN_UP then
+								f.spell.texcoord = 0.93 - (0.86 * f.spell.v1)
+								f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
+								f.iconSatCooldown:SetTexCoord(0.07, 0.93, f.spell.texcoord, 0.93)
 
+							elseif self.ui.icon.cooldown == DB.COOLDOWN_DOWN then
+								f.spell.texcoord = 0.07 + (0.86 * f.spell.v1)
+								f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
+								f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, f.spell.texcoord)
+							else
+								if self.type == HDH_TRACKER.TYPE.POWER_ESSENCE then
+									f.iconSatCooldown:Hide()
+									f.iconSatCooldown.spark:Hide()
+									f.icon:SetDesaturated(nil)
+
+									if not f.cd:IsShown() then
+										f.cd:Show()
+									end
+									
+									f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
+									-- f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
+
+									-- f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
+									-- if math.ceil((f.spell.p_startTime or 0) * 100) ~= math.ceil((f.spell.startTime or 0) * 100) then
+										
+									-- 	f.spell.p_startTime = f.spell.startTime
+									-- end
+									-- if math.ceil(f.spell.startTime*10) ~= math.ceil((f.spell.p_startTime or 0) *10) or f.spell.duration ~= f.spell.p_duration then
+									-- 	print(f.spell.startTime, f.spell.p_startTime)
+									-- 	f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
+									-- 	f.spell.p_startTime = f.spell.startTime 
+									-- 	f.spell.p_duration = f.spell.duration
+									-- end
+									-- f.cd:SetValue()
+								else
+									f.iconSatCooldown:SetHeight(f.icon:GetHeight())
+									f.iconSatCooldown:SetWidth(f.icon:GetWidth())
+									f.iconSatCooldown:Hide()
+									f.iconSatCooldown.spark:Hide()
+								end
+							end
 						else
-							f.iconSatCooldown:SetHeight(f.icon:GetHeight())
-							f.iconSatCooldown:SetWidth(f.icon:GetWidth())
 							f.iconSatCooldown:Hide()
 							f.iconSatCooldown.spark:Hide()
+							f.cd:Hide()
 						end
 					end
 
 					if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 						f.bar:SetMinMaxValues(0, 1)
-						value = self:GetAnimatedValue(f.bar, reverse_fill and 1- f.spell.v1 or f.spell.v1)
-						-- f.bar:SetValue(value)
+						value = self:GetAnimatedValue(f.bar, reverse_fill and 1 - f.spell.v1 or f.spell.v1)
+						f.bar:SetValue(value)
 						f.bar.spark:Show()
 					end
-
 				else
-					f.v1:SetText("")
+					if f.spell.showValue and f.spell.v1 < 1 then
+						f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate))
+					else
+						f.v1:SetText("")
+					end
 					f.icon:SetDesaturated(nil)
 					f.icon:SetAlpha(self.ui.icon.on_alpha)
-					-- f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
 					f.iconSatCooldown:Hide()
 					f.iconSatCooldown.spark:Hide()
 					f.border:SetAlpha(self.ui.icon.on_alpha)
@@ -390,11 +432,14 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 
 					if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 						f.bar:SetMinMaxValues(0,1);
-						-- f.bar:SetValue(1);
-						-- f.bar:SetValue((reverse_fill and 0) or 1)
+						f.bar:SetValue((reverse_fill and 0) or 1)
 						f.bar.spark:Hide()
 					end
+					f.cd:Hide()
 				end
+
+				if f.spell.count < 1 then f.counttext:SetText(nil)
+				else f.counttext:SetText(f.spell.count) end
 			end
 			
 			f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
@@ -429,7 +474,9 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 					f.v1:SetText("")
 					self:SetGlow(f, false)
 					f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-					
+					if f.cd:IsShown() then
+						f.cd:Hide()
+					end
 					f:Show()
 					if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 						f.bar:SetMinMaxValues(0,1);
@@ -515,16 +562,18 @@ function HDH_COMBO_POINT_TRACKER:Update() -- HDH_TRACKER override
 					iconf.spell.v1 = power + 1 - i 
 				else
 					iconf.spell.v1 = 1
+					iconf.spell.count = i
 				end
 			else
 				iconf.spell.isUpdate = false
 				iconf.spell.v1 = 0
+				iconf.spell.count = 0
 			end
 			ret = ret + 1
 		end
 	end
 	self:UpdateIcons();
-	if UnitAffectingCombat("player") or power > 0 then
+	if UnitAffectingCombat("player") or power > 0 or self.ui.common.always_show then
 		self:ShowTracker();
 	else
 		self:HideTracker();
@@ -574,12 +623,13 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 		spell.overlay = 0
 		spell.endTime = 0
 		spell.happenTime = 0;
+		spell.startTime = 0;
 		spell.is_buff = false;
 		spell.isUpdate = false
 		spell.isItem =  isItem
 		f.spell = spell
-		f.icon:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
-		f.iconSatCooldown:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
+		f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+		f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 		-- f.icon:SetDesaturated(1)
 		-- f.icon:SetAlpha(self.ui.icon.off_alpha)
 		-- f.border:SetAlpha(self.ui.icon.off_alpha)

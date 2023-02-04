@@ -24,10 +24,10 @@
 	
 		<Layers>
 			<Layer level="artwork">
-				<FontString parentKey="Text" name="$parentText" inherits="Font_Yellow_M" text="스킬 이름" justifyH="LEFT">
+				<FontString parentKey="Text" name="$parentText" inherits="Font_Yellow_M" text="" justifyH="LEFT">
 					<Size x="200" y="25" />
 					<Anchors>
-						<Anchor point="BOTTOM" relativePoint="TOP" x="0" y="0"/>
+						<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
 					</Anchors>
 				</FontString>
 			</Layer>
@@ -358,7 +358,7 @@
 											</Anchors>
 										</FontString>
 
-										<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT" text="※ TIP : 주문과 추적창의 화면 출력 순서 변경하려면 리스트를 드래그하세요.">											<Color r="1" g="0.8" b="0" />
+										<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT" text="※ TIP : 주문과 추적창의 출력 순서 변경하려면 리스트를 드래그하세요.">											<Color r="1" g="0.8" b="0" />
 											<Size>
 												<AbsDimension x="400" y="25"/>
 											</Size>
@@ -424,14 +424,66 @@
 
 						<Frames>
 							<Frame name="$parentTop" inherits="HDH_AT_BackgroundTemplate">
-								<Size y="40" />
+								<Size y="55" />
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 									<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" />
 								</Anchors>
 								<Frames>
 
-									<Button name="$parentDDLConfigMode" inherits="HDH_AT_DropDownOptionTemplate">
+									<Frame name="$parentSwithConfigMode" inherits="HDH_AT_SwitchFrameTemplate">
+										<Size y="20"/>
+										<Layers>
+											<Layer level="artwork">
+												<FontString parentKey="Text" inherits="Font_Yellow_S" text="공용 설정 사용 여부" justifyH="LEFT">
+													<Size><AbsDimension x="95" y="22" /></Size>
+													<Anchors>
+														<Anchor point="RIGHT" relativePoint="LEFT" x="0" y="0"/>
+													</Anchors>
+												</FontString>
+											</Layer>
+										</Layers>
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="110" y="-5" />
+											<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="-10" y="-5" />
+										</Anchors>
+										<Scripts>
+											<OnLoad>
+												self.Text:SetText(HDH_AT_L.CONFIG_TYPE)
+											</OnLoad>
+											<OnShow>
+											</OnShow>
+										</Scripts>
+									</Frame>
+
+									<Frame name="$parentSwithDisplayMode" inherits="HDH_AT_SwitchFrameTemplate">
+										<Size y="20"/>
+										<Layers>
+											<Layer level="artwork">
+												<FontString parentKey="Text" inherits="Font_Yellow_S" text="디스플레이 유형" justifyH="LEFT">
+													<Size><AbsDimension x="95" y="22" /></Size>
+													<Anchors>
+														<Anchor point="RIGHT" relativePoint="LEFT" x="0" y="0"/>
+													</Anchors>
+												</FontString>
+											</Layer>
+										</Layers>
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentSwithConfigMode" x="0" y="-5" />
+											<Anchor point="RIGHT" relativePoint="RIGHT" x="-10" y="-5" />
+										</Anchors>
+
+										<Scripts>
+											<OnLoad>
+												self.Text:SetText(HDH_AT_L.DISPLAY_TYPE)
+											</OnLoad>
+											<OnShow>
+											</OnShow>
+										</Scripts>
+									</Frame>
+									
+
+									<Button name="$parentDDLConfigMode" inherits="HDH_AT_DropDownOptionTemplate" hidden="true">
 										<Size x="125" y="22" />
 										<Anchors>
 											<Anchor point="LEFT" relativePoint="LEFT" x="70" y="0" />
@@ -449,7 +501,7 @@
 										</Layers>
 									</Button>
 
-									<Button name="$parentDDLDisplayType" inherits="HDH_AT_DropDownOptionTemplate">
+									<Button name="$parentDDLDisplayType" inherits="HDH_AT_DropDownOptionTemplate"  hidden="true">
 										<Size x="125" y="22" />
 										<Anchors>
 											<!-- <Anchor point="LEFT" relativePoint="LEFT" x="120" y="0" /> -->
@@ -476,9 +528,10 @@
 									<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
 								</Anchors>
 								<Frames>
+							
 									<CheckButton name="$parentCBMove" inherits="HDH_AT_CheckButtonTemplate">
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="LEFT" x="225" y="0" />
+											<Anchor point="LEFT" relativePoint="LEFT" x="10" y="0" />
 											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 										</Anchors>
 										<Scripts>
@@ -489,7 +542,7 @@
 
 									<CheckButton name="$parentCBShowIdInTooltip" inherits="HDH_AT_CheckButtonTemplate">
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="LEFT" x="295" y="0" />
+											<Anchor point="LEFT" relativePoint="LEFT" x="90" y="0" />
 											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 										</Anchors>
 										<Scripts>
@@ -566,7 +619,7 @@
 						<Frames>
 
 							<Frame name="$parentTop" inherits="HDH_AT_BackgroundTemplate">
-								<Size y="30" />
+								<Size y="40" />
 								<Anchors>
 									<Anchor point="TOPLEFT" x="0" y="0" />
 									<Anchor point="TOPRIGHT" x="0" y="0" />
@@ -766,7 +819,68 @@
 								</Frames>
 							</Frame>
 							
-								
+							<Frame name="$parentETC" hidden="true">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentTop" x="0" y="0" />
+									<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT"  relativeTo="$parentBottom" x="0" y="0" />
+								</Anchors>
+								<Frames>
+									<ScrollFrame name="$parentMenuSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+										<Size><AbsDimension x="135" y="35"/></Size>
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="0" />
+											<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parent" x="0" y="0" />
+										</Anchors>
+										<Frames>
+											<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
+												<Anchors>
+													<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
+													<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
+												</Anchors>
+											</Slider>
+										</Frames>
+
+										<ScrollChild>
+											<Frame name="$parentContents" hidden="false">
+												<Size><AbsDimension x="135" y="200"/></Size>
+												<Anchors>
+													<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+													<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+												</Anchors>
+												<Frames>
+												</Frames>
+											</Frame>
+										</ScrollChild>
+
+									</ScrollFrame>
+
+									<ScrollFrame name="$parentSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentMenuSF" x="0" y="0" />
+											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="0" y="0" />
+										</Anchors>
+										<Frames>
+											<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
+												<Anchors>
+													<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
+													<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
+												</Anchors>
+											</Slider>
+										</Frames>
+
+										<ScrollChild>
+											<Frame name="$parentContents" hidden="false">
+												<Size><AbsDimension x="135" y="35"/></Size>
+												<Anchors>
+													<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+													<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+												</Anchors>
+											</Frame>
+										</ScrollChild>
+									</ScrollFrame>
+								</Frames>
+							</Frame>
+
 						</Frames>
 					</Frame>
 

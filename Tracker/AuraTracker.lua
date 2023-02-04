@@ -233,7 +233,7 @@ do
 				end
 				
 				if f.spell.showValue and f.spell.v1 then 
-					f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, true)) 
+					f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate)) 
 				else 
 					f.v1:SetText(nil) 
 				end
@@ -368,7 +368,7 @@ do
 			self.frame:Hide() return 
 		end
 		self.GetAurasFunc(self)
-		if (self:UpdateIcons() > 0) or UnitAffectingCombat("player") then --  self.ui.icon.always_show 
+		if (self:UpdateIcons() > 0) or UnitAffectingCombat("player") or self.ui.common.always_show then  
 			self:ShowTracker();
 		else
 			self:HideTracker();
@@ -439,8 +439,8 @@ do
 				spell.isUpdate = false
 				spell.isItem =  isItem
 				f.spell = spell
-				f.icon:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
-				f.iconSatCooldown:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
+				f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+				f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 				f.iconSatCooldown:SetDesaturated(nil)
 				-- f.icon:SetDesaturated(1)
 				-- f.icon:SetAlpha(self.ui.icon.off_alpha)

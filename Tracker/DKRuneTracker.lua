@@ -10,7 +10,7 @@ HDH_TRACKER.TYPE.POWER_RUNE = 20
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_RUNE, HDH_DK_RUNE_TRACKER)
 
 local POWER_INFO = {}
-POWER_INFO[HDH_TRACKER.TYPE.POWER_RUNE] 	= {power_type="RUNE", 	power_index = 5,	color={1.00, 0.50, 0.25}, texture = "Interface\\Icons\\Spell_Deathknight_FrostPresence"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_RUNE] 	= {power_type="RUNE", 	power_index = 5,	color={0.77, 0.12, 0.23, 1}, texture = "Interface/Icons/Spell_Deathknight_BloodPresence"};
 
 
 local super = HDH_C_TRACKER
@@ -63,9 +63,10 @@ function HDH_DK_RUNE_TRACKER:CreateData()
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 6)
+	DB:SetTrackerValue(trackerId, 'ui.%s.common.order_by', DB.ORDERBY_CD_ASC)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 40)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 40)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_fill', false)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_fill', true)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_progress', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)	
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.show_spark', true)
@@ -73,12 +74,12 @@ function HDH_DK_RUNE_TRACKER:CreateData()
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', {r,g,b, 0.35})
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.full_color', self.POWER_INFO[self.type].color)
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.show_name', false)
-	-- DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_BAR_L)
+	DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_HIDE)
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_BAR_R)
+	DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_format', DB.TIME_TYPE_CEIL)
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 40)
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', self.POWER_INFO[self.type].color)
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.cooldown', DB.COOLDOWN_RIGHT)
-
 	self:UpdateSetting();
 end
 
@@ -127,6 +128,7 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 			f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
 			f.counttext:SetText(nil)
 			f.iconSatCooldown:Hide()
+			f.iconSatCooldown.spark:Hide()
 			f.cd:Hide() 
 			self:SetGlow(f, true)
 			f:Show()
@@ -142,32 +144,6 @@ function HDH_DK_RUNE_TRACKER:UpdateIcons()
 		self:UpdateIcon(v)
 	end
 	-- self:Update_Layout()
-end
-
-function HDH_DK_RUNE_TRACKER:UpdateSetting()
-	if not self or not self.frame then return end
-	self.frame:SetSize(self.ui.icon.size, self.ui.icon.size)
-	if HDH_TRACKER.ENABLE_MOVE then
-		if self.frame.text then self.frame.text:SetPoint("TOPLEFT", self.frame, "BOTTOMRIGHT", -5, 12) end
-	end
-	if not self.frame.icon then return end
-	for k,iconf in pairs(self.frame.icon) do
-		self:UpdateIconSettings(iconf)
-		if self:IsGlowing(iconf) then
-			self:SetGlow(iconf, false)
-			self:SetGlow(iconf, true)
-		end
-		self:ChangeCooldownType(iconf, self.ui.icon.cooldown)
-		if iconf.spell and (iconf.spell.remaining or 0) > 0.1 then
-			iconf.icon:SetAlpha(self.ui.icon.off_alpha)
-			iconf.border:SetAlpha(self.ui.icon.off_alpha)
-		else
-			iconf.icon:SetAlpha(self.ui.icon.on_alpha)
-			iconf.border:SetAlpha(self.ui.icon.on_alpha)
-		end
-	end	
-	self.location.x = self.frame:GetLeft()
-	self.location.y = self.frame:GetBottom()
 end
 
 function HDH_DK_RUNE_TRACKER:Update_Layout()
@@ -226,7 +202,7 @@ function HDH_DK_RUNE_TRACKER:Update_Layout()
 			end
 		end
 	end
-	if HDH_TRACKER.ENABLE_MOVE or ret > 0 or UnitAffectingCombat("player") then
+	if HDH_TRACKER.ENABLE_MOVE or ret > 0 or UnitAffectingCombat("player") or self.ui.common.always_show  then
 		self:ShowTracker();
 	else
 		self:HideTracker();
@@ -340,8 +316,8 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 		spell.charges.endTime = 0
 
 		f.spell = spell
-		f.icon:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
-		f.iconSatCooldown:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
+		f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+		f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 		
 		self:SetGlow(f, false)
 		f:Hide()

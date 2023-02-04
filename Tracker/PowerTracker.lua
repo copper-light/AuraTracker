@@ -3,7 +3,7 @@ HDH_POWER_TRACKER = {}
 
 local DB = HDH_AT_ConfigDB
 
-local POWRE_BAR_SPLIT_MARGIN = 5;
+local POWRE_BAR_SPLIT_MARGIN = 4;
 
 local MyClassKor, MyClass = UnitClass("player");
 
@@ -25,30 +25,30 @@ IS_REGEN_POWER[0] = true; -- 마나
 IS_REGEN_POWER[2] = true; -- 집중
 IS_REGEN_POWER[3] = true; -- 기력
 
--- HDH_POWER["MANA"]		 = {tracker_name="자원:마나", 	color={0.25, 0.78, 0.92}, 	texture = "Interface\\Icons\\INV_Misc_Rune_03"};
--- HDH_POWER["RAGE"]		 = {tracker_name="자원:분노", 	color={0.77, 0.12, 0.23}, 	texture = "Interface\\Icons\\Ability_Warrior_Rampage"};
--- HDH_POWER["FOCUS"] 		 = {tracker_name="자원:집중", 	color={1.00, 0.50, 0.25}, 	texture = "Interface\\Icons\\Ability_Fixated_State_Orange"};
--- HDH_POWER["ENERGY"]		 = {tracker_name="자원:기력", 	color={1, 0.96, 0.41}, 	  	texture = "Interface\\Icons\\Ability_Priest_SpiritOfTheRedeemer"};
--- HDH_POWER["RUNIC_POWER"] = {tracker_name="자원:룬마력", 	color={0.77, 0.12, 0.23}, 	texture = "Interface\\Icons\\Spell_DeathKnight_FrozenRuneWeapon"};
--- HDH_POWER["LUNAR_POWER"] = {tracker_name="자원:천공의힘", 	color={0.30, 0.52, 0.90},	texture = "Interface\\Icons\\Spell_Nature_AbolishMagic"};
--- HDH_POWER["MAELSTROM"]	 = {tracker_name="자원:소용돌이", 	color={0.25, 0.78, 0.92},	texture = "Interface\\Icons\\Spell_Lightning_LightningBolt01"};
--- HDH_POWER["INSANITY"] 	 = {tracker_name="자원:광기", 	color={0.40, 0, 0.80},	  	texture = "Interface\\Icons\\Ability_Rogue_EnvelopingShadows"};
--- HDH_POWER["FURY"] 		 = {tracker_name="자원:격노", 	color={0.788, 0.259, 0.992},texture = "Interface\\Icons\\Ability_BossFelOrcs_Necromancer_Purple"};-- 17
--- HDH_POWER["PAIN"] 		 = {tracker_name="자원:고통",		color={1, 156/255, 0}, 		texture = "Interface\\Icons\\Ability_BossFelOrcs_Necromancer_Purple"}; -- 18
+-- HDH_POWER["MANA"]		 = {tracker_name="자원:마나", 	color={0.25, 0.78, 0.92}, 	texture = "Interface/Icons/INV_Misc_Rune_03"};
+-- HDH_POWER["RAGE"]		 = {tracker_name="자원:분노", 	color={0.77, 0.12, 0.23}, 	texture = "Interface/Icons/Ability_Warrior_Rampage"};
+-- HDH_POWER["FOCUS"] 		 = {tracker_name="자원:집중", 	color={1.00, 0.50, 0.25}, 	texture = "Interface/Icons/Ability_Fixated_State_Orange"};
+-- HDH_POWER["ENERGY"]		 = {tracker_name="자원:기력", 	color={1, 0.96, 0.41}, 	  	texture = "Interface/Icons/Ability_Priest_SpiritOfTheRedeemer"};
+-- HDH_POWER["RUNIC_POWER"] = {tracker_name="자원:룬마력", 	color={0.77, 0.12, 0.23}, 	texture = "Interface/Icons/Spell_DeathKnight_FrozenRuneWeapon"};
+-- HDH_POWER["LUNAR_POWER"] = {tracker_name="자원:천공의힘", 	color={0.30, 0.52, 0.90},	texture = "Interface/Icons/Spell_Nature_AbolishMagic"};
+-- HDH_POWER["MAELSTROM"]	 = {tracker_name="자원:소용돌이", 	color={0.25, 0.78, 0.92},	texture = "Interface/Icons/Spell_Lightning_LightningBolt01"};
+-- HDH_POWER["INSANITY"] 	 = {tracker_name="자원:광기", 	color={0.40, 0, 0.80},	  	texture = "Interface/Icons/Ability_Rogue_EnvelopingShadows"};
+-- HDH_POWER["FURY"] 		 = {tracker_name="자원:격노", 	color={0.788, 0.259, 0.992},texture = "Interface/Icons/Ability_BossFelOrcs_Necromancer_Purple"};-- 17
+-- HDH_POWER["PAIN"] 		 = {tracker_name="자원:고통",		color={1, 156/255, 0}, 		texture = "Interface/Icons/Ability_BossFelOrcs_Necromancer_Purple"}; -- 18
 
 
 -- else TrackerTypeName[1] = "2차 자원(콤보)"; end
 
--- local POWER_MANA	 	= {power_type="MANA",		 	power_index =0,		color={0.25, 0.78, 0.92}, 		texture = "Interface\\Icons\\INV_Misc_Rune_03"};
--- local POWER_RAGE		= {power_type="RAGE", 			power_index =1,		color={0.77, 0.12, 0.23}, 		texture = "Interface\\Icons\\Ability_Warrior_Rampage"};
--- local POWER_FOCUS 		= {power_type="FOCUS", 			power_index =2,		color={1.00, 0.50, 0.25}, 		texture = "Interface\\Icons\\Ability_Fixated_State_Orange"};
--- local POWER_ENERGY		= {power_type="ENERGY",			power_index =3, 	color={1, 0.96, 0.41}, 	  		texture = "Interface\\Icons\\Spell_Holy_PowerInfusion"};
--- local POWER_RUNIC_POWER	= {power_type="RUNIC_POWER", 	power_index =6,		color={0, 0.82, 1}, 			texture = "Interface\\Icons\\Spell_DeathKnight_FrozenRuneWeapon"};
--- local POWER_LUNAR_POWER = {power_type="LUNAR_POWER",	power_index =8, 	color={0.30, 0.52, 0.90},		texture = "Interface\\Icons\\Ability_Druid_Eclipse"};
--- local POWER_MAELSTROM	= {power_type="MAELSTROM", 		power_index =11,	color={0.25, 0.5, 1},			texture = "Interface\\Icons\\Spell_Shaman_StaticShock"};
--- local POWER_INSANITY 	= {power_type="INSANITY", 		power_index =13,	color={0.70, 0.4, 0.90},	  	texture = "Interface\\Icons\\SPELL_SHADOW_TWISTEDFAITH"};
--- local POWER_FURY  		= {power_type="FURY",			power_index =17, 	color={0.788, 0.259, 0.992},	texture = "Interface\\Icons\\Spell_Shadow_SummonVoidWalker"};-- 17
--- local POWER_PAIN 		= {power_type="PAIN",			power_index =18,	color={1, 156/255, 0}, 			texture = "Interface\\Icons\\Ability_Warlock_FireandBrimstone"}; -- 18
+-- local POWER_MANA	 	= {power_type="MANA",		 	power_index =0,		color={0.25, 0.78, 0.92}, 		texture = "Interface/Icons/INV_Misc_Rune_03"};
+-- local POWER_RAGE		= {power_type="RAGE", 			power_index =1,		color={0.77, 0.12, 0.23}, 		texture = "Interface/Icons/Ability_Warrior_Rampage"};
+-- local POWER_FOCUS 		= {power_type="FOCUS", 			power_index =2,		color={1.00, 0.50, 0.25}, 		texture = "Interface/Icons/Ability_Fixated_State_Orange"};
+-- local POWER_ENERGY		= {power_type="ENERGY",			power_index =3, 	color={1, 0.96, 0.41}, 	  		texture = "Interface/Icons/Spell_Holy_PowerInfusion"};
+-- local POWER_RUNIC_POWER	= {power_type="RUNIC_POWER", 	power_index =6,		color={0, 0.82, 1}, 			texture = "Interface/Icons/Spell_DeathKnight_FrozenRuneWeapon"};
+-- local POWER_LUNAR_POWER = {power_type="LUNAR_POWER",	power_index =8, 	color={0.30, 0.52, 0.90},		texture = "Interface/Icons/Ability_Druid_Eclipse"};
+-- local POWER_MAELSTROM	= {power_type="MAELSTROM", 		power_index =11,	color={0.25, 0.5, 1},			texture = "Interface/Icons/Spell_Shaman_StaticShock"};
+-- local POWER_INSANITY 	= {power_type="INSANITY", 		power_index =13,	color={0.70, 0.4, 0.90},	  	texture = "Interface/Icons/SPELL_SHADOW_TWISTEDFAITH"};
+-- local POWER_FURY  		= {power_type="FURY",			power_index =17, 	color={0.788, 0.259, 0.992},	texture = "Interface/Icons/Spell_Shadow_SummonVoidWalker"};-- 17
+-- local POWER_PAIN 		= {power_type="PAIN",			power_index =18,	color={1, 156/255, 0}, 			texture = "Interface/Icons/Ability_Warlock_FireandBrimstone"}; -- 18
 
 -- local SPEC_INFO = {}
 -- HDH_POWER_TRACKER.SPEC_INFO[62] = POWER_MANA-- Mage: Arcane
@@ -132,16 +132,16 @@ HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_INSANITY,  HDH_POWER_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_FURY,      HDH_POWER_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_PAIN,	   HDH_POWER_TRACKER)
 
-POWER_INFO[HDH_TRACKER.TYPE.POWER_MANA]		 	= {power_type="MANA",		 	power_index =0,		color={0.25, 0.78, 0.92, 1}, 	texture = "Interface\\Icons\\INV_Misc_Rune_03"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_RAGE]			= {power_type="RAGE", 			power_index =1,		color={0.77, 0.12, 0.23, 1}, 	texture = "Interface\\Icons\\Ability_Warrior_Rampage"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_FOCUS] 		= {power_type="FOCUS", 			power_index =2,		color={1.00, 0.50, 0.25, 1}, 	texture = "Interface\\Icons\\Ability_Fixated_State_Orange"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_ENERGY]		= {power_type="ENERGY",			power_index =3, 	color={1, 0.96, 0.41, 1}, 	  	texture = "Interface\\Icons\\Spell_Holy_PowerInfusion"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_RUNIC]    	= {power_type="RUNIC_POWER", 	power_index =6,		color={0, 0.82, 1, 1}, 			texture = "Interface\\Icons\\Spell_DeathKnight_FrozenRuneWeapon"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_LUNAR] 	    = {power_type="LUNAR_POWER",	power_index =8, 	color={0.30, 0.52, 0.90, 1},	texture = "Interface\\Icons\\Ability_Druid_Eclipse"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_MAELSTROM]	= {power_type="MAELSTROM", 		power_index =11,	color={0.25, 0.5, 1, 1},		texture = "Interface\\Icons\\Spell_Shaman_StaticShock"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_INSANITY] 	= {power_type="INSANITY", 		power_index =13,	color={0.70, 0.4, 0.90, 1},	  	texture = "Interface\\Icons\\SPELL_SHADOW_TWISTEDFAITH"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_FURY] 		= {power_type="FURY",			power_index =17, 	color={0.788, 0.259, 0.992, 1},	texture = "Interface\\Icons\\Spell_Shadow_SummonVoidWalker"};-- 17
-POWER_INFO[HDH_TRACKER.TYPE.POWER_PAIN] 		= {power_type="PAIN",			power_index =18,	color={1, 156/255, 0, 1}, 		texture = "Interface\\Icons\\Ability_Warlock_FireandBrimstone"}; -- 18
+POWER_INFO[HDH_TRACKER.TYPE.POWER_MANA]		 	= {power_type="MANA",		 	power_index =0,		color={0.25, 0.78, 0.92, 1}, 	texture = "Interface/Icons/INV_Misc_Rune_03"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_RAGE]			= {power_type="RAGE", 			power_index =1,		color={0.77, 0.12, 0.23, 1}, 	texture = "Interface/Icons/Ability_Warrior_Rampage"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_FOCUS] 		= {power_type="FOCUS", 			power_index =2,		color={1.00, 0.50, 0.25, 1}, 	texture = "Interface/Icons/Ability_Fixated_State_Orange"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_ENERGY]		= {power_type="ENERGY",			power_index =3, 	color={1, 0.96, 0.41, 1}, 	  	texture = "Interface/Icons/Spell_Holy_PowerInfusion"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_RUNIC]    	= {power_type="RUNIC_POWER", 	power_index =6,		color={0, 0.82, 1, 1}, 			texture = "Interface/Icons/Spell_DeathKnight_FrozenRuneWeapon"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_LUNAR] 	    = {power_type="LUNAR_POWER",	power_index =8, 	color={0.30, 0.52, 0.90, 1},	texture = "Interface/Icons/Ability_Druid_Eclipse"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_MAELSTROM]	= {power_type="MAELSTROM", 		power_index =11,	color={0.25, 0.5, 1, 1},		texture = "Interface/Icons/Spell_Shaman_StaticShock"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_INSANITY] 	= {power_type="INSANITY", 		power_index =13,	color={0.70, 0.4, 0.90, 1},	  	texture = "Interface/Icons/SPELL_SHADOW_TWISTEDFAITH"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_FURY] 		= {power_type="FURY",			power_index =17, 	color={0.788, 0.259, 0.992, 1},	texture = "Interface/Icons/Spell_Shadow_SummonVoidWalker"};-- 17
+POWER_INFO[HDH_TRACKER.TYPE.POWER_PAIN] 		= {power_type="PAIN",			power_index =18,	color={1, 156/255, 0, 1}, 		texture = "Interface/Icons/Ability_Warlock_FireandBrimstone"}; -- 18
 HDH_POWER_TRACKER.POWER_INFO = POWER_INFO;
 
 local function HDH_POWER_OnUpdate(self)
@@ -156,7 +156,7 @@ local function HDH_POWER_OnUpdate(self)
 	-- if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
 	self.counttext:SetText(format("%d%%", self.spell.count)); 
 	-- else self.counttext:SetText(nil) end
-	if self.spell.showValue then self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1)); else self.v1:SetText(nil) end
+	if self.spell.showValue then self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1, self:GetParent().parent.ui.font.v1_abbreviate)); else self.v1:SetText(nil) end
 	
 	if IS_REGEN_POWER[self.spell.power_index] then
 		if self.spell.v1 < maxValue then
@@ -188,14 +188,18 @@ local function HDH_POWER_OnUpdate(self)
 	self:GetParent().parent:UpdateBarValue(self);
 end
 
-function HDH_POWER_TRACKER:UpdateBarValue(f)
+function HDH_POWER_TRACKER:UpdateBarValue(f, non_animate)
 	if f.bar and f.bar.bar and #f.bar.bar > 0 then
 		local bar;
 		for i = 1, #f.bar.bar do 
 			bar = f.bar.bar[i];
 			-- bar:SetMinMaxValues(bar.mpMin, bar.mpMax);
 			if bar then 
-				bar:SetValue(self:GetAnimatedValue(bar, f.spell.v1, i)); 
+				if non_animate then
+					bar:SetValue(f.spell.v1); 
+				else
+					bar:SetValue(self:GetAnimatedValue(bar, f.spell.v1, i)); 
+				end
 				-- bar:SetValue(f.spell.v1); 
 				if f:GetParent().parent.ui.bar.use_full_color then
 					if f.spell.v1 >= (bar.mpMax) then
@@ -235,7 +239,7 @@ function HDH_POWER_TRACKER:CreateData()
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.location', DB.BAR_LOCATION_R)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 200)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 40)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_fill', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_progress', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)
@@ -249,8 +253,9 @@ function HDH_POWER_TRACKER:CreateData()
 	end
 
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_BAR_R)
+	DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_abbreviate', false)
 
-	DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 40)
+	DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 20)
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', POWER_INFO[self.type].color)
 	self:UpdateSetting();
 end
@@ -293,12 +298,13 @@ function HDH_POWER_TRACKER:CreateDummySpell(count)
 	spell.showValue = true
 	spell.v1 = power_max
 	spell.max = power_max;
+	spell.splitValues = f.spell.splitValues
 	f.cd:Hide();
 	if ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 		f:SetScript("OnUpdate",nil);
 		-- f.bar:SetMinMaxValues(0, power_max);
 		-- f.bar:SetValue(spell.v1);
-		f.v1:SetText(HDH_AT_UTIL.CommaValue(spell.v1));
+		f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(spell.v1, self.ui.font.v1_abbreviate))
 		-- f.bar:Show();
 		local bar
 		for i = 1, #f.bar.bar do
@@ -363,16 +369,12 @@ function HDH_POWER_TRACKER:UpdateArtBar(f) -- HDH_TRACKER override
 end
 
 -- barMax: 다른 클래스에서 호환성을 위해서 추가 파워트래킹에서는 사용안함
-function HDH_POWER_TRACKER:UpdateBar(f, barMax) 
+function HDH_POWER_TRACKER:UpdateBar(f, barMax, value) 
 	local bar_op = self.ui.bar;
 	local hide_icon = self.ui.common.display_mode == DB.DISPLAY_BAR
 	if not self:IsHaveData() or not f.bar then return end
-	local aura_data = {}
-	if not aura_data then return; end
-	aura_data = aura_data.split_bar;
-	
 	local bf = f.bar;
-	local split = {unpack(aura_data or {})}
+	local split = (f.spell and f.spell.splitValues) or {}
 	local nextIsNill = false;
 	bf.max = barMax or UnitPowerMax("player", POWER_INFO[self.type].power_index);
 	self.max = bf.max;
@@ -416,7 +418,7 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax)
 			newBar.background = newBar:CreateTexture(nil,"BACKGROUND");
 			newBar.background:SetPoint('TOPLEFT', newBar, 'TOPLEFT', -1, 1)
 			newBar.background:SetPoint('BOTTOMRIGHT', newBar, 'BOTTOMRIGHT', 1, -1)
-			newBar.background:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\cooldown_bg");
+			newBar.background:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg");
 			newBar.spark = newBar:CreateTexture(nil, "OVERLAY");
 			newBar.spark:SetBlendMode("ADD");
 			bf.bar[i] = newBar;
@@ -428,6 +430,7 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax)
 		bf.bar[i].mpMin = split[i-1] or 0;
 		
 		local gap = bf.bar[i].mpMax - bf.bar[i].mpMin;
+		-- bf.bar[i]:SetValue(value or 0)
 		bf.bar[i]:SetMinMaxValues(bf.bar[i].mpMin, bf.bar[i].mpMax);
 		
 		local r = bar_op.reverse_progress;
@@ -440,16 +443,16 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax)
 			bf.bar[i]:SetOrientation("Vertical"); bf.bar[i]:SetRotatesTexture(true);
 			if i == 1 then bf.bar[i]:SetPoint(r and "TOP" or "BOTTOM",0,0);
 						else bf.bar[i]:SetPoint(r and "TOP" or "BOTTOM", bf.bar[i-1], r and "BOTTOM" or "TOP", 0, r and -bf.margin or bf.margin); end
-			bf.bar[i].spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark_v");
-			bf.bar[i].spark:SetSize(bar_op.height*1.3, 19);
+			bf.bar[i].spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
+			bf.bar[i].spark:SetSize(bar_op.height*1.15, 19);
 		else
 			local w = ( bf:GetWidth() - (bf.margin * #split) ) * (gap/powerMax);
 			bf.bar[i]:SetSize(w, bf:GetHeight());
 			bf.bar[i]:SetOrientation("Horizontal"); bf.bar[i]:SetRotatesTexture(false);
 			if i == 1 then bf.bar[i]:SetPoint(r and "RIGHT" or "LEFT",0,0);
 						else bf.bar[i]:SetPoint(r and "RIGHT" or "LEFT", bf.bar[i-1], r and "LEFT" or "RIGHT", r and -bf.margin or bf.margin, 0); end
-			bf.bar[i].spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark");
-			bf.bar[i].spark:SetSize(19, bar_op.height*1.3);		  
+			bf.bar[i].spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
+			bf.bar[i].spark:SetSize(19, bar_op.height*1.15);		  
 		end
 		if bar_op.show_spark then
 			bf.bar[i].spark:Show();
@@ -518,7 +521,7 @@ function HDH_POWER_TRACKER:Update() -- HDH_TRACKER override
 			if f.spell.max ~= f.spell.v1 then show = true end
 		elseif f.spell.v1 > 0 then show = true end
 	end
-	if HDH_TRACKER.ENABLE_MOVE or UnitAffectingCombat("player") or show then
+	if HDH_TRACKER.ENABLE_MOVE or UnitAffectingCombat("player") or show or self.ui.common.always_show then
 		-- self.frame:Show()
 		self:ShowTracker();
 	else
@@ -536,8 +539,8 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 	if not id then 
 		return 
 	end
-
-	local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue
+	
+	local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue, splitValues
 	local elemSize = DB:GetTrackerElementSize(trackerId)
 	local spell 
 	local f
@@ -556,6 +559,7 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 		for i = 1 , elemSize do
 			elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 			glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
+			splitValues = DB:GetTrackerElementSplitValues(trackerId, i)
 			
 			iconIdx = iconIdx + 1
 			f = self.frame.icon[iconIdx]
@@ -587,15 +591,15 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.is_buff = isBuff;
 			spell.isUpdate = false
 			spell.isItem =  isItem
+			spell.splitValues = splitValues or {}
 			f.spell = spell
-			f.icon:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
-			f.iconSatCooldown:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
+			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+			f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 			f.iconSatCooldown:SetDesaturated(nil)
 			self:ChangeCooldownType(f, self.ui.icon.cooldown)
 			self:SetGlow(f, false)
-			
-			f.spell = spell;
-			f:SetScript("OnUpdate",HDH_POWER_OnUpdate);
+			self:UpdateArtBar(f)
+			f:SetScript("OnUpdate", HDH_POWER_OnUpdate);
 			f:Hide();
 			self:ActionButton_HideOverlayGlow(f)
 		end

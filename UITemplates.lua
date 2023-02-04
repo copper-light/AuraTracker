@@ -926,3 +926,249 @@ end
 function HDH_AT_DialogFrameTemplateMixin:Close()
 	self:Hide();
 end 
+
+
+-----------------------------------
+-- HDH_AT_SplitBarTemplateMixin
+-----------------------------------
+
+HDH_AT_SplitBarTemplateMixin = {}
+
+local function HDH_AT_SplitBar_OnDragging(self)
+    local x, y, w, h = self:GetBoundsRect()
+    local p_x, p_y, p_w, p_h = self:GetParent():GetBoundsRect()
+    self.Value:SetText(math.ceil((x - p_x) + math.floor( w / 2 )))
+end
+
+local function HDH_AT_SplitBar_OnDragStart(self)
+    self:StartMoving()
+    self:SetToplevel(true)
+    self:SetScript('OnUpdate', HDH_AT_SplitBar_OnDragging)
+end
+
+local function HDH_AT_SplitBar_OnDragStop(self)
+    self:StopMovingOrSizing();
+	self:SetScript('OnUpdate', nil)
+
+    local x, y, w, h = self:GetBoundsRect()
+    local p_x, p_y, p_w, p_h = self:GetParent():GetBoundsRect()
+
+    -- if y > p_y then
+    self:ClearAllPoints()
+    self:SetPoint("TOPLEFT", self:GetParent(), "TOPLEFT", (x - p_x)+10, 0)
+
+
+    x, y, w, h = self:GetBoundsRect()
+    p_x, p_y, p_w, p_h = self:GetParent():GetBoundsRect()
+    self.Value:SetText(math.ceil((x - p_x) + math.floor( w / 2 )))
+end
+
+function HDH_AT_SplitBarTemplateMixin:GetValue()
+    local value = self.EditBox:GetText()
+    if string.len(value) > 0 then
+        return tonumber(self.EditBox:GetText())
+    else
+        return 0
+    end
+end
+
+function HDH_AT_SplitBarTemplateMixin:SetMinMaxValues(minValue, maxValue)
+    self.splitList = self.splitList or {}
+    
+    if not self.minPointer then
+        self.minPointer = CreateFrame("Frame", self:GetName().."splitMin", self, "HDH_AT_SplitPointerTemplate")
+        self.minPointer:SetPoint("TOP", self.Bar, "TOPLEFT", 0, 0)
+        self.minPointer.Line:Hide()
+        self.minPointer.TopValue:Hide()
+        self.minPointer.TopAnchor:Hide()
+        self.minPointer.TopValue:SetFontObject('Font_Yellow_S')
+        self.minPointer.BottomValue:SetFontObject('Font_Yellow_S')
+    end
+    self.minPointer.BottomValue:SetText(minValue)
+
+    if not self.maxPointer then
+        self.maxPointer = CreateFrame("Frame", self:GetName().."splitMin", self, "HDH_AT_SplitPointerTemplate")
+        self.maxPointer:SetPoint("TOP", self.Bar, "TOPRIGHT", 0, 0)
+        self.maxPointer.Line:Hide()
+        self.maxPointer.TopValue:Hide()
+        self.maxPointer.TopAnchor:Hide()
+        self.maxPointer.TopValue:SetFontObject('Font_Yellow_S')
+        self.maxPointer.BottomValue:SetFontObject('Font_Yellow_S')
+    end
+    self.maxPointer.TopValue:SetText(maxValue)
+    self.maxPointer.BottomValue:SetText(maxValue)
+    self.minValue = minValue
+    self.maxValue = maxValue
+
+    if self:GetSize() ~= 0 and self:GetSize() % 2 == 0 then
+        self.maxPointer.BottomAnchor:Hide()
+        self.maxPointer.BottomValue:Hide()
+        self.maxPointer.TopValue:Show()
+        self.maxPointer.TopAnchor:Show()
+    else
+        self.maxPointer.BottomAnchor:Show()
+        self.maxPointer.BottomValue:Show()
+        self.maxPointer.TopValue:Hide()
+        self.maxPointer.TopAnchor:Hide()
+    end
+end
+
+function HDH_AT_SplitBarTemplateMixin:GetMinMaxValues()
+    return self.minValue, self.maxValue
+end
+
+function HDH_AT_SplitBarTemplateMixin:RemovePointer(index)
+    -- self.splitList = self.splitList or {}
+    local i
+    for i = index, #self.splitList do
+        if self.splitList[i] and self.splitList[i].value and self.size and self.size > 0 then
+            self.size = self.size - 1
+            self.splitList[i].value = (self.splitList[i+1] and self.splitList[i+1].value) or nil
+            if not self.splitList[i].value then
+                self.splitList[i]:Hide()
+            end
+        end
+    end
+    if self:GetSize() ~= 0 and self:GetSize() % 2 == 0 then
+        self.maxPointer.BottomAnchor:Hide()
+        self.maxPointer.BottomValue:Hide()
+        self.maxPointer.TopValue:Show()
+        self.maxPointer.TopAnchor:Show()
+    else
+        self.maxPointer.BottomAnchor:Show()
+        self.maxPointer.BottomValue:Show()
+        self.maxPointer.TopValue:Hide()
+        self.maxPointer.TopAnchor:Hide()
+    end
+end
+
+function HDH_AT_SplitBarTemplateMixin:AddPointer(index, value)
+    self.splitList = self.splitList or {}
+    local split
+    if not self.splitList[index] then
+        self.splitList[index] = CreateFrame("Frame", self:GetName().."split".. index , self, "HDH_AT_SplitPointerTemplate")
+    end
+
+    split = self.splitList[index]
+    if not split.value then
+        self.size = (self.size or 0) + 1
+    end
+    split.value = value 
+    split:SetPoint("TOP", self.Bar, "TOPLEFT", self.Bar:GetWidth() * (value / self.maxValue), 0)
+    split:Show()
+    if index % 2 == 0 then
+        split.BottomValue:SetText(split.value)
+        split.BottomAnchor:Show()
+        split.TopValue:Hide()
+        split.TopAnchor:Hide()
+    else
+        split.TopValue:SetText(split.value)
+        split.TopAnchor:Show()
+        split.BottomAnchor:Hide()
+        split.BottomValue:Hide()
+    end
+
+    if self:GetSize() ~= 0 and self:GetSize() % 2 == 0 then
+        self.maxPointer.BottomAnchor:Hide()
+        self.maxPointer.BottomValue:Hide()
+        self.maxPointer.TopValue:Show()
+        self.maxPointer.TopAnchor:Show()
+    else
+        self.maxPointer.BottomAnchor:Show()
+        self.maxPointer.BottomValue:Show()
+        self.maxPointer.TopValue:Hide()
+        self.maxPointer.TopAnchor:Hide()
+    end
+end
+
+function HDH_AT_SplitBarTemplateMixin:GetSize()
+    return self.size or 0
+end
+
+function HDH_AT_SplitBar_OnMouseUp(self)
+    local w = self:GetWidth()
+
+end
+
+
+-----------------------------------
+-- HDH_AT_AddDelEdtiboxTemplateMixin
+-----------------------------------
+HDH_AT_AddDelEdtiboxTemplateMixin = {}
+
+function HDH_AT_AddDelEdtiboxTemplateMixin:GetValue()
+    local value = self.EditBox:GetText()
+    if string.len(value) > 0 then
+        return tonumber(self.EditBox:GetText())
+    else
+        return 0
+    end
+end
+
+function HDH_AT_AddDelEdtiboxTemplateMixin:SetValue(value)
+    if tonumber(value) then
+        self.EditBox:SetText(value)
+    end
+end
+
+
+-------------------------------------
+-- HDH_AT_SwitchFrameTemplateMixin-
+-------------------------------------
+
+HDH_AT_SwitchFrameTemplateMixin = {}
+
+function HDH_AT_SwitchFrameTemplateMixin:Init(itemList, onChangedHandler)
+    if not itemList or #itemList == 0 then return end
+    local size = #itemList
+    local itemWidth = math.ceil(self.Background:GetWidth() / size)
+    local itemHeight = self.Background:GetHeight() - 6
+    local btn
+    self.onChangedHandler = onChangedHandler
+    self.list = self.list or {}
+    for index, value in ipairs(itemList) do
+        if not self.list[index] then
+            self.list[index] = CreateFrame("Button", self:GetName()..index, self, "HDH_AT_SwitchItemFrameTemplate")
+            self.list[index]:SetScript("OnClick", function(btn)
+                btn:GetParent():SetSelectedIndex(btn.index)
+                print(btn:GetParent().onChangedHandler)
+                if btn:GetParent().onChangedHandler then
+                    btn:GetParent().onChangedHandler(btn:GetParent(), btn, btn.index, btn.index)
+                end
+            end)
+        end
+        btn = self.list[index]
+        btn:ClearAllPoints()
+        btn:SetSize(itemWidth - 6, itemHeight)
+        btn:SetPoint("TOPLEFT", self.Background, "TOPLEFT", (itemWidth * (index - 1)) + 3, -3)
+        btn:SetText(value)
+        btn.index = index
+    end
+end
+
+function HDH_AT_SwitchFrameTemplateMixin:SetSelectedValue(selectedIndex)
+    self:SetSelectedIndex(selectedIndex)
+end
+
+function HDH_AT_SwitchFrameTemplateMixin:SetSelectedIndex(selectedIndex)
+    for index, btn in ipairs(self.list) do
+        if index == selectedIndex then
+            btn.Active:Show()
+            btn.Deactive:Hide()
+            btn:SetNormalFontObject("Font_White_S")
+        else
+            btn.Active:Hide()
+            btn.Deactive:Show()
+            btn:SetNormalFontObject("Font_Gray_S")
+        end
+    end
+    self.index = selectedIndex
+end
+
+function HDH_AT_SwitchFrameTemplateMixin:GetSelectedIndex()
+    return self.index
+end
+
+function HDH_AT_SwitchFrameTemplateMixin:GetSelectedValue()
+    return self.index
+end

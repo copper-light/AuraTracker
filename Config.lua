@@ -17,6 +17,9 @@ COMP_TYPE.SLIDER = 5
 COMP_TYPE.DROPDOWN = 6
 COMP_TYPE.MULTI_SELECTOR = 7
 COMP_TYPE.PREV_NEXT_BUTTON = 8
+COMP_TYPE.IMAGE_CHECKBUTTON = 9
+COMP_TYPE.EDITBOX_ADD_DEL = 10
+COMP_TYPE.SWITCH = 11
 
 local FRAME_WIDTH = 404
 local FRAME_MAX_H = 1000
@@ -59,6 +62,12 @@ local UI_CONFIG_TAB_LIST= {
 	{name=L.PROFILE, type="LABEL"},
 	{name=L.RESET, type="BUTTON"},         -- 8
 	{name=L.SHARE, type="BUTTON"},         -- 9
+}
+
+local DETAIL_ETC_CONFIG_TAB_LIST= {
+	{name=L.DETAIL_CONIFG, type="LABEL"}, 
+	{name=L.CHANGE_ICON, type="BUTTON"}, --1
+	{name=L.SPLIT_POWER_BAR, type="BUTTON"}, --2
 }
 
 local MyClassKor, MyClass = UnitClass("player");
@@ -128,6 +137,7 @@ elseif MyClass == "MONK" then
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY})
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_CHI, L.POWER_CHI})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.STAGGER, L.STAGGER})
 elseif MyClass == "DEMONHUNTER" then 
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_FURY, L.POWER_FURY})
 	-- table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_PAIN, L.POWER_PAIN}) -- 삭제됨
@@ -319,12 +329,63 @@ local SPEC_FORMAT_STRINGS = {
 	[1468] = "evoker-preservation",
 }
 
+local CHANGE_ICON_CB_LIST = {}
+local ICON_PRESET_LIST = {
+	"Interface/Icons/INV_Misc_Gem_Pearl_04",
+	"Interface/Icons/INV_Misc_Gem_Pearl_05",
+	"Interface/Icons/INV_Misc_Gem_Pearl_06",
+	"Interface/Icons/Ability_Priest_SpiritOfTheRedeemer",
+	"Interface/Icons/INV_Elemental_Primal_Life",
+	"Interface/Icons/INV_Elemental_Primal_Mana",
+	"Interface/Icons/INV_Elemental_Primal_Nether",
+	"Interface/Icons/Spell_Shadow_SoulGem",
+	"Interface/Icons/spell_Shaman_Measuredinsight",
+	"Interface/Icons/INV_Jewelcrafting_DragonsEye03",
+	"Interface/Icons/INV_Jewelcrafting_DragonsEye04",
+	"Interface/Icons/INV_Jewelcrafting_DragonsEye05",
+	"Interface/Icons/Spell_Nature_WispSplode",
+	"Interface/Icons/Ability_Skyreach_Flash_Bang",
+	"Interface/Icons/INV_Jewelcrafting_70_SabersEye",
+	"Interface/Icons/inv_misc_enchantedpearlE",
+	"Interface/Icons/Spell_Shadow_MindTwisting",
+	"Interface/Icons/Spell_Holy_SealOfWrath",
+	"Interface/Icons/Spell_AnimaRevendreth_Orb",
+	"Interface/Icons/INV_chaos_orb",
+	"Interface/Icons/Spell_Deathknight_UnholyPresence",
+	"Interface/Icons/Spell_Deathknight_BloodPresence",
+	"Interface/Icons/Spell_Deathknight_FrostPresence",
+	"Interface/Icons/UI_AllianceIcon",
+	"Interface/Icons/UI_HordeIcon",
+	"Interface/Icons/Spell_Holy_SealOfValor",
+	"Interface/Icons/Achievement_PVP_O_10",
+	"Interface/Icons/Achievement_PVP_A_10",
+	"Interface/Icons/Achievement_PVP_G_10",
+	"Interface/Icons/Achievement_PVP_P_10",
+	"Interface/Icons/INV_Alchemy_80_AlchemistStone02",
+	"Interface/Icons/INV_Alchemist_81_EternalAlchemistStone",
+	"Interface/Icons/INV_Alchemist_81_TidalAlchemistStone",
+	"Interface/Icons/INV_Alchemy_80_AlchemistStone01",
+	"Interface/Icons/INV_Misc_Orb_05",
+	"Interface/Icons/INV_Misc_QirajiCrystal_05",
+	"Interface/Icons/SPELL_AZERITE_ESSENCE08",
+	"Interface/Icons/INV_RadientAzeriteHeart",
+	"Interface/Icons/inv_misc_enchantedpearlF",
+	"Interface/Icons/inv_misc_enchantedpearlD",
+	"Interface/Icons/inv_misc_enchantedpearl",
+	"Interface/Icons/inv_misc_enchantedpearlA",
+	"Interface/Icons/inv_misc_enchantedpearlB",
+	"Interface/Icons/ability_evoker_powernexus"
+}
+
 local BODY_TRACKER_NEW = 1
 local BODY_TRACKER_EDIT = 2
 local BODY_ELEMENTS = 3
 local BODY_UI = 4
 local BODY_DETAIL_GLOW = 5
 local BODY_DETAIL_ETC = 6
+
+local DETAIL_ETC_CHANGE_ICON = 1
+local DETAIL_ETC_SPLIT_BAR = 2
 
 ---------------------------------------------------------
 -- local functions
@@ -369,9 +430,11 @@ local function ChangeTab(list, idx)
 	list.selectedIndex = idx
 	if idx then
 		list.activateButton = list[list.selectedIndex]
-		list.activateButton:SetActivate(true)
-		if list.activateButton.content then
-			list.activateButton.content:Show()
+		if list.activateButton then
+			list.activateButton:SetActivate(true)
+			if list.activateButton.content then
+				list.activateButton.content:Show()
+			end
 		end
 	end
 end
@@ -426,6 +489,7 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		self.F.BODY.CONFIG_TRACKER:Show()
 		self.F.BODY.CONFIG_UI:Hide()
 		self.F.BODY.CONFIG_DETAIL:Hide()
+		-- self.F.BODY.CONFIG_DETAIL.ETC:Hide()
 		-- self.F.BODY.CONFIG_UI.DD_CONFIG_MODE:Disable()
 		-- self:LoadTrackerList()
 		self:LoadTrackerConfig()
@@ -438,6 +502,7 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		self.F.BODY.CONFIG_TRACKER:Show()
 		self.F.BODY.CONFIG_UI:Hide()
 		self.F.BODY.CONFIG_DETAIL:Hide()
+		-- self.F.BODY.CONFIG_DETAIL.ETC:Hide()
 		bottom_list[2]:Show()
 		self:LoadTrackerConfig(self.trackerId)
 		-- self.F.BODY.CONFIG_UI.DD_CONFIG_MODE:Eanble()
@@ -449,6 +514,7 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		self.F.BODY.CONFIG_TRACKER:Hide()
 		self.F.BODY.CONFIG_UI:Hide()
 		self.F.BODY.CONFIG_DETAIL:Hide()
+		-- self.F.BODY.CONFIG_DETAIL.ETC:Hide()
 		self:LoadTrackerElementConfig(self.trackerId)
 		bottom_list[2]:Show()
 		ChangeTab(bottom_list, 1)
@@ -459,9 +525,10 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		self.F.BODY.CONFIG_TRACKER:Hide()
 		self.F.BODY.CONFIG_UI:Show()
 		self.F.BODY.CONFIG_DETAIL:Hide()
+		-- self.F.BODY.CONFIG_DETAIL.ETC:Hide()
 		-- self.F.BODY.CONFIG_UI.DD_CONFIG_MODE:Enable()
 		self:LoadUIConfig(self.trackerId)
-		self:UpdateAbleConfigs(self.F.BODY.CONFIG_UI.DD_DISPLAY_MODE:GetSelectedValue())
+		self:UpdateAbleConfigs(self.F.BODY.CONFIG_UI.SW_DISPLAY_MODE:GetSelectedValue())
 		ChangeTab(bottom_list, 2)
 		ChangeTab(tracker_list, self.trackerIndex)
 		ChangeTab(ui_list, self.subType)
@@ -471,6 +538,8 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		self.F.BODY.CONFIG_TRACKER:Hide()
 		self.F.BODY.CONFIG_UI:Hide()
 		self.F.BODY.CONFIG_DETAIL:Show()
+		self.F.BODY.CONFIG_DETAIL.GLOW:Show()
+		self.F.BODY.CONFIG_DETAIL.ETC:Hide()
 		self:LoadDetailFrame(BODY_DETAIL_GLOW, self.trackerId, self.elemIndex, args)
 
 	elseif self.bodyType == BODY_DETAIL_ETC then
@@ -478,7 +547,26 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		self.F.BODY.CONFIG_TRACKER:Hide()
 		self.F.BODY.CONFIG_UI:Hide()
 		self.F.BODY.CONFIG_DETAIL:Show()
+		self.F.BODY.CONFIG_DETAIL.GLOW:Hide()
+		self.F.BODY.CONFIG_DETAIL.ETC:Show()
 		self:LoadDetailFrame(BODY_DETAIL_ETC, self.trackerId, self.elemIndex, args)
+		
+		local trackerType = select(3, DB:GetTrackerInfo(self.trackerId))
+		local CLASS = HDH_TRACKER.GetClass(trackerType)
+		if trackerType == HDH_TRACKER.TYPE.STAGGER then
+			self.DETAIL_ETC_TAB[1]:Disable()
+			self.DETAIL_ETC_TAB[2]:Disable()
+			ChangeTab(self.DETAIL_ETC_TAB, -1)
+		elseif CLASS:GetClassName() == "HDH_POWER_TRACKER" then
+			self.DETAIL_ETC_TAB[1]:Enable()
+			self.DETAIL_ETC_TAB[2]:Enable()
+			ChangeTab(self.DETAIL_ETC_TAB, self.subType)
+		else
+			self.DETAIL_ETC_TAB[1]:Enable()
+			self.DETAIL_ETC_TAB[2]:Disable()
+			ChangeTab(self.DETAIL_ETC_TAB, 1)
+		end
+
 	end
 end
 
@@ -491,7 +579,7 @@ local function LoadDB(trackerId, comp)
 		comp:UpdateValue(tonumber(dbValue))
 	elseif comp.type == COMP_TYPE.COLOR_PICKER then
 		comp:SetColorRGBA(unpack(dbValue))
-	elseif comp.type == COMP_TYPE.DROPDOWN then
+	elseif comp.type == COMP_TYPE.DROPDOWN or comp.type == COMP_TYPE.SWITCH then
 		comp:SetSelectedValue(dbValue)
 	end
 end
@@ -512,7 +600,7 @@ local function DrawLine(frame, x, y, total, point1, point2)
 	local t;
 	while (total / 2) > (size * i) do
 		t = frame:CreateTexture(nil, "BACKGROUND");
-		t:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\cooldown_bg.blp");
+		t:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg.blp");
 		t:SetVertexColor(0,0,0, 0.45);
 		if i % 5 == 0 then
 			t:SetSize(3,3);
@@ -532,7 +620,6 @@ local function ShowGrid(frame, show)
 			frame.GridFrame = CreateFrame("Frame",nil,UIParent);
 			local t;
 			local displayX, displayY = UIParent:GetSize();
-			-- local space = 0;
 			
 			DrawLine(frame.GridFrame,size,0,displayX,"TOP","BOTTOM");
 			DrawLine(frame.GridFrame,-size,0,displayX, "TOP","BOTTOM");
@@ -540,20 +627,18 @@ local function ShowGrid(frame, show)
 			DrawLine(frame.GridFrame,0,-size,displayY,"LEFT","RIGHT");
 			
 			t = frame.GridFrame:CreateTexture(nil, "BACKGROUND");
-			t:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\cooldown_bg.blp");
+			t:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg.blp");
 			t:SetVertexColor(1,0,0, 0.5);
 			t:SetSize(3,3);
 			t:SetPoint("LEFT",UIParent,"LEFT",0,0);
 			t:SetPoint("RIGHT",UIParent,"RIGHT",0,0);
 			
 			t = frame.GridFrame:CreateTexture(nil, "BACKGROUND");
-			t:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\cooldown_bg.blp");
+			t:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg.blp");
 			t:SetVertexColor(1,0,0, 0.5);
 			t:SetSize(3,3);
 			t:SetPoint("TOP",UIParent,"TOP",0,0);
 			t:SetPoint("BOTTOM",UIParent,"BOTTOM",0,0);
-		
-		-- frame.hdh_at_option_move_line = t;
 		end
 		frame.GridFrame:Show();
 	else
@@ -595,10 +680,40 @@ function HDH_AT_UI_OnCheck(self)
 	local value = self:GetChecked()
 	local trackerId = GetMainFrame():GetCurTrackerId()
 
+	if value ~= nil and self.dbKey ~= nil then
+		DB:SetTrackerValue(trackerId, self.dbKey, value)
+		HDH_TRACKER.UpdateSettings(trackerId)
+	end
+	
 	if self == F.BODY.CONFIG_UI.CB_MOVE then
 		HDH_TRACKER.ENABLE_MOVE = value
 		HDH_TRACKER.SetMoveAll(value)
 		ShowGrid(GetMainFrame(), value)
+	
+	elseif self == F.BODY.CONFIG_UI.CB_DISPLAY_WHEN_NONCOMBAT then
+		HDH_TRACKER.InitVaribles(DB:HasUI(trackerId) and trackerId)
+
+	elseif UTIL.HasValue(CHANGE_ICON_CB_LIST, self) then
+		for _, cb in pairs(CHANGE_ICON_CB_LIST) do
+			cb:SetChecked(cb == self)
+		end
+		local trackerId = F.BODY.CONFIG_DETAIL.trackerId
+		local elemIdx = F.BODY.CONFIG_DETAIL.elemIdx
+		local texture = self.Icon:GetTexture()
+		local searchChecked = F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON:GetChecked()
+		local key = nil
+		local isItem = false
+
+		if self == F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON and searchChecked then
+			key = F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon.key
+			isItem = F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon.isItem
+		end
+		if (searchChecked and not key) then
+			GetMainFrame().Dialog:AlertShow(L.PLASE_SEARCH_ICON) return 
+		end
+
+		DB:SetTrackerElementImage(trackerId, elemIdx, texture, key, isItem)
+		HDH_TRACKER.InitVaribles(trackerId)
 
 	elseif self == F.BODY.CONFIG_DETAIL.GLOW.CD1 or 
 		   self == F.BODY.CONFIG_DETAIL.GLOW.CD2 or
@@ -609,12 +724,7 @@ function HDH_AT_UI_OnCheck(self)
 				cd[1]:SetChecked(false)
 			end
 		end
-
-	else
-		if value ~= nil and self.dbKey ~= nil then
-			DB:SetTrackerValue(trackerId, self.dbKey, value)
-			HDH_TRACKER.UpdateSettings(trackerId)
-		end
+		
 	end
 end
 
@@ -755,10 +865,8 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 	if self == F.DD_TRANSIT then
 		main:LoadTrackerList(value)
 		main:ChangeBody(nil, 1)
-		-- main:LoadTrackerList(value)
-		-- main:SetCurTrackerIdx(1)
 
-	elseif self == F.BODY.CONFIG_UI.DD_CONFIG_MODE then
+	elseif self == F.BODY.CONFIG_UI.SW_CONFIG_MODE then
 		if main:GetCurTrackerId() then
 			if value == DB.USE_SEVERAL_CONFIG then
 				main.Dialog:AlertShow(L.ALERT_CONFIRM_CHANGE_TO_ONLY_THIS_TRACKER_CONFIGURATION, main.Dialog.DLG_TYPE.YES_NO,
@@ -767,11 +875,11 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 						local trackerId = main:GetCurTrackerId()
 						DB:CopyGlobelToTracker(trackerId)
 						main:LoadUIConfig(trackerId)
-						main:UpdateAbleConfigs(main.F.BODY.CONFIG_UI.DD_DISPLAY_MODE:GetSelectedValue())
+						main:UpdateAbleConfigs(main.F.BODY.CONFIG_UI.SW_DISPLAY_MODE:GetSelectedValue())
 						HDH_TRACKER.InitVaribles(trackerId)
 					end,
 					function()
-						F.BODY.CONFIG_UI.DD_CONFIG_MODE:SetSelectedIndex(DB.USE_GLOBAL_CONFIG)
+						F.BODY.CONFIG_UI.SW_CONFIG_MODE:SetSelectedIndex(DB.USE_GLOBAL_CONFIG)
 					end
 				)
 			else
@@ -781,17 +889,18 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 						local trackerId = main:GetCurTrackerId()
 						DB:ClearTracker(trackerId)
 						main:LoadUIConfig(trackerId)
-						main:UpdateAbleConfigs(main.F.BODY.CONFIG_UI.DD_DISPLAY_MODE:GetSelectedValue())
+						main:UpdateAbleConfigs(main.F.BODY.CONFIG_UI.SW_DISPLAY_MODE:GetSelectedValue())
 						HDH_TRACKER.InitVaribles(trackerId)
 					end,
 					function()
-						F.BODY.CONFIG_UI.DD_CONFIG_MODE:SetSelectedIndex(DB.USE_SEVERAL_CONFIG)
+						F.BODY.CONFIG_UI.SW_CONFIG_MODE:SetSelectedIndex(DB.USE_SEVERAL_CONFIG)
 					end
 				)
 			end
 		end
 
-	elseif self == F.BODY.CONFIG_UI.DD_DISPLAY_MODE then
+	elseif self == F.BODY.CONFIG_UI.SW_DISPLAY_MODE then
+		print("HI")
 		main:UpdateAbleConfigs(value)
 		HDH_TRACKER.UpdateSettings(main:GetCurTrackerId())
 
@@ -799,13 +908,6 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 		main:UpdateTraitsSelector(idx)
 
 	elseif self == F.DD_TRACKER_TYPE then
-		-- if value == HDH_TRACKER.TYPE.BUFF or value == HDH_TRACKER.TYPE.DEBUFF then
-		-- 	HDH_AT_DropDown_Init(F.DD_TRACKER_UNIT, DDP_AURA_UNIT_LIST, HDH_AT_OnSelected_Dropdown)
-
-		-- elseif value == HDH_TRACKER.TYPE.COOLDOWN then
-		-- 	HDH_AT_DropDown_Init(F.DD_TRACKER_UNIT, DDP_COOLDOWN_UNIT_LIST, HDH_AT_OnSelected_Dropdown)
-		-- end
-
 		F.DD_TRACKER_UNIT:SelectClear()
 		F.DD_TRACKER_AURA_CASTER:SelectClear()
 		F.DD_TRACKER_AURA_FILTER:SelectClear()
@@ -838,23 +940,16 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 end
 
 local function HDH_AT_OnChangeTabUI(self)
-	GetMainFrame():ChangeBody(nil, nil, nil, self.index)
+	if self:GetParent() == GetMainFrame().F.BODY.CONFIG_UI.MEMU then
+		GetMainFrame():ChangeBody(nil, nil, nil, self.index)
+	elseif self:GetParent() == GetMainFrame().F.BODY.CONFIG_DETAIL.ETC.MENU then
+		GetMainFrame():ChangeBody(nil, nil, nil, self.index)
+	end
+	
 end
 
 local function HDH_AT_OnClick_TrackerConfigButton(self)
 	GetMainFrame():ChangeBody(BODY_TRACKER_EDIT, self.index, nil, nil)
-	-- local F = main.F
-	-- local value = self:GetParent().id
-	-- local ret = main:LoadTrackerConfig(value)
-
-	-- HDH_AT_OnClick_TrackerTapButton(self:GetParent())
-	-- ChangeTab(main.BODY_TAB, 1)
-	-- F.BODY.CONFIG_UI:Hide()
-	-- F.BODY.CONFIG_TRACKER_ELEMENTS:Hide()
-
-	-- if ret and not F.BODY.CONFIG_TRACKER:IsShown() then 
-	-- 	F.BODY.CONFIG_TRACKER:Show()
-	-- end
 end 
 
 function HDH_AT_OnClick_Button(self)
@@ -872,6 +967,7 @@ function HDH_AT_OnClick_Button(self)
 		local trackerObj
 		local id
 
+		name = UTIL.Trim(name)
 		if not name or string.len(name) <= 0 then
 			main.Dialog:AlertShow(L.PLASE_INPUT_NAME) return 
 		end
@@ -891,16 +987,20 @@ function HDH_AT_OnClick_Button(self)
 			main.Dialog:AlertShow(L.PLASE_SELECT_AURA_CASTER) return 
 		end
 
-
 		if not transitList or #transitList == 0 then
-			main.Dialog:AlertShow(L.PLASE_SELECT_TRANSIT) return 
+			main.Dialog:AlertShow(L.PLASE_SELECT_TRAIT) return 
 		end
 
+		local perType
 		if F.BODY.CONFIG_TRACKER.is_creation then
 			id = DB:InsertTracker(name, type, unit, filter, caster, transitList)
 			trackerObj = HDH_TRACKER.New(id, name, type, unit)
 		else
 			id = main:GetCurTrackerId()
+			perType = select(3, DB:GetTrackerInfo(id))
+			if perType ~= type then
+				perType = nil
+			end
 			DB:UpdateTracker(id, name, type, unit, filter, caster, transitList)
 			trackerObj = HDH_TRACKER.Get(id)
 			if trackerObj then
@@ -909,15 +1009,11 @@ function HDH_AT_OnClick_Button(self)
 			end
 		end
 
-		-- F.BODY.CONFIG_TRACKER:Hide()
-		-- F.BODY.CONFIG_UI.DD_CONFIG_MODE:Enable()
-		-- main:UpdateFrame()
-		-- main:LoadTrackerList(main:GetCurTraits())
-		-- main:ChangeTrackerTabByTrackerId(id)
+		local className = trackerObj:GetClassName()
 		local curTraits = main:GetCurTraits()
+		local index = main:GetTrackerIndex(id)
 		main:LoadTraits()
 		main:LoadTrackerList(curTraits)
-		local index = main:GetTrackerIndex(id)
 		if not index then
 			main:LoadTrackerList()
 			index = main:GetTrackerIndex(id)
@@ -926,7 +1022,50 @@ function HDH_AT_OnClick_Button(self)
 			F.DD_TRANSIT:SetSelectedValue(curTraits)
 		end
 		main:ChangeBody(BODY_ELEMENTS, index)
-		HDH_TRACKER.InitVaribles()
+		 
+		if not perType and (className == "HDH_COMBO_POINT_TRACKER" or className == "HDH_ESSENCE_TRACKER" or className == "HDH_DK_RUNE_TRACKER") then
+			if not main.DIALOG_SELECT_DISPLAY_TYPE then
+				main.DIALOG_SELECT_DISPLAY_TYPE = CreateFrame("Frame", main:GetName().."DialogSelectDisplayType", main, "HDH_AT_DialogSelectDisplayTypeTemplate")
+				main.DIALOG_SELECT_DISPLAY_TYPE.Button:SetScript("OnClick", function(self)
+					local trackerId = self:GetParent().trackerId
+					if self:GetParent().CheckButton1:GetChecked() then
+						DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON)
+					else
+						DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_BAR)
+					end
+					
+					HDH_TRACKER.InitVaribles()
+					self:GetParent():Hide()
+				end)
+
+				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1:SetScript("OnClick", function(self) 
+					self:GetParent().CheckButton2:SetChecked(false)
+				end)
+
+				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2:SetScript("OnClick", function(self) 
+					self:GetParent().CheckButton1:SetChecked(false)
+				end)
+			-- main.Dialog:AlertShow(L.DO_YOU_WANT_TO_DELETE_THIS_ITEM, nil, function(trackerObj)
+			-- 	trackerObj:Get
+			-- 	HDH_TRACKER.InitVaribles()
+			-- end, nil, trackerObj)
+			end
+			main.DIALOG_SELECT_DISPLAY_TYPE.trackerId = id
+			local color = trackerObj.POWER_INFO[type].color
+			local texture = trackerObj.POWER_INFO[type].texture
+			for i = 1, 5 do
+				_G[ (main.DIALOG_SELECT_DISPLAY_TYPE:GetName() .. "Texture".. i) ]:SetTexture(texture)
+				if i >= 3 then
+					_G[ (main.DIALOG_SELECT_DISPLAY_TYPE:GetName() .. "TextureBorder".. i) ]:SetVertexColor(unpack(color))
+					_G[ (main.DIALOG_SELECT_DISPLAY_TYPE:GetName() .. "Bar".. i) ]:SetVertexColor(unpack(color))
+				end
+			end
+			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1:SetChecked(true)
+			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2:SetChecked(false)
+			main.DIALOG_SELECT_DISPLAY_TYPE:Show()
+		else
+			HDH_TRACKER.InitVaribles()
+		end
 		
 	elseif self == F.BODY.CONFIG_TRACKER.BTN_DELETE then
 		local id = main:GetCurTrackerId()
@@ -954,14 +1093,15 @@ function HDH_AT_OnClick_Button(self)
 		local name = select(2, DB:GetTrackerInfo(id))
 		main.Dialog:AlertShow(L.ALRET_CONFIRM_COPY_TRACKER:format(name), main.Dialog.DLG_TYPE.EDIT, function() 
 			local copyName =  main.Dialog.EditBox:GetText()
-			copyName = HDH_AT_UTIL.Trim(copyName)
+			copyName = UTIL.Trim(copyName)
 			if copyName and string.len(copyName) > 0 then
 				local newId = DB:CopyTracker(id, copyName)
+
 				F.BODY.CONFIG_TRACKER:Hide()
 				GetMainFrame():UpdateFrame()
 				-- GetMainFrame():ChangeTrackerTabByTrackerId(newId)
 				HDH_TRACKER.InitVaribles()
-				main.Dialog:AlertShow(L.ALRET_CONFIRM_COPY)
+				main.Dialog:AlertShow(L.ALRET_CONFIRM_COPY:format(copyName))
 			else
 				main.Dialog:AlertShow(L.PLASE_INPUT_NAME)
 
@@ -1009,7 +1149,7 @@ function HDH_AT_OnClick_Button(self)
 				if cd[1]:GetChecked() then
 					checkedIdx = idx
 					condition = cd[2] and cd[2]:GetSelectedValue()
-					glowValue = cd[3] and HDH_AT_UTIL.Trim(cd[3]:GetText())
+					glowValue = cd[3] and UTIL.Trim(cd[3]:GetText())
 				end
 			end
 			if checkedIdx then
@@ -1026,11 +1166,81 @@ function HDH_AT_OnClick_Button(self)
 				main:LoadTrackerElementConfig(trackerId, elemIdx, elemIdx)
 			end
 		end
-		main:ChangeBody(BODY_ELEMENTS)
+
+		main.Dialog:AlertShow(L.SAVED_CONFIG)
+		-- main:ChangeBody(BODY_ELEMENTS)
 
 	elseif self == F.BODY.CONFIG_DETAIL.BTN_CLOSE then
 		main:ChangeBody(BODY_ELEMENTS)
+
+	elseif self == F.BODY.CONFIG_DETAIL.ETC.CUSTOM_BTN_SEARCH then
+		local trackerId = F.BODY.CONFIG_DETAIL.trackerId
+		local elemIdx = F.BODY.CONFIG_DETAIL.elemIdx
+		local spell = F.BODY.CONFIG_DETAIL.ETC.CUSTOM_EB_SPELL:GetText()
+		local isItem = F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CB_IS_ITEM:GetChecked()
+		spell = UTIL.Trim(spell)
+
+		if not spell or string.len(spell) == 0 then
+			main.Dialog:AlertShow(L.PLASE_INPUT_ID) return 
+		end
+		local name, id, texture = UTIL.GetInfo(spell, isItem)
+		if not id then
+			main.Dialog:AlertShow(L.NOT_FOUND_ID:format(spell)) return 
+		end
+		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon:SetTexture(texture)
+		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon.key = spell
+		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon.isItem = isItem
+
+		if F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON:GetChecked() and spell then
+			DB:SetTrackerElementImage(trackerId, elemIdx, texture, key, isItem)
+			HDH_TRACKER.InitVaribles(trackerId)
+		end
+	
+	elseif UTIL.HasValue(F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR.ED_LIST, self:GetParent()) then
+		local index = self:GetParent().index
+		local trackerId = F.BODY.CONFIG_DETAIL.trackerId
+		local elemIdx = F.BODY.CONFIG_DETAIL.elemIdx
+		local values = DB:GetTrackerElementSplitValues(trackerId, elemIdx) or {}
+		local minValue, maxValue = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR:GetMinMaxValues()
+
+		if maxValue < 10 then
+			main.Dialog:AlertShow(L.NEED_TO_MAXIMUM_VALUE)
+			return 
+		end
+
+		if self:GetParent().ButtonAdd == self then
+			local v = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR.ED_LIST[index]:GetValue()
+			if v == 0 then
+				main.Dialog:AlertShow(L.PLASE_INPUT_VALUE)
+				return
+			end
+			if minValue < v and maxValue > v then
+				values[index] = v
+				table.sort(values)
+
+				if (maxValue - v) < 10 or (v - minValue) < 10 then
+					main.Dialog:AlertShow(L.NEED_TO_INTER_VALUE)
+					return 
+				end
+				for i = 1, #values-1 do
+					if (values[i+1] - values[i] < 10 ) then
+						main.Dialog:AlertShow(L.NEED_TO_INTER_VALUE)
+						return 
+					end
+				end
+			else
+				main.Dialog:AlertShow(L.PLASE_INPUT_MINMAX_VALUE)
+				return
+			end
+		elseif self:GetParent().ButtonDel == self then
+			table.remove(values, index)
+		end
+
+		DB:SetTrackerElementSplitValues(trackerId, elemIdx, values)
+		main:LoadDetailFrame(BODY_DETAIL_ETC, trackerId, elemIdx)
+		HDH_TRACKER.InitVaribles(trackerId)
 	end
+	
 end
 
 function HDH_AT_OnClick_ButtomTapButton(self)
@@ -1121,7 +1331,7 @@ end
 function HDH_AT_ConfigFrameMixin:AddTrackerElement(elem, trackerId, elemIdx)
 	local rowIdx, key, id, name, texture, isAlways, isGlow, isValue, isItem = elem:Get()
 
-	key = HDH_AT_UTIL.Trim(key)
+	key = UTIL.Trim(key)
 	if not key or string.len(key) == 0 then
 		self.Dialog:AlertShow(L.PLASE_INPUT_ID)
 		return 
@@ -1132,7 +1342,7 @@ function HDH_AT_ConfigFrameMixin:AddTrackerElement(elem, trackerId, elemIdx)
 		return 
 	end
 	
-	name, id, texture, isItem = HDH_AT_UTIL.GetInfo(key, isItem)
+	name, id, texture, isItem = UTIL.GetInfo(key, isItem)
 
 	if not id then
 		self.Dialog:AlertShow(L.NOT_FOUND_ID:format(tostring(key)))
@@ -1341,14 +1551,14 @@ end
 
 function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx, button)
 	local F = self.F
-	local _, id, name, texture = DB:GetTrackerElement(trackerId, elemIdx)
+	local key, id, name, texture, _, _, _, isItem = DB:GetTrackerElement(trackerId, elemIdx)
 	F.BODY.CONFIG_DETAIL.elemIdx = elemIdx
 	F.BODY.CONFIG_DETAIL.id = id
 	F.BODY.CONFIG_DETAIL.texture = texture
 	F.BODY.CONFIG_DETAIL.trackerId = trackerId
 	
 	F.BODY.CONFIG_DETAIL.ICON:SetTexture(texture)
-	F.BODY.CONFIG_DETAIL.TEXT:SetText(name .. " " .. L.DETAIL_CONIFG)
+	F.BODY.CONFIG_DETAIL.TEXT:SetText(name)
 	F.BODY.CONFIG_DETAIL.mode = detailMode
 
 	if detailMode == BODY_DETAIL_GLOW then
@@ -1366,8 +1576,92 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			end
 		end
 		button:SetChecked(F.BODY.CONFIG_DETAIL.GLOW.preCheck)
-	else
+		F.BODY.CONFIG_DETAIL.BTN_SAVE:Show()
+		F.BODY.CONFIG_DETAIL.BTN_CLOSE:ClearAllPoints()
+		F.BODY.CONFIG_DETAIL.BTN_CLOSE:SetPoint("BOTTOMLEFT", F.BODY.CONFIG_DETAIL.BTN_CLOSE:GetParent() ,"BOTTOM", 5, 5)
+	elseif detailMode == BODY_DETAIL_ETC then
+		local trackerType = select(3, DB:GetTrackerInfo(trackerId))
+		local texture, key, isItem = DB:GetTrackerElementImage(trackerId, elemIdx)
+		local deFaultTexture = DB:GetTrackerElementDefaultImage(trackerId, elemIdx)
+		local CLASS = HDH_TRACKER.GetClass(trackerType)
 
+		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CB_ION_DEFAULT.Icon:SetTexture(deFaultTexture)
+		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon.key = key
+		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon.isItem = isItem
+		F.BODY.CONFIG_DETAIL.BTN_CLOSE:ClearAllPoints()
+		F.BODY.CONFIG_DETAIL.BTN_CLOSE:SetPoint("BOTTOM", F.BODY.CONFIG_DETAIL.BTN_CLOSE:GetParent() ,"BOTTOM", 0, 5)
+		F.BODY.CONFIG_DETAIL.BTN_SAVE:Hide()
+
+		-- Load ChangeIcon
+		if key then
+			F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon:SetTexture(texture)
+		else
+			F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon:SetTexture("Interface/Icons/INV_Misc_QuestionMark")
+		end
+		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_EB_SPELL:SetText(key or "")
+		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CB_IS_ITEM:SetChecked(isItem)
+		
+		local tex = F.BODY:CreateTexture()
+		if key then
+			for _, cb in ipairs(CHANGE_ICON_CB_LIST) do
+				cb:SetChecked(false)
+			end
+			F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON:SetChecked(true)
+		else
+			for _, cb in ipairs(CHANGE_ICON_CB_LIST) do
+				cb:SetChecked(texture == cb.Icon:GetTexture())
+			end
+		end
+
+		local values = DB:GetTrackerElementSplitValues(trackerId, elemIdx) or {}
+		-- Load splitbar
+		local splitbar = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR
+		splitbar.ED_LIST = splitbar.ED_LIST or {}
+		local edList = splitbar.ED_LIST
+		local v 
+		local component
+		local parent = self.DETAIL_ETC_TAB[2].content
+		for i =1 , (#values + 1) do
+			v = values[i]
+			if not edList[i] then
+				component = CreateFrame("Frame", (parent:GetName()..'AddDelEdtibox'..i), parent, "HDH_AT_AddDelEdtiboxTemplate")
+				component:SetSize(115, 26)
+				component.EditBox:SetAutoFocus(false)
+				component.EditBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
+				component.EditBox:SetScript("OnEnterPressed", function(self) self:ClearFocus() HDH_AT_OnClick_Button(self:GetParent().ButtonAdd) end)
+				component.ButtonAdd:SetScript("OnClick", HDH_AT_OnClick_Button)
+				component.ButtonDel:SetScript("OnClick", HDH_AT_OnClick_Button)
+				component.Text:SetText(L.SPLIT_POINT:format(i))
+				if i == 1 then
+					component:SetPoint('TOPLEFT', splitbar, 'BOTTOMLEFT', 0, -40)
+				else
+					component:SetPoint('TOPLEFT', edList[i -1], 'BOTTOMLEFT', 0, -5)
+				end
+				edList[i] = component
+			end
+			edList[i].EditBox:SetText(v or "")
+			edList[i]:Show()
+			edList[i].index = i
+			if v then
+				splitbar:AddPointer(i, v)
+			else
+				splitbar:RemovePointer(i)
+			end
+		end
+		for i = #values + 2, #edList do
+			edList[i]:Hide()
+			splitbar:RemovePointer(i)
+		end
+		
+
+		if CLASS.POWER_INFO and trackerType ~= HDH_TRACKER.TYPE.STAGGER then
+			local max = UnitPowerMax('player', CLASS.POWER_INFO[trackerType].power_index)
+			if max then
+				splitbar:SetMinMaxValues(0, max)
+			end
+		else
+			splitbar:SetMinMaxValues(0, 1)
+		end
 	end
 end
 
@@ -1663,9 +1957,9 @@ function HDH_AT_ConfigFrameMixin:LoadUIConfig(tackerId)
 		LoadDB(tackerId, comp)
 	end
 	if DB:hasTrackerUI(tackerId) then
-		F.BODY.CONFIG_UI.DD_CONFIG_MODE:SetSelectedIndex(DB.USE_SEVERAL_CONFIG)
+		F.BODY.CONFIG_UI.SW_CONFIG_MODE:SetSelectedIndex(DB.USE_SEVERAL_CONFIG)
 	else
-		F.BODY.CONFIG_UI.DD_CONFIG_MODE:SetSelectedIndex(DB.USE_GLOBAL_CONFIG)
+		F.BODY.CONFIG_UI.SW_CONFIG_MODE:SetSelectedIndex(DB.USE_GLOBAL_CONFIG)
 	end
 end
 
@@ -1680,7 +1974,7 @@ function HDH_AT_ConfigFrameMixin:UpdateFrame()
 		HDH_TRACKER.warining_count = 0
 		self.Dialog:AlertShow(L.PLASE_RESELECT_TRATIS)
 	end
-	HDH_AT_ConfigFrame.Text:SetText((transitName or "none").. ":".. (transitID or 'none'))
+	-- HDH_AT_ConfigFrame.Text:SetText((transitName or "none").. ":".. (transitID or 'none'))
 	-- if not transitName then
 		-- self.Dialog:AlertShow(L.NONACTIVATE_TRANSIT, nil, function() self:Hide() end)
 	-- else
@@ -1741,6 +2035,10 @@ local function DBSync(comp, comp_type, key)
 	end
 end
 
+function HDH_AT_ConfigFrameMixin:AddSplitPoint()
+
+end
+
 function HDH_AT_ConfigFrameMixin:InitFrame()
     self.F = {}
 	local F = self.F
@@ -1771,7 +2069,6 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.F.BODY.CONFIG_DETAIL.GLOW.CD3.idx = 3
 	self.F.BODY.CONFIG_DETAIL.GLOW.CD4 = _G[self:GetName().."BodyDetailConfigGlowCBCondition4"]
 	self.F.BODY.CONFIG_DETAIL.GLOW.CD4.idx = 4
-
 	self.F.BODY.CONFIG_DETAIL.GLOW.CD_DD2 = _G[self:GetName().."BodyDetailConfigGlowDDCondition2"]
 	HDH_AT_DropDown_Init(F.BODY.CONFIG_DETAIL.GLOW.CD_DD2, DDP_CONDITION_LIST, HDH_AT_OnSelected_Dropdown)
 	F.BODY.CONFIG_DETAIL.GLOW.CD_DD2:SetSelectedIndex(3)
@@ -1781,7 +2078,6 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.F.BODY.CONFIG_DETAIL.GLOW.CD_DD4 = _G[self:GetName().."BodyDetailConfigGlowDDCondition4"]
 	HDH_AT_DropDown_Init(F.BODY.CONFIG_DETAIL.GLOW.CD_DD4, DDP_CONDITION_LIST, HDH_AT_OnSelected_Dropdown)
 	F.BODY.CONFIG_DETAIL.GLOW.CD_DD4:SetSelectedIndex(3)
-
 	self.F.BODY.CONFIG_DETAIL.GLOW.CD_EB2 = _G[self:GetName().."BodyDetailConfigGlowEBCondition2"]
 	self.F.BODY.CONFIG_DETAIL.GLOW.CD_EB3 = _G[self:GetName().."BodyDetailConfigGlowEBCondition3"]
 	self.F.BODY.CONFIG_DETAIL.GLOW.CD_EB4 = _G[self:GetName().."BodyDetailConfigGlowEBCondition4"]
@@ -1793,6 +2089,70 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 		{ self.F.BODY.CONFIG_DETAIL.GLOW.CD4, self.F.BODY.CONFIG_DETAIL.GLOW.CD_DD4, self.F.BODY.CONFIG_DETAIL.GLOW.CD_EB4 }
 	}
 	
+	self.F.BODY.CONFIG_DETAIL.ETC = _G[self:GetName().."BodyDetailConfigETC"]
+	self.F.BODY.CONFIG_DETAIL.ETC.MENU = _G[self:GetName().."BodyDetailConfigETCMenuSFContents"]
+	self.F.BODY.CONFIG_DETAIL.ETC.CONTENTS = _G[self:GetName().."BodyDetailConfigETCSFContents"]
+
+	self.DETAIL_ETC_TAB = self:AppendUITab(DETAIL_ETC_CONFIG_TAB_LIST, self.F.BODY.CONFIG_DETAIL.ETC.MENU, self.F.BODY.CONFIG_DETAIL.ETC.CONTENTS)
+	
+	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON, L.USE_DEFAULT_ICON, nil, 1, 1)
+	comp.Icon:SetTexture(nil)
+	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CB_ION_DEFAULT = comp
+	table.insert(CHANGE_ICON_CB_LIST, comp)
+
+	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON, L.USE_SEARCH_ICON, nil, 2, 1)
+	comp.Icon:SetTexture("Interface/Icons/INV_Misc_QuestionMark")
+	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON = comp
+	table.insert(CHANGE_ICON_CB_LIST, comp)
+	local component1 = CreateFrame("EditBox", (comp:GetName()..'EditBox'), comp, "InputBoxTemplate")
+	component1:SetSize(130, 26)
+	component1:SetPoint('TOPLEFT', comp, 'BOTTOMLEFT', 10, 0)
+	component1:SetText(value or "")
+	component1:SetAutoFocus(false)
+	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_EB_SPELL = component1
+
+	local component2 = CreateFrame("CheckButton", (comp:GetName()..'CheckButtonIsItem'), comp, "HDH_AT_CheckButtonTemplate")
+	component2:SetSize(26, 26)
+	component2:SetPoint('TOPLEFT', component1, 'BOTTOMLEFT', -8, 0)
+	component2.Text:SetText(L.ITEM_TOOLTIP)
+	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CB_IS_ITEM = component2
+
+	local component3 = CreateFrame("Button", (comp:GetName()..'BUTTOM'), comp, "HDH_AT_ButtonTemplate")
+	component3:SetSize(50, 26)
+	component3:SetPoint('LEFT', component2, 'RIGHT', 63, 0)
+	component3:SetText(L.SEARCH)
+	component3:SetScript("OnClick", HDH_AT_OnClick_Button)
+	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_BTN_SEARCH = component3
+
+	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_EB_SPELL:SetScript("OnEnterPressed", function(self)
+		self:ClearFocus()
+		HDH_AT_OnClick_Button(GetMainFrame().F.BODY.CONFIG_DETAIL.ETC.CUSTOM_BTN_SEARCH) 
+	end)
+
+	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, nil,  L.ICON_LIST,   nil, 4, 1)
+
+	local col_idx = 0
+	local row_idx = 5
+	for _, texture in ipairs(ICON_PRESET_LIST) do
+		col_idx = (col_idx % 3)
+		col_idx = col_idx + 1
+		comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON,     nil, nil, row_idx, col_idx)
+		comp.Icon:SetTexture(texture)
+		table.insert(CHANGE_ICON_CB_LIST, comp)
+		if col_idx == 3 then
+			row_idx = row_idx + 1
+		end
+	end
+
+	-- self.DETAIL_ETC_TAB[2].content
+	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[2].content, nil, L.THIS_IS_ONLY_SPLIT_POWER_BAR)
+	local comp = CreateFrame("Frame", (self.DETAIL_ETC_TAB[2].content:GetName()..'SplitBar'), self.DETAIL_ETC_TAB[2].content, "HDH_AT_SplitBarTemplate")
+	comp:SetSize(200, 30)
+	comp:SetPoint('TOPLEFT', self.DETAIL_ETC_TAB[2].content, 'TOPLEFT', 20, -70)
+	comp:SetMinMaxValues(0, 1)
+	self.F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR = comp
+	-- INV_Jewelcrafting_DragonsEye03 INV_Jewelcrafting_DragonsEye04 INV_Jewelcrafting_DragonsEye05
+
 	self.F.BODY.CONFIG_DETAIL.BTN_SAVE = _G[self:GetName().."BodyDetailConfigBottomButtonApply"]
 	self.F.BODY.CONFIG_DETAIL.BTN_CLOSE = _G[self:GetName().."BodyDetailConfigBottomButtonClose"]
 
@@ -1817,15 +2177,25 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	-- self.F.BODY.CONFIG_TRACKER.BTN_SAVE = _G[self.F.BODY:GetName().."TrackerBottomBtnSaveTracker"]
 
 	self.F.BODY.CONFIG_UI = _G[self.F.BODY:GetName().."UI"]
-	self.F.BODY.CONFIG_UI.DD_DISPLAY_MODE = _G[self.F.BODY:GetName().."UITopDDLDisplayType"]
-	self.F.BODY.CONFIG_UI.DD_CONFIG_MODE = _G[self.F.BODY:GetName().."UITopDDLConfigMode"]
+	-- self.F.BODY.CONFIG_UI.DD_DISPLAY_MODE = _G[self.F.BODY:GetName().."UITopDDLDisplayType"]
+	-- self.F.BODY.CONFIG_UI.DD_CONFIG_MODE = _G[self.F.BODY:GetName().."UITopDDLConfigMode"]
+
+	self.F.BODY.CONFIG_UI.SW_DISPLAY_MODE = _G[self.F.BODY:GetName().."UITopSwithDisplayMode"]
+	self.F.BODY.CONFIG_UI.SW_DISPLAY_MODE:Init({HDH_AT_L.USE_DISPLAY_ICON, HDH_AT_L.USE_DISPLAY_BAR, HDH_AT_L.USE_DISPLAY_ICON_AND_BAR}, HDH_AT_OnSelected_Dropdown)
+	DBSync(F.BODY.CONFIG_UI.SW_DISPLAY_MODE, COMP_TYPE.SWITCH, "ui.%s.common.display_mode")
+
+	self.F.BODY.CONFIG_UI.SW_CONFIG_MODE = _G[self.F.BODY:GetName().."UITopSwithConfigMode"]
+	self.F.BODY.CONFIG_UI.SW_CONFIG_MODE:Init({HDH_AT_L.USE_GLOBAL_CONFIG, HDH_AT_L.USE_SEVERAL_CONFIG}, HDH_AT_OnSelected_Dropdown)
+	-- DBSync(F.BODY.CONFIG_UI.DD_DISPLAY_MODE, COMP_TYPE.DROPDOWN, "ui.%s.common.display_mode")
+
 	self.F.BODY.CONFIG_UI.CB_MOVE = _G[self.F.BODY:GetName().."UIBottomCBMove"]
 	self.F.BODY.CONFIG_UI.CB_SHOW_ID_TOOPTIP = _G[self.F.BODY:GetName().."UIBottomCBShowIdInTooltip"]
+	DBSync(F.BODY.CONFIG_UI.CB_SHOW_ID_TOOPTIP, COMP_TYPE.CHECK_BOX, "show_tooltip_id")
 
-	HDH_AT_DropDown_Init(F.BODY.CONFIG_UI.DD_DISPLAY_MODE, DDP_DISPLAY_MODE_LIST, HDH_AT_OnSelected_Dropdown)
-	DBSync(F.BODY.CONFIG_UI.DD_DISPLAY_MODE, COMP_TYPE.DROPDOWN, "ui.%s.common.display_mode")
+	-- HDH_AT_DropDown_Init(F.BODY.CONFIG_UI.DD_DISPLAY_MODE, DDP_DISPLAY_MODE_LIST, HDH_AT_OnSelected_Dropdown)
+	-- DBSync(F.BODY.CONFIG_UI.DD_DISPLAY_MODE, COMP_TYPE.DROPDOWN, "ui.%s.common.display_mode")
 
-	HDH_AT_DropDown_Init(F.BODY.CONFIG_UI.DD_CONFIG_MODE, DDP_CONFIG_MODE_LIST, HDH_AT_OnSelected_Dropdown)
+	-- HDH_AT_DropDown_Init(F.BODY.CONFIG_UI.DD_CONFIG_MODE, DDP_CONFIG_MODE_LIST, HDH_AT_OnSelected_Dropdown)
 	
 
 	-- self.F.BODY.CONFIG_UI.CONTENTS = _G[self.F.BODY:GetName().."UISFContents"]
@@ -1869,8 +2239,6 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.UI_TAB = tabUIList
 	ChangeTab(tabUIList, 1)
 
-	DBSync(F.BODY.CONFIG_UI.CB_SHOW_ID_TOOPTIP, COMP_TYPE.CHECK_BOX, "show_tooltip_id")
-
 	-- FONT COOLDOWN 
 	comp = HDH_AT_CreateOptionComponent(tabUIList[1].content, COMP_TYPE.DROPDOWN,     L.TIME_FORMAT,  		  "ui.%s.font.cd_format")
 	HDH_AT_DropDown_Init(comp, DDP_FONT_CD_FORMAT_LIST, HDH_AT_OnSelected_Dropdown)
@@ -1879,6 +2247,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp = HDH_AT_CreateOptionComponent(tabUIList[1].content, COMP_TYPE.COLOR_PICKER, L.FONT_COLOR,          "ui.%s.font.cd_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[1].content, COMP_TYPE.COLOR_PICKER, L.UNDER_5S_FONT_COLOR, "ui.%s.font.cd_color_5s")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[1].content, COMP_TYPE.SLIDER,       L.FONT_SIZE,           "ui.%s.font.cd_size")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[1].content, COMP_TYPE.CHECK_BOX,       L.SHORT_TIME,      "ui.%s.font.cd_abbreviate")
 
 	-- FONT COUNT
 	comp = HDH_AT_CreateOptionComponent(tabUIList[2].content, COMP_TYPE.DROPDOWN,     L.TIME_LOCATION,       "ui.%s.font.count_location")
@@ -1891,6 +2260,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	HDH_AT_DropDown_Init(comp, DDP_FONT_CD_LOC_LIST, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[3].content, COMP_TYPE.COLOR_PICKER, L.FONT_COLOR,          "ui.%s.font.v1_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[3].content, COMP_TYPE.SLIDER,       L.FONT_SIZE,           "ui.%s.font.v1_size")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[3].content, COMP_TYPE.CHECK_BOX,       L.SHORT_VALUE,      "ui.%s.font.v1_abbreviate")
 
 	-- FONT NAME
 	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.DROPDOWN,       L.NAME_ALIGN,         "ui.%s.font.name_align")
@@ -1915,9 +2285,9 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:Init(1, 1, 20, true, false, nil, L.ROW_N_COL_N)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.CHECK_BOX,       L.ICON_REVERSE_DISPLAY_V,           "ui.%s.common.reverse_v")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.CHECK_BOX,       L.ICON_REVERSE_DISPLAY_H,           "ui.%s.common.reverse_h")
-	
+	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.CHECK_BOX,       L.DISPLAY_WHEN_NONCOMBAT,           "ui.%s.common.always_show")
+	self.F.BODY.CONFIG_UI.CB_DISPLAY_WHEN_NONCOMBAT = comp
 	-- ICON COLOR
-	
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.DROPDOWN,       L.COOLDOWN_ANIMATION_DIDRECTION,         "ui.%s.icon.cooldown")
 	HDH_AT_DropDown_Init(comp, DDP_ICON_COOLDOWN_LIST, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SLIDER,     L.ICON_SIZE,       "ui.%s.icon.size")
@@ -1944,11 +2314,11 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.FILL_BAR,         "ui.%s.bar.reverse_fill")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.REVERSE_PROGRESS,         "ui.%s.bar.reverse_progress")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.DISPLAY_SPARK,         "ui.%s.bar.show_spark")
-	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.USE_DEFAULT_BORDER_COLOR,           "ui.%s.common.default_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.COLOR_PICKER,     L.BG_COLOR,       "ui.%s.bar.bg_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.COLOR_PICKER,     L.BAR_COLOR,       "ui.%s.bar.color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.DISPLAY_FILL_BAR,         "ui.%s.bar.use_full_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.COLOR_PICKER,     L.FILL_COLOR,       "ui.%s.bar.full_color")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.USE_DEFAULT_BORDER_COLOR,           "ui.%s.common.default_color")
 	
 	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.BUTTON,       L.RESET_ADDON)
 	comp:SetText(L.RESET)
@@ -1969,6 +2339,10 @@ function HDH_AT_ConfigFrameMixin:SetupCommend()
 end
 
 function HDH_AT_ConfigFrame_OnShow(self)
+
+	if GetSpecialization() == 5 then
+		self.Dialog:AlertShow(L.NOT_FOUND_TALENT)
+	end
 	self:SetClampedToScreen(true)
 	local x = self:GetLeft()
 	local y = self:GetBottom()
@@ -1995,37 +2369,60 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	local COMP_HEIGHT = 25
 	local COMP_WIDTH = 95
 	local COMP_MARGIN = 8
+
+	local start_x = 0
+
 	parent.row = parent.row or 0
-	parent.col = parent.col or 0
+	parent.col = col or parent.col or 1
+
+	if col then
+		if col == 2 then
+			start_x = 80
+		elseif col == 3 then
+			start_x = 160
+		end
+	end
 	
-	local x = COMP_WIDTH * parent.col -- + COMP_MARGIN
-	local y = -(COMP_HEIGHT + COMP_MARGIN) * (parent.row)
+	if row and (row > parent.row) then
+		parent.row = row
+	else
+		parent.row = parent.row + 1
+	end
+	
+	local x = start_x -- + COMP_MARGIN
+	local y = -(COMP_HEIGHT + COMP_MARGIN) * ((row and row-1) or (parent.row-1))
 	local component = nil
 	local frame = CreateFrame("Frame", (parent:GetName()..'Label'..parent.row), parent)
-	frame:SetSize(COMP_WIDTH, COMP_HEIGHT)
-	frame:SetPoint('TOPLEFT', parent, 'TOPLEFT', MARGIN_X + x, MARGIN_Y + y)
-	frame.text = frame:CreateFontString(nil, 'OVERLAY', "Font_Yellow_M")
-	frame.text:SetPoint('LEFT', frame, 'LEFT', COMP_MARGIN, 0)
-	frame.text:SetNonSpaceWrap(false)
-	frame.text:SetJustifyH('LEFT')
-	frame.text:SetJustifyV('CENTER')
-	frame.text:SetFontObject("Font_Yellow_S")
-	frame.text:SetText(option_name)
+
+	if option_name then
+		frame:SetSize(COMP_WIDTH, COMP_HEIGHT)
+		frame:SetPoint('TOPLEFT', parent, 'TOPLEFT', MARGIN_X + x, MARGIN_Y + y)
+		frame.text = frame:CreateFontString(nil, 'OVERLAY', "Font_Yellow_M")
+		frame.text:SetPoint('LEFT', frame, 'LEFT', COMP_MARGIN, 0)
+		frame.text:SetNonSpaceWrap(false)
+		frame.text:SetJustifyH('LEFT')
+		frame.text:SetJustifyV('CENTER')
+		frame.text:SetFontObject("Font_Yellow_S")
+		frame.text:SetText(option_name)
+	else
+		frame:SetSize(1, COMP_HEIGHT)
+		frame:SetPoint('TOPLEFT', parent, 'TOPLEFT', MARGIN_X + x, MARGIN_Y + y)
+	end
 
 	if component_type == COMP_TYPE.CHECK_BOX then
-		component = CreateFrame("CheckButton", (parent:GetName()..'CheckButton'..parent.row), parent, "OptionsBaseCheckButtonTemplate")
+		component = CreateFrame("CheckButton", (parent:GetName()..'CheckButton'..parent.row.."_"..parent.col), parent, "OptionsBaseCheckButtonTemplate")
 		component:SetPoint('LEFT', frame, 'RIGHT', 18, 0)
 		component:SetScript("OnClick", HDH_AT_UI_OnCheck)
 
 	elseif component_type == COMP_TYPE.BUTTON then
-		component = CreateFrame("Button", (parent:GetName()..'Button'..parent.row), parent, "HDH_AT_ButtonTemplate")
+		component = CreateFrame("Button", (parent:GetName()..'Button'..parent.row.."_"..parent.col), parent, "HDH_AT_ButtonTemplate")
 		component:SetSize(110, 26)
 		component:SetPoint('LEFT', frame, 'RIGHT', 25, 0)
 		component:SetText(value or 'None')
 		component:SetScript("OnClick", HDH_AT_OnClick_Button)
 	
 	elseif component_type == COMP_TYPE.EDIT_BOX then
-		component = CreateFrame("EditBox", (parent:GetName()..'EditBox'..parent.row), parent, "InputBoxTemplate")
+		component = CreateFrame("EditBox", (parent:GetName()..'EditBox'..parent.row.."_"..parent.col), parent, "InputBoxTemplate")
 		component:SetSize(110, 26)
 		component:SetPoint('LEFT', frame, 'RIGHT', 25, 0)
 		component:SetText(value or "")
@@ -2035,38 +2432,57 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		component:SetMaxLetters(15)
 
 	elseif component_type == COMP_TYPE.DROPDOWN then
-		component = CreateFrame("Button", (parent:GetName()..'DropDown'..parent.row), parent, "HDH_AT_DropDownOptionTemplate")
+		component = CreateFrame("Button", (parent:GetName()..'DropDown'..parent.row.."_"..parent.col), parent, "HDH_AT_DropDownOptionTemplate")
 		component:SetSize(115, 22)
 		component:SetPoint('LEFT', frame, 'RIGHT', 20, 0)
 
 	elseif component_type == COMP_TYPE.MULTI_SELECTOR then
-		component = CreateFrame("FRAME", (parent:GetName()..'MultiSelector'..parent.row), parent, "HDH_AT_MultiSelectorTemplate")
+		component = CreateFrame("FRAME", (parent:GetName()..'MultiSelector'..parent.row.."_"..parent.col), parent, "HDH_AT_MultiSelectorTemplate")
 		component:SetSize(115, 200)
 		component:SetPoint('TOPLEFT', frame, 'TOPRIGHT', 15, -2)
 	-- elseif then
 
 	elseif component_type == COMP_TYPE.SLIDER then
-		component = CreateFrame("Slider", (parent:GetName()..'Slider'..parent.row), parent, "HDH_AT_SliderTemplate")
+		component = CreateFrame("Slider", (parent:GetName()..'Slider'..parent.row.."_"..parent.col), parent, "HDH_AT_SliderTemplate")
 		component:SetSize(115, 17)
 		component:SetPoint('LEFT', frame, 'RIGHT', 20, -4)
 		component:SetHandler(HDH_AT_OnChangedSlider)
 		component:Init(10, 0, 100, true, true, 10)
 
 	elseif component_type == COMP_TYPE.COLOR_PICKER then
-		component = CreateFrame("Button", (parent:GetName()..'ColorPicker'..parent.row), parent, "HDH_AT_ColorPickerTemplate")
-		component:SetSize(115, 26)
+		component = CreateFrame("Button", (parent:GetName()..'ColorPicker'..parent.row.."_"..parent.col), parent, "HDH_AT_ColorPickerTemplate")
+		component:SetSize(26, 26)
 		component:SetPoint('LEFT', frame, 'RIGHT', 22, 0)
 		component:SetHandler(HDH_AT_OnSeletedColor)
 
 	elseif component_type == COMP_TYPE.PREV_NEXT_BUTTON then
-		component = CreateFrame("Button", (parent:GetName()..'PrevNextButton'..parent.row), parent, "HDH_AT_PrevNextButtonTemplate")
+		component = CreateFrame("Button", (parent:GetName()..'PrevNextButton'..parent.row.."_"..parent.col), parent, "HDH_AT_PrevNextButtonTemplate")
 		component:SetSize(115, 26)
 		component:SetPoint('LEFT', frame, 'RIGHT', 20, 0)
 		-- component:SetHandler(HDH_AT_OnSeletedColor)
+	
+	elseif component_type == COMP_TYPE.IMAGE_CHECKBUTTON then
+		component = CreateFrame("CheckButton", (parent:GetName()..'ImageCheckButton'..parent.row.."_"..parent.col), parent, "HDH_AT_CheckButtonImageTemplate")
+		component:SetSize(26, 26)
+		component:SetPoint('LEFT', frame, 'RIGHT', 0, 0)
+		component:SetScript("OnClick", HDH_AT_UI_OnCheck)
+		-- component:SetHandler(HDH_AT_OnSeletedColor)
+
+	elseif component_type == COMP_TYPE.EDITBOX_ADD_DEL then
+		component = CreateFrame("Frame", (parent:GetName()..'AddDelEdtibox'..parent.row.."_"..parent.col), parent, "HDH_AT_AddDelEdtiboxTemplate")
+		component:SetSize(115, 26)
+		component:SetPoint('LEFT', frame, 'RIGHT', 0, 0)
+		component.EditBox:SetText(value or "")
+		component.EditBox:SetAutoFocus(false) 
+		component.EditBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
+		component.EditBox:SetScript("OnEnterPressed", function(self) self:ClearFocus() end)
+
+		-- component:SetHandler(HDH_AT_OnSeletedColor)
 	end
 
-	parent.row = parent.row + 1
-	DBSync(component, component_type, db_key)
+	if component_type then
+		DBSync(component, component_type, db_key)
+	end
 	local w, h = parent:GetParent():GetSize()
 	parent:ClearAllPoints()
 	parent:SetSize(w, -(y - COMP_HEIGHT))

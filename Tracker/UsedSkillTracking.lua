@@ -7,7 +7,7 @@ local L_TRACKER_NAME = "사용된 스킬 목록";
 HDH_USED_SKILL_TRACKER.TIMER_DELAY = 10;
 HDH_USED_SKILL_TRACKER.OVER_TIME = 30;
 -- local HDH_POWER = {}
--- HDH_USED_SKILL_TRACKER.DATA = {type_name="HEALTH", bar_color={0, 1, 0}, texture = "Interface\\Icons\\Ability_Malkorok_BlightofYshaarj_Green"};
+-- HDH_USED_SKILL_TRACKER.DATA = {type_name="HEALTH", bar_color={0, 1, 0}, texture = "Interface/Icons/Ability_Malkorok_BlightofYshaarj_Green"};
 
 -- HDH_TRACKER_LIST[#HDH_TRACKER_LIST+1] = L_TRACKER_NAME -- 유닛은 명확하게는 추적 타입으로 보는게 맞지만 at 에서 이미 그렇게 사용하기 때문에 그냥 유닛 리스트로 넣어서 사용함
 -- HDH_GET_CLASS[L_TRACKER_NAME] = HDH_USED_SKILL_TRACKER -- 

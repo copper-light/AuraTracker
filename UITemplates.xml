@@ -28,7 +28,7 @@
     <Font name="Font_Yellow_S" font="Fonts\2002.TTF" virtual="true">
 		<Color r="1" g="0.8" b="0"/>
 		<FontHeight>
-		  <AbsValue val="12"/>
+		  <AbsValue val="11"/>
 		</FontHeight>
 		<Shadow>
 			<Offset x="1" y="-1"/>
@@ -39,7 +39,7 @@
 	<Font name="Font_Gray_S" font="Fonts\2002.TTF" virtual="true">
 		<Color r="0.4" g="0.4" b="0.4"/>
 		<FontHeight>
-		  <AbsValue val="12"/>
+		  <AbsValue val="11"/>
 		</FontHeight>
 		<Shadow>
 			<Offset x="1" y="-1"/>
@@ -61,7 +61,7 @@
 	<Font name="Font_White_S" font="Fonts\2002.TTF" virtual="true">
 		<Color r="0.9" g="0.9" b="0.9"/>
 		<FontHeight>
-		  <AbsValue val="12"/>
+		  <AbsValue val="11"/>
 		</FontHeight>
 		<Shadow x="1" y="-1">
 			<Color r="0" g="0" b="0"/>
@@ -71,7 +71,7 @@
 	<Font name="Font_Black_S" font="Fonts\2002.TTF" virtual="true">
 		<Color r="0" g="0" b="0"/>
 		<FontHeight>
-		  <AbsValue val="12"/>
+		  <AbsValue val="11"/>
 		</FontHeight>
 		<Shadow>
 			<Offset x="1" y="-1"/>
@@ -79,7 +79,7 @@
 		</Shadow>
 	</Font>
 
-	<Frame name="HDH_AT_DialogFrame" frameStrata="TOOLTIP" virtual="true" enableMouse="true" hidden = "true" >
+	<Frame name="HDH_AT_DialogFrame" frameStrata="Dialog" virtual="true" enableMouse="true" hidden = "true" >
 		<Anchors>
 			<Anchor point="TOPLEFT" />
 			<Anchor point="BOTTOMRIGHT" />
@@ -101,6 +101,219 @@
 			<OnMouseUp>self:GetParent():StopMovingOrSizing()</OnMouseUp>
 		</Scripts>
 	</Frame>
+
+	<Frame name="HDH_AT_DialogSelectDisplayTypeTemplate" inherits="HDH_AT_DialogFrame" virtual="true">
+		<Size><AbsDimension x="400" y="100"/></Size>
+		<Layers>
+			<Layer level="BACKGROUND"/>
+		</Layers>
+		<Anchors>
+			<Anchor point="TOPLEFT" />
+			<Anchor point="BOTTOMRIGHT" />
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name ="$parentText" parentKey="HeaderText" inherits="Font_Yellow_M" text="사용할 디스플레이 유형을 선택해주세요">
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="100"/>
+					</Anchors>
+				</FontString>
+
+				<FontString name ="$parentText" parentKey="DescIconText" inherits="Font_Yellow_S" justifyV="TOP" text="※ 아이콘 이미지는 '추적 설정 > 주문별 상세설정 > 아이콘 변경' 메뉴에서 변경 가능합니다.">
+					<Size x="160"  />
+					<Anchors>
+						<Anchor point="LEFTTOP" relativePoint="CENTER" relativeTo="$parent" x="-180" y="-40"/>
+					</Anchors>
+				</FontString>
+
+				<FontString name ="$parentText" parentKey="DescBarText" inherits="Font_Yellow_S" justifyV="TOP" text="※ 바 텍스처와 색상은 'UI 설정 > 바' 메뉴에서 변경 가능합니다.">
+					<Size x="160"  />
+					<Anchors>
+						<Anchor point="LEFTTOP" relativePoint="CENTER" relativeTo="$parent" x="20" y="-40"/>
+					</Anchors>
+				</FontString>
+
+				<Texture file="Interface\AddOns\HDH_AuraTracker\Texture\UI-CastingBar-Spark" >
+					<Size  x="9" y="160" />
+					<Anchors>
+						<Anchor point="CENTER" x="0" y="0"/>
+						<Anchor point="CENTER" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+
+				<Texture name="$parentBar5" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar">
+					<Size x="25" y="13" />
+					<Color r="0.5" g="0.8" b="0.2" />
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="CENTER" x="30" y="0"/>
+					</Anchors>
+				</Texture>
+
+				<Texture name="$parentBar4" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar">
+					<Size x="25" y="13" />
+					<Color r="0.5" g="0.8" b="0.2" />
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBar5" x="3" y="0"/>
+					</Anchors>
+				</Texture>
+
+				<Texture name="$parentBar3" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar">
+					<Size x="25" y="13" />
+					<Color r="0.5" g="0.8" b="0.2" />
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBar4" x="3" y="0"/>
+					</Anchors>
+				</Texture>
+
+				<Texture name="$parentBar2" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar">
+					<Size x="25" y="13" />
+					<Color r="0.3" g="0.3" b="0.3" />
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBar3" x="3" y="0"/>
+					</Anchors>
+				</Texture>
+
+				<Texture name="$parentBar1" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar">
+					<Size x="25" y="13" />
+					<Color r="0.3" g="0.3" b="0.3" />
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBar2" x="3" y="0"/>
+					</Anchors>
+				</Texture>
+
+				<Texture name="$parentTexture1" file="Interface/ICONS/INV_Misc_Gem_Pearl_04" desaturated="True" parentKey="Icon1">
+					<Size x="25" y="25" />
+					<Color  r="1" g="1" b="1" a="0.5" />
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="CENTER" x="-30" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+
+				<Texture name="$parentTexture2" file="Interface/ICONS/INV_Misc_Gem_Pearl_04" desaturated="True" parentKey="Icon2">
+					<Size x="25" y="25" />
+					<Color  r="1" g="1" b="1" a="0.5"/>
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTexture1" x="-3" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+
+				<Texture name="$parentTexture3" file="Interface/ICONS/INV_Misc_Gem_Pearl_04" parentKey="Icon3">
+					<Size x="25" y="25" />
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTexture2" x="-3" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+
+				<Texture name="$parentTexture4" file="Interface/ICONS/INV_Misc_Gem_Pearl_04"  parentKey="Icon4">
+					<Size x="25" y="25" />
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTexture3" x="-3" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+
+				<Texture name="$parentTexture5" file="Interface/ICONS/INV_Misc_Gem_Pearl_04"  parentKey="Icon5">
+					<Size x="25" y="25" />
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTexture4" x="-3" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+			</Layer>
+
+			<Layer level="OVERLAY">
+				<Texture name="$parentTextureBorder1" file="Interface/AddOns/HDH_AuraTracker/Texture/border" parentKey="IconBorder1">
+					<Size x="25" y="25" />
+					<Color  r="0.3" g="0.3" b="0.3" a="0.5" />
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="CENTER" x="-30" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+
+				<Texture name="$parentTextureBorder2" file="Interface/AddOns/HDH_AuraTracker/Texture/border" parentKey="IconBorder2">
+					<Size x="25" y="25" />
+					<Color  r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTextureBorder1" x="-3" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+
+				<Texture name="$parentTextureBorder3" file="Interface/AddOns/HDH_AuraTracker/Texture/border" parentKey="IconBorder3">
+					<Size x="25" y="25" />
+					<Color  r="1" g="1" b="1" a="0.5"/>
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTextureBorder2" x="-3" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+
+				<Texture name="$parentTextureBorder4" file="Interface/AddOns/HDH_AuraTracker/Texture/border"  parentKey="IconBorder4">
+					<Size x="25" y="25" />
+					<Color  r="1" g="1" b="1" a="0.5"/>
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTextureBorder3" x="-3" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+
+				<Texture name="$parentTextureBorder5" file="Interface/AddOns/HDH_AuraTracker/Texture/border"  parentKey="IconBorder5">
+					<Size x="25" y="25" />
+					<Color  r="1" g="1" b="1" a="0.5"/>
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTextureBorder4" x="-3" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+
+			<CheckButton parentKey="CheckButton1" inherits="HDH_AT_CheckButtonTemplate" >
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="CENTER" relativeTo="$parent" x="-150" y="40"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>self.Text:SetText(HDH_AT_L.USE_DISPLAY_ICON)</OnLoad>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton parentKey="CheckButton2"  inherits="HDH_AT_CheckButtonTemplate" >
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="CENTER" relativeTo="$parent" x="50" y="40"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>self.Text:SetText(HDH_AT_L.USE_DISPLAY_BAR)</OnLoad>
+				</Scripts>
+			</CheckButton>
+
+			<Button name="$parentButtonSave" parentKey="Button" inherits="HDH_AT_ButtonTemplate" text="저장">
+				<Anchors>
+					<Anchor point="BOTTOM" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="0" y="5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetText(HDH_AT_L.SAVE)
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self.HeaderText:SetText(HDH_AT_L.PLASE_SELECT_DISPLAY_TYPE)
+				self.DescIconText:SetText(HDH_AT_L.DESC_CONFIG_ICON)
+				self.DescBarText:SetText(HDH_AT_L.DESC_CONFIG_BAR)
+			</OnLoad>
+		</Scripts>	
+	</Frame>
+	
 	
 	<Frame name="HDH_AT_DialogFrameTemplate" mixin="HDH_AT_DialogFrameTemplateMixin" inherits="HDH_AT_DialogFrame" virtual="true">
 		<Size><AbsDimension x="400" y="100"/></Size>
@@ -297,7 +510,7 @@
 					</Anchors>
 				</Texture>	 -->
 			</Layer>
-			<Layer level="OVERAY">
+			<Layer level="OVERLAY">
 				<Texture name="$parentBgLine2" hidden="true">
 					<Color r="1" g="0.8" b="0" a="0.8"/>
 					<!-- <Color r="0" g="0" b="0" a="1"/> -->
@@ -362,7 +575,7 @@
 		</ButtonText>
 		<NormalFont style="Font_White_S"/>
 		<HighlightFont style="Font_Yellow_S"/>
-		<DisabledFont style="GameFontDisable"/>
+		<DisabledFont style="Font_Gray_S"/>
 		<!-- <HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
 			<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
 		</HighlightTexture> -->
@@ -671,7 +884,7 @@
 					</Anchors>
 				</Texture>
 			
-				<FontString name="$parentTextNum" inherits="GameFontNormal">
+				<FontString name="$parentTextNum" inherits="Font_Yellow_S">
 					<Size>
 						<AbsDimension x="20" y="25"/>
 					</Size>
@@ -683,7 +896,7 @@
 					</Anchors>
 				</FontString>
 				
-				<FontString name="$parentTextID" inherits="GameFontNormal" justifyH="CENTER" text="0000000"  hidden="true">
+				<FontString name="$parentTextID" inherits="Font_Yellow_S" justifyH="CENTER" text="0000000"  hidden="true">
 					<Size>
 						<AbsDimension x="65" y="25"/>
 					</Size>
@@ -695,7 +908,7 @@
 					</Anchors>
 				</FontString>
 				
-				<FontString name="$parentTextName" inherits="GameFontNormal" justifyH="LEFT">
+				<FontString name="$parentTextName" inherits="Font_Yellow_S" justifyH="LEFT">
 					<Size>
 						<AbsDimension x="150" y="25"/>
 					</Size>
@@ -710,7 +923,7 @@
 					</Anchors>
 				</FontString>
 				
-				<FontString name="$parentRowDesc" inherits="GameFontNormal" justifyH="LEFT" text="(추가하려면 행을 클릭하세요)">
+				<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT" text="(추가하려면 행을 클릭하세요)">
 					<Color r="0.7" g="0.7" b="0.7" />
 					<Size>
 						<AbsDimension x="250" y="25"/>
@@ -805,7 +1018,7 @@
 			</Anchors>
 		</ButtonText>
 		<NormalFont style="Font_White_S"/>
-		<HighlightFont style="GameFontHighlight"/>
+		<HighlightFont style="Font_Yellow_S"/>
 		<DisabledFont style="Font_Gray_S"/>
 		<HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
 			<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
@@ -814,7 +1027,7 @@
 
 	<Button name="HDH_AT_UITabBtnLabelTemplate" inherits="HDH_AT_UITabBtnTemplate" virtual="true">
 		<NormalFont style="Font_White_S"/>
-		<HighlightFont style="GameFontHighlight"/>
+		<HighlightFont style="Font_Yellow_S"/>
 		<DisabledFont style="Font_Yellow_S"/>
 		<NormalTexture>
 			<Color r="0" g="0" b="0" a="0.5"/>
@@ -859,8 +1072,8 @@
 		</Layers>
 		<ButtonText name="$parentText"/>
 		<NormalFont style="Font_White_S"/>
-		<HighlightFont style="GameFontHighlight"/>
-		<DisabledFont style="GameFontDisable"/>
+		<HighlightFont style="Font_Yellow_S"/>
+		<DisabledFont style="Font_Gray_S"/>
 		<NormalTexture>
 			<Color r="1" g="0.8" b="0" a="0.8"/>
 			<Anchors>
@@ -904,8 +1117,8 @@
 		</Layers>
 		<ButtonText name="$parentText"/>
 		<NormalFont style="Font_White_S"/>
-		<HighlightFont style="GameFontHighlight"/>
-		<DisabledFont style="GameFontDisable"/>
+		<HighlightFont style="Font_Yellow_S"/>
+		<DisabledFont style="Font_Gray_S"/>
 		<HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
 			<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
 		</HighlightTexture>
@@ -1025,8 +1238,8 @@
 		</NormalTexture> -->
 		<!-- <ButtonText name="$parentText"/> -->
 		<!-- <NormalFont style="HDH_AT_Font_White_S"/> -->
-		<HighlightFont style="GameFontHighlight"/>
-		<DisabledFont style="GameFontDisable"/>
+		<HighlightFont style="Font_Yellow_S"/>
+		<DisabledFont style="Font_Gray_S"/>
 		<HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
 			<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
 		</HighlightTexture>
@@ -1055,7 +1268,7 @@
 		<Layers>
 			<Layer level="BACKGROUND">
                 <Texture name="$parentTexture" parentKey="Texture" >
-					<Color r="0" g="0" b="0" a="0.8"/>
+					<Color r="0" g="0" b="0" a="0.5"/>
 					<Anchors>
 						<Anchor point="TOPLEFT" x="2" y="-2" />
 						<Anchor point="BOTTOMRIGHT" x="-2" y="2" />
@@ -1171,7 +1384,7 @@
 				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
 			</Anchors> -->
 		<!-- <NormalFont/> -->
-		<HighlightFont style="GameFontHighlight"/>
+		<HighlightFont style="Font_Yellow_S"/>
 		<DisabledFont style="Font_Gray_S"/>
         <HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
 			<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
@@ -1297,7 +1510,7 @@
 
             <Layer level="BORDER">
                 <Texture>
-                    <Color r="0.1" g="0.1" b="0.1" a="0.5"/>
+                    <Color r="0.1" g="0.1" b="0.1" a="0.3"/>
                     <Anchors>
                         <Anchor point="TOPLEFT" x="2" y="-2" />
                         <Anchor point="BOTTOMRIGHT" x="-2" y="2" />
@@ -1426,7 +1639,7 @@
 				<Texture name="$parentBg2">
                     <!-- <Color r="1" g="0.8" b="0" a="0.5"/> -->
 					<!-- <Color r="0.2" g="0.2" b="0.2" a="0.5"/> -->
-                    <Color r="0" g="0" b="0" a="0.3"/>
+                    <Color r="0" g="0" b="0" a="0.2"/>
                     <Anchors>
                         <Anchor point="TOPLEFT" x="0" y="0" />
                         <Anchor point="BOTTOMRIGHT" x="0" y="0" />
@@ -1601,4 +1814,373 @@
 			</Button>
 		</Frames>
 	</Button>
+
+	<CheckButton name="HDH_AT_CheckButtonImageTemplate" inherits="OptionsBaseCheckButtonTemplate" virtual="true">
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon" parentKey="Icon" file="Interface\ICONS\INV_Misc_QuestionMark">
+					<Size><AbsDimension x="30" y="30" /></Size>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="LEFT" x="30" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</CheckButton>
+
+	<Frame name="HDH_AT_SplitPointerTemplate" virtual="true" >
+		<Size x="31" y="60" />
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentLine" parentKey="Line">
+					<Size x="5" y="30" />
+					<Color r="0" g="0" b="0"/>
+					<Anchors>
+						<Anchor point="TOP" relativePoint="TOP" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+
+				<FontString name ="$parentBottomAnchor" parentKey="BottomAnchor" inherits="Font_Yellow_S" text="▲" justifyH="CENTER">
+					<Size><AbsDimension x="51" y="15" /></Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativePoint="BOTTOM" x="0" y="15"/>
+					</Anchors>
+				</FontString>
+
+				<FontString name ="$parentBottomValue" parentKey="BottomValue" inherits="Font_White_S" text="" justifyH="CENTER">
+					<Size><AbsDimension x="51" y="15" /></Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativePoint="BOTTOM" x="0" y="0"/>
+					</Anchors>
+				</FontString>
+
+				<FontString name ="$parentTopAnchor" parentKey="TopAnchor" inherits="Font_Yellow_S" text="▼" justifyH="CENTER">
+					<Size><AbsDimension x="51" y="15" /></Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativePoint="TOP" x="0" y="2"/>
+					</Anchors>
+				</FontString>
+
+				<FontString name ="$parentTopValue" parentKey="TopValue" inherits="Font_White_S" text="" justifyH="CENTER">
+					<Size><AbsDimension x="51" y="15" /></Size>
+					<Anchors>
+						<Anchor point="BOTTOM" relativePoint="TOP" x="0" y="17"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="HDH_AT_SplitBarTemplate" mixin="HDH_AT_SplitBarTemplateMixin" virtual="true" >
+		<Size x="100" y="30" />
+		<Layers>
+			<Layer level="BORDER">
+				<Texture name="$parentBorder">
+					<Size x="30" y="30" />
+					<Color r="0.5" g="0.8" b="0.2" />
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentBar" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar">
+					<Size x="100" y="30" />
+					<Color r="0.5" g="0.8" b="0.2" />
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentBorder" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			
+			<Layer level="OVERLAY">
+				<Texture name="$parentTexture" file="Interface/ICONS/WoW_Token01" parentKey="Icon">
+					<Size x="28" y="28" />
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parentBorder" x="0" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Scripts>
+			<OnMouseUp function="HDH_AT_SplitBar_OnMouseUp" />
+		</Scripts>
+	</Frame>
+
+	<Frame name="HDH_AT_AddDelEdtiboxTemplate" mixin="HDH_AT_AddDelEdtiboxTemplateMixin" virtual="true" >
+		<Size x="100" y="30" />
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" parentKey="Text" inherits="Font_Yellow_S" text="" justifyH="LEFT">
+					<Size x="70" y="26" />
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="LEFT" x="5" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<EditBox name="$parentEdit" parentKey="EditBox" inherits="InputBoxTemplate" enableMouse="true" autoFocus="false"  >
+				<Size x="60" y="26" />
+				<Anchors>
+					<Anchor point="LEFT"  relativePoint="RIGHT" relativeTo="$parentText" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>self:SetNumeric(true)</OnLoad>
+				</Scripts>
+			</EditBox>
+
+			<Button name="$parentButtonAdd" parentKey="ButtonAdd" inherits="HDH_AT_ButtonTemplate" text="+">
+				<Size x="26" y="26" />
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentEdit" relativePoint="RIGHT" x="5" y="0" />
+				</Anchors>
+			</Button>
+			
+			<Button name="$parentButtonDel"  parentKey="ButtonDel" inherits="HDH_AT_ButtonTemplate" text="-">
+				<Size x="26" y="26" />
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentButtonAdd" relativePoint="RIGHT" x="5" y="0" />
+				</Anchors>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="HDH_AT_SelectDisplayTypeTemplate" virtual="true">
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTexture1" file="Interface/ICONS/INV_Misc_Gem_Pearl_04"  parentKey="Icon1">
+					<Size x="20" y="20" />
+					<Color  r="1" g="1" b="1" a="1" />
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="LEFT" x="30" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+
+				<Texture name="$parentBar1" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar">
+					<Size x="50" y="20" />
+					<Color r="0.5" g="0.8" b="0.2" />
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentTexture1" x="50" y="0"/>
+					</Anchors>
+				</Texture>
+
+				<Texture name="$parentTexture2" file="Interface/ICONS/INV_Misc_Gem_Pearl_04"  parentKey="Icon1">
+					<Size x="20" y="20" />
+					<Color  r="1" g="1" b="1" a="1" />
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBar1" x="50" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+
+				<Texture name="$parentBar2" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar">
+					<Size x="50" y="20" />
+					<Color r="0.5" g="0.8" b="0.2" />
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentTexture2" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="OVERLAY">
+				<Texture name="$parentTextureBorder1" file="Interface/AddOns/HDH_AuraTracker/Texture/border"  parentKey="IconBorder1">
+					<Size x="20" y="20" />
+					<Color  r="1" g="1" b="1" a="1"/>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parentTexture1" x="0" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+
+				<Texture name="$parentTextureBorder2" file="Interface/AddOns/HDH_AuraTracker/Texture/border"  parentKey="IconBorder2">
+					<Size x="20" y="20" />
+					<Color  r="1" g="1" b="1" a="1"/>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parentTexture2" x="0" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<CheckButton parentKey="CheckButton1" inherits="HDH_AT_CheckButtonTemplate" >
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTexture1" x="-5" y="0"/>
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton parentKey="CheckButton2" inherits="HDH_AT_CheckButtonTemplate" >
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBar1" x="-5" y="0"/>
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton parentKey="CheckButton3" inherits="HDH_AT_CheckButtonTemplate" >
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTexture2" x="-5" y="0"/>
+				</Anchors>
+			</CheckButton>
+		</Frames>
+
+		<Scripts>
+		</Scripts>
+	</Frame>
+
+	<Frame name="HDH_AT_SelectConfigTypeTemplate" virtual="true">
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentBg" parentKey="Background">
+					<Size y="25" />
+					<!-- <Color r="1" g="0.8" b="0"/> -->
+					<Color r="0.2" g="0.2" b="0.2" a="0.5"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<Button name="$parentButtonSave" parentKey="Button" inherits="HDH_AT_ButtonTemplate" text="모든 추적창 공용 설정">
+				<Size x="100" y="22"/>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parentBg"  x="3" y="0" />
+					<Anchor point="RIGHT" relativePoint="CENTER" relativeTo="$parentBg" x="0" y="0" />
+					<Anchor point="TOP" relativePoint="TOP" relativeTo="$parentBg" x="0" y="-3" />
+					<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parentBg" x="0" y="3" />
+				</Anchors>
+
+				<ButtonText name="$parentText"/>
+				<NormalFont style="Font_White_S"/>
+				<HighlightFont style="Font_Yellow_S"/>
+				<DisabledFont style="Font_Gray_S"/>
+				<NormalTexture>
+					<Color r="1" g="0.8" b="0" a="0.8"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</NormalTexture>
+				<HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
+					<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
+				</HighlightTexture>
+				<DisabledTexture>
+					<Color r="1" g="0.8" b="0" a="0"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</DisabledTexture>
+
+				<Scripts>
+					<OnLoad>
+						self:SetText(HDH_AT_L.USE_GLOBAL_CONFIG)
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentButtonSave2" parentKey="Button" inherits="HDH_AT_ButtonTemplate" text="">
+				<Size x="100" y="22" />
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parentBg"  x="-3" y="0" />
+					<Anchor point="LEFT" relativePoint="CENTER" relativeTo="$parentBg" x="0" y="0" />
+					<Anchor point="TOP" relativePoint="TOP" relativeTo="$parentBg" x="0" y="-3" />
+					<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parentBg" x="0" y="3" />
+				</Anchors>
+
+				<ButtonText name="$parentText"/>
+				<NormalFont style="Font_White_S"/>
+				<HighlightFont style="Font_Yellow_S"/>
+				<DisabledFont style="Font_Gray_S"/>
+				<NormalTexture>
+					<Color r="1" g="0.8" b="0" a="0.8"/>
+					<!-- <Color r="1" g="0.8" b="0" a="1"/> -->
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</NormalTexture>
+				<HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
+					<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
+				</HighlightTexture>
+				<DisabledTexture>
+					<Color r="1" g="0.8" b="0" a="0"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</DisabledTexture>
+
+				<Scripts>
+					<OnLoad>
+						self:SetText(HDH_AT_L.USE_SEVERAL_CONFIG)
+						self:Disable()
+					</OnLoad>
+				</Scripts>
+			</Button>
+		</Frames>
+
+		<Scripts>
+		</Scripts>
+	</Frame>
+
+
+	<Button name="HDH_AT_SwitchItemFrameTemplate" inherits="HDH_AT_ButtonTemplate"  virtual="true" text="아이템">
+		<Size x="100" y="22"/>
+		<Anchors>
+			<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parentBg"  x="3" y="0" />
+			<Anchor point="RIGHT" relativePoint="CENTER" relativeTo="$parentBg" x="0" y="0" />
+			<Anchor point="TOP" relativePoint="TOP" relativeTo="$parentBg" x="0" y="-3" />
+			<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parentBg" x="0" y="3" />
+		</Anchors>
+
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture parentKey="Active">
+					<Color r="1" g="0.8" b="0" a="0.8"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+
+				<Texture parentKey="Deactive">
+					<Color r="1" g="0.8" b="0" a="0"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalFont style="Font_White_S"/>
+		<NormalTexture>
+			<Color r="1" g="0.8" b="0" a="0"/>
+		</NormalTexture>
+		<DisabledTexture>
+			<Color r="1" g="0.8" b="0" a="0"/>
+		</DisabledTexture>
+	</Button>
+
+	<Frame name="HDH_AT_SwitchFrameTemplate" mixin="HDH_AT_SwitchFrameTemplateMixin" virtual="true">
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentBg" parentKey="Background">
+					<Size y="25" />
+					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
 </Ui> 

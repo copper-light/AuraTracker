@@ -9,7 +9,7 @@ HDH_TRACKER = {}
 HDH_TRACKER.objList = {}
 HDH_TRACKER.__index = HDH_TRACKER
 HDH_TRACKER.className = "HDH_TRACKER"
-
+HDH_TRACKER.LOCALE = GetLocale()
 HDH_TRACKER.CLASSLIST = {}
 HDH_TRACKER.TYPE = {}
 
@@ -20,9 +20,10 @@ HDH_TRACKER.ENABLE_MOVE = false
 HDH_TRACKER.ONUPDATE_FRAME_TERM = 0.016;
 HDH_TRACKER.ANI_SHOW = 1
 HDH_TRACKER.ANI_HIDE = 2
-HDH_TRACKER.FONT_STYLE = "fonts\\2002.ttf";
+HDH_TRACKER.FONT_STYLE = "fonts/2002.ttf";
 HDH_TRACKER.MAX_ICONS_COUNT = 10
-HDH_TRACKER.BAR_ANI_TERM = 0.1 -- second
+HDH_TRACKER.BAR_UP_ANI_TERM = 0.1 -- second
+HDH_TRACKER.BAR_DOWN_ANI_TERM = 0.05
 
 
 -------------------------------------------
@@ -75,7 +76,7 @@ local function UpdateCooldown(f, elapsed)
 						-- spell.texcoord = math.ceil(spell.texcoord * 10) / 10
 						f.iconSatCooldown:SetTexCoord(0.07, spell.texcoord, 0.07, 0.93)
 					elseif tracker.ui.icon.cooldown == DB.COOLDOWN_RIGHT then
-						spell.texcoord = (0.07 + 0.86 - (0.86 * spell.per))
+						spell.texcoord = (0.93 - (0.86 * spell.per))
 						f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
 						-- spell.texcoord = math.ceil(spell.texcoord * 10) /10
 						f.iconSatCooldown:SetTexCoord(spell.texcoord, 0.93, 0.07, 0.93)
@@ -85,7 +86,7 @@ local function UpdateCooldown(f, elapsed)
 						-- spell.texcoord = math.ceil(spell.texcoord * 10) /10
 						f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, spell.texcoord)
 					else
-						spell.texcoord = (0.07 + 0.86 - (0.86 * spell.per))
+						spell.texcoord = (0.93 - (0.86 * spell.per))
 						f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
 						-- spell.texcoord = math.ceil(spell.texcoord * 10) /10
 						f.iconSatCooldown:SetTexCoord(0.07, 0.93, spell.texcoord, 0.93)
@@ -183,7 +184,7 @@ local function frameBaseSettings(f)
 	f.cooldown1:SetScript('OnUpdate', OnUpdateCooldown)
 	f.cooldown1:SetPoint('TOPLEFT', f.iconframe, 'TOPLEFT', 0, 0)
 	f.cooldown1:SetPoint('BOTTOMRIGHT', f.iconframe, 'BOTTOMRIGHT', 0, 0)
-	f.cooldown1:SetStatusBarTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\cooldown_bg.blp");
+	f.cooldown1:SetStatusBarTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg.blp");
 	f.cooldown1:Hide();
 	f.cooldown1.parent=f;
 	f.cd = f.cooldown1
@@ -194,7 +195,7 @@ local function frameBaseSettings(f)
 	f.cooldown2:SetMovable(true);
 	f.cooldown2:SetScript('OnUpdate', OnUpdateCooldown)
 	f.cooldown2:SetHideCountdownNumbers(true) 
-	f.cooldown2:SetSwipeTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\cooldown_bg.blp"); -- Interface\\AddOns\\HDH_AuraTracker\\cooldown_bg.blp
+	f.cooldown2:SetSwipeTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg.blp"); -- Interface/AddOns/HDH_AuraTracker/cooldown_bg.blp
 	f.cooldown2:SetDrawSwipe(true) 
 	f.cooldown2:SetReverse(true)
 	f.cooldown2:Hide();
@@ -310,7 +311,6 @@ function HDH_TRACKER.Updates(trackerId)
 	if trackerId then
 		local t= HDH_TRACKER.Get(trackerId)
 		if t then
-			print(t.name)
 			t:Update()
 		end
 	else
@@ -344,17 +344,15 @@ function HDH_TRACKER.InitVaribles(trackerId)
 		-- end
 	else
 		HDH_TRACKER.Delete()
-		local talentID, _, _ = GetSpecializationInfo(GetSpecialization())
-		local currentTraitsValue = C_ClassTalents.GetLastSelectedSavedConfigID(talentID)
-		local trackerIds = DB:GetTrackerIdsByTraitss(talentID, currentTraitsValue)
-		if not trackerIds or #trackerIds == 0 then return end
-
-		-- ClassTalents.UpdateLastSelectedSavedConfigID(GetSpecializationInfo(GetSpecialization()))
-		-- local trackerId = trackerList[1]
-		-- local tracker = DB:GetTracker(trackerId)
-
-		-- local trackers =  DB:GetTrackerList()
-
+		local trackerIds
+		if GetSpecialization() < 5 then
+			local talentID, _, _ = GetSpecializationInfo(GetSpecialization())
+			local currentTraitsValue = C_ClassTalents.GetLastSelectedSavedConfigID(talentID)
+			trackerIds = DB:GetTrackerIdsByTraitss(talentID, currentTraitsValue)
+			if not trackerIds or #trackerIds == 0 then return end
+		else
+			trackerIds = DB:GetTrackerIds()
+		end
 		
 		for _, trackerId in pairs(trackerIds) do
 			id, name, type, unit = DB:GetTrackerInfo(trackerId)
@@ -387,12 +385,14 @@ function HDH_TRACKER.UpdateSettings(trackerId)
 		if t then
 			t:UpdateSetting()
 			t:UpdateIcons()
+			t:Update()
 		end
 	else
 		for k, t in pairs(HDH_TRACKER.GetList()) do
 			if not DB:HasUI(k) then
 				t:UpdateSetting()
 				t:UpdateIcons()
+				t:Update()
 			end
 		end
 	end
@@ -582,9 +582,14 @@ function HDH_TRACKER:GetAnimatedValue(bar, v) -- v:target value
 	local gap = bar.targetValue - bar:GetValue();
 	local gapTime;
 	if gap ~= 0 then
+		if gap > 0 then
+			bar.termType = HDH_TRACKER.BAR_UP_ANI_TERM
+		else
+			bar.termType = HDH_TRACKER.BAR_DOWN_ANI_TERM
+		end
 		gapTime = (GetTime() - bar.animatedStartTime);
-		if gapTime < HDH_TRACKER.BAR_ANI_TERM then
-			v = gap * (gapTime/HDH_TRACKER.BAR_ANI_TERM);
+		if gapTime < bar.termType then
+			v = gap * (gapTime/bar.termType);
 		else
 			v = gap;
 		end
@@ -599,19 +604,20 @@ function HDH_TRACKER:MoveSpark(bar, value)
 	if not bar or not self.ui.bar.show_spark then return end
 	bar.min, bar.max = bar:GetMinMaxValues()
 	bar.tmpV = (bar:GetValue() - bar.min)
-	if bar.tmpV > 0 then
+	if bar.tmpV > 0.0 then
 		bar.per = bar.tmpV / (bar.max - bar.min)
+		if bar.per >= 1.0 then
+			bar.per = 1
+			bar.spark:Hide()
+			return
+		else
+			bar.spark:Show()
+		end
 	else
 		bar.per = 0
 		bar.spark:Hide()
 	end
-	if bar.per >= 1.0 then
-		bar.per = 1
-		bar.spark:Hide()
-		return
-	else
-		bar.spark:Show()
-	end
+	
 	if bar:GetOrientation() == "HORIZONTAL" then
 		if self.ui.bar.reverse_progress then
 			bar.spark:SetPoint("CENTER", bar,"RIGHT", -bar:GetWidth() * bar.per, 0);
@@ -627,14 +633,13 @@ function HDH_TRACKER:MoveSpark(bar, value)
 	end
 end
 
-
-
 function HDH_TRACKER:UpdateArtBar(f)
 	local op = self.ui.bar;
 	local font = self.ui.font;
 	local show_tooltip = self.ui.common.show_tooltip;
 	local display_mode = self.ui.common.display_mode
 	local hide_icon = (display_mode == DB.DISPLAY_BAR)
+
 	if display_mode ~= DB.DISPLAY_ICON then
 		if (f.bar and f.bar:GetObjectType() ~= "StatusBar") then
 			f.bar:Hide();
@@ -644,7 +649,7 @@ function HDH_TRACKER:UpdateArtBar(f)
 		if not f.bar then
 			f.bar = CreateFrame("StatusBar", nil, f);
 			local t= f.bar:CreateTexture(nil,"BACKGROUND");
-			t:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\cooldown_bg.blp");
+			t:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg.blp");
 			t:SetPoint('TOPLEFT', f.bar, 'TOPLEFT', -1, 1)
 			t:SetPoint('BOTTOMRIGHT', f.bar, 'BOTTOMRIGHT', 1, -1)
 			f.bar.bg = t;
@@ -670,17 +675,6 @@ function HDH_TRACKER:UpdateArtBar(f)
 		f.name:SetTextColor(unpack(font.name_color));
 		f.name:SetPoint('TOPLEFT', f.bar, 'TOPLEFT', font.name_margin_left, -3)
 		f.name:SetPoint('BOTTOMRIGHT', f.bar, 'BOTTOMRIGHT', -font.name_margin_right, 3)
-
-		-- 아이콘 숨기기는 바와 연관되어 있기 때문에 바 설정쪽에 위치함.
-		if hide_icon then
-			f.iconframe:Hide();
-			-- f.border:Hide();
-			f.bar:SetScript("OnUpdate",self.OnUpdateBarValue);
-		else
-			f.iconframe:Show();
-			-- f.border:Show();
-			f.bar:SetScript("OnUpdate",nil);
-		end
 		
 		if op.reverse_progress then f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r); 
 		else f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture); end
@@ -689,26 +683,26 @@ function HDH_TRACKER:UpdateArtBar(f)
 			f.bar:SetSize(op.width, op.height);
 			f.bar:SetPoint("BOTTOM",f, hide_icon and "BOTTOM" or "TOP",0,1); 
 			f.bar:SetOrientation("Vertical"); f.bar:SetRotatesTexture(true);
-			f.bar.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark_v");
-			f.bar.spark:SetSize(op.width*1.3, 19);
+			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
+			f.bar.spark:SetSize(op.width*1.15, 19);
 		elseif op.location == DB.BAR_LOCATION_B then 
 			f.bar:SetSize(op.width,op.height);
 			f.bar:SetPoint("TOP",f, hide_icon and "TOP" or "BOTTOM",0,-1); 
 			f.bar:SetOrientation("Vertical"); f.bar:SetRotatesTexture(true);
-			f.bar.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark_v");
-			f.bar.spark:SetSize(op.width*1.3, 19);
+			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
+			f.bar.spark:SetSize(op.width*1.15, 19);
 		elseif op.location == DB.BAR_LOCATION_L then 
 			f.bar:SetSize(op.width,op.height);
 			f.bar:SetPoint("RIGHT",f, hide_icon and "RIGHT" or "LEFT",-1,0); 
 			f.bar:SetOrientation("Horizontal"); f.bar:SetRotatesTexture(false);
-			f.bar.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark");
-			f.bar.spark:SetSize(19, op.height*1.3);
+			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
+			f.bar.spark:SetSize(19, op.height*1.15);
 		else 
 			f.bar:SetSize(op.width,op.height);
 			f.bar:SetPoint("LEFT",f, hide_icon and "LEFT" or "RIGHT",1,0); 
 			f.bar:SetOrientation("Horizontal"); f.bar:SetRotatesTexture(false);
-			f.bar.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark");
-			f.bar.spark:SetSize(19, op.height*1.3);
+			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
+			f.bar.spark:SetSize(19, op.height*1.15);
 			
 		end
 		f.bar:SetStatusBarColor(unpack(op.color));
@@ -722,11 +716,6 @@ function HDH_TRACKER:UpdateArtBar(f)
 
 		if not HDH_TRACKER.ENABLE_MOVE then
 			f.bar:SetMouseClickEnabled(false)
-		end
-	else
-		if f.bar then f.bar:Hide(); f.bar:SetScript("OnUpdate",nil); end
-		if hide_icon then
-			f.iconframe:Show();
 		end
 	end
 end
@@ -771,7 +760,7 @@ function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown:SetPoint("TOPRIGHT", f.iconframe,"TOPRIGHT",0,0)
 		f.iconSatCooldown:SetHeight(self.ui.icon.size)
 		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
-		f.iconSatCooldown.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark_v");
+		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"BOTTOM",0,0)
 
 	elseif cooldown_type == DB.COOLDOWN_DOWN  then 
@@ -785,7 +774,7 @@ function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown:SetPoint("BOTTOMRIGHT", f.iconframe,"BOTTOMRIGHT",0,0)
 		f.iconSatCooldown:SetHeight(self.ui.icon.size)
 		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
-		f.iconSatCooldown.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark_v");
+		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"TOP",0,0)
 
 	elseif cooldown_type == DB.COOLDOWN_LEFT  then 
@@ -800,7 +789,7 @@ function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown:SetWidth(self.ui.icon.size)
 
 		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
-		f.iconSatCooldown.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark");
+		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"RIGHT",0,0)
 
 	elseif cooldown_type == DB.COOLDOWN_RIGHT then 
@@ -815,7 +804,7 @@ function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown:SetWidth(self.ui.icon.size)
 
 		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
-		f.iconSatCooldown.spark:SetTexture("Interface\\AddOns\\HDH_AuraTracker\\Texture\\UI-CastingBar-Spark");
+		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"LEFT",0,0)
 
 	else
@@ -827,13 +816,14 @@ function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
 end
 
 function HDH_TRACKER:UpdateTimeText(text, value)
-	if self.ui.font.cd_format == DB.TIME_TYPE_FLOOR then value = value + 1; end
+	if self.ui.font.cd_format == DB.TIME_TYPE_CEIL then value = value + 1; end
 	if value > 5 then text:SetTextColor(unpack(self.ui.font.cd_color)) 
 					else text:SetTextColor(unpack(self.ui.font.cd_color_5s)) end
 	if value <= 9.9 and self.ui.font.cd_format == DB.TIME_TYPE_FLOAT then 
 		text:SetText(('%.1f'):format(value))
-	elseif value < 60 then text:SetText(('%d'):format(value))
-	else text:SetText(('%d:%02d'):format((value)/60, (value)%60)) end
+	else
+		text:SetText(UTIL.AbbreviateTime(value, self.ui.font.cd_abbreviate or false))
+	end
 end
 
 function HDH_TRACKER:UpdateBarValue(f, isEnding)
@@ -1021,8 +1011,8 @@ function HDH_TRACKER:CreateDummySpell(count)
 		f:SetMouseClickEnabled(false);
 		if not f:GetParent() then f:SetParent(self.frame) end
 		if f.icon:GetTexture() == nil then
-			f.icon:SetTexture("Interface\\ICONS\\TEMP")
-			f.iconSatCooldown:SetTexture("Interface\\ICONS\\TEMP")
+			f.icon:SetTexture("Interface/ICONS/TEMP")
+			f.iconSatCooldown:SetTexture("Interface/ICONS/TEMP")
 		end
 		f:ClearAllPoints()
 		prevf = f
@@ -1298,6 +1288,28 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	-- 						 else f.timetext:Hide() end
 	
 	self:ChangeCooldownType(f, self.ui.icon.cooldown)
+
+	
+	-- 아이콘 숨기기는 바와 연관되어 있기 때문에 바 설정쪽에 위치함.
+	if op_common.display_mode == DB.DISPLAY_ICON then
+		f.iconframe:Show()
+		if f.bar then 
+			f.bar:SetScript("OnUpdate",nil); 
+			f.bar:Hide()
+		end
+	elseif op_common.display_mode == DB.DISPLAY_BAR then
+		f.iconframe:Hide();
+		if f.bar then
+			f.bar:SetScript("OnUpdate", self.OnUpdateBarValue); 
+			f.bar:Show()
+		end
+	else -- DISPLAY_ICON_AND_BAR
+		f.iconframe:Show();
+		if f.bar then
+			f.bar:SetScript("OnUpdate", self.OnUpdateBarValue); 
+			f.bar:Show()
+		end
+	end
 	
 	if not HDH_TRACKER.ENABLE_MOVE then
 		if self:GetClassName() == "HDH_AURA_TRACKER" and self.ui.icon.able_buff_cancel then
@@ -1587,6 +1599,18 @@ local function VersionUpdateDB()
 		end
 		DB:SetVersion(2.2)
 	end
+
+	-- ADD defaultTexture
+	if DB:GetVersion() == 2.2 then
+		local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem
+		for _, trackerId in ipairs(DB:GetTrackerIds()) do
+			for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
+				elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, elemIdx)
+				DB:SetTrackerElement(trackerId, elemIdx, elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem)
+			end
+		end
+		DB:SetVersion(2.3)
+	end
 end
 
 local function PLAYER_ENTERING_WORLD()
@@ -1674,11 +1698,11 @@ local function OnEvent(self, event, ...)
 			HDH_AT_ConfigFrame:UpdateFrame()
 		end
 	elseif event == "TRAIT_TREE_CURRENCY_INFO_UPDATED" then
-		HDH_TRACKER.warining_count = HDH_TRACKER.warining_count or 0
-		if HDH_TRACKER.warining_count % 20 == 0 then
-			print('|cffffff00AuraTracker:|r '..L.PLASE_RESELECT_TRATIS_2)
-		end
-		HDH_TRACKER.warining_count = HDH_TRACKER.warining_count + 1
+		-- HDH_TRACKER.warining_count = HDH_TRACKER.warining_count or 0
+		-- if HDH_TRACKER.warining_count % 20 == 0 then
+		-- 	print('|cffffff00AuraTracker:|r '..L.PLASE_RESELECT_TRATIS_2)
+		-- end
+		-- HDH_TRACKER.warining_count = HDH_TRACKER.warining_count + 1
 	end
 end
 

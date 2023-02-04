@@ -1,4 +1,4 @@
-﻿## Interface: 100002
+﻿## Interface: 100005
 ## Title: HDH_AuraTracker
 ## Author: hdh
 ## Notes: 설정창 명령어 /at, /auratracker
@@ -25,7 +25,7 @@ Tracker\PowerTracker.lua
 Tracker\ComboPointTracker.lua
 Tracker\DKRuneTracker.lua
 Tracker\EssenceTracker.lua
-#Tracker\StaggerTracker.lua
+Tracker\StaggerTracker.lua
 
 lib\LibCompress\LibStub.lua
 lib\LibCompress\LibCompress.lua

@@ -123,8 +123,8 @@ do
 				spell.isUpdate = false
 				spell.isItem =  isItem
 				f.spell = spell
-				f.icon:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
-				f.iconSatCooldown:SetTexture(texture or "Interface\\ICONS\\INV_Misc_QuestionMark")
+				f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+				f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 				f.iconSatCooldown:SetDesaturated(nil)
 				-- f.icon:SetDesaturated(1)
 				-- f.icon:SetAlpha(self.ui.icon.off_alpha)

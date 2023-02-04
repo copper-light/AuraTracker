@@ -9,7 +9,7 @@ CONFIG.NAME_ALIGN_CENTER = "CENTER"
 CONFIG.NAME_ALIGN_TOP = "TOP"
 CONFIG.NAME_ALIGN_BOTTOM = "BOTTOM"
 
-CONFIG.VERSION = 2.2
+CONFIG.VERSION = 2.3
 
 CONFIG.ANI_HIDE = 1
 CONFIG.ANI_SHOW = 2
@@ -48,8 +48,8 @@ CONFIG.ORDERBY_CD_DESC   = 3
 CONFIG.ORDERBY_CAST_ASC  = 4
 CONFIG.ORDERBY_CAST_DESC = 5
 
-CONFIG.TIME_TYPE_CEIL  = 1
-CONFIG.TIME_TYPE_FLOOR = 2
+CONFIG.TIME_TYPE_FLOOR = 1
+CONFIG.TIME_TYPE_CEIL  = 2
 CONFIG.TIME_TYPE_FLOAT = 3
 
 CONFIG.DISPLAY_ICON = 1
@@ -60,13 +60,13 @@ CONFIG.USE_GLOBAL_CONFIG = 1
 CONFIG.USE_SEVERAL_CONFIG = 2
 
 CONFIG.BAR_TEXTURE = {
-    {name ="BantoBar", texture = "Interface\\AddOns\\HDH_AuraTracker\\Texture\\BantoBar", texture_r = "Interface\\AddOns\\HDH_AuraTracker\\Texture\\BantoBar_r"},
-    {name ="Minimalist", texture = "Interface\\AddOns\\HDH_AuraTracker\\Texture\\Minimalist", texture_r = "Interface\\AddOns\\HDH_AuraTracker\\Texture\\Minimalist"},
-    {name ="NormTex", texture = "Interface\\AddOns\\HDH_AuraTracker\\Texture\\normTex", texture_r = "Interface\\AddOns\\HDH_AuraTracker\\Texture\\normTex"},
-    {name ="Smooth", texture = "Interface\\AddOns\\HDH_AuraTracker\\Texture\\Smooth", texture_r = "Interface\\AddOns\\HDH_AuraTracker\\Texture\\Smooth"},
-    {name ="Blizzard", texture = "Interface\\TARGETINGFRAME\\UI-StatusBar", texture_r = "Interface\\TARGETINGFRAME\\UI-StatusBar"},
-    -- {name ="Blizzard", texture = "Interface\\Vehicles\\Vehicle_Target_Base_01", texture_r = "Interface\\Vehicles\\Vehicle_Target_Base_01"},
-    {name = L.NONE, texture = "Interface\\AddOns\\HDH_AuraTracker\\Texture\\cooldown_bg", texture_r = "Interface\\AddOns\\HDH_AuraTracker\\Texture\\cooldown_bg"}
+    {name ="BantoBar", texture = "Interface/AddOns/HDH_AuraTracker/Texture/BantoBar", texture_r = "Interface/AddOns/HDH_AuraTracker/Texture/BantoBar_r"},
+    {name ="Minimalist", texture = "Interface/AddOns/HDH_AuraTracker/Texture/Minimalist", texture_r = "Interface/AddOns/HDH_AuraTracker/Texture/Minimalist"},
+    {name ="NormTex", texture = "Interface/AddOns/HDH_AuraTracker/Texture/normTex", texture_r = "Interface/AddOns/HDH_AuraTracker/Texture/normTex"},
+    {name ="Smooth", texture = "Interface/AddOns/HDH_AuraTracker/Texture/Smooth", texture_r = "Interface/AddOns/HDH_AuraTracker/Texture/Smooth"},
+    {name ="Blizzard", texture = "Interface/TARGETINGFRAME/UI-StatusBar", texture_r = "Interface/TARGETINGFRAME/UI-StatusBar"},
+    -- {name ="Blizzard", texture = "Interface/Vehicles/Vehicle_Target_Base_01", texture_r = "Interface/Vehicles/Vehicle_Target_Base_01"},
+    {name = L.NONE, texture = "Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg", texture_r = "Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg"}
 }
 
 CONFIG.ALIGN_LIST = {"left","center","right","TOP","BOTTOM"}
@@ -153,6 +153,7 @@ local DEFAULT_DISPLAY = {
         cd_format = CONFIG.TIME_TYPE_CEIL, -- 쿨 다운
         cd_color={1,1,0, 1}, 
         cd_color_5s={1,0,0, 1}, 
+        cd_abbreviate = true,
         
         count_size = 15, 
         count_location = CONFIG.FONT_LOCATION_BL, 
@@ -280,8 +281,6 @@ function HDH_AT_ConfigDB:SwapTracker(id_1, id_2)
     tmp = HDH_AT_DB.ui[id_1]
     HDH_AT_DB.ui[id_1] = HDH_AT_DB.ui[id_2]
     HDH_AT_DB.ui[id_2] = tmp
-
-
 end
 
 function HDH_AT_ConfigDB:GetTrackerIds()
@@ -400,6 +399,7 @@ function HDH_AT_ConfigDB:SetTrackerElement(trackerId, elementIndex, key, id, nam
 	element.name = name
 	element.isAlways = isAlways
 	element.texture = texture
+    if not element.defaultTexture then element.defaultTexture = texture end
 	element.isItem = isItem
     element.isValue = isValue
 
@@ -407,6 +407,29 @@ function HDH_AT_ConfigDB:SetTrackerElement(trackerId, elementIndex, key, id, nam
     if not glowType then
         element.glowType = CONFIG.GLOW_CONDITION_NONE
     end
+end
+
+function HDH_AT_ConfigDB:SetTrackerElementImage(trackerId, elementIndex, texture, key, isItem)
+    local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
+    if element then
+        element.texture = texture
+        element.textureKey = key
+        element.textureIsItem = isItem
+    end
+end
+
+function HDH_AT_ConfigDB:GetTrackerElementImage(trackerId, elementIndex)
+    local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
+    if element then
+        return element.texture, element.textureKey, element.textureIsItem
+    else
+        return nil
+    end
+end
+
+function HDH_AT_ConfigDB:GetTrackerElementDefaultImage(trackerId, elementIndex)
+    local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
+    return element.defaultTexture
 end
 
 function HDH_AT_ConfigDB:UpdateTrackerElementAlways(trackerId, elementIndex, bool)
@@ -429,6 +452,20 @@ end
 function HDH_AT_ConfigDB:UpdateTrackerElementValue(trackerId, elementIndex, bool)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
     element.isValue = bool
+end
+
+function HDH_AT_ConfigDB:SetTrackerElementSplitValues(trackerId, elementIndex, splitValues)
+    local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
+    element.splitValues = splitValues
+end
+
+function HDH_AT_ConfigDB:GetTrackerElementSplitValues(trackerId, elementIndex)
+    local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
+    if element then
+        return UTIL.Deepcopy(element.splitValues)
+    else
+        return nil
+    end
 end
 
 function HDH_AT_ConfigDB:hasTrackerUI(id)
@@ -529,5 +566,10 @@ function HDH_AT_ConfigDB:CopyTracker(trackerId, copyName)
     copyTracker.name = copyName
     copyTracker.id = newId
     HDH_AT_DB.tracker[newId] = copyTracker
+    if self:hasTrackerUI(trackerId) then
+        local ui = UTIL.Deepcopy(HDH_AT_DB.ui[trackerId])
+        HDH_AT_DB.ui[newId] = ui
+    end
+
     return newId
 end
