@@ -24,18 +24,18 @@ do
 
 
 	function HDH_AT_UTIL.GetTraitsName(id)
-		local transitName = nil
+		local traitName = nil
 		if id then
 			local info = C_Traits.GetConfigInfo(id)
 			if not info then
 				if GetSpecializationInfoByID(id) then
-					transitName = HDH_AT_L.ALWAYS_USE
+					traitName = HDH_AT_L.ALWAYS_USE
 				end
 			else
-				transitName = info.name
+				traitName = info.name
 			end
 		end
-		return transitName
+		return traitName
 	end
 
 	function HDH_AT_UTIL.GetInfo(value, isItem)
@@ -215,5 +215,5 @@ do
 			end
 		end
 	end
-    
+
 end

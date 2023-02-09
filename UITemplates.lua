@@ -842,8 +842,14 @@ local function OnCancelColorPicker()
     ColorPickerFrame.buttonFrame:SetColorRGBA(unpack(ColorPickerFrame.previousValues))
 end
 
-function HDH_AT_OnClickColorPicker(self, enableAlpha)
-	self.enableAlpha = self.enableAlpha or true;
+function HDH_AT_ColorPickerMixin:SetEnableAlpha(enableAlpha)
+    self.enableAlpha = enableAlpha
+end
+
+function HDH_AT_OnClickColorPicker(self)
+    if self.enableAlpha == nil then
+        self.enableAlpha = true
+    end
 	if ColorPickerFrame:IsShown() then return end
 	ColorPickerFrame.colorButton = self
 	local r, g, b, a = self:GetColorRGBA()
@@ -1121,8 +1127,9 @@ HDH_AT_SwitchFrameTemplateMixin = {}
 function HDH_AT_SwitchFrameTemplateMixin:Init(itemList, onChangedHandler)
     if not itemList or #itemList == 0 then return end
     local size = #itemList
-    local itemWidth = math.ceil(self.Background:GetWidth() / size)
-    local itemHeight = self.Background:GetHeight() - 6
+    local itemWidth, itemHeight = self:GetSize()
+    itemWidth = (itemWidth-12) / size
+    itemHeight = self:GetHeight() - 6
     local btn
     self.onChangedHandler = onChangedHandler
     self.list = self.list or {}
@@ -1138,8 +1145,8 @@ function HDH_AT_SwitchFrameTemplateMixin:Init(itemList, onChangedHandler)
         end
         btn = self.list[index]
         btn:ClearAllPoints()
-        btn:SetSize(itemWidth - 6, itemHeight)
-        btn:SetPoint("TOPLEFT", self.Background, "TOPLEFT", (itemWidth * (index - 1)) + 3, -3)
+        btn:SetPoint("TOPLEFT", self, "TOPLEFT", ((itemWidth) * (index - 1)) + 3, -3)
+        btn:SetSize(itemWidth, itemHeight)
         btn:SetText(value)
         btn.index = index
     end

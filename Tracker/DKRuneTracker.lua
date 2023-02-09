@@ -31,7 +31,8 @@ local function DK_OnUpdateCooldown(self)
 
 	if spell.remaining > 0 and spell.duration > 0 then
 		self:GetParent():GetParent():GetParent().parent:UpdateTimeText(self:GetParent():GetParent().timetext, spell.remaining);
-		if  self:GetParent():GetParent():GetParent().parent.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE then
+		if self:GetParent():GetParent():GetParent().parent.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE 
+		      and self:GetParent():GetParent():GetParent().parent.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
 			self:SetValue(spell.endTime - (spell.curTime - spell.startTime))
 		end
 	end
@@ -106,7 +107,7 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 		f.border:SetAlpha(self.ui.icon.off_alpha)
 		f.border:SetVertexColor(0,0,0)
 		f.iconSatCooldown:Show()
-		if self.ui.icon.cooldown == DB.COOLDOWN_CIRCLE then
+		if self.ui.icon.cooldown == DB.COOLDOWN_CIRCLE or self.ui.icon.cooldown == DB.COOLDOWN_NONE then
 			f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
 		else
 			f.cd:SetMinMaxValues(f.spell.startTime, f.spell.endTime)

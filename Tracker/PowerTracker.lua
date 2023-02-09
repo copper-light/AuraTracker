@@ -154,7 +154,7 @@ local function HDH_POWER_OnUpdate(self)
 	self.spell.v1 = curValue;
 	self.spell.count = math.ceil(self.spell.v1 / maxValue * 100);
 	-- if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
-	self.counttext:SetText(format("%d%%", self.spell.count)); 
+	self.counttext:SetText(self.spell.count .. "%"); 
 	-- else self.counttext:SetText(nil) end
 	if self.spell.showValue then self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1, self:GetParent().parent.ui.font.v1_abbreviate)); else self.v1:SetText(nil) end
 	

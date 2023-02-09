@@ -230,6 +230,7 @@ local DDP_FONT_NAME_ALIGN_LIST = {
 }
 
 local DDP_ICON_COOLDOWN_LIST = {
+	{DB.COOLDOWN_NONE, L.NONE},
 	{DB.COOLDOWN_UP, L.UPWARD},
 	{DB.COOLDOWN_DOWN, L.DOWNWARD},
 	{DB.COOLDOWN_LEFT, L.TO_THE_LEFT},
@@ -397,7 +398,7 @@ end
 
 local function GetTalentIdByTraits(searchTraitsId)
 	local ret = {}
-	local transitIds
+	local traitIds
 	if not searchTraitsId then return nil end
 	for i = 1, MAX_TALENT_TABS do
 		talentId, _, _, _ = GetSpecializationInfo(i)
@@ -407,8 +408,8 @@ local function GetTalentIdByTraits(searchTraitsId)
 		if searchTraitsId == talentId then
 			return talentId
 		end
-		transitIds = C_ClassTalents.GetConfigIDsBySpecID(talentId)
-		for _, v in pairs(transitIds) do
+		traitIds = C_ClassTalents.GetConfigIDsBySpecID(talentId)
+		for _, v in pairs(traitIds) do
 			if v == searchTraitsId then
 				return talentId
 			end
@@ -578,7 +579,7 @@ local function LoadDB(trackerId, comp)
 	elseif comp.type == COMP_TYPE.SLIDER then
 		comp:UpdateValue(tonumber(dbValue))
 	elseif comp.type == COMP_TYPE.COLOR_PICKER then
-		comp:SetColorRGBA(unpack(dbValue))
+		comp:SetColorRGBA(unpack(dbValue or {1,1,1,1}))
 	elseif comp.type == COMP_TYPE.DROPDOWN or comp.type == COMP_TYPE.SWITCH then
 		comp:SetSelectedValue(dbValue)
 	end
@@ -586,7 +587,7 @@ end
 
 local function isHasTraits(id)
 	for _, tracker in ipairs(HDH_AT_DB.tracker) do
-		if tracker.transit and UTIL.HasValue(tracker.transit, id) then
+		if tracker.trait and UTIL.HasValue(tracker.trait, id) then
 			return true
 		end
 	end
@@ -960,7 +961,7 @@ function HDH_AT_OnClick_Button(self)
 		local name = F.ED_TRACKER_NAME:GetText()
 		local type = F.DD_TRACKER_TYPE:GetSelectedValue()
 		local unit = F.DD_TRACKER_UNIT:GetSelectedValue()
-		local transitList = F.DD_TRACKER_TRANSIT:GetSelectedValue()
+		local traitList = F.DD_TRACKER_TRANSIT:GetSelectedValue()
 		local caster = F.DD_TRACKER_AURA_CASTER:GetSelectedValue()
 		local filter = F.DD_TRACKER_AURA_FILTER:GetSelectedValue()
 		local trackerObj
@@ -986,13 +987,13 @@ function HDH_AT_OnClick_Button(self)
 			main.Dialog:AlertShow(L.PLASE_SELECT_AURA_CASTER) return 
 		end
 
-		if not transitList or #transitList == 0 then
+		if not traitList or #traitList == 0 then
 			main.Dialog:AlertShow(L.PLASE_SELECT_TRAIT) return 
 		end
 
 		local perType
 		if F.BODY.CONFIG_TRACKER.is_creation then
-			id = DB:InsertTracker(name, type, unit, filter, caster, transitList)
+			id = DB:InsertTracker(name, type, unit, filter, caster, traitList)
 			trackerObj = HDH_TRACKER.New(id, name, type, unit)
 		else
 			id = main:GetCurTrackerId()
@@ -1000,11 +1001,13 @@ function HDH_AT_OnClick_Button(self)
 			if perType ~= type then
 				perType = nil
 			end
-			DB:UpdateTracker(id, name, type, unit, filter, caster, transitList)
+			DB:UpdateTracker(id, name, type, unit, filter, caster, traitList)
 			trackerObj = HDH_TRACKER.Get(id)
 			if trackerObj then
 				trackerObj:Modify(name, type, unit)
 				trackerObj:InitIcons()
+			else
+				trackerObj = HDH_TRACKER.New(id, name, type, unit)
 			end
 		end
 
@@ -1044,10 +1047,6 @@ function HDH_AT_OnClick_Button(self)
 				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2:SetScript("OnClick", function(self) 
 					self:GetParent().CheckButton1:SetChecked(false)
 				end)
-			-- main.Dialog:AlertShow(L.DO_YOU_WANT_TO_DELETE_THIS_ITEM, nil, function(trackerObj)
-			-- 	trackerObj:Get
-			-- 	HDH_TRACKER.InitVaribles()
-			-- end, nil, trackerObj)
 			end
 			main.DIALOG_SELECT_DISPLAY_TYPE.trackerId = id
 			local color = trackerObj.POWER_INFO[type].color
@@ -1072,13 +1071,13 @@ function HDH_AT_OnClick_Button(self)
 		main.Dialog:AlertShow(L.DO_YOU_WANT_TO_DELETE_THIS_ITEM:format(name), main.Dialog.DLG_TYPE.YES_NO, function() 
 			local main = GetMainFrame()
 			local id = main:GetCurTrackerId()
-			local transit = main:GetCurTraits()
+			local trait = main:GetCurTraits()
 			main.F.BODY.CONFIG_TRACKER:Hide()
 			DB:DeleteTracker(id)
 			-- HDH_TRACKER.Delete(idx)
 			-- HDH_TRACKER.Reload(idx)
 			main:UpdateFrame()
-			-- main:LoadTrackerList(transit)
+			-- main:LoadTrackerList(trait)
 			main:ChangeBody(BODY_TRACKER_NEW)
 			HDH_TRACKER.InitVaribles()
 		end)
@@ -1171,6 +1170,32 @@ function HDH_AT_OnClick_Button(self)
 
 	elseif self == F.BODY.CONFIG_DETAIL.BTN_CLOSE then
 		main:ChangeBody(BODY_ELEMENTS)
+
+	elseif self == F.BODY.CONFIG_UI.BTN_EXPORT_STRING then
+		local data = WeakAuraLib_TableToString(HDH_AT_DB, true)
+		F.BODY.CONFIG_UI.ED_EXPORT_STRING:SetText(data)
+
+		main.Dialog:AlertShow(L.CREATE_SHARE_STRING)
+
+	elseif self == F.BODY.CONFIG_UI.BTN_IMPORT_STRING then
+		local data = F.BODY.CONFIG_UI.ED_IMPORT_STRING:GetText()
+		data = WeakAuraLib_StringToTable(data, true)
+		
+		if not data then
+			main.Dialog:AlertShow(L.SHARE_STRING_IS_WRONG)
+			return 
+		end
+
+		if not DB:VaildationProfile(data) then
+			main.Dialog:AlertShow(L.SHARE_STRING_IS_WRONG)
+			return 
+		end
+
+		main.Dialog:AlertShow(L.REPLACE_PROFILE, main.Dialog.DLG_TYPE.YES_NO, function() 	
+			local data = F.BODY.CONFIG_UI.ED_IMPORT_STRING:GetText()
+			HDH_AT_DB = WeakAuraLib_StringToTable(data, true)
+			ReloadUI()
+		end)
 
 	elseif self == F.BODY.CONFIG_DETAIL.ETC.CUSTOM_BTN_SEARCH then
 		local trackerId = F.BODY.CONFIG_DETAIL.trackerId
@@ -1365,30 +1390,30 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 
 	local F = self.F
 	local ids = DB:GetTrackerIds()
-	local transitList = {}
-	local talentID, talentName, transitName, icon
+	local traitList = {}
+	local talentID, talentName, traitName, icon
 	local cacheTraits = {}
 	local unusedTracker = 0
-	local transits
-	local errorTrackerIds = {}
+	local traits
 	local trackerId
-
 	-- Tracker 목록 생성 및 트랜짓이 없는 않는 트래커 확인
-	transitList[#transitList+1] = {DDM_TRACKER_ALL, L.ALL_LIST, nil}
+	traitList[#traitList+1] = {DDM_TRACKER_ALL, L.ALL_LIST, nil}
 	for _, id in ipairs(ids) do
-		transits = select(7, DB:GetTrackerInfo(id))
-		if #transits > 0 then
-			for idx, transitID in ipairs(transits) do
-				if not cacheTraits[transitID] then  
-					talentID = GetTalentIdByTraits(transitID)
+		traits = select(7, DB:GetTrackerInfo(id))
+		if #traits > 0 then
+			for idx, traitID in ipairs(traits) do
+				if not cacheTraits[traitID] then  
+					talentID = GetTalentIdByTraits(traitID)
 					if talentID then
-						cacheTraits[transitID] = true
+						cacheTraits[traitID] = true
 						talentName = select(2, GetSpecializationInfoByID(talentID))
-						transitName = UTIL.GetTraitsName(transitID)
+						traitName = UTIL.GetTraitsName(traitID)
 						icon = SPEC_TEXTURE_FORMAT:format(SPEC_FORMAT_STRINGS[talentID])
-						transitList[#transitList+1] = {transitID, STR_TRANSIT_FORMAT:format(transitName, talentName), icon}
+						traitList[#traitList+1] = {traitID, STR_TRANSIT_FORMAT:format(traitName, talentName), icon}
 					else
-						errorTrackerIds[#errorTrackerIds+1] = id
+						
+						DB:ClearTraits(id)
+						unusedTracker = unusedTracker + 1
 					end
 				end
 			end
@@ -1398,12 +1423,12 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 	end
 
 	if unusedTracker > 0 then
-		transitList[#transitList+1] = {DDM_TRACKER_UNUSED, L.UNUSED_LIST}
+		traitList[#traitList+1] = {DDM_TRACKER_UNUSED, L.UNUSED_LIST}
 		self.Dialog:AlertShow(L.ALERT_UNUSED_LIST:format(unusedTracker))
 	end
 
 	F.DD_TRANSIT:UseAtlasSize(true)
-	HDH_AT_DropDown_Init(F.DD_TRANSIT, transitList, HDH_AT_OnSelected_Dropdown , nil, "HDH_AT_DropDownTrackerItemTemplate") --	HDH_AT_DropDownTrackerItemTemplate")
+	HDH_AT_DropDown_Init(F.DD_TRANSIT, traitList, HDH_AT_OnSelected_Dropdown , nil, "HDH_AT_DropDownTrackerItemTemplate") --	HDH_AT_DropDownTrackerItemTemplate")
 
 	for _, item in ipairs(self:GetTalentList(true)) do
 		id, name, icon = unpack(item)
@@ -1411,8 +1436,8 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 		itemTemplates[#itemTemplates+1] = "HDH_AT_SplitItemTemplate"
 		itemValues[#itemValues+1] = {id, L.ALWAYS_USE, nil}
 		itemTemplates[#itemTemplates+1] = "HDH_AT_CheckButtonItemTemplate"
-		for _, transit in ipairs(self:GetTraits(id)) do
-			itemValues[#itemValues+1] = transit
+		for _, trait in ipairs(self:GetTraits(id)) do
+			itemValues[#itemValues+1] = trait
 			itemTemplates[#itemTemplates+1] = "HDH_AT_CheckButtonItemTemplate"
 		end
 	end
@@ -1459,14 +1484,14 @@ function HDH_AT_ConfigFrameMixin:GetElementFrame(listFrame, trackerId, index)
 		row:EnableMouse(true)
 		row:SetMovable(true)
 		row.idx  = index
-		_G[row:GetName().."EditBoxID"]:SetScript("OnEnterPressed", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().idx) end)
-		_G[row:GetName().."ButtonSet"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().idx) end)
-		_G[row:GetName().."CheckButtonGlow"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().idx) end)
-		_G[row:GetName().."CheckButtonValue"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().idx) end)
-		_G[row:GetName().."CheckButtonAlways"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().idx) end)
-		_G[row:GetName().."ButtonDel"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().idx) end)
-		_G[row:GetName().."ButtonAdd"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().idx) end)
-		_G[row:GetName().."ButtonCancel"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().idx) end)
+		_G[row:GetName().."EditBoxID"]:SetScript("OnEnterPressed", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
+		_G[row:GetName().."ButtonSet"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
+		_G[row:GetName().."CheckButtonGlow"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
+		_G[row:GetName().."CheckButtonValue"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
+		_G[row:GetName().."CheckButtonAlways"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
+		_G[row:GetName().."ButtonDel"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
+		_G[row:GetName().."ButtonAdd"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
+		_G[row:GetName().."ButtonCancel"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
 
 		listFrame.list[index] = row
 	end
@@ -1488,7 +1513,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerElementConfig(trackerId, startRowIdx
 	if not trackerId then return end
 	local rowFrame
 	local i = startRowIdx or 1
-	local id, name, type, unit, aura_filter, aura_caster, transit = DB:GetTrackerInfo(trackerId)
+	local id, name, type, unit, aura_filter, aura_caster, trait = DB:GetTrackerInfo(trackerId)
 	local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, readOnly
 	if (type ~= HDH_TRACKER.TYPE.BUFF and type ~= HDH_TRACKER.TYPE.DEBUFF and type ~= HDH_TRACKER.TYPE.TOTEM) or aura_filter == DB.AURA_FILTER_REG then
 		if startRowIdx and endRowIdx and (startRowIdx > endRowIdx) then return end
@@ -1578,6 +1603,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 		F.BODY.CONFIG_DETAIL.BTN_SAVE:Show()
 		F.BODY.CONFIG_DETAIL.BTN_CLOSE:ClearAllPoints()
 		F.BODY.CONFIG_DETAIL.BTN_CLOSE:SetPoint("BOTTOMLEFT", F.BODY.CONFIG_DETAIL.BTN_CLOSE:GetParent() ,"BOTTOM", 5, 5)
+
 	elseif detailMode == BODY_DETAIL_ETC then
 		local trackerType = select(3, DB:GetTrackerInfo(trackerId))
 		local texture, key, isItem = DB:GetTrackerElementImage(trackerId, elemIdx)
@@ -1669,7 +1695,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerConfig(value)
 	F.BODY.CONFIG_TRACKER_ELEMENTS:Hide()
 	-- self:LoadTraits()
 	if value then
-		local id, name, type, unit, aura_filter, aura_caster, transit = DB:GetTrackerInfo(value)
+		local id, name, type, unit, aura_filter, aura_caster, trait = DB:GetTrackerInfo(value)
 		F.BODY.CONFIG_TRACKER.is_creation = false
 		F.BODY.CONFIG_TRACKER.TITLE:SetText(L.EDIT_TRACKER)
 		if id then
@@ -1707,7 +1733,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerConfig(value)
 			end
 
 			F.DD_TRACKER_TYPE:SetSelectedValue(type)
-			F.DD_TRACKER_TRANSIT:SetSelectedValue(transit)
+			F.DD_TRACKER_TRANSIT:SetSelectedValue(trait)
 			F.BODY.CONFIG_TRACKER.BTN_DELETE:Enable()
 			F.BODY.CONFIG_TRACKER.BTN_CANCEL:Enable()
 			F.BODY.CONFIG_TRACKER.BTN_COPY:Enable()
@@ -1751,8 +1777,8 @@ end
 function HDH_AT_ConfigFrameMixin:GetTrackerData(id)
 	local trackerData = {}
 	for _, tracker in ipairs(HDH_AT_DB.tracker) do
-		if tracker.transit then
-			if UTIL.HasValue(tracker.transit, id) then
+		if tracker.trait then
+			if UTIL.HasValue(tracker.trait, id) then
 				-- values[#values+1] = { tracker.id, tracker.name }
 				trackerData[#trackerData+1] = {
 					id = tracker.id,
@@ -1786,22 +1812,22 @@ end
 -- 		self.F.DD_TRANSIT:SetSelectedValue(1)
 -- 		self:LoadTrackerList()
 -- 		self:ChangeTrackerTabByTrackerId(id)
--- 		-- self:LoadTrackerList(transitId)
--- 		-- local transitList = select(7, DB:GetTrackerInfo(id))
+-- 		-- self:LoadTrackerList(traitId)
+-- 		-- local traitList = select(7, DB:GetTrackerInfo(id))
 -- 		-- local curTalent = select(1, GetSpecializationInfo(GetSpecialization()))
--- 		-- local transitId
--- 		-- if #transitList > 0 then
--- 		-- 	for _, t in ipairs(transitList) do
+-- 		-- local traitId
+-- 		-- if #traitList > 0 then
+-- 		-- 	for _, t in ipairs(traitList) do
 -- 		-- 		if curTalent == GetTalentIdByTraits(t) then
--- 		-- 			transitId = t
+-- 		-- 			traitId = t
 -- 		-- 			break
 -- 		-- 		end
 -- 		-- 	end
--- 		-- 	if not transitId then
--- 		-- 		transitId = transitList[1]
+-- 		-- 	if not traitId then
+-- 		-- 		traitId = traitList[1]
 -- 		-- 	end
--- 		-- 	self.F.DD_TRANSIT:SetSelectedValue(transitId)
--- 		-- 	self:LoadTrackerList(transitId)
+-- 		-- 	self.F.DD_TRANSIT:SetSelectedValue(traitId)
+-- 		-- 	self:LoadTrackerList(traitId)
 -- 		-- 	self:ChangeTrackerTabByTrackerId(id)
 -- 		-- else
 -- 		-- 	-- self:SetCurTrackerIdx(0)
@@ -1829,7 +1855,7 @@ function HDH_AT_ConfigFrameMixin:GetTrackerListSize()
 	return #list
 end
 
-function HDH_AT_ConfigFrameMixin:LoadTrackerList(transitId)
+function HDH_AT_ConfigFrameMixin:LoadTrackerList(traitId)
 	local F = self.F
 	local component
 	local parent = self.F.TRACKER
@@ -1838,13 +1864,13 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(transitId)
 	local id, name, type, unit
 	local typeName
 
-	if not transitId or transitId == DDM_TRACKER_ALL then
+	if not traitId or traitId == DDM_TRACKER_ALL then
 		trackerIds = DB:GetTrackerIds()
-	elseif transitId == DDM_TRACKER_UNUSED then
+	elseif traitId == DDM_TRACKER_UNUSED then
 		trackerIds = DB:GetUnusedTrackerIds()
 	else
-		local talentId = GetTalentIdByTraits(transitId)
-		trackerIds = transitId and DB:GetTrackerIdsByTraitss(transitId, talentId)
+		local talentId = GetTalentIdByTraits(traitId)
+		trackerIds = traitId and DB:GetTrackerIdsByTraits(traitId, talentId)
 	end
 
 	parent.list = parent.list or {}
@@ -1877,6 +1903,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(transitId)
 		component:SetPoint('TOPRIGHT', parent, 'TOPRIGHT', 2, -((component:GetHeight())  * (idx -1) + MARGIN_Y))
 
 		local unitName = ""
+		typeName = "Unknown Tracker"
 		if type == HDH_TRACKER.TYPE.BUFF or type == HDH_TRACKER.TYPE.DEBUFF then
 			unitName = ": " .. UNIT_TO_LABEL[unit]
 		end
@@ -1886,7 +1913,6 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(transitId)
 				typeName = label[2]
 			end
 		end
-
 		component:SetText(STR_TRACKER_FORMAT:format(name, typeName, unitName))
 		component:SetActivate(false)
 	end
@@ -1916,7 +1942,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(transitId)
 		F.BTN_SHOW_ADD_TRACKER_CONFIG:ClearAllPoints()
 		F.BTN_SHOW_ADD_TRACKER_CONFIG:SetPoint('TOPRIGHT', parent, 'TOPRIGHT', 2, -((F.BTN_SHOW_ADD_TRACKER_CONFIG:GetHeight())  * (#trackerIds ) + MARGIN_Y))
 	end
-	-- self:SetCurTraits(transitId)
+	-- self:SetCurTraits(traitId)
 end
 
 function HDH_AT_ConfigFrameMixin:AppendUITab(tabData, tabFrame, bodyFrame)
@@ -1966,18 +1992,18 @@ function HDH_AT_ConfigFrameMixin:UpdateFrame()
 	local F = self.F
 	local ddm = F.DD_TRANSIT
 	local talentID = select(1, GetSpecializationInfo(GetSpecialization()))
-	local transitID = C_ClassTalents.GetLastSelectedSavedConfigID(talentID)
-	local transitName = UTIL.GetTraitsName(transitID)
+	local traitID = talentID and C_ClassTalents.GetLastSelectedSavedConfigID(talentID)
+	local traitName = traitID and UTIL.GetTraitsName(traitID)
 	
 	if (HDH_TRACKER.warining_count or 0) > 0 then
 		HDH_TRACKER.warining_count = 0
 		self.Dialog:AlertShow(L.PLASE_RESELECT_TRATIS)
 	end
-	-- HDH_AT_ConfigFrame.Text:SetText((transitName or "none").. ":".. (transitID or 'none'))
-	-- if not transitName then
+	-- HDH_AT_ConfigFrame.Text:SetText((traitName or "none").. ":".. (traitID or 'none'))
+	-- if not traitName then
 		-- self.Dialog:AlertShow(L.NONACTIVATE_TRANSIT, nil, function() self:Hide() end)
 	-- else
-		-- HDH_AT_ConfigFrame.Text:SetText((transitName or "none").. ":".. (transitID or 'none'))
+		-- HDH_AT_ConfigFrame.Text:SetText((traitName or "none").. ":".. (traitID or 'none'))
 	-- end
 	self:LoadTraits()
 	if ddm:GetIndex(DDM_TRACKER_UNUSED) then
@@ -1985,10 +2011,10 @@ function HDH_AT_ConfigFrameMixin:UpdateFrame()
 	end
 	if ddm:GetSize() > 0 then	
 		if not ddm:GetSelectedValue() then
-			if ddm:GetIndex(transitID) then
-				ddm:SetSelectedValue(transitID)
+			if ddm:GetIndex(traitID) then
+				ddm:SetSelectedValue(traitID)
 			elseif ddm:GetIndex(talentID) then
-				transitID = talentID
+				traitID = talentID
 				ddm:SetSelectedValue(talentID)
 			else	
 				ddm:SetSelectedIndex(1)
@@ -2222,7 +2248,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	F.DD_TRACKER_UNIT = HDH_AT_CreateOptionComponent(F.BODY.CONFIG_TRACKER.CONTENTS, 	  COMP_TYPE.DROPDOWN, 	  L.TRACKER_UNIT)
 	F.DD_TRACKER_AURA_FILTER = HDH_AT_CreateOptionComponent(F.BODY.CONFIG_TRACKER.CONTENTS, COMP_TYPE.DROPDOWN, 	  L.AURA_FILTER_TYPE)
 	F.DD_TRACKER_AURA_CASTER = HDH_AT_CreateOptionComponent(F.BODY.CONFIG_TRACKER.CONTENTS, COMP_TYPE.DROPDOWN, 	  L.AURA_CASTER_TYPE)
-	-- F.DD_TRACKER_TRANSIT = HDH_AT_CreateOptionComponent(F.BODY.CONFIG_TRACKER.CONTENTS,   COMP_TYPE.DROPDOWN, 	  L.USE_TANSIT)
+	-- F.DD_TRACKER_TRANSIT = HDH_AT_CreateOptionComponent(F.BODY.CONFIG_TRACKER.CONTENTS,   COMP_TYPE.DROPDOWN, 	  L.USE_TRAIT)
 
 	F.BTN_PREV_NEXT = HDH_AT_CreateOptionComponent(F.BODY.CONFIG_TRACKER.CONTENTS, COMP_TYPE.PREV_NEXT_BUTTON, 	  L.DISPLAY_LEVEL)
 	F.BTN_PREV_NEXT.BtnPrev:SetScript("OnClick", HDH_AT_OnClick_Button)
@@ -2284,6 +2310,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:Init(1, 1, 20, true, false, nil, L.ROW_N_COL_N)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.CHECK_BOX,       L.ICON_REVERSE_DISPLAY_V,           "ui.%s.common.reverse_v")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.CHECK_BOX,       L.ICON_REVERSE_DISPLAY_H,           "ui.%s.common.reverse_h")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.CHECK_BOX,       L.DISPLAY_GAME_TOOPTIP,           "ui.%s.common.show_tooltip")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.CHECK_BOX,       L.DISPLAY_WHEN_NONCOMBAT,           "ui.%s.common.always_show")
 	self.F.BODY.CONFIG_UI.CB_DISPLAY_WHEN_NONCOMBAT = comp
 	-- ICON COLOR
@@ -2299,7 +2326,15 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	-- comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.COLOR_PICKER, L.COOLDOWN_COLOR,      "ui.%s.icon.cooldown_bg_color")
 	-- UI[#UI+1] = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.ICON_REVERSE_DISPLAY_V,           "ui.%s.icon.desaturation")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.CHECK_BOX,       L.USE_DEFAULT_BORDER_COLOR,           "ui.%s.common.default_color")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,       L.ICON_SPARK_COLOR,         "ui.%s.icon.spark_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.CHECK_BOX,       L.CANCEL_BUFF,         "ui.%s.icon.able_buff_cancel")
+
+	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.CHECK_BOX,       L.ICON_USE_NOT_ENOUGH_MANA_COLOR,         "ui.%s.cooldown.use_not_enough_mana_color")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,       L.ICON_NOT_ENOUGH_MANA_COLOR,         "ui.%s.cooldown.not_enough_mana_color")
+	comp:SetEnableAlpha(false)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.CHECK_BOX,       L.ICON_USE_OUT_RAGNE_COLOR,         "ui.%s.cooldown.use_out_range_color")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,       L.ICON_OUT_RAGNE_COLOR,         "ui.%s.cooldown.out_range_color")
+	comp:SetEnableAlpha(false)
 
 	-- BAR 
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SLIDER, 	L.WIDTH_SIZE,          "ui.%s.bar.width")
@@ -2322,6 +2357,20 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.BUTTON,       L.RESET_ADDON)
 	comp:SetText(L.RESET)
 	self.F.BODY.CONFIG_UI.BTN_RESET = comp
+
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.BUTTON,       L.EXPORT_SHARE_STRING, nil, 1)
+	comp:SetText(L.EXPORT_SHARE_STRING)
+	self.F.BODY.CONFIG_UI.BTN_EXPORT_STRING = comp
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX,       L.SHARE_STRING, nil, 2)
+	comp:SetMaxLetters(0)
+	self.F.BODY.CONFIG_UI.ED_EXPORT_STRING = comp
+
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.BUTTON,       L.IMPORT_SHARE_STRING, nil, 4)
+	comp:SetText(L.IMPORT_SHARE_STRING)
+	self.F.BODY.CONFIG_UI.BTN_IMPORT_STRING = comp
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX,       L.SHARE_STRING, nil, 5)
+	comp:SetMaxLetters(0)
+	self.F.BODY.CONFIG_UI.ED_IMPORT_STRING = comp
 end
 
 function HDH_AT_ConfigFrameMixin:SetupCommend()
@@ -2338,18 +2387,22 @@ function HDH_AT_ConfigFrameMixin:SetupCommend()
 end
 
 function HDH_AT_ConfigFrame_OnShow(self)
-
-	if GetSpecialization() == 5 then
-		self.Dialog:AlertShow(L.NOT_FOUND_TALENT)
+	local IsLoaded = select(1, GetSpecializationInfo(GetSpecialization()))
+	if IsLoaded then
+		if GetSpecialization() == 5 then
+			self.Dialog:AlertShow(L.NOT_FOUND_TALENT)
+		end
+		self:SetClampedToScreen(true)
+		local x = self:GetLeft()
+		local y = self:GetBottom()
+		self:ClearAllPoints()
+		self:SetPoint("BOTTOMLEFT", x, y)
+		self:SetClampedToScreen(false)
+		self:SetWidth(FRAME_WIDTH)
+		self:UpdateFrame()
+	else
+		self:Hide()
 	end
-	self:SetClampedToScreen(true)
-	local x = self:GetLeft()
-	local y = self:GetBottom()
-	self:ClearAllPoints()
-	self:SetPoint("BOTTOMLEFT", x, y)
-	self:SetClampedToScreen(false)
-	self:SetWidth(FRAME_WIDTH)
-    self:UpdateFrame()
 end
 
 function HDH_AT_ConfigFrame_OnLoad(self)

@@ -172,7 +172,7 @@ local function CT_UpdateCooldown(f, elapsed)
 		if not spell.isCharging and spell.duration > HDH_C_TRACKER.GlobalCooldown then
 			tracker:UpdateTimeText(f.timetext, spell.remaining);
 		end
-		if tracker.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE then
+		if tracker.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE and tracker.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
 			-- if f.cd:GetObjectType() == "StatusBar" then f.cd:SetValue(spell.startTime + spell.remaining) end
 			spell.per = 1.0 - (spell.remaining / spell.duration)
 			if not spell.isCharging then
@@ -308,7 +308,7 @@ function HDH_C_TRACKER:Update_CountAndCooldown(f)
 			spell.isCharging = false;
 		end
 		f.counttext:SetText(spell.charges.count);
-		if (cooldown_type == DB.COOLDOWN_CIRCLE) then
+		if (cooldown_type == DB.COOLDOWN_CIRCLE) or (cooldown_type == DB.COOLDOWN_NONE) then
 			f.charges:SetCooldown(spell.charges.startTime, spell.charges.duration or 0); 
 		end
 	else
@@ -326,7 +326,7 @@ function HDH_C_TRACKER:Update_CountAndCooldown(f)
 		end--f.bar:Hide() 
 	else 
 		if not f.cd:IsShown() then f.cd:Show(); end	
-		if (cooldown_type == DB.COOLDOWN_CIRCLE) then 
+		if (cooldown_type == DB.COOLDOWN_CIRCLE) or (cooldown_type == DB.COOLDOWN_NONE)  then 
 			if HDH_TRACKER.startTime < f.spell.startTime or (spell.duration == 0) then
 				f.cd:SetCooldown(spell.startTime, spell.duration or 0); 
 			else
@@ -357,11 +357,10 @@ function HDH_C_TRACKER:Update_Usable(f)
 	local isUpdate= false
 	local isAble, isNotEnoughMana;
 
-	local not_enough_mana_color = {0.25, 0.25, 0.88}
-	local out_range_color = {0.73, 0.1, 0.1}
-	local desaturation_not_mana = false
-	local desaturation = true
-	local desaturation_out_range = false
+	local not_enough_mana_color = (self.ui.cooldown.not_enough_mana_color or {0.35, 0.35, 0.78})
+	local out_range_color = (self.ui.cooldown.out_range_color or {0.53, 0.1, 0.1})
+	local use_not_enough_mana_color = self.ui.cooldown.use_not_enough_mana_color
+	local use_out_range_color = self.ui.cooldown.use_out_range_color
 
 	if spell.slot then
 		spell.inRange = IsActionInRange(spell.slot); -- 1:true,0:false,nil:non target
@@ -369,7 +368,7 @@ function HDH_C_TRACKER:Update_Usable(f)
 		spell.inRange = IsSpellInRange(spell.name,"target"); -- 1:true,0:false,nil:non target
 	end
 	if spell.inRange == false or spell.inRange == 0 then
-		if not desaturation_out_range then
+		if use_out_range_color then
 			f.iconSatCooldown:SetVertexColor(unpack(out_range_color))
 			f.icon:SetVertexColor(unpack(out_range_color))
 			f.icon:SetDesaturated(nil);
@@ -392,7 +391,7 @@ function HDH_C_TRACKER:Update_Usable(f)
 		-- end
 		
 		if f.spell.isNotEnoughMana then
-			if not desaturation_not_mana then
+			if use_not_enough_mana_color then
 				f.icon:SetVertexColor(unpack(not_enough_mana_color))
 				f.iconSatCooldown:SetVertexColor(unpack(not_enough_mana_color))
 				f.icon:SetDesaturated(nil)
@@ -486,7 +485,7 @@ function HDH_C_TRACKER:Update_Icon(f) -- f == f
 			end
 		end
 
-		if ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE then
+		if ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE and ui.icon.cooldown ~= DB.COOLDOWN_NONE then
 			f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
 			f.iconSatCooldown:Show()
 			-- f.iconSatCooldown.spark:Show()
@@ -708,6 +707,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"TOP",0,0)
+		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
 
 	elseif cooldown_type == DB.COOLDOWN_DOWN  then 
 		f.cd = f.cooldown1
@@ -722,6 +722,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"BOTTOM",0,0)
+		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
 
 	elseif cooldown_type == DB.COOLDOWN_LEFT  then 
 		f.cd = f.cooldown1
@@ -736,6 +737,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"LEFT",0,0)
+		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
 
 	elseif cooldown_type == DB.COOLDOWN_RIGHT then 
 		f.cd = f.cooldown1
@@ -750,6 +752,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"RIGHT",0,0)
+		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
 
 	else 
 		f.cd = f.cooldown2
@@ -803,7 +806,7 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 		spell.isCharging = false;
 		spell.isAble = true
 		if not f.cd:IsShown() then f.cd:Show(); end	
-		if (ui.icon.cooldown == DB.COOLDOWN_CIRCLE) then 
+		if (ui.icon.cooldown == DB.COOLDOWN_CIRCLE) or (ui.icon.cooldown == DB.COOLDOWN_NONE) then 
 			f.cd:SetCooldown(spell.startTime, spell.duration or 0); 
 			f.cd:SetDrawSwipe(spell.isCharging == false); 
 		else 
@@ -1037,13 +1040,13 @@ function CT_OnEvent_Frame(self, event, ...)
 	elseif event == 'GROUP_ROSTER_UPDATE' then
 		tracker:Update()
 	elseif event == 'UNIT_PET' then
-		tracker:RunTimer("UNIT_PET", 0.5, tracker.Update, self.parent) 
+		tracker:RunTimer("UNIT_PET", 0.5, tracker.Update, tracker) 
 	elseif event == 'ARENA_OPPONENT_UPDATE' then
-		tracker:RunTimer("ARENA_OPPONENT_UPDATE", 0.5, tracker.Update, self.parent) 
+		tracker:RunTimer("ARENA_OPPONENT_UPDATE", 0.5, tracker.Update, tracker) 
 	elseif event == 'PLAYER_TALENT_UPDATE' then
-		tracker:RunTimer("PLAYER_TALENT_UPDATE", 0.2, tracker.InitIcons, self.parent)
+		tracker:RunTimer("PLAYER_TALENT_UPDATE", 0.2, tracker.InitIcons, tracker)
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
-		tracker:RunTimer("PLAYER_EQUIPMENT_CHANGED", 0.5, tracker.InitIcons, self.parent)
+		tracker:RunTimer("PLAYER_EQUIPMENT_CHANGED", 0.5, tracker.InitIcons, tracker)
 	elseif event == "ACTIONBAR_SLOT_CHANGED" then
 		tracker:UpdateSlot(...);
 	end

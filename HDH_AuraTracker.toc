@@ -1,8 +1,8 @@
 ﻿## Interface: 100005
 ## Title: HDH_AuraTracker
-## Author: hdh
-## Notes: 설정창 명령어 /at, /auratracker
-## Version: 10.0.5.02
+## Author: CopperLight
+## Notes: 설정창 명령어 /at, /auratracker (with libcompress)
+## Version: 10.0.5.03
 ## SavedVariables: DB_PROFILE, HDH_AT_PROFILE
 ## SavedVariablesPerCharacter: HDH_AT_DB
 
@@ -27,9 +27,9 @@ Tracker\DKRuneTracker.lua
 Tracker\EssenceTracker.lua
 Tracker\StaggerTracker.lua
 
+# https://www.wowace.com/projects/libcompress
 lib\LibCompress\LibStub.lua
 lib\LibCompress\LibCompress.lua
-lib\AceSerializer-3.0\AceSerializer-3.0.xml
+lib\AceSerializer-3.0\AceSerializer-3.0.lua
 lib\WeakAuraLib\Transmission.lua
-
 Config.xml

@@ -14,11 +14,13 @@ CONFIG.VERSION = 2.3
 CONFIG.ANI_HIDE = 1
 CONFIG.ANI_SHOW = 2
 
+
 CONFIG.COOLDOWN_UP     = 1
 CONFIG.COOLDOWN_DOWN   = 2
 CONFIG.COOLDOWN_LEFT   = 3
 CONFIG.COOLDOWN_RIGHT  = 4
 CONFIG.COOLDOWN_CIRCLE = 5
+CONFIG.COOLDOWN_NONE = 6
 
 CONFIG.FONT_LOCATION_TL = 1
 CONFIG.FONT_LOCATION_BL = 2
@@ -107,7 +109,11 @@ local DEFAULT_DISPLAY = {
     },
 
     cooldown = {
-        maxtime = -1
+        maxtime = -1,
+        use_not_enough_mana_color = true,
+        not_enough_mana_color = {0.35, 0.35, 0.78, 1},
+        use_out_range_color = true,
+        out_range_color = {0.53, 0.1, 0.1, 1}
     },
     -- -- 오라 전용 설정
     -- aura = {
@@ -121,11 +127,12 @@ local DEFAULT_DISPLAY = {
         size = 40, 
         
         on_alpha = 1, 
-        off_alpha = 0.3,
+        off_alpha = 0.5,
         active_border_color = {0,1,0,1}, 
         -- debuff_color = {0,0,0,1},
         cooldown_bg_color = {0,0,0,0.75},
         desaturation = true, 
+        spark_color = {1,1,1,1},
     }, 
 
     -- 바 설정
@@ -195,7 +202,7 @@ HDH_AT_DB = {
     unit
     aura_caster
     aura_filter
-    transit 
+    trait 
 ]]--
 
 function HDH_AT_ConfigDB:GetVersion()
@@ -234,16 +241,16 @@ function HDH_AT_ConfigDB:IsExistsTracker(id)
     return HDH_AT_DB.tracker[id] and true or false
 end
 
-function HDH_AT_ConfigDB:HasTraits(transitId)
+function HDH_AT_ConfigDB:HasTraits(traitId)
     for i, tracker in ipairs(HDH_AT_DB.tracker) do
-        if UTIL.HasValue(tracker.transit, transitId) then
+        if UTIL.HasValue(tracker.trait, traitId) then
             return true
         end
     end
     return false
 end
 
-function HDH_AT_ConfigDB:InsertTracker(name, type, unit, aura_filter, aura_caster, transit)
+function HDH_AT_ConfigDB:InsertTracker(name, type, unit, aura_filter, aura_caster, trait)
     table.insert(HDH_AT_DB.tracker, {
         id = #HDH_AT_DB.tracker + 1,
         element = {},
@@ -252,7 +259,7 @@ function HDH_AT_ConfigDB:InsertTracker(name, type, unit, aura_filter, aura_caste
             y = UIParent:GetHeight()/2
         }
     })
-    self:UpdateTracker(#HDH_AT_DB.tracker, name, type, unit, aura_filter, aura_caster, transit)
+    self:UpdateTracker(#HDH_AT_DB.tracker, name, type, unit, aura_filter, aura_caster, trait)
     return #HDH_AT_DB.tracker
 end
 
@@ -260,13 +267,13 @@ function HDH_AT_ConfigDB:GetLocation(trackerId)
     return HDH_AT_DB.tracker[trackerId].location
 end
 
-function HDH_AT_ConfigDB:UpdateTracker(id, name, type, unit, aura_filter, aura_caster, transit)
+function HDH_AT_ConfigDB:UpdateTracker(id, name, type, unit, aura_filter, aura_caster, trait)
     HDH_AT_DB.tracker[id].name = name
     HDH_AT_DB.tracker[id].type = type
     HDH_AT_DB.tracker[id].unit = unit
     HDH_AT_DB.tracker[id].aura_caster = aura_caster
     HDH_AT_DB.tracker[id].aura_filter = aura_filter
-    HDH_AT_DB.tracker[id].transit = transit
+    HDH_AT_DB.tracker[id].trait = trait
 end
 
 function HDH_AT_ConfigDB:SwapTracker(id_1, id_2)
@@ -292,10 +299,15 @@ function HDH_AT_ConfigDB:GetTrackerIds()
     return ret --tracker.id, tracker.name, tracker.type, tracker.unit, tracker.aura_type
 end
 
+function HDH_AT_ConfigDB:ClearTraits(trackerId)
+    local tmp = HDH_AT_DB.tracker[trackerId]
+    tmp.trait ={}
+end
+
 function HDH_AT_ConfigDB:GetUnusedTrackerIds()
     local ret = {}
     for _, tracker in ipairs(HDH_AT_DB.tracker) do
-        if not tracker.transit or #tracker.transit == 0 then
+        if not tracker.trait or #tracker.trait == 0 then
             ret[#ret+1] = tracker.id
         end
     end
@@ -303,10 +315,10 @@ function HDH_AT_ConfigDB:GetUnusedTrackerIds()
     return ret --tracker.id, tracker.name, tracker.type, tracker.unit, tracker.aura_type
 end
 
-function HDH_AT_ConfigDB:GetTrackerIdsByTraitss(talentId, transitId)
+function HDH_AT_ConfigDB:GetTrackerIdsByTraits(talentId, traitId)
     local ret = {}
     for i, tracker in ipairs(HDH_AT_DB.tracker) do
-        if UTIL.HasValue(tracker.transit, talentId) or UTIL.HasValue(tracker.transit, transitId) then
+        if UTIL.HasValue(tracker.trait, talentId) or UTIL.HasValue(tracker.trait, traitId) then
             ret[#ret+1] = tracker.id
         end
     end
@@ -317,7 +329,7 @@ end
 function HDH_AT_ConfigDB:GetTrackerInfo(trackerId)
     if HDH_AT_DB.tracker[trackerId] then
         local tracker = HDH_AT_DB.tracker[trackerId]
-        return tracker.id, tracker.name, tracker.type, tracker.unit, tracker.aura_filter, tracker.aura_caster, tracker.transit
+        return tracker.id, tracker.name, tracker.type, tracker.unit, tracker.aura_filter, tracker.aura_caster, tracker.trait
     else
         return nil
     end
@@ -446,7 +458,11 @@ end
 
 function HDH_AT_ConfigDB:GetTrackerElementGlow(trackerId, elementIndex)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
-    return element.glowType or CONFIG.GLOW_CONDITION_NONE,  element.glowCondition, element.glowValue
+    if element then
+        return element.glowType or CONFIG.GLOW_CONDITION_NONE,  element.glowCondition, element.glowValue
+    else
+        return CONFIG.GLOW_CONDITION_NONE, nil, nil
+    end
 end
 
 function HDH_AT_ConfigDB:UpdateTrackerElementValue(trackerId, elementIndex, bool)
@@ -545,12 +561,12 @@ function HDH_AT_ConfigDB:CheckTraitsDB()
 	local idx = 1
     local ids = self:GetTrackerIds()
     for _, id in ipairs(ids) do
-        transits = select(7, self:GetTrackerInfo(id))
-        while transits[idx] do
-            if C_Traits.GetConfigInfo(transits[idx]) then
+        traits = select(7, self:GetTrackerInfo(id))
+        while traits[idx] do
+            if C_Traits.GetConfigInfo(traits[idx]) then
                 idx = idx + 1
             else
-                table.remove(transits, idx)
+                table.remove(traits, idx)
             end
         end
     end
@@ -572,4 +588,27 @@ function HDH_AT_ConfigDB:CopyTracker(trackerId, copyName)
     end
 
     return newId
+end
+
+
+function HDH_AT_ConfigDB:VaildationProfile(data)
+    if not data.version then
+        return false
+    end
+
+    if not data.ui or not data.ui.global_ui then
+        return false
+    end
+
+    if not data.tracker then
+        return false
+    end
+
+    for _, t in ipairs(data.tracker) do
+        if not t.name then
+            return false
+        end
+    end
+
+    return true
 end

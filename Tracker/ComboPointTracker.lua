@@ -215,6 +215,7 @@ function HDH_COMBO_POINT_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"TOP",0,0)
+		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
 
 	elseif cooldown_type == DB.COOLDOWN_DOWN  then 
 		f.cooldown2:Hide()
@@ -225,6 +226,7 @@ function HDH_COMBO_POINT_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"BOTTOM",0,0)
+		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
 
 	elseif cooldown_type == DB.COOLDOWN_LEFT  then 
 		f.cooldown2:Hide()
@@ -235,6 +237,7 @@ function HDH_COMBO_POINT_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"LEFT",0,0)
+		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
 
 	elseif cooldown_type == DB.COOLDOWN_RIGHT then 
 		f.cooldown2:Hide()
@@ -245,6 +248,7 @@ function HDH_COMBO_POINT_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"RIGHT",0,0)
+		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
 
 	else 
 		f.cd = f.cooldown2

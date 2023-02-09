@@ -2133,14 +2133,7 @@
 
 
 	<Button name="HDH_AT_SwitchItemFrameTemplate" inherits="HDH_AT_ButtonTemplate"  virtual="true" text="아이템">
-		<Size x="100" y="22"/>
-		<Anchors>
-			<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parentBg"  x="3" y="0" />
-			<Anchor point="RIGHT" relativePoint="CENTER" relativeTo="$parentBg" x="0" y="0" />
-			<Anchor point="TOP" relativePoint="TOP" relativeTo="$parentBg" x="0" y="-3" />
-			<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parentBg" x="0" y="3" />
-		</Anchors>
-
+		<Size x="50" y="22"/>
 		<Layers>
 			<Layer level="ARTWORK">
 				<Texture parentKey="Active">
@@ -2176,8 +2169,8 @@
 					<Size y="25" />
 					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
 					<Anchors>
-						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
 					</Anchors>
 				</Texture>
 			</Layer>

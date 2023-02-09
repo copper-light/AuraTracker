@@ -445,7 +445,7 @@
 										</Layers>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="110" y="-5" />
-											<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="-10" y="-5" />
+											<Anchor point="RIGHT" relativePoint="RIGHT" x="-10" y="0" />
 										</Anchors>
 										<Scripts>
 											<OnLoad>

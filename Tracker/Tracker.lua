@@ -42,7 +42,7 @@ local function UpdateCooldown(f, elapsed)
 	spell.remaining = (spell.endTime or 0) - spell.curTime
 	if spell.remaining > 0.0 and spell.duration > 0 then
 		tracker:UpdateTimeText(f.timetext, spell.remaining)
-		if tracker.ui.common.cooldown ~= DB.COOLDOWN_CIRCLE then
+		if tracker.ui.common.cooldown ~= DB.COOLDOWN_CIRCLE and tracker.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
 			if f.cd:GetObjectType() == "StatusBar" then 
 				f.cd:SetValue(spell.curTime) 
 			end
@@ -55,7 +55,7 @@ local function UpdateCooldown(f, elapsed)
 		end
 
 		if tracker.ui.common.display_mode ~= DB.DISPLAY_BAR then
-			if tracker.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE then
+			if tracker.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE and tracker.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
 				spell.per = spell.remaining / spell.duration
 
 				if spell.per < 0.99 and spell.per > 0.01 then
@@ -315,8 +315,8 @@ function HDH_TRACKER.Updates(trackerId)
 		end
 	else
 		-- local curTalentId = select(1, GetSpecializationInfo(GetSpecialization()))
-		-- local curTraits = C_ClassTalents.GetLastSelectedSavedConfigID(curTalentId)
-		local ids = DB:GetTrackerIdsByTraitss(curTalentId, curTraits)
+		-- local curTrait = C_ClassTalents.GetLastSelectedSavedConfigID(curTalentId)
+		-- local ids = DB:GetTrackerIdsByTraits(curTalentId, curTrait)
 		for _, t in pairs(HDH_TRACKER.GetList()) do
 			if t then
 				t:Update()
@@ -344,12 +344,14 @@ function HDH_TRACKER.InitVaribles(trackerId)
 		-- end
 	else
 		HDH_TRACKER.Delete()
-		local trackerIds
+		local trackerIds = {}
 		if GetSpecialization() < 5 then
 			local talentID, _, _ = GetSpecializationInfo(GetSpecialization())
-			local currentTraitsValue = C_ClassTalents.GetLastSelectedSavedConfigID(talentID)
-			trackerIds = DB:GetTrackerIdsByTraitss(talentID, currentTraitsValue)
-			if not trackerIds or #trackerIds == 0 then return end
+			if talentID then
+				local currentTraitsValue = C_ClassTalents.GetLastSelectedSavedConfigID(talentID)
+				trackerIds = DB:GetTrackerIdsByTraits(talentID, currentTraitsValue)
+				if not trackerIds or #trackerIds == 0 then return end
+			end
 		else
 			trackerIds = DB:GetTrackerIds()
 		end
@@ -762,6 +764,7 @@ function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"BOTTOM",0,0)
+		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
 
 	elseif cooldown_type == DB.COOLDOWN_DOWN  then 
 		f.cd = f.cooldown1
@@ -776,6 +779,7 @@ function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"TOP",0,0)
+		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
 
 	elseif cooldown_type == DB.COOLDOWN_LEFT  then 
 		f.cd = f.cooldown1
@@ -791,6 +795,7 @@ function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"RIGHT",0,0)
+		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
 
 	elseif cooldown_type == DB.COOLDOWN_RIGHT then 
 		f.cd = f.cooldown1
@@ -806,6 +811,7 @@ function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"LEFT",0,0)
+		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
 
 	else
 		f.iconSatCooldown:Hide() 
@@ -1036,7 +1042,7 @@ function HDH_TRACKER:CreateDummySpell(count)
 												else spell.isBuff = false end
 		if ui.icon.cooldown == DB.COOLDOWN_CIRCLE then
 			f.cd:SetCooldown(spell.startTime,spell.duration)
-		else
+		elseif ui.icon.cooldown ~= DB.COOLDOWN_NONE then
 			f.cd:SetMinMaxValues(spell.startTime, spell.remaining)
 			f.cd:SetValue(spell.startTime+spell.duration);
 		end
@@ -1049,10 +1055,10 @@ function HDH_TRACKER:CreateDummySpell(count)
 			spell.name = spell.name or ("NAME"..i);
 		end
 		f.counttext:SetText(i)
-		if (ui.icon.cooldown == DB.COOLDOWN_CIRCLE) then 
+		if (ui.icon.cooldown == DB.COOLDOWN_CIRCLE) or (ui.icon.cooldown == DB.COOLDOWN_NONE) then 
 			f.icon:SetAlpha(ui.icon.on_alpha)
 			f.border:SetAlpha(ui.icon.on_alpha)
-		else
+		else	
 			f.icon:SetAlpha(ui.icon.off_alpha)
 			f.border:SetAlpha(ui.icon.on_alpha)
 		end
@@ -1555,8 +1561,20 @@ function HDH_TRACKER:RunTimer(timerName, time, func, ...)
 	if self.timer[timerName] then
 		self.timer[timerName]:Cancel()
 	end
-	local args = {...}
-	self.timer[timerName] = C_Timer.NewTimer(time, function() self.timer[timerName] = nil func(unpack(args)) end)
+	self.timer[timerName] = C_Timer.NewTimer(time, function(timer) 
+		print(unpack(timer.args))
+		if timer.parent then 
+			timer:func(timer.args) 
+			timer.parent[timer.name] = nil
+			timer.name = nil
+			timer.args = nil
+		end 
+	end)
+	self.timer[timerName].tracker = self
+	self.timer[timerName].parent = self.timer
+	self.timer[timerName].name = timerName
+	self.timer[timerName].func = func
+	self.timer[timerName].args = ...
 end
 
 ------------------------------------------
@@ -1570,9 +1588,9 @@ end
 
 local function VersionUpdateDB()
 	if DB:GetVersion() == 2.0 then
-		local id, name, type, unit, aura_filter, aura_caster, transit
+		local id, name, type, unit, aura_filter, aura_caster, trait
 		for _, id in ipairs(DB:GetTrackerIds()) do
-			id, name, type, unit, aura_filter, aura_caster, transit = DB:GetTrackerInfo(id)
+			id, name, type, unit, aura_filter, aura_caster, trait = DB:GetTrackerInfo(id)
 			if unit == 1 then
 				unit = 'player'
 			elseif unit == 2 then
@@ -1580,7 +1598,7 @@ local function VersionUpdateDB()
 			elseif unit == 3 then
 				unit = 'focus'
 			end
-			DB:UpdateTracker(id, name, type, unit, aura_filter, aura_caster, transit)
+			DB:UpdateTracker(id, name, type, unit, aura_filter, aura_caster, trait)
 		end
 		DB:SetVersion(2.1)
 	end
@@ -1610,6 +1628,34 @@ local function VersionUpdateDB()
 			end
 		end
 		DB:SetVersion(2.3)
+	end
+
+	if DB:GetVersion() == 2.3 then
+		local id, name, type, unit, aura_filter, aura_caster, trait
+		for _, id in ipairs(DB:GetTrackerIds()) do
+			HDH_AT_DB.tracker[id].trait = HDH_AT_DB.tracker[id].transit
+			HDH_AT_DB.tracker[id].transit = nil
+		end
+		DB:SetVersion(2.4)
+	end
+
+	if DB:GetVersion() == 2.4 then
+		local ui = DB:GetTrackerUI()
+		ui.cooldown.not_enough_mana_color = {0.35, 0.35, 0.78, 1}
+		ui.cooldown.out_range_color =  {0.53, 0.1, 0.1, 1}
+		ui.cooldown.use_not_enough_mana_color = true
+		ui.cooldown.use_out_range_color = true
+		local ui
+		for _, id in ipairs(DB:GetTrackerIds()) do
+			if DB:hasTrackerUI(id) then
+				ui = DB:GetTrackerUI(id)
+				ui.cooldown.not_enough_mana_color = {0.35, 0.35, 0.78, 1}
+				ui.cooldown.out_range_color =  {0.53, 0.1, 0.1, 1}
+				ui.cooldown.use_not_enough_mana_color = true
+				ui.cooldown.use_out_range_color = true
+			end
+		end
+		DB:SetVersion(2.5)
 	end
 end
 
@@ -1643,17 +1689,17 @@ end
 -- 이벤트 콜백 함수
 local function OnEvent(self, event, ...)
 	-- local talentID = select(1, GetSpecializationInfo(GetSpecialization()))
-	-- local transitID = C_ClassTalents.GetLastSelectedSavedConfigID(talentID)
-	-- local transitName = UTIL.GetTraitsName(transitID)
+	-- local traitID = C_ClassTalents.GetLastSelectedSavedConfigID(talentID)
+	-- local traitName = UTIL.GetTraitsName(traitID)
 
-	-- if not transitName then
+	-- if not traitName then
 	-- 	print("|cffffff00AuraTracker|cffffffff ".. L.NONACTIVATE_TRAIT)
 	-- end
-	if self.CUR_TRAIT_ID ~= C_ClassTalents.GetLastSelectedSavedConfigID(select(1, GetSpecializationInfo(GetSpecialization()))) then
-		self.CUR_TRAIT_ID = C_ClassTalents.GetLastSelectedSavedConfigID(select(1, GetSpecializationInfo(GetSpecialization())))
-		HDH_TRACKER.InitVaribles()
-		HDH_TRACKER.Updates()
-	end
+	-- if self.CUR_TRAIT_ID ~= C_ClassTalents.GetLastSelectedSavedConfigID(select(1, GetSpecializationInfo(GetSpecialization()))) then
+	-- 	self.CUR_TRAIT_ID = C_ClassTalents.GetLastSelectedSavedConfigID(select(1, GetSpecializationInfo(GetSpecialization())))
+	-- 	HDH_TRACKER.InitVaribles()
+	-- 	HDH_TRACKER.Updates()
+	-- end
 	-- print( event, ...)
 	if event =='ACTIVE_TALENT_GROUP_CHANGED' then
 		-- HDH_AT_UTIL.IsTalentSpell(nil,nil,true);
