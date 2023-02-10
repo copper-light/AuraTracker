@@ -67,6 +67,16 @@
 			<Color r="0" g="0" b="0"/>
 		</Shadow>
 	</Font>
+
+	<Font name="Font_White_XS" font="Fonts\2002.TTF" virtual="true">
+		<Color r="0.9" g="0.9" b="0.9"/>
+		<FontHeight>
+		  <AbsValue val="7"/>
+		</FontHeight>
+		<Shadow x="1" y="-1">
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
 	
 	<Font name="Font_Black_S" font="Fonts\2002.TTF" virtual="true">
 		<Color r="0" g="0" b="0"/>
@@ -2131,7 +2141,6 @@
 		</Scripts>
 	</Frame>
 
-
 	<Button name="HDH_AT_SwitchItemFrameTemplate" inherits="HDH_AT_ButtonTemplate"  virtual="true" text="아이템">
 		<Size x="50" y="22"/>
 		<Layers>
@@ -2176,4 +2185,20 @@
 			</Layer>
 		</Layers>
 	</Frame>
+
+	<Frame name="HDH_AT_LineFrameTemplate" virtual="true">
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentLine">
+					<Size y="2" />
+					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="LEFT" x="0" y="0"/>
+						<Anchor point="RIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+
 </Ui> 

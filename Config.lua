@@ -20,7 +20,9 @@ COMP_TYPE.PREV_NEXT_BUTTON = 8
 COMP_TYPE.IMAGE_CHECKBUTTON = 9
 COMP_TYPE.EDITBOX_ADD_DEL = 10
 COMP_TYPE.SWITCH = 11
-
+COMP_TYPE.SPLIT_LINE = 12
+COMP_TYPE.MULTILINE_EDITBOX = 13
+          
 local FRAME_WIDTH = 404
 local FRAME_MAX_H = 1000
 local FRAME_MIN_H = 260
@@ -651,14 +653,6 @@ end
 -- OnScript
 ---------------------------------------------------------
 
-local function HDH_AT_OnClick_TrackerTapButton(self)
-	if self == GetMainFrame().F.BTN_SHOW_ADD_TRACKER_CONFIG then
-		GetMainFrame():ChangeBody(BODY_TRACKER_NEW, nil, nil, nil)
-	else
-		GetMainFrame():ChangeBody(nil, self.index, nil, nil)
-	end
-end
-
 local function HDH_AT_OnChangedSlider(self, value)
 	local trackerId = GetMainFrame():GetCurTrackerId()
 	if value ~= nil and self.dbKey ~= nil then
@@ -952,7 +946,19 @@ local function HDH_AT_OnClick_TrackerConfigButton(self)
 	GetMainFrame():ChangeBody(BODY_TRACKER_EDIT, self.index, nil, nil)
 end 
 
-function HDH_AT_OnClick_Button(self)
+local function HDH_AT_OnClick_TrackerTapButton(self, button)
+	if self == GetMainFrame().F.BTN_SHOW_ADD_TRACKER_CONFIG then
+		GetMainFrame():ChangeBody(BODY_TRACKER_NEW, nil, nil, nil)
+	else
+		if button == 'LeftButton' then
+			GetMainFrame():ChangeBody(nil, self.index, nil, nil)
+		else
+			HDH_AT_OnClick_TrackerConfigButton(self)
+		end
+	end
+end
+
+function HDH_AT_OnClick_Button(self, button)
 	local main = GetMainFrame()
 	local F = main.F
 
@@ -1885,6 +1891,8 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(traitId)
 			component:SetScript("OnClick", HDH_AT_OnClick_TrackerTapButton)	
 			component:SetScript('OnDragStart', HDH_AT_OP_OnDragStartRow)
 			component:SetScript('OnDragStop', HDH_AT_OP_OnDragStopRow)
+			component:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			
 			component:RegisterForDrag('LeftButton')
 			component:EnableMouse(true)
 			component:SetMovable(true)
@@ -1995,10 +2003,6 @@ function HDH_AT_ConfigFrameMixin:UpdateFrame()
 	local traitID = talentID and C_ClassTalents.GetLastSelectedSavedConfigID(talentID)
 	local traitName = traitID and UTIL.GetTraitsName(traitID)
 	
-	if (HDH_TRACKER.warining_count or 0) > 0 then
-		HDH_TRACKER.warining_count = 0
-		self.Dialog:AlertShow(L.PLASE_RESELECT_TRATIS)
-	end
 	-- HDH_AT_ConfigFrame.Text:SetText((traitName or "none").. ":".. (traitID or 'none'))
 	-- if not traitName then
 		-- self.Dialog:AlertShow(L.NONACTIVATE_TRANSIT, nil, function() self:Hide() end)
@@ -2198,7 +2202,6 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.F.BODY.CONFIG_TRACKER_ELEMENTS.NOTICE_ALL_TRACKER:SetText(L.TRACKING_ALL_AURA)
 	self.F.BODY.CONFIG_TRACKER_ELEMENTS.NOTICE_BOSS_TRACKER = _G[self.F.BODY:GetName().."TrackerElementsSFNoticeBossTracker"]
 	self.F.BODY.CONFIG_TRACKER_ELEMENTS.NOTICE_BOSS_TRACKER:SetText(L.TRACKING_BOSS_AURA)
-	
 	-- self.F.BODY.CONFIG_TRACKER.BTN_SAVE = _G[self.F.BODY:GetName().."TrackerBottomBtnSaveTracker"]
 
 	self.F.BODY.CONFIG_UI = _G[self.F.BODY:GetName().."UI"]
@@ -2361,14 +2364,19 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.BUTTON,       L.EXPORT_SHARE_STRING, nil, 1)
 	comp:SetText(L.EXPORT_SHARE_STRING)
 	self.F.BODY.CONFIG_UI.BTN_EXPORT_STRING = comp
-	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX,       L.SHARE_STRING, nil, 2)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX,       nil, nil, 2)
+	comp:SetSize(200,26)
 	comp:SetMaxLetters(0)
+	comp:SetFontObject("Font_White_XS")
 	self.F.BODY.CONFIG_UI.ED_EXPORT_STRING = comp
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.SPLIT_LINE,       nil, nil, 3)
 
 	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.BUTTON,       L.IMPORT_SHARE_STRING, nil, 4)
 	comp:SetText(L.IMPORT_SHARE_STRING)
 	self.F.BODY.CONFIG_UI.BTN_IMPORT_STRING = comp
-	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX,       L.SHARE_STRING, nil, 5)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX,       nil, nil, 5)
+	comp:SetSize(200,26)
+	comp:SetFontObject("Font_White_XS")
 	comp:SetMaxLetters(0)
 	self.F.BODY.CONFIG_UI.ED_IMPORT_STRING = comp
 end
@@ -2420,7 +2428,7 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	local MARGIN_Y = -10
 	local COMP_HEIGHT = 25
 	local COMP_WIDTH = 95
-	local COMP_MARGIN = 8
+	local COMP_MARGIN = 5
 
 	local start_x = 0
 
@@ -2451,6 +2459,7 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		frame:SetPoint('TOPLEFT', parent, 'TOPLEFT', MARGIN_X + x, MARGIN_Y + y)
 		frame.text = frame:CreateFontString(nil, 'OVERLAY', "Font_Yellow_M")
 		frame.text:SetPoint('LEFT', frame, 'LEFT', COMP_MARGIN, 0)
+		frame.text:SetPoint('RIGHT', frame, 'RIGHT', 15, 0)
 		frame.text:SetNonSpaceWrap(false)
 		frame.text:SetJustifyH('LEFT')
 		frame.text:SetJustifyV('CENTER')
@@ -2488,12 +2497,6 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		component:SetSize(115, 22)
 		component:SetPoint('LEFT', frame, 'RIGHT', 20, 0)
 
-	elseif component_type == COMP_TYPE.MULTI_SELECTOR then
-		component = CreateFrame("FRAME", (parent:GetName()..'MultiSelector'..parent.row.."_"..parent.col), parent, "HDH_AT_MultiSelectorTemplate")
-		component:SetSize(115, 200)
-		component:SetPoint('TOPLEFT', frame, 'TOPRIGHT', 15, -2)
-	-- elseif then
-
 	elseif component_type == COMP_TYPE.SLIDER then
 		component = CreateFrame("Slider", (parent:GetName()..'Slider'..parent.row.."_"..parent.col), parent, "HDH_AT_SliderTemplate")
 		component:SetSize(115, 17)
@@ -2528,7 +2531,13 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		component.EditBox:SetAutoFocus(false) 
 		component.EditBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
 		component.EditBox:SetScript("OnEnterPressed", function(self) self:ClearFocus() end)
-
+		-- component:SetHandler(HDH_AT_OnSeletedColor)
+	
+	elseif component_type == COMP_TYPE.SPLIT_LINE then
+		component = CreateFrame("Frame", (parent:GetName()..'Line'..parent.row.."_"..parent.col), parent, "HDH_AT_LineFrameTemplate")
+		component:SetSize(230, 26)
+		component:SetPoint('LEFT', frame, 'LEFT', 0, 0)
+		-- component:SetPoint('RIGHT', parent, 'RIGHT', -10, 0)
 		-- component:SetHandler(HDH_AT_OnSeletedColor)
 	end
 
@@ -2540,5 +2549,5 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	parent:SetSize(w, -(y - COMP_HEIGHT))
 	parent:SetPoint('TOPLEFT', parent:GetParent(), 'TOPLEFT', 0, 0)
 	-- parent:SetPoint('BOTTOMRIGHT', parent:GetParent(), 'BOTTOMRIGHT', 0, 30)
-	return component
+	return component, label
 end

@@ -1178,3 +1178,4 @@ end
 function HDH_AT_SwitchFrameTemplateMixin:GetSelectedValue()
     return self.index
 end
+

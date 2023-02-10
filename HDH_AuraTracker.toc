@@ -1,20 +1,17 @@
 ﻿## Interface: 100005
 ## Title: HDH_AuraTracker
-## Author: CopperLight
+## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: 설정창 명령어 /at, /auratracker (with libcompress)
 ## Version: 10.0.5.03
 ## SavedVariables: DB_PROFILE, HDH_AT_PROFILE
 ## SavedVariablesPerCharacter: HDH_AT_DB
 
-Utils.lua
-
 locale\locale.lua
 locale\locale_koKR.lua
 
+Utils.lua
 UITemplates.xml
-
 Tooltip.lua
-
 ConfigDB.lua
 
 Tracker\Tracker.lua

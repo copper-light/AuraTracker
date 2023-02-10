@@ -337,33 +337,34 @@
 											</Anchors>
 										</FontString>
 
-										<FontString name="$parentText4" inherits="Font_Yellow_S" justifyH ="LEFT" text="항상표시" hidden="false">
+										<FontString name="$parentText4" parentKey="LabelAlways" inherits="Font_Yellow_S" justifyH ="CENTER" text="항상표시" hidden="false">
 											<Size><AbsDimension x="50" y="25"/></Size>
 											<Anchors>
-												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText3" x="-38" y="0" />
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText3" x="-40" y="0" />
 											</Anchors>	
 										</FontString>
 
-										<FontString name="$parentText5" inherits="Font_Yellow_S" justifyH ="LEFT" text="반짝효과" hidden="false">
+										<FontString name="$parentText5" parentKey="LabelGlow" inherits="Font_Yellow_S" justifyH ="CENTER" text="반짝효과" hidden="false">
 											<Size><AbsDimension x="50" y="25"/></Size>
 											<Anchors>
-												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText4" x="1" y="0" />
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText4" x="2" y="0" />
 											</Anchors>
 										</FontString>
 
-										<FontString name="$parentText6" inherits="Font_Yellow_S" justifyH ="LEFT" text="수치표시" hidden="false">
+										<FontString name="$parentText6" parentKey="LabelValue" inherits="Font_Yellow_S" justifyH ="CENTER" text="수치표시" hidden="false">
 											<Size><AbsDimension x="50" y="25"/></Size>
 											<Anchors>
-												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText5" x="1" y="0" />
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText5" x="0" y="0" />
 											</Anchors>
 										</FontString>
 
-										<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT" text="※ TIP : 주문과 추적창의 출력 순서 변경하려면 리스트를 드래그하세요.">											<Color r="1" g="0.8" b="0" />
+										<FontString name="$parentRowDesc" parentKey="Tip" inherits="Font_Yellow_S" justifyH="LEFT" text="※ TIP : 주문과 추적창의 출력 순서 변경하려면 리스트를 드래그하세요.">
+											<Color r="1" g="0.8" b="0" />
 											<Size>
 												<AbsDimension x="400" y="25"/>
 											</Size>
 											<Anchors>
-												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent" x="5" y="5"/>
+												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent" x="0" y="5"/>
 												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-5" y="5"/>
 											</Anchors>
 										</FontString>
@@ -406,13 +407,24 @@
 										</Scripts>
 									</Frame>
 								</ScrollChild>
+
+								<Scripts>
+									<OnLoad>
+										self.LabelAlways:SetText(HDH_AT_L.ALWAYS_SHOW)
+										self.LabelGlow:SetText(HDH_AT_L.GLOW)
+										self.LabelValue:SetText(HDH_AT_L.DISPLAY_VALUE)
+										self.TIP_LIST = HDH_AT_L.ADDON_TIP
+										self.tipIdx = math.floor(random() * 100)
+									</OnLoad>
+
+									<OnShow>
+										self.tipIdx = ((self.tipIdx+1) % #self.TIP_LIST) + 1
+										self.Tip:SetText(self.TIP_LIST[self.tipIdx])
+									</OnShow>
+								</Scripts>
 							</ScrollFrame>
 							
 						</Frames>
-						
-						<Scripts>
-							<OnLoad></OnLoad>
-						</Scripts>
 					</Frame>	
 				
 					<Frame name="$parentUI" hidden="true">
