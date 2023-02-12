@@ -1,6 +1,5 @@
-HDH_AT_L ={}
+HDH_AT_L = {}
 local L = HDH_AT_L
-
 L.DISPLAY_ID_IN_TOOPTIP = "Display the ID in the tooltip"
 L.SELECT = "Select"
 L.NOTHING_LIST = "Empty"
@@ -107,8 +106,6 @@ L.COOLDOWN_ANIMATION_DIDRECTION = "Direction of cooldown"
 L.ANIMATION_DIDRECTION = "Direction of Animation"
 L.CANCEL_BUFF = "Remove buff using R-Click (Can't in combat)"
 L.ICON_SIZE = "Icon size"
-L.ICON_REVERSE_DISPLAY_H = "Reverse the order of horizontal alignment"
-L.ICON_REVERSE_DISPLAY_V = "Reverse the order of vertical alignment"
 L.ICON_MARGIN_HORIZONTAL = "Spacing Left and Right"
 L.ICON_MARGIN_VERTICAL = "Spacing Top and Bottom"
 L.ICON_NUMBER_OF_HORIZONTAL  = "Number of icon\nRow x Col"
@@ -125,7 +122,6 @@ L.USE_DEFAULT_BORDER_COLOR = "Use WOW's aura type colors (|cff3377ffMag|r,|cff77
 L.ACTIVED_ICON_BORDER_COLOR = "Border color for activated icon"
 L.ANIMATION = "Animation on bar"
 L.FILL_BAR = "Fill in reverse\nthe animation on bar"
-L.REVERSE_PROGRESS = "Direction in reverse\nthe animation on bar"
 L.DISPLAY_SPARK = "Visible the spark on boundary of animation on bar"
 L.WIDTH_SIZE = "Bar width"
 L.HEIGHT_SIZE = "Bar Height"
@@ -253,11 +249,9 @@ L.ICON_NOT_ENOUGH_MANA_COLOR = "Power deficiency color"
 L.ICON_USE_NOT_ENOUGH_MANA_COLOR = "Use power deficiency color"
 L.ICON_OUT_RAGNE_COLOR = "Color out of range"
 L.ICON_USE_OUT_RAGNE_COLOR = "Use color out of range"
-L.ADDON_TIP = {
-    "※ TIP 1: You can change the order of the spell list or the tracker list by dragging the list.",
-    "※ TIP 2: You can directly go to the tracker settings menu by right-clicking the tracker list.",
-    "※ TIP 3: When icons overlap, the screen order is determined by the order of the tracker registered."
-}
+L.ADDON_TIP1 = "※ TIP 1: You can change the order of the spell list or the tracker list by dragging the list."
+L.ADDON_TIP2 = "※ TIP 2: You can directly go to the tracker settings menu by right-clicking the tracker list."
+L.ADDON_TIP3 = "※ TIP 3: When icons overlap, the screen order is determined by the order of the tracker registered."
 L.DISPLAY_VALUE = "Display Value"
 L.ON = "ON"
 L.OFF = "OFF"
@@ -270,3 +264,6 @@ L.ONLY_FOR_CONFIG_OF_AURA_TRACKER = "Tracker type: Buff/Debuff dedicated configu
 L.TRAITS_IN_USE = "Traits in use"
 L.MINIMUM_WINDOW = "Min"
 L.MAXIMUM_WINDOW = "Max"
+L.CONDITION_GT_OR_EQ = ">="
+L.CONDITION_LT_OR_EQ = "<="
+L.CONDITION_EQ = "="

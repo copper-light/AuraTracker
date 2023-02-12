@@ -1902,7 +1902,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(traitId)
 			component:SetWidth(120)
 			component.Text:SetJustifyH("RIGHT")
 			component.Text:SetPoint("TOPLEFT", 5, 0)
-			component.Text:SetPoint("BOTTOMRIGHT", -10, 12)
+			component.Text:SetPoint("BOTTOMRIGHT", -10, 11)
 			component.ConfigBtn:SetScript("OnClick", HDH_AT_OnClick_TrackerConfigButton)
 			component.ConfigBtn.index = idx
 			component:SetScript("OnClick", HDH_AT_OnClick_TrackerTapButton)	

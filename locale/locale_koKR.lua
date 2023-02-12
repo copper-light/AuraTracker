@@ -255,11 +255,9 @@ L.ICON_NOT_ENOUGH_MANA_COLOR = "자원 부족 색상"
 L.ICON_USE_NOT_ENOUGH_MANA_COLOR = "자원 부족 색상 사용"
 L.ICON_OUT_RAGNE_COLOR = "사정거리 밖 색상"
 L.ICON_USE_OUT_RAGNE_COLOR = "사정거리 밖 색상 사용"
-L.ADDON_TIP = {
-    "※ TIP 1: 주문 목록 또는 추적창 목록을 드래그하여 순서를 변경할 수 있습니다.",
-    "※ TIP 2: 추적창 목록을 오른 클릭하면 추적 설정 메뉴로 바로 이동 가능합니다.",
-    "※ TIP 3: 아이콘 위치가 겹칠 때, 화면 순서는 추적창 등록 순서로 결정됩니다."
-}
+L.ADDON_TIP1 = "※ TIP 1: 주문 목록 또는 추적창 목록을 드래그하여 순서를 변경할 수 있습니다."
+L.ADDON_TIP2 = "※ TIP 2: 추적창 목록을 오른 클릭하면 추적 설정 메뉴로 바로 이동 가능합니다."
+L.ADDON_TIP3 = "※ TIP 3: 아이콘 위치가 겹칠 때, 화면 순서는 추적창 등록 순서로 결정됩니다."
 L.DISPLAY_VALUE = "수치표시"
 L.ON = "사용"
 L.OFF = "사용안함"
