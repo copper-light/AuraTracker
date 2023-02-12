@@ -28,7 +28,7 @@ local FRAME_MAX_H = 1000
 local FRAME_MIN_H = 260
 
 local STR_TRANSIT_FORMAT = "|cffffc800%s\r\n|cffaaaaaa%s"
-local STR_TRACKER_FORMAT = "%s\r\n|cffaaaaaa%s%s"
+local STR_TRACKER_FORMAT = "%s%s"
 
 local MAX_TALENT_TABS = 4
 
@@ -1133,24 +1133,22 @@ function HDH_AT_OnClick_Button(self, button)
 	elseif self == F.BTN_PREV_NEXT.BtnPrev then
 		local value = tonumber(F.BTN_PREV_NEXT.Value:GetText())
 		local newValue = max(value - 1, 1)
-		local idx = main:GetCurTrackerIdx()
 		if value ~= newValue then
 			F.BTN_PREV_NEXT.Value:SetText(newValue)
 			DB:SwapTracker(value, newValue)
 			main:LoadTrackerList(main:GetCurTraits())
-			main:ChangeTrackerTabByTrackerId(newValue)
+			main:ChangeBody(BODY_TRACKER_EDIT, main:GetTrackerIndex(newValue))
 		end
 
 	elseif self == F.BTN_PREV_NEXT.BtnNext then
 		local maxValue = #DB:GetTrackerIds()
 		local value = tonumber(F.BTN_PREV_NEXT.Value:GetText())
 		local newValue = min(value + 1, maxValue)
-		local idx = main:GetCurTrackerIdx()
 		if newValue ~= value then
 			F.BTN_PREV_NEXT.Value:SetText(newValue)
 			DB:SwapTracker(value, newValue)
 			main:LoadTrackerList(main:GetCurTraits())
-			main:ChangeTrackerTabByTrackerId(newValue)
+			main:ChangeBody(BODY_TRACKER_EDIT, main:GetTrackerIndex(newValue))
 		end
 
 	elseif self == F.BODY.CONFIG_DETAIL.BTN_SAVE then
@@ -1903,6 +1901,8 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(traitId)
 			component = CreateFrame("Button", (parent:GetName()..'Tracker'..idx), parent, "HDH_AT_TrackerTapBtnTemplate")
 			component:SetWidth(120)
 			component.Text:SetJustifyH("RIGHT")
+			component.Text:SetPoint("TOPLEFT", 5, 0)
+			component.Text:SetPoint("BOTTOMRIGHT", -10, 12)
 			component.ConfigBtn:SetScript("OnClick", HDH_AT_OnClick_TrackerConfigButton)
 			component.ConfigBtn.index = idx
 			component:SetScript("OnClick", HDH_AT_OnClick_TrackerTapButton)	
@@ -1938,7 +1938,8 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(traitId)
 				typeName = label[2]
 			end
 		end
-		component:SetText(STR_TRACKER_FORMAT:format(name, typeName, unitName))
+		component:SetText(name) --STR_TRACKER_FORMAT:format(name, typeName, unitName)
+		component.Tracker:SetText(STR_TRACKER_FORMAT:format(typeName, unitName))
 		component:SetActivate(false)
 	end
 	if parent.list[#parent.list] ~= F.BTN_SHOW_ADD_TRACKER_CONFIG then
@@ -2482,7 +2483,7 @@ end
 -------------------------------
 
 function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_key, row, col)
-	local MARGIN_X = 10
+	local MARGIN_X = 5
 	local MARGIN_Y = -10
 	local COMP_HEIGHT = 25
 	local COMP_WIDTH = parent:GetParent():GetWidth() - 180
@@ -2512,12 +2513,11 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	local frame = CreateFrame("Frame", (parent:GetName()..'Label'..parent.row), parent)
 
 	if option_name then
-		frame.text = frame:CreateFontString(nil, 'OVERLAY', "Font_Yellow_M")
+		frame.text = frame:CreateFontString(nil, 'OVERLAY', "Font_Yellow_S")
 		frame:SetPoint('TOPLEFT', parent, 'TOPLEFT', MARGIN_X + x, MARGIN_Y + y)
 		frame.text:SetPoint('LEFT', frame, 'LEFT', COMP_MARGIN, 0)
 		frame.text:SetNonSpaceWrap(false)
 		frame.text:SetJustifyV('CENTER')
-		frame.text:SetFontObject("Font_Yellow_S")
 		frame.text:SetText(option_name)
 
 		if component_type == COMP_TYPE.SPLIT_LINE then

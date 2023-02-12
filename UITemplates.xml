@@ -68,6 +68,16 @@
 		</Shadow>
 	</Font>
 
+	<Font name="Font_White_SS" font="Fonts\2002.TTF" virtual="true">
+		<Color r="0.7" g="0.7" b="0.7"/>
+		<FontHeight>
+		  <AbsValue val="9"/>
+		</FontHeight>
+		<Shadow x="1" y="-1">
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+
 	<Font name="Font_White_XS" font="Fonts\2002.TTF" virtual="true">
 		<Color r="0.9" g="0.9" b="0.9"/>
 		<FontHeight>
@@ -528,6 +538,13 @@
 						<Anchor point="BOTTOMRIGHT" x="0" y="1" relativePoint="BOTTOMRIGHT" />
 					</Anchors>
 				</Texture>
+
+				<FontString parentKey="Tracker" inherits="Font_White_SS" maxLines="1" justifyH="RIGHT" text="">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="5" y="-12"/>
+						<Anchor point="BOTTOMRIGHT" x="-10" y="0"/>
+					</Anchors>
+				</FontString>
 			</Layer>
 		</Layers>
 		<!-- <NormalTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
@@ -575,9 +592,9 @@
 			</OnLeave>
 		</Scripts>
 
-		<ButtonText name="$parentText" parentKey="Text" justifyH="CENTER">
+		<ButtonText name="$parentText" parentKey="Text" maxLines="1" justifyH="CENTER">
 			<Anchors>
-				<Anchor point="TOPLEFT" x="0" y="0"/>
+				<Anchor point="TOPLEFT" x="5" y="0"/>
 				<Anchor point="BOTTOMRIGHT" x="-10" y="0"/>
 			</Anchors>
 		</ButtonText>
@@ -792,7 +809,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>self:SetText(HDH_AT_L.SAVE)</OnLoad>
-					<OnClick>print("UI")</OnClick>
+					<OnClick></OnClick>
 				</Scripts>
 			</Button>
 
@@ -807,7 +824,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>self:SetText(HDH_AT_L.CANCEL)</OnLoad>
-					<OnClick>print("UI")</OnClick>
+					<OnClick></OnClick>
 				</Scripts>
 			</Button>
 			
@@ -1021,8 +1038,8 @@
 		</Layers>
 		<ButtonText name="$parentText" justifyH="LEFT">
 			<Anchors>
-				<Anchor point="TOPLEFT" x="5" y="0"/>
-				<Anchor point="BOTTOMRIGHT" x="-3" y="0"/>
+				<Anchor point="TOPLEFT" x="8" y="0"/>
+				<Anchor point="BOTTOMRIGHT" x="-8" y="0"/>
 			</Anchors>
 		</ButtonText>
 		<NormalFont style="Font_White_S"/>

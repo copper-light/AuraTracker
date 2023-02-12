@@ -2,19 +2,6 @@
 ..\FrameXML\UI.xsd">
 	<Script file="Config.lua"/>
 
-
-	<!-- <Button name="HDH_AT_ConfigFrame222" parent="UIParent" toplevel="true" frameStrata="FULLSCREEN_DIALOG" inherits="SecureHandlerClickTemplate">
-		<Anchors>
-			<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
-			<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
-		</Anchors>
-		<Scripts>
-			<OnLoad>self:SetAttribute("_onClick", [=[
-				print("asdfasdfasdf")
-			]=])</OnLoad>
-		</Scripts>
-	</Button> -->
-
     <!-- 설정 프레임 시작 -->
     <Frame name="HDH_AT_ConfigFrame" mixin="HDH_AT_ConfigFrameMixin" movable="true" toplevel="true" parent="UIParent" frameStrata="HIGH" hidden="true" enableMouse="true" resizable="true" inherits="HDH_AT_ConfigFrameTemplate">
 		<Size><AbsDimension x="410" y="500"/></Size>
@@ -329,7 +316,7 @@
 												</Anchor>
 											</Anchors>
 										</FontString>
-										<FontString  name="$parentText2" inherits="Font_Yellow_S" justifyH ="LEFT" text="Element Name">
+										<FontString  name="$parentText2" inherits="Font_Yellow_S" justifyH ="LEFT" text="Spell Name">
 											<Size><AbsDimension x="100" y="25"/></Size>
 											<Anchors>
 												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText1">
@@ -459,7 +446,7 @@
 												<FontString parentKey="Text" inherits="Font_Yellow_S" text="공용 설정 사용 여부" justifyH="LEFT">
 													<Size><AbsDimension x="95" y="22" /></Size>
 													<Anchors>
-														<Anchor point="RIGHT" relativePoint="LEFT" x="0" y="0"/>
+														<Anchor point="RIGHT" relativePoint="LEFT" x="-5" y="0"/>
 													</Anchors>
 												</FontString>
 											</Layer>
@@ -484,7 +471,7 @@
 												<FontString parentKey="Text" inherits="Font_Yellow_S" text="디스플레이 유형" justifyH="LEFT">
 													<Size><AbsDimension x="95" y="22" /></Size>
 													<Anchors>
-														<Anchor point="RIGHT" relativePoint="LEFT" x="0" y="0"/>
+														<Anchor point="RIGHT" relativePoint="LEFT" x="-5" y="0"/>
 													</Anchors>
 												</FontString>
 											</Layer>
@@ -972,6 +959,7 @@
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnClose" x="0" y="0" />
 				</Anchors>
 				<Scripts>
+					<OnLoad>self:SetText(HDH_AT_L.MINIMUM_WINDOW)</OnLoad>
 					<OnClick>
 						HDH_AT_MinimumFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
 						HDH_AT_MinimumFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
@@ -1037,10 +1025,14 @@
 					<Offset><AbsDimension x="0" y="0"/></Offset>
 					</Anchor>
 				</Anchors>
-				<Scripts><OnClick>
-					HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
-					HDH_AT_ConfigFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
-					HDH_AT_ConfigFrame:Show(); self:GetParent():Hide(); </OnClick></Scripts>
+				<Scripts>
+					<OnLoad>self:SetText(HDH_AT_L.MAXIMUM_WINDOW)</OnLoad>
+					<OnClick>
+						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
+						HDH_AT_ConfigFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
+						HDH_AT_ConfigFrame:Show(); self:GetParent():Hide();
+					</OnClick>
+				</Scripts>
 			</Button>
 		</Frames>
 		<Scripts>

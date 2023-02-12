@@ -708,7 +708,6 @@ end
 
 
 function HDH_AT_DropDownList_OnLeave(self)
-    -- print("asdf")
     -- local parent = self:GetParent()
     -- if not parent.always_show_list and not self:GetParent():IsMouseOver() then
     --     local show = CheckMouseOver(self)
