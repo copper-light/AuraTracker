@@ -409,7 +409,11 @@
 										self.LabelAlways:SetText(HDH_AT_L.ALWAYS_SHOW)
 										self.LabelGlow:SetText(HDH_AT_L.GLOW)
 										self.LabelValue:SetText(HDH_AT_L.DISPLAY_VALUE)
-										self.TIP_LIST = HDH_AT_L.ADDON_TIP
+										self.TIP_LIST = {
+											HDH_AT_L.ADDON_TIP1,
+											HDH_AT_L.ADDON_TIP2,
+											HDH_AT_L.ADDON_TIP3
+										}
 										self.tipIdx = math.floor(random() * 100)
 									</OnLoad>
 
