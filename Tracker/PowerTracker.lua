@@ -156,7 +156,11 @@ local function HDH_POWER_OnUpdate(self)
 	-- if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
 	self.counttext:SetText(self.spell.count .. "%"); 
 	-- else self.counttext:SetText(nil) end
-	if self.spell.showValue then self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1, self:GetParent().parent.ui.font.v1_abbreviate)); else self.v1:SetText(nil) end
+	if self.spell.showValue then 
+		self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1, self:GetParent().parent.ui.font.v1_abbreviate)); 
+	else 
+		self.v1:SetText(nil) 
+	end
 	
 	if IS_REGEN_POWER[self.spell.power_index] then
 		if self.spell.v1 < maxValue then
@@ -194,11 +198,16 @@ function HDH_POWER_TRACKER:UpdateBarValue(f, non_animate)
 		for i = 1, #f.bar.bar do 
 			bar = f.bar.bar[i];
 			-- bar:SetMinMaxValues(bar.mpMin, bar.mpMax);
-			if bar then 
-				if non_animate then
-					bar:SetValue(f.spell.v1); 
+			if bar then
+				if self.ui.bar.to_fill then
+					bar.v1 = f.spell.v1
 				else
-					bar:SetValue(self:GetAnimatedValue(bar, f.spell.v1, i)); 
+					bar.v1 = bar.mpMax - f.spell.v1 + bar.mpMin
+				end
+				if non_animate then
+					bar:SetValue(bar.v1); 
+				else
+					bar:SetValue(self:GetAnimatedValue(bar, bar.v1, i)); 
 				end
 				-- bar:SetValue(f.spell.v1); 
 				if f:GetParent().parent.ui.bar.use_full_color then
@@ -240,11 +249,11 @@ function HDH_POWER_TRACKER:CreateData()
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.location', DB.BAR_LOCATION_R)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 200)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_fill', false)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_progress', false)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.to_fill', true)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.cooldown_progress', DB.COOLDOWN_RIGHT)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)
 
-	DB:SetTrackerValue(trackerId, 'ui.%s.font.show_name', false)
+	DB:SetTrackerValue(trackerId, 'ui.%s.font.name_location', DB.FONT_LOCATION_HIDE)
 
 	if maxValue >= 200 then
 		DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_BAR_L)
@@ -412,6 +421,7 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 	end
 	
 	local cnt = (#split == 0) and 1 or (#split +1);
+	local bar
 	for i = 1, cnt do
 		if bf.bar[i] == nil then
 			local newBar = CreateFrame("StatusBar",nil,bf);
@@ -424,45 +434,108 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			bf.bar[i] = newBar;
 			if i== 1 and not f.name then f.name = newBar:CreateFontString(nil,"OVERLAY"); end
 		end 
+		bar = bf.bar[i]
 		
 		local powerMax = bf.max
-		bf.bar[i].mpMax = split[i] or powerMax;
-		bf.bar[i].mpMin = split[i-1] or 0;
+		bar.mpMax = split[i] or powerMax;
+		bar.mpMin = split[i-1] or 0;
 		
-		local gap = bf.bar[i].mpMax - bf.bar[i].mpMin;
-		-- bf.bar[i]:SetValue(value or 0)
-		bf.bar[i]:SetMinMaxValues(bf.bar[i].mpMin, bf.bar[i].mpMax);
+		local gap = bar.mpMax - bar.mpMin;
+		-- bar:SetValue(value or 0)
+		bar:SetMinMaxValues(bar.mpMin, bar.mpMax);
+		bar:SetStatusBarColor(unpack(bar_op.color));
+		bar.spark:SetVertexColor(unpack(bar_op.spark_color or {1,1,1,1}))
+		bar.background:SetVertexColor(unpack(bar_op.bg_color));
 		
-		local r = bar_op.reverse_progress;
-		bf.bar[i]:SetStatusBarTexture(r and DB.BAR_TEXTURE[bar_op.texture].texture_r or DB.BAR_TEXTURE[bar_op.texture].texture); 
-		bf.bar[i]:SetStatusBarColor(unpack(bar_op.color));
-		bf.bar[i]:ClearAllPoints();
-		if bar_op.location == DB.BAR_LOCATION_T or bar_op.location == DB.BAR_LOCATION_B then  
-			local h = ( bf:GetHeight() - (bf.margin * #split) ) * (gap/powerMax);
-			bf.bar[i]:SetSize(bf:GetWidth(), h);
-			bf.bar[i]:SetOrientation("Vertical"); bf.bar[i]:SetRotatesTexture(true);
-			if i == 1 then bf.bar[i]:SetPoint(r and "TOP" or "BOTTOM",0,0);
-						else bf.bar[i]:SetPoint(r and "TOP" or "BOTTOM", bf.bar[i-1], r and "BOTTOM" or "TOP", 0, r and -bf.margin or bf.margin); end
-			bf.bar[i].spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-			bf.bar[i].spark:SetSize(bar_op.height*1.15, 19);
-		else
+		bar:ClearAllPoints();
+		if bar_op.cooldown_progress == DB.COOLDOWN_LEFT then
 			local w = ( bf:GetWidth() - (bf.margin * #split) ) * (gap/powerMax);
-			bf.bar[i]:SetSize(w, bf:GetHeight());
-			bf.bar[i]:SetOrientation("Horizontal"); bf.bar[i]:SetRotatesTexture(false);
-			if i == 1 then bf.bar[i]:SetPoint(r and "RIGHT" or "LEFT",0,0);
-						else bf.bar[i]:SetPoint(r and "RIGHT" or "LEFT", bf.bar[i-1], r and "LEFT" or "RIGHT", r and -bf.margin or bf.margin, 0); end
-			bf.bar[i].spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-			bf.bar[i].spark:SetSize(19, bar_op.height*1.15);		  
+			bar:SetSize(w, bf:GetHeight());
+			if i == 1 then 
+				bar:SetPoint("RIGHT",0,0)
+			else
+				bar:SetPoint("RIGHT", bf.bar[i-1], "LEFT", -bf.margin, 0)
+			end
+			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture); 
+			bar:SetOrientation("Horizontal"); 
+			bar:SetRotatesTexture(false);
+			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
+			bar.spark:SetSize(19, bar_op.height*1.15);
+			
+			if bar_op.to_fill then
+				bar:SetReverseFill(true)
+			else
+				bar:SetReverseFill(false)
+			end
+			
+		elseif bar_op.cooldown_progress == DB.COOLDOWN_RIGHT then
+			local w = ( bf:GetWidth() - (bf.margin * #split) ) * (gap/powerMax);
+			bar:SetSize(w, bf:GetHeight());
+
+			if i == 1 then 
+				bar:SetPoint("LEFT",0,0)
+			else
+				bar:SetPoint("LEFT", bf.bar[i-1], "RIGHT", bf.margin, 0)
+			end
+			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture); 
+			bar:SetOrientation("Horizontal"); 
+			bar:SetRotatesTexture(false);
+			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
+			bar.spark:SetSize(19, bar_op.height*1.15);
+			
+			if bar_op.to_fill then
+				bar:SetReverseFill(false)
+			else
+				bar:SetReverseFill(true)
+			end
+
+		elseif bar_op.cooldown_progress == DB.COOLDOWN_UP then
+			local h = ( bf:GetHeight() - (bf.margin * #split) ) * (gap/powerMax);
+			bar:SetSize(bf:GetWidth(), h);
+			if i == 1 then 
+				bar:SetPoint("BOTTOM", 0, 0)
+			else
+				bar:SetPoint("BOTTOM", bf.bar[i-1], "TOP", 0, bf.margin)
+			end
+			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture_r); 
+			bar:SetOrientation("Vertical"); 
+			bar:SetRotatesTexture(true);
+			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
+			bar.spark:SetSize(bar_op.width*1.15, 19);
+			if bar_op.to_fill then
+				bar:SetReverseFill(false)
+			else
+				bar:SetReverseFill(true)
+			end
+			
+
+		else -- bottom
+			local h = ( bf:GetHeight() - (bf.margin * #split) ) * (gap/powerMax);
+			bar:SetSize(bf:GetWidth(), h);
+			if i == 1 then 
+				bar:SetPoint("TOP", 0, 0)
+			else
+				bar:SetPoint("TOP", bf.bar[i-1], "BOTTOM", 0, -bf.margin)
+			end
+			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture_r); 
+			bar:SetOrientation("Vertical"); 
+			bar:SetRotatesTexture(true);
+			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
+			bar.spark:SetSize(bar_op.width*1.15, 19);
+			if bar_op.to_fill then
+				bar:SetReverseFill(true)
+			else
+				bar:SetReverseFill(false)
+			end
 		end
+
 		if bar_op.show_spark then
-			bf.bar[i].spark:Show();
+			bar.spark:Show();
 		else
-			bf.bar[i].spark:Hide();
+			bar.spark:Hide();
 		end
-		bf.bar[i].background:SetVertexColor(unpack(bar_op.bg_color));
-		bf.bar[i]:SetReverseFill(r);	
 		
-		bf.bar[i]:Show();
+		bar:Show();
 	end
 	
 	for i = cnt+1, #bf.bar do

@@ -3,17 +3,10 @@ local L = HDH_AT_L
 local CONFIG = HDH_AT_ConfigDB
 local UTIL = HDH_AT_UTIL
 
-CONFIG.NAME_ALIGN_LEFT = "LEFT"
-CONFIG.NAME_ALIGN_RIGHT = "RIGHT"
-CONFIG.NAME_ALIGN_CENTER = "CENTER"
-CONFIG.NAME_ALIGN_TOP = "TOP"
-CONFIG.NAME_ALIGN_BOTTOM = "BOTTOM"
-
-CONFIG.VERSION = 2.3
+CONFIG.VERSION = 2.6
 
 CONFIG.ANI_HIDE = 1
 CONFIG.ANI_SHOW = 2
-
 
 CONFIG.COOLDOWN_UP     = 1
 CONFIG.COOLDOWN_DOWN   = 2
@@ -35,6 +28,8 @@ CONFIG.FONT_LOCATION_BAR_L = 10
 CONFIG.FONT_LOCATION_BAR_C = 11
 CONFIG.FONT_LOCATION_BAR_R = 12
 CONFIG.FONT_LOCATION_HIDE = 13
+CONFIG.FONT_LOCATION_BAR_T = 14
+CONFIG.FONT_LOCATION_BAR_B = 15
 
 --HDH_AT_DB.FONT_LOCATION_OT2 = 7
 --HDH_AT_DB.FONT_LOCATION_OB2 = 9
@@ -86,8 +81,8 @@ CONFIG.GLOW_CONDITION_TIME = 2
 CONFIG.GLOW_CONDITION_COUNT = 3
 CONFIG.GLOW_CONDITION_VALUE = 4
 
-CONFIG.CONDITION_GT = 1
-CONFIG.CONDITION_LT = 2
+CONFIG.CONDITION_GT_OR_EQ = 1
+CONFIG.CONDITION_LT_OR_EQ = 2
 CONFIG.CONDITION_EQ = 3
 
 local DEFAULT_DISPLAY = { 
@@ -115,15 +110,11 @@ local DEFAULT_DISPLAY = {
         use_out_range_color = true,
         out_range_color = {0.53, 0.1, 0.1, 1}
     },
-    -- -- 오라 전용 설정
-    -- aura = {
-    --     -- type = CONFIG.AURA_TYPE.ONLY_MINE
-    -- },
 
     -- 아이콘 설정
     icon = { 
         able_buff_cancel = false, 
-        cooldown = CONFIG.COOLDOWN_UP, -- 1위로, 2아래로 3왼쪽으로 4오른쪽으로 5 원형
+        cooldown = CONFIG.COOLDOWN_UP,
         size = 40, 
         
         on_alpha = 1, 
@@ -137,8 +128,8 @@ local DEFAULT_DISPLAY = {
 
     -- 바 설정
     bar = { 
-        reverse_fill = false, 
-        reverse_progress = false, 
+        to_fill = false, 
+        -- reverse_progress = false, 
         show_spark = true,
 
         color = {0.3,1,0.3, 1}, 
@@ -146,8 +137,9 @@ local DEFAULT_DISPLAY = {
         full_color = {0.3,1,0.3, 1}, 
         bg_color = {0,0,0,0.5}, 
         texture = 1,
-
+        spark_color = {1,1,1,0.7},
         location = CONFIG.BAR_LOCATION_R,
+        cooldown_progress = CONFIG.COOLDOWN_LEFT,
         width = 150, 
         height= 40
     },
@@ -176,7 +168,7 @@ local DEFAULT_DISPLAY = {
         v2_color = {1,1,1,1}, -- 2차
         
         show_name = true, 
-        name_align = CONFIG.NAME_ALIGN_CENTER,
+        name_location = CONFIG.NAME_ALIGN_CENTER,
         name_size=15, 
         name_margin_left=5, 
         name_margin_right=5, 

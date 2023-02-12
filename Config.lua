@@ -223,12 +223,13 @@ local DDP_FONT_CD_LOC_LIST = {
 	{DB.FONT_LOCATION_BAR_R, L.FONT_LOCATION_BAR_R},
 }
 
-local DDP_FONT_NAME_ALIGN_LIST = {
-	{DB.NAME_ALIGN_LEFT, L.LEFT},
-	{DB.NAME_ALIGN_RIGHT, L.RIGHT},
-	{DB.NAME_ALIGN_CENTER, L.CENTER},
-	{DB.NAME_ALIGN_TOP, L.TOP},
-	{DB.NAME_ALIGN_BOTTOM, L.BOTTOM}
+local DDP_FONT_NAME_LOC_LIST = {
+	{DB.FONT_LOCATION_HIDE, L.HIDE},
+	{DB.FONT_LOCATION_BAR_L, L.FONT_LOCATION_BAR_L},
+	{DB.FONT_LOCATION_BAR_R, L.FONT_LOCATION_BAR_R},
+	{DB.FONT_LOCATION_BAR_C, L.FONT_LOCATION_BAR_C},
+	{DB.FONT_LOCATION_BAR_T, L.FONT_LOCATION_BAR_T},
+	{DB.FONT_LOCATION_BAR_B, L.FONT_LOCATION_BAR_B}
 }
 
 local DDP_ICON_COOLDOWN_LIST = {
@@ -249,10 +250,17 @@ local DDP_ICON_ORDER_LIST = {
 }
 
 local DDP_BAR_LOC_LIST = {
-	{DB.BAR_LOCATION_T, L.TOP_AND_UPWARD},
-	{DB.BAR_LOCATION_B, L.BOTTOM_AND_DOWNWARD},
-	{DB.BAR_LOCATION_L, L.LEFT_AND_TORIGHT},
-	{DB.BAR_LOCATION_R, L.RIGHT_AND_TOLEFT}
+	{DB.BAR_LOCATION_T, L.TOP_TO_ICON},
+	{DB.BAR_LOCATION_B, L.BOTTOM_TO_ICON},
+	{DB.BAR_LOCATION_L, L.LEFT_TO_ICON},
+	{DB.BAR_LOCATION_R, L.RIGHT_TO_ICON}
+}
+
+local DDP_BAR_COOLDOWN_LIST = {
+	{DB.COOLDOWN_UP, L.UPWARD},
+	{DB.COOLDOWN_DOWN, L.DOWNWARD},
+	{DB.COOLDOWN_LEFT, L.TO_THE_LEFT},
+	{DB.COOLDOWN_RIGHT, L.TO_THE_RIGHT},
 }
 
 local DDP_CONFIG_MODE_LIST = {
@@ -285,8 +293,8 @@ do
 end
 
 local DDP_CONDITION_LIST = {
-	{DB.CONDITION_GT, L.CONDITION_GT},
-	{DB.CONDITION_LT, L.CONDITION_LT},
+	{DB.CONDITION_GT_OR_EQ, L.CONDITION_GT_OR_EQ},
+	{DB.CONDITION_LT_OR_EQ, L.CONDITION_LT_OR_EQ},
 	{DB.CONDITION_EQ, L.CONDITION_EQ},
 }
 
@@ -563,7 +571,11 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		elseif CLASS:GetClassName() == "HDH_POWER_TRACKER" then
 			self.DETAIL_ETC_TAB[1]:Enable()
 			self.DETAIL_ETC_TAB[2]:Enable()
-			ChangeTab(self.DETAIL_ETC_TAB, self.subType)
+			if #self.DETAIL_ETC_TAB >= self.subType then
+				ChangeTab(self.DETAIL_ETC_TAB, self.subType)
+			else
+				ChangeTab(self.DETAIL_ETC_TAB, 1)
+			end
 		else
 			self.DETAIL_ETC_TAB[1]:Enable()
 			self.DETAIL_ETC_TAB[2]:Disable()
@@ -704,7 +716,7 @@ function HDH_AT_UI_OnCheck(self)
 			isItem = F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon.isItem
 		end
 		if (searchChecked and not key) then
-			GetMainFrame().Dialog:AlertShow(L.PLASE_SEARCH_ICON) return 
+			GetMainFrame().Dialog:AlertShow(L.PLEASE_SEARCH_ICON) return 
 		end
 
 		DB:SetTrackerElementImage(trackerId, elemIdx, texture, key, isItem)
@@ -975,26 +987,26 @@ function HDH_AT_OnClick_Button(self, button)
 
 		name = UTIL.Trim(name)
 		if not name or string.len(name) <= 0 then
-			main.Dialog:AlertShow(L.PLASE_INPUT_NAME) return 
+			main.Dialog:AlertShow(L.PLEASE_INPUT_NAME) return 
 		end
 		if not type then
-			main.Dialog:AlertShow(L.PLASE_SELECT_TYPE) return 
+			main.Dialog:AlertShow(L.PLEASE_SELECT_TYPE) return 
 		end
 
 		if F.DD_TRACKER_UNIT:IsEnabled() and not unit then
-			main.Dialog:AlertShow(L.PLASE_SELECT_UNIT) return 
+			main.Dialog:AlertShow(L.PLEASE_SELECT_UNIT) return 
 		end
 
 		if F.DD_TRACKER_AURA_FILTER:IsEnabled() and not filter then
-			main.Dialog:AlertShow(L.PLASE_SELECT_AURA_FILTER) return 
+			main.Dialog:AlertShow(L.PLEASE_SELECT_AURA_FILTER) return 
 		end
 
 		if F.DD_TRACKER_AURA_CASTER:IsEnabled() and not caster then
-			main.Dialog:AlertShow(L.PLASE_SELECT_AURA_CASTER) return 
+			main.Dialog:AlertShow(L.PLEASE_SELECT_AURA_CASTER) return 
 		end
 
 		if not traitList or #traitList == 0 then
-			main.Dialog:AlertShow(L.PLASE_SELECT_TRAIT) return 
+			main.Dialog:AlertShow(L.PLEASE_SELECT_TRAIT) return 
 		end
 
 		local perType
@@ -1107,7 +1119,7 @@ function HDH_AT_OnClick_Button(self, button)
 				HDH_TRACKER.InitVaribles()
 				main.Dialog:AlertShow(L.ALRET_CONFIRM_COPY:format(copyName))
 			else
-				main.Dialog:AlertShow(L.PLASE_INPUT_NAME)
+				main.Dialog:AlertShow(L.PLEASE_INPUT_NAME)
 
 			end
 		end)
@@ -1158,7 +1170,7 @@ function HDH_AT_OnClick_Button(self, button)
 			end
 			if checkedIdx then
 				if checkedIdx > 1 and (not glowValue or string.len(glowValue) == 0) then
-					main.Dialog:AlertShow(L.ALERT_PLASE_INPUT_GLOW_VALUE)
+					main.Dialog:AlertShow(L.ALERT_PLEASE_INPUT_GLOW_VALUE)
 					return
 				end
 				DB:UpdateTrackerElementGlow(trackerId, elemIdx, checkedIdx, condition, glowValue)
@@ -1181,7 +1193,7 @@ function HDH_AT_OnClick_Button(self, button)
 		local data = WeakAuraLib_TableToString(HDH_AT_DB, true)
 		F.BODY.CONFIG_UI.ED_EXPORT_STRING:SetText(data)
 
-		main.Dialog:AlertShow(L.CREATE_SHARE_STRING)
+		main.Dialog:AlertShow(L.DIALOG_CREATE_SHARE_STRING)
 
 	elseif self == F.BODY.CONFIG_UI.BTN_IMPORT_STRING then
 		local data = F.BODY.CONFIG_UI.ED_IMPORT_STRING:GetText()
@@ -1211,7 +1223,7 @@ function HDH_AT_OnClick_Button(self, button)
 		spell = UTIL.Trim(spell)
 
 		if not spell or string.len(spell) == 0 then
-			main.Dialog:AlertShow(L.PLASE_INPUT_ID) return 
+			main.Dialog:AlertShow(L.PLEASE_INPUT_ID) return 
 		end
 		local name, id, texture = UTIL.GetInfo(spell, isItem)
 		if not id then
@@ -1241,7 +1253,7 @@ function HDH_AT_OnClick_Button(self, button)
 		if self:GetParent().ButtonAdd == self then
 			local v = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR.ED_LIST[index]:GetValue()
 			if v == 0 then
-				main.Dialog:AlertShow(L.PLASE_INPUT_VALUE)
+				main.Dialog:AlertShow(L.PLEASE_INPUT_VALUE)
 				return
 			end
 			if minValue < v and maxValue > v then
@@ -1259,7 +1271,7 @@ function HDH_AT_OnClick_Button(self, button)
 					end
 				end
 			else
-				main.Dialog:AlertShow(L.PLASE_INPUT_MINMAX_VALUE)
+				main.Dialog:AlertShow(L.PLEASE_INPUT_MINMAX_VALUE)
 				return
 			end
 		elseif self:GetParent().ButtonDel == self then
@@ -1363,7 +1375,7 @@ function HDH_AT_ConfigFrameMixin:AddTrackerElement(elem, trackerId, elemIdx)
 
 	key = UTIL.Trim(key)
 	if not key or string.len(key) == 0 then
-		self.Dialog:AlertShow(L.PLASE_INPUT_ID)
+		self.Dialog:AlertShow(L.PLEASE_INPUT_ID)
 		return 
 	end
 	
@@ -1588,28 +1600,33 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 	F.BODY.CONFIG_DETAIL.trackerId = trackerId
 	
 	F.BODY.CONFIG_DETAIL.ICON:SetTexture(texture)
-	F.BODY.CONFIG_DETAIL.TEXT:SetText(name)
+	if id then
+		F.BODY.CONFIG_DETAIL.TEXT:SetText(string.format('%s (ID: %s)',name, id))
+	else
+		F.BODY.CONFIG_DETAIL.TEXT:SetText(name)
+	end
 	F.BODY.CONFIG_DETAIL.mode = detailMode
 
 	if detailMode == BODY_DETAIL_GLOW then
-		F.BODY.CONFIG_DETAIL.GLOW.checkbutton = button
-		F.BODY.CONFIG_DETAIL.GLOW.preCheck = not button:GetChecked()
+		if button ~= nil then
+			F.BODY.CONFIG_DETAIL.GLOW.checkbutton = button
+			F.BODY.CONFIG_DETAIL.GLOW.preCheck = not button:GetChecked()
 
-		local glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, elemIdx)
-		local match
-		for idx, cd in ipairs(F.BODY.CONFIG_DETAIL.GLOW.CD_LIST) do
-			match = idx == glowType
-			F.BODY.CONFIG_DETAIL.GLOW.CD_LIST[idx][1]:SetChecked(match)
-			if idx > 1 then
-				F.BODY.CONFIG_DETAIL.GLOW.CD_LIST[idx][2]:SetSelectedIndex((match and glowCondition) or 1)
-				F.BODY.CONFIG_DETAIL.GLOW.CD_LIST[idx][3]:SetText((match and glowValue) or "")
+			local glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, elemIdx)
+			local match
+			for idx, cd in ipairs(F.BODY.CONFIG_DETAIL.GLOW.CD_LIST) do
+				match = idx == glowType
+				F.BODY.CONFIG_DETAIL.GLOW.CD_LIST[idx][1]:SetChecked(match)
+				if idx > 1 then
+					F.BODY.CONFIG_DETAIL.GLOW.CD_LIST[idx][2]:SetSelectedIndex((match and glowCondition) or 1)
+					F.BODY.CONFIG_DETAIL.GLOW.CD_LIST[idx][3]:SetText((match and glowValue) or "")
+				end
 			end
+			button:SetChecked(F.BODY.CONFIG_DETAIL.GLOW.preCheck)
+			F.BODY.CONFIG_DETAIL.BTN_SAVE:Show()
+			F.BODY.CONFIG_DETAIL.BTN_CLOSE:ClearAllPoints()
+			F.BODY.CONFIG_DETAIL.BTN_CLOSE:SetPoint("BOTTOMLEFT", F.BODY.CONFIG_DETAIL.BTN_CLOSE:GetParent() ,"BOTTOM", 5, 5)
 		end
-		button:SetChecked(F.BODY.CONFIG_DETAIL.GLOW.preCheck)
-		F.BODY.CONFIG_DETAIL.BTN_SAVE:Show()
-		F.BODY.CONFIG_DETAIL.BTN_CLOSE:ClearAllPoints()
-		F.BODY.CONFIG_DETAIL.BTN_CLOSE:SetPoint("BOTTOMLEFT", F.BODY.CONFIG_DETAIL.BTN_CLOSE:GetParent() ,"BOTTOM", 5, 5)
-
 	elseif detailMode == BODY_DETAIL_ETC then
 		local trackerType = select(3, DB:GetTrackerInfo(trackerId))
 		local texture, key, isItem = DB:GetTrackerElementImage(trackerId, elemIdx)
@@ -2174,9 +2191,9 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	end
 
 	-- self.DETAIL_ETC_TAB[2].content
-	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[2].content, nil, L.THIS_IS_ONLY_SPLIT_POWER_BAR)
+	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[2].content, COMP_TYPE.SPLIT_LINE, L.THIS_IS_ONLY_SPLIT_POWER_BAR)
 	local comp = CreateFrame("Frame", (self.DETAIL_ETC_TAB[2].content:GetName()..'SplitBar'), self.DETAIL_ETC_TAB[2].content, "HDH_AT_SplitBarTemplate")
-	comp:SetSize(200, 30)
+	comp:SetSize(230, 30)
 	comp:SetPoint('TOPLEFT', self.DETAIL_ETC_TAB[2].content, 'TOPLEFT', 20, -70)
 	comp:SetMinMaxValues(0, 1)
 	self.F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR = comp
@@ -2209,11 +2226,18 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	-- self.F.BODY.CONFIG_UI.DD_CONFIG_MODE = _G[self.F.BODY:GetName().."UITopDDLConfigMode"]
 
 	self.F.BODY.CONFIG_UI.SW_DISPLAY_MODE = _G[self.F.BODY:GetName().."UITopSwithDisplayMode"]
-	self.F.BODY.CONFIG_UI.SW_DISPLAY_MODE:Init({HDH_AT_L.USE_DISPLAY_ICON, HDH_AT_L.USE_DISPLAY_BAR, HDH_AT_L.USE_DISPLAY_ICON_AND_BAR}, HDH_AT_OnSelected_Dropdown)
+	self.F.BODY.CONFIG_UI.SW_DISPLAY_MODE:Init({
+		{1, HDH_AT_L.USE_DISPLAY_ICON},
+		{2, HDH_AT_L.USE_DISPLAY_BAR}, 
+		{3, HDH_AT_L.USE_DISPLAY_ICON_AND_BAR}
+	}, HDH_AT_OnSelected_Dropdown)
 	DBSync(F.BODY.CONFIG_UI.SW_DISPLAY_MODE, COMP_TYPE.SWITCH, "ui.%s.common.display_mode")
 
 	self.F.BODY.CONFIG_UI.SW_CONFIG_MODE = _G[self.F.BODY:GetName().."UITopSwithConfigMode"]
-	self.F.BODY.CONFIG_UI.SW_CONFIG_MODE:Init({HDH_AT_L.USE_GLOBAL_CONFIG, HDH_AT_L.USE_SEVERAL_CONFIG}, HDH_AT_OnSelected_Dropdown)
+	self.F.BODY.CONFIG_UI.SW_CONFIG_MODE:Init({
+		{1, HDH_AT_L.USE_GLOBAL_CONFIG}, 
+		{2, HDH_AT_L.USE_SEVERAL_CONFIG}
+	}, HDH_AT_OnSelected_Dropdown)
 	-- DBSync(F.BODY.CONFIG_UI.DD_DISPLAY_MODE, COMP_TYPE.DROPDOWN, "ui.%s.common.display_mode")
 
 	self.F.BODY.CONFIG_UI.CB_MOVE = _G[self.F.BODY:GetName().."UIBottomCBMove"]
@@ -2268,55 +2292,70 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	ChangeTab(tabUIList, 1)
 
 	-- FONT COOLDOWN 
+	comp = HDH_AT_CreateOptionComponent(tabUIList[1].content, COMP_TYPE.DROPDOWN,     L.FONT_LOCATION,       "ui.%s.font.cd_location")
+	HDH_AT_DropDown_Init(comp, DDP_FONT_CD_LOC_LIST, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[1].content, COMP_TYPE.DROPDOWN,     L.TIME_FORMAT,  		  "ui.%s.font.cd_format")
 	HDH_AT_DropDown_Init(comp, DDP_FONT_CD_FORMAT_LIST, HDH_AT_OnSelected_Dropdown)
-	comp = HDH_AT_CreateOptionComponent(tabUIList[1].content, COMP_TYPE.DROPDOWN,     L.TIME_LOCATION,       "ui.%s.font.cd_location")
-	HDH_AT_DropDown_Init(comp, DDP_FONT_CD_LOC_LIST, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[1].content, COMP_TYPE.COLOR_PICKER, L.FONT_COLOR,          "ui.%s.font.cd_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[1].content, COMP_TYPE.COLOR_PICKER, L.UNDER_5S_FONT_COLOR, "ui.%s.font.cd_color_5s")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[1].content, COMP_TYPE.SLIDER,       L.FONT_SIZE,           "ui.%s.font.cd_size")
-	comp = HDH_AT_CreateOptionComponent(tabUIList[1].content, COMP_TYPE.CHECK_BOX,       L.SHORT_TIME,      "ui.%s.font.cd_abbreviate")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[1].content, COMP_TYPE.SWITCH,       L.SHORT_TIME,      "ui.%s.font.cd_abbreviate")
+	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 
 	-- FONT COUNT
-	comp = HDH_AT_CreateOptionComponent(tabUIList[2].content, COMP_TYPE.DROPDOWN,     L.TIME_LOCATION,       "ui.%s.font.count_location")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[2].content, COMP_TYPE.DROPDOWN,     L.FONT_LOCATION,       "ui.%s.font.count_location")
 	HDH_AT_DropDown_Init(comp, DDP_FONT_CD_LOC_LIST, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[2].content, COMP_TYPE.COLOR_PICKER, L.FONT_COLOR,          "ui.%s.font.count_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[2].content, COMP_TYPE.SLIDER,       L.FONT_SIZE,           "ui.%s.font.count_size")
 
 	-- FONT VALUE
-	comp = HDH_AT_CreateOptionComponent(tabUIList[3].content, COMP_TYPE.DROPDOWN,     L.TIME_LOCATION,       "ui.%s.font.v1_location")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[3].content, COMP_TYPE.DROPDOWN,     L.FONT_LOCATION,       "ui.%s.font.v1_location")
 	HDH_AT_DropDown_Init(comp, DDP_FONT_CD_LOC_LIST, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[3].content, COMP_TYPE.COLOR_PICKER, L.FONT_COLOR,          "ui.%s.font.v1_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[3].content, COMP_TYPE.SLIDER,       L.FONT_SIZE,           "ui.%s.font.v1_size")
-	comp = HDH_AT_CreateOptionComponent(tabUIList[3].content, COMP_TYPE.CHECK_BOX,       L.SHORT_VALUE,      "ui.%s.font.v1_abbreviate")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[3].content, COMP_TYPE.SWITCH,       L.SHORT_VALUE,      "ui.%s.font.v1_abbreviate")
+	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 
 	-- FONT NAME
-	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.DROPDOWN,       L.NAME_ALIGN,         "ui.%s.font.name_align")
-	HDH_AT_DropDown_Init(comp, DDP_FONT_NAME_ALIGN_LIST, HDH_AT_OnSelected_Dropdown)
-	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.CHECK_BOX,     L.DISPLAY_NAME,       "ui.%s.font.show_name")
+	
+	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.DROPDOWN,       L.FONT_LOCATION,         "ui.%s.font.name_location")
+	HDH_AT_DropDown_Init(comp, DDP_FONT_NAME_LOC_LIST, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.COLOR_PICKER, L.FONT_ON_COLOR,          "ui.%s.font.name_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.COLOR_PICKER, L.FONT_OFF_COLOR,      "ui.%s.font.name_color_off")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.SLIDER,       L.FONT_SIZE,           "ui.%s.font.name_size")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.SLIDER,       L.MARGIN_LEFT,           "ui.%s.font.name_margin_left")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.SLIDER,       L.MARGIN_RIGHT,           "ui.%s.font.name_margin_right")
 
-	-- ICON DEFAULT
-
-	-- ICON SIZE
+	-- DEFAULT
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.DROPDOWN,       L.ICON_ORDER,         "ui.%s.common.order_by")
 	HDH_AT_DropDown_Init(comp, DDP_ICON_ORDER_LIST, HDH_AT_OnSelected_Dropdown)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.ICON_ORDER_DISPLAY_V,           "ui.%s.common.reverse_v")
+	comp:Init({
+		{true, L.UPWARD},
+		{false, L.DOWNWARD}
+	}, HDH_AT_OnSelected_Dropdown)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.ICON_ORDER_DISPLAY_H,           "ui.%s.common.reverse_h")
+	comp:Init({
+		{true, L.TO_THE_LEFT},
+		{false, L.TO_THE_RIGHT}
+	}, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER, 	L.ICON_MARGIN_VERTICAL,          "ui.%s.common.margin_v")
 	comp:Init(1, 0, 500, true, true, 20)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER,       L.ICON_MARGIN_HORIZONTAL,           "ui.%s.common.margin_h")
 	comp:Init(1, 0, 500, true, true, 20)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER,       L.ICON_NUMBER_OF_HORIZONTAL,           "ui.%s.common.column_count")
 	comp:Init(1, 1, 20, true, false, nil, L.ROW_N_COL_N)
-	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.CHECK_BOX,       L.ICON_REVERSE_DISPLAY_V,           "ui.%s.common.reverse_v")
-	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.CHECK_BOX,       L.ICON_REVERSE_DISPLAY_H,           "ui.%s.common.reverse_h")
-	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.CHECK_BOX,       L.DISPLAY_GAME_TOOPTIP,           "ui.%s.common.show_tooltip")
-	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.CHECK_BOX,       L.DISPLAY_WHEN_NONCOMBAT,           "ui.%s.common.always_show")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_GAME_TOOPTIP,           "ui.%s.common.show_tooltip")
+	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_WHEN_NONCOMBAT,           "ui.%s.common.always_show")
+	comp:Init({
+		{true, L.ALWAYS},
+		{false, L.IN_COMBAT}
+	}, HDH_AT_OnSelected_Dropdown)
 	self.F.BODY.CONFIG_UI.CB_DISPLAY_WHEN_NONCOMBAT = comp
-	-- ICON COLOR
+
+	-------------------------------------------------------------------------------------
+	-- ICON
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.DROPDOWN,       L.COOLDOWN_ANIMATION_DIDRECTION,         "ui.%s.icon.cooldown")
 	HDH_AT_DropDown_Init(comp, DDP_ICON_COOLDOWN_LIST, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SLIDER,     L.ICON_SIZE,       "ui.%s.icon.size")
@@ -2326,19 +2365,26 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SLIDER,     L.INACTIVED_ICON_ALPHA,       "ui.%s.icon.off_alpha")
 	comp:Init(0, 0, 1)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,     L.ACTIVED_ICON_BORDER_COLOR,       "ui.%s.icon.active_border_color")
-	-- comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.COLOR_PICKER, L.COOLDOWN_COLOR,      "ui.%s.icon.cooldown_bg_color")
-	-- UI[#UI+1] = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.ICON_REVERSE_DISPLAY_V,           "ui.%s.icon.desaturation")
-	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.CHECK_BOX,       L.USE_DEFAULT_BORDER_COLOR,           "ui.%s.common.default_color")
+	
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,       L.ICON_SPARK_COLOR,         "ui.%s.icon.spark_color")
-	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.CHECK_BOX,       L.CANCEL_BUFF,         "ui.%s.icon.able_buff_cancel")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER, L.COOLDOWN_COLOR,      "ui.%s.icon.cooldown_bg_color")
+	HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SPLIT_LINE, L.ONLY_FOR_CONFIG_OF_AURA_TRACKER)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.USE_DEFAULT_BORDER_COLOR,           "ui.%s.common.default_color")
+	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.CANCEL_BUFF,         "ui.%s.icon.able_buff_cancel")
+	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 
-	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.CHECK_BOX,       L.ICON_USE_NOT_ENOUGH_MANA_COLOR,         "ui.%s.cooldown.use_not_enough_mana_color")
+	HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SPLIT_LINE, L.ONLY_FOR_CONFIG_OF_COOLDOWN_TRACKER)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.ICON_USE_NOT_ENOUGH_MANA_COLOR,         "ui.%s.cooldown.use_not_enough_mana_color")
+	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,       L.ICON_NOT_ENOUGH_MANA_COLOR,         "ui.%s.cooldown.not_enough_mana_color")
 	comp:SetEnableAlpha(false)
-	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.CHECK_BOX,       L.ICON_USE_OUT_RAGNE_COLOR,         "ui.%s.cooldown.use_out_range_color")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.ICON_USE_OUT_RAGNE_COLOR,         "ui.%s.cooldown.use_out_range_color")
+	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,       L.ICON_OUT_RAGNE_COLOR,         "ui.%s.cooldown.out_range_color")
 	comp:SetEnableAlpha(false)
 
+	-------------------------------------------------------------------------------------
 	-- BAR 
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SLIDER, 	L.WIDTH_SIZE,          "ui.%s.bar.width")
 	comp:Init(0, 10, 500, true, true, 20)
@@ -2348,33 +2394,45 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	HDH_AT_DropDown_Init(comp, DDP_BAR_TEXTURE_LIST, HDH_AT_OnSelected_Dropdown, nil, "HDH_AT_DropDownOptionTextureItemTemplate")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.DROPDOWN,       L.LOCATION_BAR,         "ui.%s.bar.location")
 	HDH_AT_DropDown_Init(comp, DDP_BAR_LOC_LIST, HDH_AT_OnSelected_Dropdown)
-	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.FILL_BAR,         "ui.%s.bar.reverse_fill")
-	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.REVERSE_PROGRESS,         "ui.%s.bar.reverse_progress")
-	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.DISPLAY_SPARK,         "ui.%s.bar.show_spark")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.DROPDOWN,       L.ANIMATION_DIDRECTION,         "ui.%s.bar.cooldown_progress")
+	HDH_AT_DropDown_Init(comp, DDP_BAR_COOLDOWN_LIST, HDH_AT_OnSelected_Dropdown)
+
+	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SWITCH,       L.FILL_BAR,         "ui.%s.bar.to_fill")
+	comp:Init({
+		{true, L.TO_FILL },
+		{false, L.TO_EMPTY}
+	}, HDH_AT_OnSelected_Dropdown)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SWITCH,       L.DISPLAY_SPARK,         "ui.%s.bar.show_spark")
+	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.COLOR_PICKER,       L.BAR_SPARK_COLOR,         "ui.%s.bar.spark_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.COLOR_PICKER,     L.BG_COLOR,       "ui.%s.bar.bg_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.COLOR_PICKER,     L.BAR_COLOR,       "ui.%s.bar.color")
-	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.DISPLAY_FILL_BAR,         "ui.%s.bar.use_full_color")
+	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SWITCH,       L.DISPLAY_FILL_BAR,         "ui.%s.bar.use_full_color")
+	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.COLOR_PICKER,     L.FILL_COLOR,       "ui.%s.bar.full_color")
-	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.CHECK_BOX,       L.USE_DEFAULT_BORDER_COLOR,           "ui.%s.common.default_color")
+	HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SPLIT_LINE, L.ONLY_FOR_CONFIG_OF_AURA_TRACKER)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SWITCH,       L.USE_DEFAULT_BORDER_COLOR,           "ui.%s.common.default_color")
+	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 	
 	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.BUTTON,       L.RESET_ADDON)
 	comp:SetText(L.RESET)
 	self.F.BODY.CONFIG_UI.BTN_RESET = comp
 
-	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.BUTTON,       L.EXPORT_SHARE_STRING, nil, 1)
-	comp:SetText(L.EXPORT_SHARE_STRING)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.SPLIT_LINE,       L.EXPORT_SHARE_STRING)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.BUTTON,       L.EXPORT_SHARE_STRING)
+	comp:SetText(L.CREATE_SHARE_STRING)
 	self.F.BODY.CONFIG_UI.BTN_EXPORT_STRING = comp
-	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX,       nil, nil, 2)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX)
 	comp:SetSize(200,26)
 	comp:SetMaxLetters(0)
 	comp:SetFontObject("Font_White_XS")
 	self.F.BODY.CONFIG_UI.ED_EXPORT_STRING = comp
-	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.SPLIT_LINE,       nil, nil, 3)
-
-	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.BUTTON,       L.IMPORT_SHARE_STRING, nil, 4)
-	comp:SetText(L.IMPORT_SHARE_STRING)
+	
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.SPLIT_LINE, L.IMPORT_SHARE_STRING, nil, 5)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.BUTTON,       L.IMPORT_SHARE_STRING, nil, 6)
+	comp:SetText(L.APPLY_SHARE_STRING)
 	self.F.BODY.CONFIG_UI.BTN_IMPORT_STRING = comp
-	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX,       nil, nil, 5)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX, nil, nil, 7)
 	comp:SetSize(200,26)
 	comp:SetFontObject("Font_White_XS")
 	comp:SetMaxLetters(0)
@@ -2427,9 +2485,8 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	local MARGIN_X = 10
 	local MARGIN_Y = -10
 	local COMP_HEIGHT = 25
-	local COMP_WIDTH = 95
-	local COMP_MARGIN = 5
-
+	local COMP_WIDTH = parent:GetParent():GetWidth() - 180
+	local COMP_MARGIN = 10
 	local start_x = 0
 
 	parent.row = parent.row or 0
@@ -2455,16 +2512,23 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	local frame = CreateFrame("Frame", (parent:GetName()..'Label'..parent.row), parent)
 
 	if option_name then
-		frame:SetSize(COMP_WIDTH, COMP_HEIGHT)
-		frame:SetPoint('TOPLEFT', parent, 'TOPLEFT', MARGIN_X + x, MARGIN_Y + y)
 		frame.text = frame:CreateFontString(nil, 'OVERLAY', "Font_Yellow_M")
+		frame:SetPoint('TOPLEFT', parent, 'TOPLEFT', MARGIN_X + x, MARGIN_Y + y)
 		frame.text:SetPoint('LEFT', frame, 'LEFT', COMP_MARGIN, 0)
-		frame.text:SetPoint('RIGHT', frame, 'RIGHT', 15, 0)
 		frame.text:SetNonSpaceWrap(false)
-		frame.text:SetJustifyH('LEFT')
 		frame.text:SetJustifyV('CENTER')
 		frame.text:SetFontObject("Font_Yellow_S")
 		frame.text:SetText(option_name)
+
+		if component_type == COMP_TYPE.SPLIT_LINE then
+			frame:SetSize(parent:GetParent():GetWidth()-70, COMP_HEIGHT)
+			frame.text:SetPoint('RIGHT', frame, 'RIGHT', 0, 0)
+			frame.text:SetJustifyH('CENTER')
+		else
+			frame:SetSize(COMP_WIDTH, COMP_HEIGHT)
+			frame.text:SetPoint('RIGHT', frame, 'RIGHT', 15, 0)
+			frame.text:SetJustifyH('LEFT')
+		end
 	else
 		frame:SetSize(1, COMP_HEIGHT)
 		frame:SetPoint('TOPLEFT', parent, 'TOPLEFT', MARGIN_X + x, MARGIN_Y + y)
@@ -2494,7 +2558,7 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 
 	elseif component_type == COMP_TYPE.DROPDOWN then
 		component = CreateFrame("Button", (parent:GetName()..'DropDown'..parent.row.."_"..parent.col), parent, "HDH_AT_DropDownOptionTemplate")
-		component:SetSize(115, 22)
+		component:SetSize(115, 20)
 		component:SetPoint('LEFT', frame, 'RIGHT', 20, 0)
 
 	elseif component_type == COMP_TYPE.SLIDER then
@@ -2508,7 +2572,9 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		component = CreateFrame("Button", (parent:GetName()..'ColorPicker'..parent.row.."_"..parent.col), parent, "HDH_AT_ColorPickerTemplate")
 		component:SetSize(26, 26)
 		component:SetPoint('LEFT', frame, 'RIGHT', 22, 0)
-		component:SetHandler(HDH_AT_OnSeletedColor)
+		component:SetHandler(HDH_AT_OnSeletedColor, function(self, text)
+			GetMainFrame().Dialog:AlertShow(L.ERROR_COLOR_CODE:format(UTIL.Trim(text)))
+		end)
 
 	elseif component_type == COMP_TYPE.PREV_NEXT_BUTTON then
 		component = CreateFrame("Button", (parent:GetName()..'PrevNextButton'..parent.row.."_"..parent.col), parent, "HDH_AT_PrevNextButtonTemplate")
@@ -2535,10 +2601,15 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	
 	elseif component_type == COMP_TYPE.SPLIT_LINE then
 		component = CreateFrame("Frame", (parent:GetName()..'Line'..parent.row.."_"..parent.col), parent, "HDH_AT_LineFrameTemplate")
-		component:SetSize(230, 26)
+		component:SetSize(255, 26)
 		component:SetPoint('LEFT', frame, 'LEFT', 0, 0)
 		-- component:SetPoint('RIGHT', parent, 'RIGHT', -10, 0)
 		-- component:SetHandler(HDH_AT_OnSeletedColor)
+
+	elseif component_type == COMP_TYPE.SWITCH then
+		component = CreateFrame("Frame", (parent:GetName()..'Line'..parent.row.."_"..parent.col), parent, "HDH_AT_SwitchFrameTemplate")
+		component:SetSize(115, 20)
+		component:SetPoint('LEFT', frame, 'RIGHT', 20, 0)
 	end
 
 	if component_type then
@@ -2546,7 +2617,7 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	end
 	local w, h = parent:GetParent():GetSize()
 	parent:ClearAllPoints()
-	parent:SetSize(w, -(y - COMP_HEIGHT))
+	parent:SetSize(w, -(y - COMP_HEIGHT -20) )
 	parent:SetPoint('TOPLEFT', parent:GetParent(), 'TOPLEFT', 0, 0)
 	-- parent:SetPoint('BOTTOMRIGHT', parent:GetParent(), 'BOTTOMRIGHT', 0, 30)
 	return component, label

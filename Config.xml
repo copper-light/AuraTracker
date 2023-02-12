@@ -122,7 +122,7 @@
 								</Anchors>
 								<Layers>
 									<Layer level="artwork">
-										<FontString name="$parentText" inherits="Font_Yellow_M" text="사용 특성" justifyH="CENTER">
+										<FontString name="$parentText" parentKey="Trasits" inherits="Font_Yellow_M" text="사용 특성" justifyH="CENTER">
 											<Size x="200" y="20" />
 											<Anchors>
 												<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="0"/>
@@ -131,6 +131,11 @@
 										</FontString>
 									</Layer>
 								</Layers>
+								<Scripts>
+									<OnLoad> 
+										self.Trasits:SetText(HDH_AT_L.TRAITS_IN_USE)
+									</OnLoad>
+								</Scripts>
 							</Frame>
 
 							<Frame name="$parentTop" inherits="HDH_AT_BackgroundTemplate">
@@ -166,6 +171,7 @@
 											<Anchor point="LEFT" relativePoint="LEFT" x="20" y="0" />
 										</Anchors>
 										<Scripts>
+											<OnLoad>self:SetText(HDH_AT_L.APPLY)</OnLoad>
 											<OnClick function="HDH_AT_OnClick_Button" />
 										</Scripts>
 									</Button>
@@ -175,6 +181,7 @@
 											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBtnSaveTracker" x="2" y="0" />
 										</Anchors>
 										<Scripts>
+											<OnLoad>self:SetText(HDH_AT_L.CANCEL)</OnLoad>
 											<OnClick function="HDH_AT_OnClick_Button" />
 										</Scripts>
 									</Button>
@@ -184,6 +191,7 @@
 											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBtnCancel" x="2" y="0" />
 										</Anchors>
 										<Scripts>
+											<OnLoad>self:SetText(HDH_AT_L.COPY)</OnLoad>
 											<OnClick function="HDH_AT_OnClick_Button" />
 										</Scripts>
 									</Button>
@@ -193,6 +201,7 @@
 											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBtnCopy" x="2" y="0" />
 										</Anchors>
 										<Scripts>
+											<OnLoad>self:SetText(HDH_AT_L.DELETE)</OnLoad>
 											<OnClick function="HDH_AT_OnClick_Button" />
 										</Scripts>
 									</Button>
@@ -566,7 +575,7 @@
 							</Frame>
 
 							<ScrollFrame name="$parentMenuSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
-								<Size><AbsDimension x="135" y="35"/></Size>
+								<Size><AbsDimension x="110" y="35"/></Size>
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentTop" x="0" y="0" />
 									<Anchor point="BOTTOM" relativePoint="TOP"  relativeTo="$parentBottom" x="0" y="0" />
@@ -583,7 +592,7 @@
 
 								<ScrollChild>
 									<Frame name="$parentContents" hidden="false">
-										<Size><AbsDimension x="135" y="200"/></Size>
+										<Size><AbsDimension x="110" y="200"/></Size>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
@@ -611,7 +620,7 @@
 
 								<ScrollChild>
 									<Frame name="$parentContents" hidden="false">
-										<Size><AbsDimension x="150" y="200"/></Size>
+										<Size><AbsDimension x="300" y="200"/></Size>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
@@ -651,6 +660,7 @@
 											<Size x="200" y="25" />
 											<Anchors>
 												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentIcon" x="10" y="0"/>
+												<Anchor point="RIGHT" relativePoint="RIGHT" x="-10" y="0"/>
 											</Anchors>
 										</FontString>
 									</Layer>
@@ -768,21 +778,21 @@
 									<Button name="$parentDDCondition2" inherits="HDH_AT_DropDownOptionTemplate">
 										<Size x="50" y="22" />
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="90" y="0" />
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="125" y="0" />
 										</Anchors>
 									</Button>
 
 									<Button name="$parentDDCondition3" inherits="HDH_AT_DropDownOptionTemplate">
 										<Size x="50" y="22" />
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition3" x="90" y="0" />
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition3" x="125" y="0" />
 										</Anchors>
 									</Button>
 
 									<Button name="$parentDDCondition4" inherits="HDH_AT_DropDownOptionTemplate">
 										<Size x="50" y="22" />
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition4" x="90" y="0" />
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition4" x="125" y="0" />
 										</Anchors>
 									</Button>
 
@@ -795,7 +805,7 @@
 										</Anchors>
 										<Layers>
 											<Layer level="artwork">
-												<FontString name="$parentText" inherits="Font_Yellow_M" text="초" justifyH="LEFT">
+												<FontString name="$parentText" parentKey="Second" inherits="Font_Yellow_M" text="초" justifyH="LEFT">
 													<Size x="20" y="25" />
 													<Anchors>
 														<Anchor point="LEFT" relativePoint="RIGHT" x="2" y="0"/>
@@ -804,6 +814,7 @@
 											</Layer>
 										</Layers>
 										<Scripts>
+											<OnLoad>self.Second:SetText(HDH_AT_L.SECONDS)</OnLoad>
 										</Scripts>
 									</EditBox>
 
@@ -838,7 +849,7 @@
 								</Anchors>
 								<Frames>
 									<ScrollFrame name="$parentMenuSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
-										<Size><AbsDimension x="135" y="35"/></Size>
+										<Size><AbsDimension x="110" y="35"/></Size>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="0" />
 											<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parent" x="0" y="0" />
@@ -854,7 +865,7 @@
 
 										<ScrollChild>
 											<Frame name="$parentContents" hidden="false">
-												<Size><AbsDimension x="135" y="200"/></Size>
+												<Size><AbsDimension x="110" y="200"/></Size>
 												<Anchors>
 													<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 													<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
@@ -882,7 +893,7 @@
 
 										<ScrollChild>
 											<Frame name="$parentContents" hidden="false">
-												<Size><AbsDimension x="135" y="35"/></Size>
+												<Size><AbsDimension x="300" y="35"/></Size>
 												<Anchors>
 													<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 													<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />

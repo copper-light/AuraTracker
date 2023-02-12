@@ -52,17 +52,15 @@ end
 
 function HDH_ESSENCE_TRACKER:UpdateBarValue(f)
 	if f.bar then
-		-- print(f.spell.v1)
-		f.bar:SetValue(self:GetAnimatedValue(f.bar, f.spell.v1)); 
-		-- bar:SetValue(f.spell.v1); 
-		if self.ui.bar.use_full_color then
-			if f.spell.v1 >= 1 then
-				f.bar:SetStatusBarColor(unpack(self.ui.bar.full_color));
+		f.bar:SetValue(f:GetParent().parent:GetAnimatedValue(f.bar, not f:GetParent().parent.ui.bar.to_fill and 1 - f.spell.v1 or f.spell.v1))
+		f:GetParent().parent:MoveSpark(f.bar)
+		if f:GetParent().parent.ui.bar.use_full_color then 
+			if f.bar:GetValue() == 1 then
+				f.bar:SetStatusBarColor(unpack(f:GetParent().parent.ui.bar.full_color))
 			else
-				f.bar:SetStatusBarColor(unpack(self.ui.bar.color));
+				f.bar:SetStatusBarColor(unpack(f:GetParent().parent.ui.bar.color))
 			end
 		end
-		self:MoveSpark(f.bar)
 	end
 end
 
@@ -92,14 +90,14 @@ function HDH_ESSENCE_TRACKER:CreateData()
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 6)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 40)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_fill', false)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_progress', false)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.to_fill', true)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.cooldown_progress', DB.COOLDOWN_RIGHT)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)	
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.show_spark', true)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', true)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', {r,g,b, 0.35})
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.full_color', self.POWER_INFO[self.type].color)
-	DB:SetTrackerValue(trackerId, 'ui.%s.font.show_name', false)
+	DB:SetTrackerValue(trackerId, 'ui.%s.font.name_location', DB.FONT_LOCATION_HIDE)
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_location', DB.FONT_LOCATION_TR)
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_format', DB.TIME_TYPE_CEIL)
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_HIDE)
@@ -181,8 +179,16 @@ function HDH_ESSENCE_TRACKER:Update() -- HDH_TRACKER override
 	self:UpdateIcons();
 	if UnitAffectingCombat("player") or power < power_max or self.ui.common.always_show then
 		self:ShowTracker();
+		local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
+		for i = 1, power_max do
+			self.frame.icon[i]:SetScript("OnUpdate", OnUpdate)
+		end
 	else
 		self:HideTracker();
+		local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
+		for i = 1, power_max do
+			self.frame.icon[i]:SetScript("OnUpdate", nil)
+		end
 	end
 	return ret;
 end

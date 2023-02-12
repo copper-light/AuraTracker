@@ -79,7 +79,7 @@ HDH_COMBO_POINT_TRACKER.POWER_INFO = POWER_INFO;
 
 local function OnUpdateBar(self)
 	if self.bar then
-		self.bar:SetValue(self:GetParent().parent:GetAnimatedValue(self.bar, self:GetParent().parent.ui.bar.reverse_fill and 1 - self.spell.v1 or self.spell.v1))
+		self.bar:SetValue(self:GetParent().parent:GetAnimatedValue(self.bar, not self:GetParent().parent.ui.bar.to_fill and 1 - self.spell.v1 or self.spell.v1))
 		self:GetParent().parent:MoveSpark(self.bar)
 		if self:GetParent().parent.ui.bar.use_full_color then 
 			if self.bar:GetValue() == 1 then
@@ -111,12 +111,13 @@ function HDH_COMBO_POINT_TRACKER:CreateData(elemIdx)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 10)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 40)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_fill', false)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.reverse_progress', false)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.to_fill', true)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.cooldown_progress', DB.COOLDOWN_RIGHT)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.location', DB.BAR_LOCATION_R)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', self.POWER_INFO[self.type].color)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.show_spark', true)
-	DB:SetTrackerValue(trackerId, 'ui.%s.font.show_name', false)
+	DB:SetTrackerValue(trackerId, 'ui.%s.font.name_location', DB.FONT_LOCATION_HIDE)
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_HIDE)
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 40)
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', self.POWER_INFO[self.type].color)
@@ -284,7 +285,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 	local i = 0 -- 몇번째로 아이콘을 출력했는가?
 	local col = 0  -- 열에 대한 위치 좌표값 = x
 	local row = 0  -- 행에 대한 위치 좌표값 = y
-	local reverse_fill = self.ui.bar.reverse_fill
+	local to_fill = self.ui.bar.to_fill
 	local value
 
 	local size_w, size_h
@@ -329,7 +330,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 
 				if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 					f.bar:SetMinMaxValues(0,1);
-					f.bar:SetValue((reverse_fill and 0) or 1)
+					f.bar:SetValue((to_fill and 1) or 0)
 				end
 
 				if f.spell.count < 1 then f.counttext:SetText(nil)
@@ -416,7 +417,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 
 					if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 						f.bar:SetMinMaxValues(0, 1)
-						value = self:GetAnimatedValue(f.bar, reverse_fill and 1 - f.spell.v1 or f.spell.v1)
+						value = self:GetAnimatedValue(f.bar, to_fill and f.spell.v1 or (1 - f.spell.v1))
 						f.bar:SetValue(value)
 						f.bar.spark:Show()
 					end
@@ -436,7 +437,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 
 					if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 						f.bar:SetMinMaxValues(0,1);
-						f.bar:SetValue((reverse_fill and 0) or 1)
+						f.bar:SetValue((to_fill and 1) or 0)
 						f.bar.spark:Hide()
 					end
 					f.cd:Hide()
@@ -484,7 +485,6 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 					f:Show()
 					if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 						f.bar:SetMinMaxValues(0,1);
-						-- f.bar:SetValue((reverse_fill and 1) or 0)
 						f.bar.spark:Hide()
 					end
 
@@ -520,39 +520,6 @@ function HDH_COMBO_POINT_TRACKER:Update() -- HDH_TRACKER override
 	if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type then
 		power = power / 10
 	end
-	-- if self.option.base.merge_power_icon then -- 아이콘 하나로
-	-- 	iconf = self.frame.icon[1]
-	-- 	if iconf then 
-	-- 		if not iconf.spell then
-	-- 			iconf.spell = {}
-	-- 		end
-	-- 		iconf:SetParent(self.frame) 
-	-- 		iconf.spell.duration = 0
-	-- 		iconf.spell.count = 0
-	-- 		iconf.spell.remaining = 0
-	-- 		iconf.spell.startTime = 0
-	-- 		iconf.spell.endTime = 0
-	-- 		iconf.spell.key = i
-	-- 		iconf.spell.id = 0
-	-- 		iconf.spell.happenTime = 0;
-	-- 		iconf.spell.no = auraList[1].No
-	-- 		iconf.spell.name = auraList[1].Name
-	-- 		iconf.spell.icon = auraList[1].Texture
-	-- 		iconf.spell.glow = auraList[1].Glow
-	-- 		iconf.spell.glowCount = auraList[1].GlowCount
-	-- 		iconf.spell.glowV1= auraList[1].GlowV1
-	-- 		iconf.spell.always = auraList[1].Always
-	-- 		iconf.spell.showValue = auraList[1].ShowValue;
-	-- 		iconf.icon:SetTexture(auraList[1].Texture);
-	-- 		iconf.spell.v1 = power;
-	-- 		if power > 0 then
-	-- 			iconf.spell.isUpdate = true
-	-- 		else
-	-- 			iconf.spell.isUpdate = false
-	-- 		end
-	-- 		ret = ret + 1;
-	-- 	end
-	-- else -- 아이콘 여러개
 		
 	for i = 1, power_max do
 		iconf = self.frame.icon[i]

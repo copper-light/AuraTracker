@@ -324,7 +324,6 @@
 		</Scripts>	
 	</Frame>
 	
-	
 	<Frame name="HDH_AT_DialogFrameTemplate" mixin="HDH_AT_DialogFrameTemplateMixin" inherits="HDH_AT_DialogFrame" virtual="true">
 		<Size><AbsDimension x="400" y="100"/></Size>
 		<Layers>
@@ -346,7 +345,6 @@
 					<Size><AbsDimension x="40" y="40" /></Size>
 					<Anchors>
 						<Anchor point="CENTER" relativePoint="CENTER" x="0" y="60"/>
-						<!--Anchor point="CENTER" relativePoint="TOPLEFT" x="0" y="0"/-->
 					</Anchors>
 				</Texture>
 			</Layer>
@@ -1023,8 +1021,8 @@
 		</Layers>
 		<ButtonText name="$parentText" justifyH="LEFT">
 			<Anchors>
-				<Anchor point="TOPLEFT" x="15" y="-2"/>
-				<Anchor point="BOTTOMRIGHT" x="-15" y="2"/>
+				<Anchor point="TOPLEFT" x="5" y="0"/>
+				<Anchor point="BOTTOMRIGHT" x="-3" y="0"/>
 			</Anchors>
 		</ButtonText>
 		<NormalFont style="Font_White_S"/>
@@ -1339,8 +1337,8 @@
 				<FontString name ="$parentText" parentKey="Text" inherits="Font_Yellow_S" text="특성" justifyH="CENTER">
 					<Size><AbsDimension x="100" y="36" /></Size>
 					<Anchors>
-						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="5" y="0"/>
-                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-15" y="0"/>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="2" y="0"/>
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-13" y="0"/>
 					</Anchors>
 				</FontString>
 			</Layer>
@@ -1442,8 +1440,8 @@
                 <Texture>
                     <Color r="0.1" g="0.1" b="0.1" a="0.2"/>
                     <Anchors>
-                        <Anchor point="TOPLEFT" x="2" y="-2" />
-                        <Anchor point="BOTTOMRIGHT" x="-2" y="2" />
+                        <Anchor point="TOPLEFT" x="0" y="0" />
+                        <Anchor point="BOTTOMRIGHT" x="0" y="0" />
                     </Anchors>
                 </Texture>
             </Layer>
@@ -1475,10 +1473,10 @@
 		</NormalTexture> -->
 
 		<NormalTexture>
-			<Color r="0.2" g="0.2" b="0.2" a="0.7"/>
+			<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
 			<Anchors>
-				<Anchor point="TOPLEFT" x="1" y="-1"/>
-				<Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
+				<Anchor point="TOPLEFT" x="0" y="0"/>
+				<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
 			</Anchors>					
 		</NormalTexture>
 
@@ -1785,8 +1783,49 @@
 				</Texture>
 			</Layer>
 		</Layers>
+		<Frames>
+			<EditBox name="$parentEdit" parentKey="EditBox" inherits="InputBoxTemplate" enableMouse="true" autoFocus="false"  >
+				<Size x="80" y="26" />
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="RIGHT">
+					<Offset><AbsDimension x="4" y="0"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>self:SetFontObject("Font_White_S")</OnLoad>
+					<OnEnterPressed>
+						local r, g, b, a = HDH_AT_UTIL.StringToColor(self:GetText())
+
+						if not self:GetParent().enableAlpha then
+							a = nil
+						end
+						if r ~= nil then
+							self:GetParent():SetColorRGBA(r, g, b, a)
+							if self:GetParent().handler then
+								self:GetParent().handler(self:GetParent(), r, g, b, a)
+							end
+						else
+							if self:GetParent().errorHandler then
+								self:GetParent().errorHandler(self:GetParent(), self:GetText())
+							end
+							r, g, b, a = unpack(self:GetParent().rgba)
+							self:GetParent():SetColorRGBA(r, g, b, a)
+						end
+						self:ClearFocus()
+					</OnEnterPressed>
+					<OnEscapePressed>
+						local r, g, b, a = unpack(self:GetParent().rgba)
+						self:GetParent():SetColorRGBA(r, g, b, a)
+						self:ClearFocus()
+					</OnEscapePressed>
+				</Scripts>
+			</EditBox>
+		</Frames>
 		<Scripts>
-			<OnLoad> self:SetColorRGBA(1,1,1,1)</OnLoad>
+			<OnLoad> 
+				self.enableAlpha =true 
+				self:SetColorRGBA(1,1,1,1)
+			</OnLoad>
 			<OnEnter>
                 _G[self:GetName().."On"]:Show()
             </OnEnter>
@@ -2143,31 +2182,21 @@
 
 	<Button name="HDH_AT_SwitchItemFrameTemplate" inherits="HDH_AT_ButtonTemplate"  virtual="true" text="아이템">
 		<Size x="50" y="22"/>
-		<Layers>
-			<Layer level="ARTWORK">
-				<Texture parentKey="Active">
-					<Color r="1" g="0.8" b="0" a="0.8"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="Deactive">
-					<Color r="1" g="0.8" b="0" a="0"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<NormalFont style="Font_White_S"/>
+		<NormalFont style="Font_Gray_S"/>
 		<NormalTexture>
 			<Color r="1" g="0.8" b="0" a="0"/>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
+				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+			</Anchors>
 		</NormalTexture>
+		<DisabledFont style="Font_White_S"/>
 		<DisabledTexture>
-			<Color r="1" g="0.8" b="0" a="0"/>
+			<Color r="1" g="0.8" b="0.1" a="0.65"/>
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
+				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+			</Anchors>
 		</DisabledTexture>
 	</Button>
 
@@ -2190,7 +2219,7 @@
 		<Layers>
 			<Layer level="ARTWORK">
 				<Texture name="$parentLine">
-					<Size y="2" />
+					<Size y="24" />
 					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
 					<Anchors>
 						<Anchor point="LEFT" x="0" y="0"/>

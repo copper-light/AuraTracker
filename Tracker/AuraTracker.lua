@@ -515,7 +515,7 @@ end -- TRACKER class
 -------------------------------------------
 -- 이벤트 메세지 function
 -------------------------------------------
-local function HDH_UNIT_AURA(self)
+function HDH_UNIT_AURA(self)
 	if self then
 		self:Update()
 	end
@@ -530,7 +530,8 @@ function OnEventTracker(self, event, ...)
 			HDH_UNIT_AURA(self.parent)
 		end
 	elseif event =="PLAYER_TARGET_CHANGED" then
-		self.parent:RunTimer("PLAYER_TARGET_CHANGED", 0.02, HDH_UNIT_AURA, self.parent) 
+		local t = self.parent
+		t:RunTimer("PLAYER_TARGET_CHANGED", 0.02, HDH_UNIT_AURA, self.parent) 
 	elseif event == 'PLAYER_FOCUS_CHANGED' then
 		HDH_UNIT_AURA(self.parent)
 	elseif event == 'INSTANCE_ENCOUNTER_ENGAGE_UNIT' then

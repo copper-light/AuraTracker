@@ -180,7 +180,9 @@ local function CT_UpdateCooldown(f, elapsed)
 			end
 		end
 		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and spell.duration > HDH_C_TRACKER.GlobalCooldown then
-			f.bar:SetValue(tracker.ui.bar.reverse_fill and (select(2,f.bar:GetMinMaxValues())-spell.remaining) or (spell.remaining));
+			f.bar:SetValue(tracker.ui.bar.to_fill and (select(2,f.bar:GetMinMaxValues())-spell.remaining) or (spell.remaining));
+			-- f.bar:SetValue((spell.remaining));
+
 			tracker:MoveSpark(f.bar);
 		end
 	elseif tracker.type == HDH_TRACKER.TYPE.COOLDOWN then
@@ -458,11 +460,11 @@ function HDH_C_TRACKER:Update_Icon(f) -- f == f
 				CT_StartTimer(f, ui.icon.max_time); 
 				-- self:SetGlow(f, true)
 			end
+
 			if spell.isAble then 
 				self:SetGlow(f,  true)
-			else
-				self:SetGlow(f,  false)
 			end
+				-- self:SetGlow(f,  false)
 				-- CT_StartTimer(f, option.icon.max_time); 
 				-- if not f:IsShown() then f:Show() isUpdate= true end
 			-- else
@@ -485,11 +487,21 @@ function HDH_C_TRACKER:Update_Icon(f) -- f == f
 			end
 		end
 
-		if ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE and ui.icon.cooldown ~= DB.COOLDOWN_NONE then
+		if spell.isAble then 
+			-- self:SetGlow(f,  true)
 			f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
+			f.iconSatCooldown:SetDesaturated(nil)
+			f.iconSatCooldown:Show()
+		else
+			-- self:SetGlow(f,  false)
+			f.iconSatCooldown:SetDesaturated(1)
+			f.iconSatCooldown:SetAlpha(0)
+		end
+
+		if ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE and ui.icon.cooldown ~= DB.COOLDOWN_NONE then
+			-- f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
 			f.iconSatCooldown:Show()
 			-- f.iconSatCooldown.spark:Show()
-			
 		end
 	else -- 쿨 안도는 중
 		if f.cd:IsShown() then f.cd:Hide() end
@@ -550,10 +562,16 @@ function HDH_C_TRACKER:Update_Layout()
 			if HDH_TRACKER.ENABLE_MOVE or f:IsShown() then
 				f:ClearAllPoints()
 				f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-				show_index = show_index + 1
-				if i % line == 0 then row = row + size_h + margin_v; col = 0
-								else col = col + size_h + margin_h end
-				if (f.spell.duration > 2 and f.spell.remaining > 0.5) or (f.spell.charges and f.spell.charges.remaining and f.spell.charges.remaining > 0) then ret = ret + 1 end -- 비전투라도 쿨이 돌고 잇는 스킬이 있으면 화면에 출력하기 위해서 체크함
+				if i % line == 0 then 
+					row = row + size_h + margin_v
+					col = 0			
+				else 
+					col = col + size_w + margin_h 
+				end
+				if (f.spell.duration > 2 and f.spell.remaining > 0.5) 
+						or (f.spell.charges and f.spell.charges.remaining and f.spell.charges.remaining > 0) then 
+					show_index = show_index + 1
+				end -- 비전투라도 쿨이 돌고 잇는 스킬이 있으면 화면에 출력하기 위해서 체크함
 			else
 				if self.ui.common.location_fix then
 					f:ClearAllPoints()
@@ -566,7 +584,7 @@ function HDH_C_TRACKER:Update_Layout()
 		end
 	end
 	
-	if HDH_TRACKER.ENABLE_MOVE or ret > 0 or always_show or UnitAffectingCombat("player") then
+	if HDH_TRACKER.ENABLE_MOVE or show_index > 0 or always_show or UnitAffectingCombat("player") then
 		self:ShowTracker();
 	else
 		self:HideTracker();
@@ -969,7 +987,9 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			
 			f.spell = spell
 
-			if self.ui.common.display_mode ~= DB.DISPLAY_ICON then f.name:SetText(spell.name); end
+			if self.ui.common.display_mode ~= DB.DISPLAY_ICON then 
+				f.name:SetText(spell.name); 
+			end
 			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 			f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 			f.iconSatCooldown:SetDesaturated(nil)

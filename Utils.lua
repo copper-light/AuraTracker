@@ -56,6 +56,8 @@ do
 
 	function HDH_AT_UTIL.Trim(str)
 		if not str then return nil end
+		str = str:gsub('|[r|R]', '')
+		str = str:gsub('|[c|C][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9]', '')
 		local front, near
 		for i =1, str:len() do
 			if str:sub(i,i) ~= " " then
@@ -171,9 +173,9 @@ do
 				elseif amount <= 100000000 then
 					return format("%dm",amount/1000000);
 				elseif amount <= 10000000000 then
-					return format("%.1fg",amount/1000000000);
+					return format("%.1fb",amount/1000000000);
 				else
-					return format("%dg",amount/1000000000);
+					return format("%db",amount/1000000000);
 				end
 			else
 				return HDH_AT_UTIL.CommaValue(amount);
@@ -216,4 +218,36 @@ do
 		end
 	end
 
+	local COLOR_RGB_CODE_STR = "#|cffff9999%02x|cff99ff99%02x|cff9999ff%02x"
+	local COLOR_RGBA_CODE_STR = "#|cffff9999%02x|r|cff99ff99%02x|r|cff9999ff%02x|r%02x"
+	function HDH_AT_UTIL.ColorToString(r, g, b, a)
+		if a then
+			return string.upper(COLOR_RGBA_CODE_STR:format(r * 255, g *255, b*255, a*255))
+		else
+			return string.upper(COLOR_RGB_CODE_STR:format(r * 255, g *255, b*255))
+		end
+	end
+
+	function HDH_AT_UTIL.StringToColor(text)
+		if text == nil then return nil end
+		text = HDH_AT_UTIL.Trim(text)
+		if string.len(text) == 0 then return nil end
+		if string.sub(text, 1, 1) == "#" then
+			text = string.sub(text, 2)
+		end
+		if string.len(text) ~= 6 and string.len(text) ~= 8 then return nil end
+		local code
+		local ret = {}
+		for i = 1 , string.len(text) - 1, 2 do
+			code = string.sub(text, i, i+1)
+			code = tonumber("0x"..code)
+			if code == nil then
+				return nil
+			end
+			code = code / 255
+			table.insert(ret, code)
+		end
+
+		return ret[1], ret[2], ret[3], ret[4] or 1
+	end
 end

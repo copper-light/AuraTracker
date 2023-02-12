@@ -1,4 +1,5 @@
 local L = HDH_AT_L
+local UTIL = HDH_AT_UTIL
 
 local function hasValue (tab, val)
     for index, value in ipairs(tab) do
@@ -815,6 +816,7 @@ HDH_AT_ColorPickerMixin = {}
 function HDH_AT_ColorPickerMixin:SetColorRGBA(r, g, b, a)
     self.rgba = {r, g, b, a}
     self.Color:SetVertexColor(r, g, b, a)
+    self.EditBox:SetText(UTIL.ColorToString(r, g, b, self.enableAlpha and a))
 end
 
 function HDH_AT_ColorPickerMixin:GetColorRGBA()
@@ -825,8 +827,9 @@ function HDH_AT_ColorPickerMixin:SetEnableAlpha(enable)
     self.enableAlpha = enable
 end
 
-function HDH_AT_ColorPickerMixin:SetHandler(handler)
+function HDH_AT_ColorPickerMixin:SetHandler(handler, errorHandler)
     self.handler = handler
+    self.errorHandler = errorHandler
 end
 
 local function OnSelectedColorPicker()
@@ -1124,11 +1127,22 @@ end
 
 HDH_AT_SwitchFrameTemplateMixin = {}
 
+local switchDefualtItem = {
+    { true, L.ON },
+    { false, L.OFF },
+}
+
 function HDH_AT_SwitchFrameTemplateMixin:Init(itemList, onChangedHandler)
+    itemList = itemList or switchDefualtItem
     if not itemList or #itemList == 0 then return end
     local size = #itemList
     local itemWidth, itemHeight = self:GetSize()
-    itemWidth = (itemWidth-12) / size
+    if itemWidth > 120 then
+        itemWidth = (itemWidth-12) / size
+    else
+        itemWidth = (itemWidth-6) / size
+    end
+    
     itemHeight = self:GetHeight() - 6
     local btn
     self.onChangedHandler = onChangedHandler
@@ -1147,28 +1161,40 @@ function HDH_AT_SwitchFrameTemplateMixin:Init(itemList, onChangedHandler)
         btn:ClearAllPoints()
         btn:SetPoint("TOPLEFT", self, "TOPLEFT", ((itemWidth) * (index - 1)) + 3, -3)
         btn:SetSize(itemWidth, itemHeight)
-        btn:SetText(value)
+        btn:SetText(value[2])
         btn.index = index
+        btn.value = value[1]
     end
+    self.itemList = itemList
 end
 
-function HDH_AT_SwitchFrameTemplateMixin:SetSelectedValue(selectedIndex)
+function HDH_AT_SwitchFrameTemplateMixin:SetSelectedValue(selectedValue)
+    local selectedIndex = 1
+    for index, btn in ipairs(self.list) do
+        if btn.value == selectedValue then
+            selectedIndex = index
+            break
+        end
+    end
     self:SetSelectedIndex(selectedIndex)
 end
 
 function HDH_AT_SwitchFrameTemplateMixin:SetSelectedIndex(selectedIndex)
     for index, btn in ipairs(self.list) do
         if index == selectedIndex then
-            btn.Active:Show()
-            btn.Deactive:Hide()
-            btn:SetNormalFontObject("Font_White_S")
+            -- btn.Active:Show()
+            -- btn.Deactive:Hide()
+            btn:Disable()
+            -- btn:SetNormalFontObject("Font_White_S")
         else
-            btn.Active:Hide()
-            btn.Deactive:Show()
-            btn:SetNormalFontObject("Font_Gray_S")
+            -- btn.Active:Hide()
+            -- btn.Deactive:Show()
+            btn:Enable()
+            -- btn:SetNormalFontObject("Font_Gray_S")
         end
     end
     self.index = selectedIndex
+    self.value = self.list[selectedIndex].value
 end
 
 function HDH_AT_SwitchFrameTemplateMixin:GetSelectedIndex()
@@ -1176,6 +1202,6 @@ function HDH_AT_SwitchFrameTemplateMixin:GetSelectedIndex()
 end
 
 function HDH_AT_SwitchFrameTemplateMixin:GetSelectedValue()
-    return self.index
+    return self.value
 end
 

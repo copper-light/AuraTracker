@@ -49,7 +49,8 @@ local function UpdateCooldown(f, elapsed)
 		end
 		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 			local minV, maxV = f.bar:GetMinMaxValues();
-			f.bar:SetValue(tracker.ui.bar.reverse_fill and (maxV-spell.remaining) or (spell.remaining));
+			f.bar:SetValue(tracker.ui.bar.to_fill and (maxV-spell.remaining) or (spell.remaining));
+			
 			--spell.per = max((spell.remaining/(spell.endTime-spell.startTime)), 0)
 			tracker:MoveSpark(f.bar);
 		end
@@ -620,18 +621,17 @@ function HDH_TRACKER:MoveSpark(bar, value)
 		bar.spark:Hide()
 	end
 	
-	if bar:GetOrientation() == "HORIZONTAL" then
-		if self.ui.bar.reverse_progress then
-			bar.spark:SetPoint("CENTER", bar,"RIGHT", -bar:GetWidth() * bar.per, 0);
-		else
-			bar.spark:SetPoint("CENTER", bar,"LEFT", bar:GetWidth() * bar.per, 0);
-		end
+	if self.ui.bar.to_fill then
+		bar.per = 1 - bar.per
+	end
+	if self.ui.bar.cooldown_progress == DB.COOLDOWN_LEFT then
+		bar.spark:SetPoint("CENTER", bar,"LEFT", bar:GetWidth() * bar.per, 0);
+	elseif self.ui.bar.cooldown_progress == DB.COOLDOWN_RIGHT then
+		bar.spark:SetPoint("CENTER", bar,"RIGHT", -bar:GetWidth() * bar.per, 0);
+	elseif self.ui.bar.cooldown_progress == DB.COOLDOWN_DOWN then
+		bar.spark:SetPoint("CENTER", bar,"BOTTOM", 0, bar:GetHeight() * bar.per);		
 	else
-		if self.ui.bar.reverse_progress then
-			bar.spark:SetPoint("CENTER", bar,"TOP", 0, -bar:GetHeight() * bar.per);
-		else
-			bar.spark:SetPoint("CENTER", bar,"BOTTOM", 0, bar:GetHeight() * bar.per);
-		end
+		bar.spark:SetPoint("CENTER", bar,"TOP", 0, -bar:GetHeight() * bar.per);
 	end
 end
 
@@ -657,65 +657,110 @@ function HDH_TRACKER:UpdateArtBar(f)
 			f.bar.bg = t;
 			f.bar.spark = f.bar:CreateTexture(nil, "OVERLAY");
 			f.bar.spark:SetBlendMode("ADD");
-			f.bar.spark:SetTexCoord(0, 1, 0, 0.96)
 			f.name = f.bar:CreateFontString(nil,"OVERLAY");
 		end
 		f.bar.bg:SetVertexColor(unpack(op.bg_color));
-		if font.show_name then
+
+		if  font.name_location ~= DB.FONT_LOCATION_HIDE  then
+			if font.name_location == DB.FONT_LOCATION_BAR_L then
+				f.name:SetJustifyH("LEFT");
+				f.name:SetJustifyV("CENTER");
+			elseif font.name_location == DB.FONT_LOCATION_BAR_R then
+				f.name:SetJustifyH("RIGHT");
+				f.name:SetJustifyV("CENTER");
+			elseif font.name_location == DB.FONT_LOCATION_BAR_C then
+				f.name:SetJustifyH("CENTER");
+				f.name:SetJustifyV("CENTER");
+			elseif font.name_location == DB.FONT_LOCATION_BAR_T then
+				f.name:SetJustifyH("CENTER");
+				f.name:SetJustifyV("TOP");
+			else -- BOTTOM
+				f.name:SetJustifyH("CENTER");
+				f.name:SetJustifyV("BOTTOM");
+			end
 			f.name:Show();
 		else
 			f.name:Hide();
 		end
-		if font.name_align == DB.NAME_ALIGN_TOP or font.name_align == DB.NAME_ALIGN_BOTTOM then
-			f.name:SetJustifyH("CENTER");
-			f.name:SetJustifyV(font.name_align);
-		else
-			f.name:SetJustifyH(font.name_align);
-			f.name:SetJustifyV("CENTER");
-		end
+
 		f.name:SetFont(HDH_TRACKER.FONT_STYLE, font.name_size, "OUTLINE");
 		f.name:SetTextColor(unpack(font.name_color));
 		f.name:SetPoint('TOPLEFT', f.bar, 'TOPLEFT', font.name_margin_left, -3)
 		f.name:SetPoint('BOTTOMRIGHT', f.bar, 'BOTTOMRIGHT', -font.name_margin_right, 3)
+		-- print(f.name:GetText())
+
+		f.bar.spark:SetVertexColor(unpack(op.spark_color or {1, 1, 1, 0.7}))
 		
-		if op.reverse_progress then f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r); 
-		else f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture); end
+		if op.cooldown_progress == DB.COOLDOWN_LEFT then
+			f.bar:SetOrientation("Horizontal"); 
+			f.bar:SetRotatesTexture(false);
+			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
+			f.bar.spark:SetSize(19, op.height*1.15);
+			if op.to_fill then
+				f.bar:SetReverseFill(true)
+				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r);
+			else
+				f.bar:SetReverseFill(false)
+				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture);
+			end
+
+		elseif op.cooldown_progress == DB.COOLDOWN_RIGHT then
+			f.bar:SetOrientation("Horizontal"); 
+			f.bar:SetRotatesTexture(false);
+			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
+			f.bar.spark:SetSize(19, op.height*1.15);
+			if op.to_fill then
+				f.bar:SetReverseFill(false)
+				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture);
+			else
+				f.bar:SetReverseFill(true)
+				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r);
+			end
+
+		elseif op.cooldown_progress == DB.COOLDOWN_UP then
+			f.bar:SetOrientation("Vertical"); 
+			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
+			f.bar.spark:SetSize(op.width*1.15, 19);
+			if op.to_fill then
+				f.bar:SetReverseFill(false)
+				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture);
+			else
+				f.bar:SetReverseFill(true)
+				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r); 
+			end
+
+			f.bar:SetRotatesTexture(true);
+		else -- bottom
+			
+			f.bar:SetOrientation("Vertical"); 
+			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
+			f.bar.spark:SetSize(op.width*1.15, 19);
+
+			if op.to_fill then
+				f.bar:SetReverseFill(true)
+				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r); 
+			else
+				f.bar:SetReverseFill(false)
+				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture);
+			end
+			
+			f.bar:SetRotatesTexture(true);
+		end
+
 		f.bar:ClearAllPoints();
 		if op.location == DB.BAR_LOCATION_T then     
-			f.bar:SetSize(op.width, op.height);
 			f.bar:SetPoint("BOTTOM",f, hide_icon and "BOTTOM" or "TOP",0,1); 
-			f.bar:SetOrientation("Vertical"); f.bar:SetRotatesTexture(true);
-			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-			f.bar.spark:SetSize(op.width*1.15, 19);
 		elseif op.location == DB.BAR_LOCATION_B then 
-			f.bar:SetSize(op.width,op.height);
 			f.bar:SetPoint("TOP",f, hide_icon and "TOP" or "BOTTOM",0,-1); 
-			f.bar:SetOrientation("Vertical"); f.bar:SetRotatesTexture(true);
-			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-			f.bar.spark:SetSize(op.width*1.15, 19);
 		elseif op.location == DB.BAR_LOCATION_L then 
-			f.bar:SetSize(op.width,op.height);
 			f.bar:SetPoint("RIGHT",f, hide_icon and "RIGHT" or "LEFT",-1,0); 
-			f.bar:SetOrientation("Horizontal"); f.bar:SetRotatesTexture(false);
-			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-			f.bar.spark:SetSize(19, op.height*1.15);
 		else 
-			f.bar:SetSize(op.width,op.height);
 			f.bar:SetPoint("LEFT",f, hide_icon and "LEFT" or "RIGHT",1,0); 
-			f.bar:SetOrientation("Horizontal"); f.bar:SetRotatesTexture(false);
-			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-			f.bar.spark:SetSize(19, op.height*1.15);
-			
 		end
+		f.bar:SetSize(op.width,op.height);
 		f.bar:SetStatusBarColor(unpack(op.color));
-		-- f.bar:SetAlpha(0.5);
-		f.bar:SetReverseFill(op.reverse_progress);
-		-- f.bar:Show();
-		
 		f.bar.spark:Hide();
-		-- f.bar.spark:SetPoint("CENTER",f.bar,"RIGHT",0,0);
 		self:SetGameTooltip(f.bar, show_tooltip or false)
-
 		if not HDH_TRACKER.ENABLE_MOVE then
 			f.bar:SetMouseClickEnabled(false)
 		end
@@ -834,7 +879,7 @@ end
 
 function HDH_TRACKER:UpdateBarValue(f, isEnding)
 	if f.bar and f.name then
-		if self.ui.bar.reverse_fill then
+		if self.ui.bar.to_fill then
 			if isEnding then
 				f.bar:SetMinMaxValues(0,1); 
 				f.bar:SetValue(1); 
@@ -1244,7 +1289,7 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	f.border:SetPoint('CENTER', f.iconframe, 'CENTER', 0, 0)
 
 	if op_icon.cooldown == DB.COOLDOWN_CIRCLE then
-		f.cooldown2:SetSwipeColor(0,0,0,0.8)
+		f.cooldown2:SetSwipeColor(unpack(op_icon.cooldown_bg_color))
 	else
 		-- f.cooldown1:SetStatusBarColor(unpack(op_icon.cooldown_bg_color))
 		-- f.cooldown2:SetSwipeColor(unpack(op_icon.cooldown_bg_color))
@@ -1252,8 +1297,8 @@ function HDH_TRACKER:UpdateIconSettings(f)
 		f.cooldown2:SetSwipeColor(0,0,0,0)
 	end
 	
-	--f.cooldown2:SetDrawEdge(false);
-	--f.cooldown2.textureImg:SetTexture(unpack(op_icon.cooldown_bg_color));
+	-- f.cooldown2:SetDrawEdge(false);
+	-- f.cooldown2.textureImg:SetTexture(unpack(op_icon.cooldown_bg_color));
 	
 	--f.cooldown2:SetSwipeTexture(f.cooldown2.textureImg:GetTexture(),1,1,1);
 	--local tmp = f:CreateTexture(nil,"OVERLAY")
@@ -1451,10 +1496,10 @@ function HDH_TRACKER:SetGlow(f, bool)
 			elseif f.spell.glow == DB.GLOW_CONDITION_VALUE then
 				value = f.spell.v1
 			end
-			if f.spell.glowCondtion == DB.CONDITION_GT then
-				active =  (value > f.spell.glowValue)
-			elseif f.spell.glowCondtion == DB.CONDITION_LT then
-				active =  (value < f.spell.glowValue)
+			if f.spell.glowCondtion == DB.CONDITION_GT_OR_EQ then
+				active =  (value >= f.spell.glowValue)
+			elseif f.spell.glowCondtion == DB.CONDITION_LT_OR_EQ then
+				active =  (value <= f.spell.glowValue)
 			elseif f.spell.glowCondtion == DB.CONDITION_EQ then
 				active =  (value == f.spell.glowValue) 
 			end
@@ -1562,17 +1607,16 @@ function HDH_TRACKER:RunTimer(timerName, time, func, ...)
 		self.timer[timerName]:Cancel()
 	end
 	self.timer[timerName] = C_Timer.NewTimer(time, function(timer) 
-		print(unpack(timer.args))
 		if timer.parent then 
-			timer:func(timer.args) 
-			timer.parent[timer.name] = nil
-			timer.name = nil
+			timer.func(timer.args) 
+			timer.parent[timer.timerName] = nil
+			timer.timerName = nil
 			timer.args = nil
 		end 
 	end)
 	self.timer[timerName].tracker = self
 	self.timer[timerName].parent = self.timer
-	self.timer[timerName].name = timerName
+	self.timer[timerName].timerName = timerName
 	self.timer[timerName].func = func
 	self.timer[timerName].args = ...
 end
@@ -1656,6 +1700,75 @@ local function VersionUpdateDB()
 			end
 		end
 		DB:SetVersion(2.5)
+	end
+
+	if DB:GetVersion() == 2.5 then
+		local ui = DB:GetTrackerUI()
+		
+		if ui.bar.location == DB.BAR_LOCATION_R and ui.bar.reverse_progress == false then
+			ui.bar.cooldown_progress = DB.COOLDOWN_LEFT
+		elseif ui.bar.location == DB.BAR_LOCATION_R and ui.bar.reverse_progress == true then
+			ui.bar.cooldown_progress = DB.COOLDOWN_RIGHT
+		elseif ui.bar.location == DB.BAR_LOCATION_BOTTOM and ui.bar.reverse_progress == false then
+			ui.bar.cooldown_progress = DB.COOLDOWN_DOWN
+		else
+			ui.bar.cooldown_progress = DB.COOLDOWN_UP
+		end
+		ui.bar.reverse_progress = nil
+		ui.bar.to_fill = ui.bar.reverse_fill
+		ui.bar.reverse_fill = nil
+
+		if ui.font.show_name then
+			if ui.font.name_align == "LEFT" then
+				ui.text.name_location = DB.FONT_LOCATION_BAR_L
+			elseif ui.font.name_align == "RIGHT" then
+				ui.font.name_location = DB.FONT_LOCATION_BAR_R
+			elseif ui.font.name_align == "CENTER" then
+				ui.font.name_location = DB.FONT_LOCATION_BAR_C
+			elseif ui.font.name_align == "TOP" then
+				ui.font.name_location = DB.FONT_LOCATION_BAR_T
+			else -- BOTTOM
+				ui.font.name_location = DB.FONT_LOCATION_BAR_B
+			end
+		else
+			ui.font.name_location = DB.FONT_LOCATION_HIDE
+		end
+
+		local ui
+		for _, id in ipairs(DB:GetTrackerIds()) do
+			if DB:hasTrackerUI(id) then
+				ui = DB:GetTrackerUI(id)
+				if ui.bar.location == DB.BAR_LOCATION_R and ui.bar.reverse_progress == false then
+					ui.bar.cooldown_progress = DB.COOLDOWN_LEFT
+				elseif ui.bar.location == DB.BAR_LOCATION_R and ui.bar.reverse_progress == true then
+					ui.bar.cooldown_progress = DB.COOLDOWN_RIGHT
+				elseif ui.bar.location == DB.BAR_LOCATION_BOTTOM and ui.bar.reverse_progress == false then
+					ui.bar.cooldown_progress = DB.COOLDOWN_DOWN
+				else
+					ui.bar.cooldown_progress = DB.COOLDOWN_UP
+				end
+				ui.bar.reverse_progress = nil
+				ui.bar.to_fill = ui.bar.reverse_fill
+				ui.bar.reverse_fill = nil
+
+				if ui.font.show_name then
+					if ui.font.name_align == "LEFT" then
+						ui.text.name_location = DB.FONT_LOCATION_BAR_L
+					elseif ui.font.name_align == "RIGHT" then
+						ui.font.name_location = DB.FONT_LOCATION_BAR_R
+					elseif ui.font.name_align == "CENTER" then
+						ui.font.name_location = DB.FONT_LOCATION_BAR_C
+					elseif ui.font.name_align == "TOP" then
+						ui.font.name_location = DB.FONT_LOCATION_BAR_T
+					else -- BOTTOM
+						ui.font.name_location = DB.FONT_LOCATION_BAR_B
+					end
+				else
+					ui.font.name_location = DB.FONT_LOCATION_HIDE
+				end
+			end
+		end
+		DB:SetVersion(2.6)
 	end
 end
 
@@ -1761,3 +1874,4 @@ end
 HDH_AT_ADDON_FRAME = CreateFrame("Frame", "HDH_AT_iconframe", UIParent) -- 애드온 최상위 프레임
 HDH_AT_ADDON_FRAME:SetScript("OnEvent", OnEvent)
 OnLoad(HDH_AT_ADDON_FRAME)
+
