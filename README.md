@@ -89,3 +89,7 @@
 
 ## 설정 방법
 - 설정창 팝업 명령어는 /at , /auratracker , /ㅁㅅ
+
+### Release 버전 다운로드
+- inven : https://wow.inven.co.kr/dataninfo/addonpds/detail.php?listtype=favor&idx=9396&rurl=%2Fdataninfo%2Faddonpds%2Flist.php%3Flisttype%3Dfavor
+- curseforge : https://www.curseforge.com/wow/addons/aura
