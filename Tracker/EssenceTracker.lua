@@ -25,11 +25,6 @@ function OnUpdate(self)
 	
 	if self.spell.curTime - (self.spell.delay or 0) < HDH_TRACKER.ONUPDATE_FRAME_TERM then return end 
 	self.spell.delay = self.spell.curTime
-	-- self.spell.count = math.ceil(self.spell.v1 / maxValue * 100);
-	-- if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
-	-- self.counttext:SetText(format("%d%", self.spell.count)); 
-	-- else self.counttext:SetText(nil) end
-	-- if self.spell.showValue then self.v1:SetText(string.format('%.1f', self.spell.v1)); else self.v1:SetText(nil) end
 	
 	if self.spell.v1 <= 1.0 and self.spell.no == 1 then
 		self:GetParent().parent:Update();
@@ -88,6 +83,7 @@ function HDH_ESSENCE_TRACKER:CreateData()
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 6)
+	DB:SetTrackerValue(trackerId, 'ui.%s.common.reverse_h', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 40)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.to_fill', true)

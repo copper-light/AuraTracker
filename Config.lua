@@ -817,7 +817,7 @@ local function HDH_AT_OP_OnDragStopRow(self)
 			and self.mode 
 			and self.mode ~= HDH_AT_AuraRowMixin.MODE.EMPTY then 
 		main:LoadTrackerElementConfig(trackerId)
-		HDH_TRACKER.InitIcons(trackerId)
+		HDH_TRACKER.InitIconFrame(trackerId)
 	else
 		main:LoadTrackerList(main:GetCurTraits())
 		main:ChangeBody(nil, self.index)
@@ -841,7 +841,7 @@ local function HDH_AT_OnEventTrackerElement(self, elemIdx)
 	elseif string.find(name, "CheckButtonAlways") then
 		local value = self:GetChecked()
 		DB:UpdateTrackerElementAlways(trackerId, elemIdx, value)
-		HDH_TRACKER.InitIcons(trackerId)
+		HDH_TRACKER.InitIconFrame(trackerId)
 
 	elseif string.find(name, "CheckButtonGlow") then
 		local value = self:GetChecked()
@@ -850,7 +850,7 @@ local function HDH_AT_OnEventTrackerElement(self, elemIdx)
 	elseif string.find(name, "CheckButtonValue") then
 		local value = self:GetChecked()
 		DB:UpdateTrackerElementValue(trackerId, elemIdx, value)
-		HDH_TRACKER.InitIcons(trackerId)
+		HDH_TRACKER.InitIconFrame(trackerId)
 
 	elseif string.find(name, "ButtonDel") then
 		main:DeleteTrackerElement(self:GetParent(), trackerId, elemIdx)
@@ -1031,9 +1031,9 @@ function HDH_AT_OnClick_Button(self, button)
 
 		local className = trackerObj:GetClassName()
 		local curTraits = main:GetCurTraits()
-		local index = main:GetTrackerIndex(id)
 		main:LoadTraits()
-		main:LoadTrackerList(curTraits)
+		main:LoadTrackerList(curTraits) 
+		local index = main:GetTrackerIndex(id) -- LoadTrackerList 이후에 호출 되어야함 순서 중요 !
 		if not index then
 			main:LoadTrackerList()
 			index = main:GetTrackerIndex(id)
@@ -1043,6 +1043,7 @@ function HDH_AT_OnClick_Button(self, button)
 		end
 		main:ChangeBody(BODY_ELEMENTS, index)
 		 
+		-- 트래커 고유 설정 변경해야하는 트래커 유형
 		if not perType and (className == "HDH_COMBO_POINT_TRACKER" or className == "HDH_ESSENCE_TRACKER" or className == "HDH_DK_RUNE_TRACKER") then
 			if not main.DIALOG_SELECT_DISPLAY_TYPE then
 				main.DIALOG_SELECT_DISPLAY_TYPE = CreateFrame("Frame", main:GetName().."DialogSelectDisplayType", main, "HDH_AT_DialogSelectDisplayTypeTemplate")
@@ -1175,7 +1176,7 @@ function HDH_AT_OnClick_Button(self, button)
 			else
 				DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_NONE, nil, nil)
 			end
-			HDH_TRACKER.InitIcons(trackerId)
+			HDH_TRACKER.InitIconFrame(trackerId)
 			if main:GetCurTrackerId() == trackerId then
 				main:LoadTrackerElementConfig(trackerId, elemIdx, elemIdx)
 			end

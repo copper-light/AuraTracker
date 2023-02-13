@@ -1,8 +1,8 @@
 ﻿## Interface: 100005
 ## Title: HDH_AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
-## Notes: 설정창 명령어 /at, /auratracker (with libcompress)
-## Version: 10.0.5.04
+## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
+## Version: 10.0.5.05
 ## SavedVariables: DB_PROFILE, HDH_AT_PROFILE
 ## SavedVariablesPerCharacter: HDH_AT_DB
 

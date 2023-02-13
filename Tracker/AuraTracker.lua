@@ -1,9 +1,7 @@
 ﻿local DB = HDH_AT_ConfigDB
 HDH_AURA_TRACKER = {}
 HDH_AURA_TRACKER.BOSS_DEBUFF = {}
-HDH_AURA_TRACKER.DISABLE_DEBUFF = {57724}
--- HDH_UNIT_LIST = {"player","target","focus","pet","boss1","boss2","boss3","boss4","boss5","party1","party2","party3","party4","arena1","arena2","arena3","arena4","arena5"};
-
+-- HDH_AURA_TRACKER.DISABLE_DEBUFF = {57724}
 local PLAY_SOUND = false
 
 --------------------------------------------
@@ -75,11 +73,7 @@ do
 				if not StaggerID[id] then -- 시간차가 아니면
 					spell.v1 = (v1 ~= 0) and v1 or nil
 				else -- 시간차
-					-- if spell.v1_hp then
-						-- spell.v1 = math.ceil((v3 / UnitHealthMax(self.unit)) *100)
-					-- else
-						spell.v1 = v2; 
-					-- end
+					spell.v1 = v2; 
 				end
 				
 				if not spell.isUpdate then
@@ -256,7 +250,6 @@ do
 						f.icon:SetDesaturated(1)
 						f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
 						f.iconSatCooldown:Show()
-						-- f.iconSatCooldown.spark:Show()
 					else
 						f.icon:SetAlpha(self.ui.icon.on_alpha)
 						f.border:SetAlpha(self.ui.icon.on_alpha)
@@ -285,13 +278,9 @@ do
 					f.cd:SetValue(GetTime());
 				end
 				if display_mode ~= DB.DISPLAY_ICON and f.bar then
-					-- f.bar:SetMinMaxValues(f.spell.startTime, f.spell.endTime);
 					if not f.bar:IsShown() then f.bar:Show(); end
 					f.name:SetText(f.spell.name);
-					-- f.name:SetTextColor(unpack(self.ui.bar.name_color));
 					if f.spell.duration == 0 then
-						-- f.bar:SetMinMaxValues(0,1);
-						-- f.bar:SetValue(1);
 						f.spell.remaining = 1;
 						f.spell.endTime = 1;
 						f.spell.startTime = 0;
@@ -313,10 +302,6 @@ do
 			else
 				f.timetext:SetText(nil);
 				if f.spell.always then 
-					-- if not f.icon:IsDesaturated() then f.icon:SetDesaturated(1)
-					-- 								   f.icon:SetAlpha(self.ui.icon.off_alpha)
-					-- 								   f.border:SetAlpha(self.ui.icon.off_alpha)
-					-- 								   f.border:SetVertexColor(0,0,0) end
 					f.icon:SetDesaturated(1)
 					f.icon:SetAlpha(self.ui.icon.off_alpha)
 					f.border:SetAlpha(self.ui.icon.off_alpha)
@@ -490,26 +475,9 @@ do
 		self.isRaiding = self:IsRaiding()
 	end
 	
-	-- function HDH_AURA_TRACKER:OnEffectEvent(self, event, ...)
-		-- if event == "AT_EVENT_START_SOUND" then
-		
-		-- elseif event == "AT_EVENT_END_SOUND" then
-		
-		-- elseif event == "AT_EVENT_CONDITION_SOUND" then
-		
-		-- elseif event == ""
-	-- end
-	
-	-------------------------------------------
-	-- timer 
-	-------------------------------------------
-
-
 ------------------------------------------
 end -- TRACKER class
 ------------------------------------------
-
-
 
 
 -------------------------------------------

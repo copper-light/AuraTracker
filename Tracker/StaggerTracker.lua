@@ -46,8 +46,6 @@ local function STAGGER_TRACKER_OnUpdate(self)
 	
 	if self.spell.showValue then self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1, self:GetParent().parent.ui.font.v1_abbreviate)); else self.v1:SetText(nil) end
 	
-	-- if self.bar then self.bar:SetValue(self.spell.v1); end
-	
 	if self.spell.v1 > 0 then
 		if self.spell.isOn ~= true then
 			self:GetParent().parent:Update();
@@ -63,7 +61,6 @@ local function STAGGER_TRACKER_OnUpdate(self)
 		for i = 1, #self.spell.splitValues do
 			self.bar.bar[i].mpMax = self.spell.splitValues[i] or health_max;
 			self.bar.bar[i].mpMin = self.spell.splitValues[i-1] or 0;
-			-- local gap = self.bar.bar[i].mpMax - self.bar.bar[i].mpMin;
 			self.bar.bar[i]:SetMinMaxValues(self.bar.bar[i].mpMin, self.bar.bar[i].mpMax);
 		end
 		self:GetParent().parent:UpdateBarValue(self, true);	
@@ -72,48 +69,6 @@ local function STAGGER_TRACKER_OnUpdate(self)
 	end
 	self:GetParent().parent:SetGlow(self, true);
 end
-
--- STAGGER_YELLOW_TRANSITION = .30
--- STAGGER_RED_TRANSITION = .60
--- function HDH_STAGGER_TRACKER:UpdateBarValue(f)
-	-- if f.bar and #f.bar.bar > 0 then
-		-- local bar;
-		-- for i = 1, #f.bar.bar do 
-			-- bar = f.bar.bar[i];
-			-- if bar then 
-				-- bar:SetValue(self:GetAnimatedValue(bar,f.spell.v1,i)); 
-				-- if f:GetParent().parent.option.bar.use_full_color then
-					-- if f.spell.v1 >= (bar.mpMax) then
-						-- bar:SetStatusBarColor(unpack(f:GetParent().parent.option.bar.full_color));
-					-- else
-						-- bar:SetStatusBarColor(unpack(f:GetParent().parent.option.bar.color));
-					-- end
-				-- end
-				-- if self.option.bar.show_spark then
-					-- if bar:GetValue() >= bar.mpMax then value = 1; if bar.spark:IsShown() then bar.spark:Hide(); end
-					-- elseif bar:GetValue()<= bar.mpMin then value = 0; if bar.spark:IsShown() then bar.spark:Hide(); end
-					-- else
-						-- value = (bar:GetValue()-bar.mpMin)/(bar.mpMax - bar.mpMin);
-						-- if not bar.spark:IsShown() then bar.spark:Show(); end
-					-- end
-					-- if bar:GetOrientation() == "HORIZONTAL" then
-						-- if self.option.bar.reverse_progress then
-							-- bar.spark:SetPoint("CENTER", bar,"RIGHT", -bar:GetWidth() * value, 0);
-						-- else
-							-- bar.spark:SetPoint("CENTER", bar,"LEFT", bar:GetWidth() * value, 0);
-						-- end
-					-- else
-						-- if self.option.bar.reverse_progress then
-							-- bar.spark:SetPoint("CENTER", bar,"TOP", 0, -bar:GetHeight() * value);
-						-- else
-							-- bar.spark:SetPoint("CENTER", bar,"BOTTOM", 0, bar:GetHeight() * value);
-						-- end
-					-- end
-				-- end
-			-- end
-		-- end
-	-- end
--- end
 
 function HDH_STAGGER_TRACKER:UpdateBar(f, barMax)
 	if f.spell then

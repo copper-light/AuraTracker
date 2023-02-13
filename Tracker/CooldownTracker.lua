@@ -91,7 +91,6 @@ end
 function HDH_C_CheckStartSound(self)
 	local f = self;
 	if f.spell and f.spell.startSound and not OptionFrame:IsShown() then
-		-- print(f.spell.duration, f.spell.remaining)
 		if (f.spell.duration - f.spell.remaining) < 0.15 then
 			if f.spell.duration > HDH_C_TRACKER.GlobalCooldown then
 				HDH_PlaySoundFile(f.spell.startSound, "SFX")
@@ -102,7 +101,6 @@ end
 
 function HDH_C_CheckEndSound(self)
 	local f = self;
-	-- print(f.spell.duration)
 	if f.spell and f.spell.endSound and not OptionFrame:IsShown() then
 		if f.spell.duration > HDH_C_TRACKER.GlobalCooldown then
 			HDH_PlaySoundFile(f.spell.endSound, "SFX")
@@ -455,31 +453,19 @@ function HDH_C_TRACKER:Update_Icon(f) -- f == f
 	end
 	if (spell.duration > 0) or (spell.charges.duration > 0) then -- 글로버 쿨다운 2초 포함
 		if (spell.duration < HDH_C_TRACKER.GlobalCooldown) and spell.charges.duration == 0 then
-			-- CT_StartTimer(f, option.icon.max_time); 
 			if f:IsShown() then
 				CT_StartTimer(f, ui.icon.max_time); 
-				-- self:SetGlow(f, true)
 			end
 
 			if spell.isAble then 
 				self:SetGlow(f,  true)
 			end
-				-- self:SetGlow(f,  false)
-				-- CT_StartTimer(f, option.icon.max_time); 
-				-- if not f:IsShown() then f:Show() isUpdate= true end
-			-- else
-				-- self:SetGlow(f, false)
-				-- if f:IsShown() then f:Hide() isUpdate= true print("1") end
-			-- end
 		else
 			if HDH_TRACKER.ENABLE_MOVE or (maxtime == -1) or (maxtime > spell.remaining) then
 				if (spell.duration > HDH_C_TRACKER.GlobalCooldown) or not spell.isAble then self:SetGlow(f, false)
 				else self:SetGlow(f, true) end
-				-- if spell.isAble then 
-				-- HDH_C_CheckStartSound(f);
 				CT_StartTimer(f, -1); 
 				if not f:IsShown() then f:Show() isUpdate = true end
-				-- end
 			else
 				self:SetGlow(f, false)
 				CT_StartTimer(f, -1);
@@ -488,20 +474,16 @@ function HDH_C_TRACKER:Update_Icon(f) -- f == f
 		end
 
 		if spell.isAble then 
-			-- self:SetGlow(f,  true)
 			f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
 			f.iconSatCooldown:SetDesaturated(nil)
 			f.iconSatCooldown:Show()
 		else
-			-- self:SetGlow(f,  false)
 			f.iconSatCooldown:SetDesaturated(1)
 			f.iconSatCooldown:SetAlpha(0)
 		end
 
 		if ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE and ui.icon.cooldown ~= DB.COOLDOWN_NONE then
-			-- f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
 			f.iconSatCooldown:Show()
-			-- f.iconSatCooldown.spark:Show()
 		end
 	else -- 쿨 안도는 중
 		if f.cd:IsShown() then f.cd:Hide() end
@@ -529,7 +511,6 @@ function HDH_C_TRACKER:Update_Layout()
 	local f, spell
 	local ret = 0 -- 쿨이 도는 스킬의 갯수를 체크하는것
 	local line = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
-	-- local size = self.ui.icon.size-- 아이콘 간격 띄우는 기본값
 	local margin_h = self.ui.common.margin_h
 	local margin_v = self.ui.common.margin_v
 	local reverse_v = self.ui.common.reverse_v -- 상하반전
@@ -696,14 +677,7 @@ end
 
 function HDH_C_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
 	local icon = self.frame.icon[idx]
-	--icon:SetScript("OnEvent", nil)
-	icon:UnregisterEvent("SPELL_UPDATE_CHARGES");
-	icon:UnregisterEvent("ACTIONBAR_UPDATE_USABLE");
-	icon:UnregisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
-	icon:UnregisterEvent("BAG_UPDATE");
-	icon:UnregisterEvent("BAG_UPDATE_COOLDOWN");
-	icon:UnregisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW");
-	icon:UnregisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE");
+	icon:UnregisterAllEvents()
 	icon:Hide()
 	CT_StopTimer(icon)
 	icon:SetParent(nil)
@@ -1041,7 +1015,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 end
 
 function HDH_C_TRACKER:ACTIVE_TALENT_GROUP_CHANGED()
-	self:RunTimer("PLAYER_TALENT_UPDATE", 0.2, self.InitIcons, self)
+	-- self:RunTimer("PLAYER_TALENT_UPDATE", 0.2, HDH_C_TRACKER.InitIcons, self)
 end
 
 function HDH_C_TRACKER:PLAYER_ENTERING_WORLD()
@@ -1060,13 +1034,13 @@ function CT_OnEvent_Frame(self, event, ...)
 	elseif event == 'GROUP_ROSTER_UPDATE' then
 		tracker:Update()
 	elseif event == 'UNIT_PET' then
-		tracker:RunTimer("UNIT_PET", 0.5, tracker.Update, tracker) 
+		tracker:RunTimer("UNIT_PET", 0.5, HDH_C_TRACKER.Update, tracker) 
 	elseif event == 'ARENA_OPPONENT_UPDATE' then
-		tracker:RunTimer("ARENA_OPPONENT_UPDATE", 0.5, tracker.Update, tracker) 
+		tracker:RunTimer("ARENA_OPPONENT_UPDATE", 0.5, HDH_C_TRACKER.Update, tracker) 
 	elseif event == 'PLAYER_TALENT_UPDATE' then
-		tracker:RunTimer("PLAYER_TALENT_UPDATE", 0.2, tracker.InitIcons, tracker)
+		tracker:RunTimer("PLAYER_TALENT_UPDATE", 0.5, HDH_C_TRACKER.InitIcons, tracker)
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
-		tracker:RunTimer("PLAYER_EQUIPMENT_CHANGED", 0.5, tracker.InitIcons, tracker)
+		tracker:RunTimer("PLAYER_EQUIPMENT_CHANGED", 0.5, HDH_C_TRACKER.InitIcons, tracker)
 	elseif event == "ACTIONBAR_SLOT_CHANGED" then
 		tracker:UpdateSlot(...);
 	end

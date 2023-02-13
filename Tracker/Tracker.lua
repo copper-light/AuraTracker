@@ -284,8 +284,8 @@ function HDH_TRACKER.Delete(trackerId)
 		HDH_TRACKER.objList[t.id] = nil
 	else
 		for k, t in pairs(HDH_TRACKER.objList) do
-			t:Release()
 			HDH_TRACKER.objList[t.id] = nil
+			t:Release()
 		end
 	end
 end
@@ -336,13 +336,6 @@ function HDH_TRACKER.InitVaribles(trackerId)
 		id, name, type, unit, _, _, _ = DB:GetTrackerInfo(trackerId)
 		tracker = HDH_TRACKER.Get(trackerId)
 		tracker:Init(id, name, type, unit)
-		-- print(trackerId, tracker)
-		-- if not tracker then
-		-- 	print('asdf')
-		-- 	HDH_TRACKER.New(id, name, type, unit);
-		-- else
-			
-		-- end
 	else
 		HDH_TRACKER.Delete()
 		local trackerIds = {}
@@ -369,7 +362,7 @@ function HDH_TRACKER.InitVaribles(trackerId)
 	end
 end
 
-function HDH_TRACKER.InitIcons(trackerId)
+function HDH_TRACKER.InitIconFrame(trackerId)
 	if trackerId then
 		local t = HDH_TRACKER.Get(trackerId)
 		if t then
@@ -507,7 +500,7 @@ function HDH_TRACKER:Release()
 	self.frame.parent = nil
 	self.frame = nil
 	if self.timer then
-		for k,timer in ipairs(self.timer) do
+		for k,timer in pairs(self.timer) do
 			timer:Cancel();
 			self.timer[k] = nil;
 		end
@@ -687,8 +680,6 @@ function HDH_TRACKER:UpdateArtBar(f)
 		f.name:SetTextColor(unpack(font.name_color));
 		f.name:SetPoint('TOPLEFT', f.bar, 'TOPLEFT', font.name_margin_left, -3)
 		f.name:SetPoint('BOTTOMRIGHT', f.bar, 'BOTTOMRIGHT', -font.name_margin_right, 3)
-		-- print(f.name:GetText())
-
 		f.bar.spark:SetVertexColor(unpack(op.spark_color or {1, 1, 1, 0.7}))
 		
 		if op.cooldown_progress == DB.COOLDOWN_LEFT then
@@ -1509,21 +1500,6 @@ function HDH_TRACKER:SetGlow(f, bool)
 		else
 			self:ActionButton_HideOverlayGlow(f)
 		end
-
-		-- if f.spell.glowCount 
-		-- 	and (f.spell.count >= f.spell.glowCount 
-		-- 	or (f.spell.charges and f.spell.charges.count >= f.spell.glowCount) ) then 
-		-- 	self:ActionButton_ShowOverlayGlow(f)
-		-- elseif f.spell.glowV1 and (f.spell.v1 >= f.spell.glowV1) then
-		-- 	self:ActionButton_ShowOverlayGlow(f)
-		-- elseif f.spell.glowTime then
-			
-		-- 	if (f.spell.glowTime >= f.spell.remaining) then
-		-- 		self:ActionButton_ShowOverlayGlow(f)
-		-- 	end
-		-- else
-		-- 	self:ActionButton_HideOverlayGlow(f)
-		-- end
 	else
 		self:ActionButton_HideOverlayGlow(f)
 	end
@@ -1539,13 +1515,6 @@ function HDH_TRACKER:GetAni(f, ani_type) -- row 이동 애니
 			ag.a1:SetDuration(0.5) 
 			ag.a1:SetFromAlpha(1);
 			ag.a1:SetToAlpha(0.0);
-			-- ag.a1:SetStartDelay(8);
-			-- ag.a2 = ag:CreateAnimation("ALPHA")
-			-- ag.a2:SetOrder(2)
-			-- ag.a2:SetStartDelay(8);
-			-- ag.a2:SetDuration(8) 
-			-- ag.a2:SetFromAlpha(0.5);
-			-- ag.a2:SetToAlpha(0);
 			ag:SetScript("OnFinished", function(self) 
 				self:GetParent():Hide(); 
 			end)
@@ -1574,13 +1543,10 @@ end
 
 function HDH_TRACKER:ShowTracker()
 	self:StartAni(self.frame, HDH_TRACKER.ANI_SHOW);
-	-- self.frame:SetAlpha(1);
-	-- self.frame:Show();
 end
 
 function HDH_TRACKER:HideTracker()
 	self:StartAni(self.frame, HDH_TRACKER.ANI_HIDE);
-	-- self.frame:Hide();
 end
 
 function HDH_TRACKER:StartAni(f, ani_type) -- row 이동 실행

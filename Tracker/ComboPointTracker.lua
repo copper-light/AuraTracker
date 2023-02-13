@@ -68,15 +68,6 @@ POWER_INFO[HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES]	= {power_type="ARCANE_CHARGES"
 
 HDH_COMBO_POINT_TRACKER.POWER_INFO = POWER_INFO;
 
-
--- INV_Misc_Gem_Pearl_04 214 208 57
-
-
---Ability_Priest_SpiritOfTheRedeemer
---INV__wod_Arakoa4
---PALADIN_HOLY
---Spell_Holy_Rune
-
 local function OnUpdateBar(self)
 	if self.bar then
 		self.bar:SetValue(self:GetParent().parent:GetAnimatedValue(self.bar, not self:GetParent().parent.ui.bar.to_fill and 1 - self.spell.v1 or self.spell.v1))
@@ -101,9 +92,6 @@ function HDH_COMBO_POINT_TRACKER:CreateData(elemIdx)
 	local isValue = HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type
 	local isItem = false
 
-	-- if DB:GetTrackerElementSize(trackerId) > 0 then
-	-- 	DB:TrancateTrackerElements(trackerId)
-	-- end
 	DB:SetTrackerElement(trackerId, elemIdx, key, id, name, texture, isAlways, isValue, isItem)
 	DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 	DB:CopyGlobelToTracker(trackerId)
@@ -387,20 +375,6 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 									end
 									
 									f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
-									-- f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
-
-									-- f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
-									-- if math.ceil((f.spell.p_startTime or 0) * 100) ~= math.ceil((f.spell.startTime or 0) * 100) then
-										
-									-- 	f.spell.p_startTime = f.spell.startTime
-									-- end
-									-- if math.ceil(f.spell.startTime*10) ~= math.ceil((f.spell.p_startTime or 0) *10) or f.spell.duration ~= f.spell.p_duration then
-									-- 	print(f.spell.startTime, f.spell.p_startTime)
-									-- 	f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
-									-- 	f.spell.p_startTime = f.spell.startTime 
-									-- 	f.spell.p_duration = f.spell.duration
-									-- end
-									-- f.cd:SetValue()
 								else
 									f.iconSatCooldown:SetHeight(f.icon:GetHeight())
 									f.iconSatCooldown:SetWidth(f.icon:GetWidth())

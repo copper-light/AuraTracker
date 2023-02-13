@@ -244,6 +244,8 @@ function HDH_POWER_TRACKER:CreateData()
 
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON_AND_BAR)
+	DB:SetTrackerValue(trackerId, 'ui.%s.common.reverse_h', false)
+	DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 6)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', POWER_INFO[self.type].color)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.location', DB.BAR_LOCATION_R)
@@ -252,7 +254,6 @@ function HDH_POWER_TRACKER:CreateData()
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.to_fill', true)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.cooldown_progress', DB.COOLDOWN_RIGHT)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)
-
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.name_location', DB.FONT_LOCATION_HIDE)
 
 	if maxValue >= 200 then
