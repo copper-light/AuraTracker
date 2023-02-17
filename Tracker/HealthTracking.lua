@@ -316,7 +316,6 @@ do -- HDH_HEALTH_TRACKER class
 	end
 	
 	function HDH_HEALTH_TRACKER:InitIcons() -- HDH_TRACKER override
-		if UI_LOCK then return end 							-- ui lock 이면 패스
 		if not DB_AURA.Talent then return end 				-- 특성 정보 없으면 패스
 		local talent = DB_AURA.Talent[self:GetSpec()] 
 		if not talent then return end 						-- 현재 특성 불러 올수 없으면 패스

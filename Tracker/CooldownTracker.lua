@@ -204,10 +204,17 @@ function CT_OnUpdateIcon(self) -- 거리 체크는 onUpdate 에서 처리해야�
 		self.spell.newRange = IsActionInRange(self.spell.slot) 
 		local _, slot_id = GetActionInfo(self.spell.slot)
 		if ADJUST_ID[slot_id] == self.spell.id then
-			self.spell.slotTexture = select(3, HDH_AT_UTIL.GetInfo(slot_id,  self.spell.isItem))
+			self.spell.slotTexture = select(3, HDH_AT_UTIL.GetInfo(slot_id,  self.spell.isItem))	
+
 			if self.icon:GetTexture() ~= self.spell.slotTexture then
-				self.icon:SetTexture(self.spell.slotTexture)
-				self.iconSatCooldown:SetTexture(self.spell.slotTexture)
+
+				if self.spell.defaultImg ~= self.spell.slotTexture then
+					self.icon:SetTexture(self.spell.slotTexture)
+					self.iconSatCooldown:SetTexture(self.spell.slotTexture)
+				else
+					self.icon:SetTexture(self.spell.icon);
+					self.iconSatCooldown:SetTexture(self.spell.icon);
+				end
 			end
 		end
 	else
@@ -218,7 +225,10 @@ function CT_OnUpdateIcon(self) -- 거리 체크는 onUpdate 에서 처리해야�
 		self.spell.charges.remaining = self.spell.charges.endTime - self.spell.curTime2;
 		self:GetParent().parent:UpdateTimeText(self.timetext, self.spell.charges.remaining);
 		self.spell.per = 1.0 - (self.spell.charges.remaining / self.spell.charges.duration)
-		CT_UpdateSatIcon(self:GetParent().parent, self, self.spell)
+		if self:GetParent().parent.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE 
+				and self:GetParent().parent.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
+			CT_UpdateSatIcon(self:GetParent().parent, self, self.spell)
+		end
 	end
 
 	if self.spell.preInRage ~= self.spell.newRange then
@@ -410,7 +420,7 @@ function HDH_C_TRACKER:Update_Usable(f)
 			if spell.duration < HDH_C_TRACKER.GlobalCooldown then
 				f.icon:SetVertexColor(0.4, 0.4, 0.4)
 			end
-			if not f.spell.isNotEnoughMana and (not spell.isCharging or spell.charges.count == 0) then 
+			if not f.spell.isNotEnoughMana then  -- and (not spell.isCharging or spell.charges.count == 0) 
 				f.icon:SetDesaturated(1)
 			end
 			-- f.icon:SetDesaturated(1)
@@ -594,18 +604,13 @@ function HDH_C_TRACKER:UpdateSlot(slot)
 		f_id = ADJUST_ID[f_id] or f_id;
 		if slot_id == f_id then
 			f.spell.slot = slot;
-			if not f.spell.fix_icon then
-				local texture = GetActionTexture(slot);
-				
-				if (texture) and f.icon:GetTexture() ~= texture then
-					f.icon:SetTexture(texture);
-					f.iconSatCooldown:SetTexture(texture);
-				end
-			else
-				if f.spell.icon ~= f.icon:GetTexture() then
-					f.icon:SetTexture(f.spell.icon);
-					f.iconSatCooldown:SetTexture(f.spell.icon);
-				end
+			local texture = GetActionTexture(slot)
+			if (texture) and f.spell.defaultImg ~= texture then
+				f.icon:SetTexture(texture);
+				f.iconSatCooldown:SetTexture(texture);
+			elseif f.spell.icon ~= f.icon:GetTexture() then
+				f.icon:SetTexture(f.spell.icon);
+				f.iconSatCooldown:SetTexture(f.spell.icon);
 			end
 		else
 			self:UpdateAllSlot();
@@ -627,12 +632,13 @@ function HDH_C_TRACKER:UpdateSlot(slot)
 			f = self.frame.pointer[slot_id];
 			f.spell.slot = slot;
 			self.slot_pointer[slot] = f;
-			if not f.spell.fix_icon then
-				local texture = GetActionTexture(slot);
-				if (texture) and f.icon:GetTexture() ~= texture then
-					f.icon:SetTexture(texture);
-					f.iconSatCooldown:SetTexture(texture);
-				end
+			local texture = GetActionTexture(slot);
+			if (texture) and f.spell.defaultImg ~= texture then
+				f.icon:SetTexture(texture);
+				f.iconSatCooldown:SetTexture(texture);
+			elseif f.spell.icon ~= f.icon:GetTexture() then
+				f.icon:SetTexture(f.spell.icon);
+				f.iconSatCooldown:SetTexture(f.spell.icon);
 			end
 		end
 	end
@@ -686,11 +692,21 @@ function HDH_C_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
 end
 
 function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
+	if not f.charges then
+		f.charges = CreateFrame("Cooldown", nil, f.iconframe, "CooldownFrameTemplate");
+		f.charges:SetDrawEdge(true);
+		f.charges:SetDrawSwipe(false);
+		f.charges:SetDrawBling(false);
+		f.charges:SetHideCountdownNumbers(true);
+		f.charges:SetAllPoints();
+	end
+
 	if cooldown_type == DB.COOLDOWN_UP then 
 		f.cd = f.cooldown1
 		f.cd:SetOrientation("Vertical")
 		f.cd:SetReverseFill(true)
 		f.cooldown2:Hide()
+		f.charges:Hide()
 
 		f.iconSatCooldown:ClearAllPoints()
 		f.iconSatCooldown:SetPoint("BOTTOMLEFT", f.iconframe,"BOTTOMLEFT",0,0)
@@ -706,6 +722,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.cd:SetOrientation("Vertical")
 		f.cd:SetReverseFill(false)
 		f.cooldown2:Hide()
+		f.charges:Hide()
 
 		f.iconSatCooldown:ClearAllPoints()
 		f.iconSatCooldown:SetPoint("TOPLEFT", f.iconframe,"TOPLEFT",0,0)
@@ -721,6 +738,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.cd:SetOrientation("Horizontal"); 
 		f.cd:SetReverseFill(false)
 		f.cooldown2:Hide()
+		f.charges:Hide()
 
 		f.iconSatCooldown:ClearAllPoints()
 		f.iconSatCooldown:SetPoint("TOPRIGHT", f.iconframe,"TOPRIGHT",0,0)
@@ -736,6 +754,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.cd:SetOrientation("Horizontal"); 
 		f.cd:SetReverseFill(true)
 		f.cooldown2:Hide()
+		f.charges:Hide()
 
 		f.iconSatCooldown:ClearAllPoints()
 		f.iconSatCooldown:SetPoint("TOPLEFT", f.iconframe,"TOPLEFT",0,0)
@@ -754,6 +773,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:Hide()
 		f.iconSatCooldown:SetSize(f.icon:GetSize())
 		f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+		f.charges:Show()
 	end
 end
 
@@ -897,7 +917,7 @@ function HDH_C_TRACKER:IsSwitchByRemining(icon1, icon2)
 end
 
 function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
-	if HDH_TRACKER.ENABLE_MOVE then return end
+	-- if HDH_TRACKER.ENABLE_MOVE then return end
 	local trackerId = self.id
 	local id, name, _, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
 	self.aura_filter = aura_filter
@@ -906,7 +926,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 		return 
 	end
 
-	local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue
+	local elemKey, elemId, elemName, texture, defaultImg, isAlways, glowType, isValue, isItem, glowCondition, glowValue
 	local elemSize = DB:GetTrackerElementSize(trackerId)
 	local spell 
 	local f
@@ -919,6 +939,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	for i = 1 , elemSize do
 		elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 		glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
+		defaultImg = DB:GetTrackerElementDefaultImage(trackerId, i)
 
 		if self:IsOk(elemId, elemName, isItem) then -- and not self:IsIgnoreSpellByTalentSpell(auraList[i])
 			iconIdx = iconIdx + 1
@@ -937,6 +958,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.no = iconIdx
 			spell.name = elemName
 			spell.icon = texture
+			spell.defaultImg = defaultImg
 			spell.glow = glowType
 			spell.glowCondtion = glowCondition
 			spell.glowValue = (glowValue and tonumber(glowValue)) or 0
@@ -959,7 +981,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			
 			spell.slot = nil -- self:GetSlot(spell.id);
 			-- if not auraList[i].defaultImg then auraList[i].defaultImg = auraList[i].Texture; 
-			-- elseif auraList[i].defaultImg ~= auraList[i].Texture then spell.fix_icon = true end
+			-- if auraList[i].defaultImg ~= auraList[i].Texture then spell.fix_icon = true end
 			
 			f.spell = spell
 
@@ -975,15 +997,6 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			f:SetScript("OnUpdate", CT_OnUpdateIcon);
 			if f:GetScript("OnEvent") ~= CT_OnEventIcon then
 				f:SetScript("OnEvent", CT_OnEventIcon)
-			end
-			
-			if not f.charges then
-				f.charges = CreateFrame("Cooldown", nil, f.iconframe, "CooldownFrameTemplate");
-				f.charges:SetDrawEdge(true);
-				f.charges:SetDrawSwipe(false);
-				f.charges:SetDrawBling(false);
-				f.charges:SetHideCountdownNumbers(true);
-				f.charges:SetAllPoints();
 			end
 			
 			if spell.isItem then

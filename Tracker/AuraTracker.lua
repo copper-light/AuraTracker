@@ -361,7 +361,7 @@ do
 	end
 
 	function HDH_AURA_TRACKER:InitIcons()
-		if HDH_TRACKER.ENABLE_MOVE then return end
+		-- if HDH_TRACKER.ENABLE_MOVE then return end
 		local trackerId = self.id
 		local id, name, type, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
 		self.aura_filter = aura_filter
@@ -517,11 +517,3 @@ function OnEventTracker(self, event, ...)
 	end
 end
 
---------------------------------------------
--- 유틸
---------------------------------------------	
-
-hooksecurefunc(C_ClassTalents, "LoadConfig", function(id, apply)
-	-- print('hook', C_Traits.GetConfigInfo(id).name, apply)
-	-- hook 치고 apply 가 false 가 안들어오고 TRAIT_CONFIG_UPDATED 가 콜되면 특성 변경으로 인식
-end)

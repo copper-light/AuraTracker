@@ -703,8 +703,6 @@ function HDH_POWER_TRACKER:OnEvent(event, unit, powerType)
 	if ((event == 'UNIT_POWER_UPDATE')) and (POWER_INFO[self.parent.type].power_type == powerType) then  -- (event == "UNIT_POWER")
 		if not HDH_TRACKER.ENABLE_MOVE then
 			self.parent:Update(powerType)
-			-- print("e")
-			-- self.parent:UpdateBar(self.parent.frame.icon[1]);
 		end
 	end
 end

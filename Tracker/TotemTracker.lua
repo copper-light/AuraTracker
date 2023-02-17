@@ -68,7 +68,7 @@ do
 
 	
 	function HDH_TT_TRACKER:InitIcons() -- HDH_TRACKER override
-		if HDH_TRACKER.ENABLE_MOVE then return end
+		-- if HDH_TRACKER.ENABLE_MOVE then return end
 		local trackerId = self.id
 		local id, name, type, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
 		self.aura_filter = aura_filter

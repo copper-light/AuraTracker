@@ -550,7 +550,7 @@ function HDH_COMBO_POINT_TRACKER:Update() -- HDH_TRACKER override
 end
 
 function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
-	if HDH_TRACKER.ENABLE_MOVE then return end
+	-- if HDH_TRACKER.ENABLE_MOVE then return end
 	local ret = 0
 	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
 	local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue

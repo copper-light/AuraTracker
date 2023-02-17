@@ -595,6 +595,7 @@ local function LoadDB(trackerId, comp)
 	elseif comp.type == COMP_TYPE.COLOR_PICKER then
 		comp:SetColorRGBA(unpack(dbValue or {1,1,1,1}))
 	elseif comp.type == COMP_TYPE.DROPDOWN or comp.type == COMP_TYPE.SWITCH then
+		if dbValue == nil then dbValue = false end
 		comp:SetSelectedValue(dbValue)
 	end
 end
@@ -826,6 +827,11 @@ local function HDH_AT_OP_OnDragStopRow(self)
 		if main.F.BODY.CONFIG_TRACKER:IsShown() then
 			main:LoadTrackerConfig(main:GetCurTrackerId())
 		end
+
+		if HDH_TRACKER.ENABLE_MOVE then
+			HDH_TRACKER.SetMoveAll(false)
+			HDH_TRACKER.SetMoveAll(true)
+		end
 	end
 end
 
@@ -884,6 +890,11 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 						main:LoadUIConfig(trackerId)
 						main:UpdateAbleConfigs(main.F.BODY.CONFIG_UI.SW_DISPLAY_MODE:GetSelectedValue())
 						HDH_TRACKER.InitVaribles(trackerId)
+
+						if HDH_TRACKER.ENABLE_MOVE then
+							HDH_TRACKER.SetMoveAll(false)
+							HDH_TRACKER.SetMoveAll(true)
+						end
 					end,
 					function()
 						F.BODY.CONFIG_UI.SW_CONFIG_MODE:SetSelectedIndex(DB.USE_GLOBAL_CONFIG)
@@ -898,6 +909,11 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 						main:LoadUIConfig(trackerId)
 						main:UpdateAbleConfigs(main.F.BODY.CONFIG_UI.SW_DISPLAY_MODE:GetSelectedValue())
 						HDH_TRACKER.InitVaribles(trackerId)
+
+						if HDH_TRACKER.ENABLE_MOVE then
+							HDH_TRACKER.SetMoveAll(false)
+							HDH_TRACKER.SetMoveAll(true)
+						end
 					end,
 					function()
 						F.BODY.CONFIG_UI.SW_CONFIG_MODE:SetSelectedIndex(DB.USE_SEVERAL_CONFIG)
@@ -909,6 +925,11 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 	elseif self == F.BODY.CONFIG_UI.SW_DISPLAY_MODE then
 		main:UpdateAbleConfigs(value)
 		HDH_TRACKER.UpdateSettings(main:GetCurTrackerId())
+
+		if HDH_TRACKER.ENABLE_MOVE then
+			HDH_TRACKER.SetMoveAll(false)
+			HDH_TRACKER.SetMoveAll(true)
+		end
 
 	elseif self == F.DD_TRACKER_TRANSIT then
 		main:UpdateTraitsSelector(idx)
@@ -1055,9 +1076,9 @@ function HDH_AT_OnClick_Button(self, button)
 			end)
 		end
 
-		if not trackerObj:IsHaveData() then
-			trackerObj:CreateData()
-		end
+		-- if not trackerObj:IsHaveData() then
+		-- 	trackerObj:CreateData()
+		-- end
 		 
 		-- 트래커 고유 설정 변경해야하는 트래커 유형
 		if not perType and (className == "HDH_COMBO_POINT_TRACKER" or className == "HDH_ESSENCE_TRACKER" or className == "HDH_DK_RUNE_TRACKER") then
@@ -1077,6 +1098,11 @@ function HDH_AT_OnClick_Button(self, button)
 				
 				HDH_TRACKER.InitVaribles()
 				self:GetParent():Hide()
+
+				if HDH_TRACKER.ENABLE_MOVE then
+					HDH_TRACKER.SetMoveAll(false)
+					HDH_TRACKER.SetMoveAll(true)
+				end
 			end)
 
 			main.DIALOG_SELECT_DISPLAY_TYPE.trackerId = id
@@ -1119,6 +1145,11 @@ function HDH_AT_OnClick_Button(self, button)
 					
 					HDH_TRACKER.InitVaribles()
 					self:GetParent():Hide()
+
+					if HDH_TRACKER.ENABLE_MOVE then
+						HDH_TRACKER.SetMoveAll(false)
+						HDH_TRACKER.SetMoveAll(true)
+					end
 				end)
 
 				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1:SetChecked(true)
@@ -1126,6 +1157,10 @@ function HDH_AT_OnClick_Button(self, button)
 				main.DIALOG_SELECT_DISPLAY_TYPE:Show()
 			else
 				HDH_TRACKER.InitVaribles()
+				if HDH_TRACKER.ENABLE_MOVE then
+					HDH_TRACKER.SetMoveAll(false)
+					HDH_TRACKER.SetMoveAll(true)
+				end
 			end
 		end
 		
@@ -1144,6 +1179,11 @@ function HDH_AT_OnClick_Button(self, button)
 			-- main:LoadTrackerList(trait)
 			main:ChangeBody(BODY_TRACKER_NEW)
 			HDH_TRACKER.InitVaribles()
+
+			if HDH_TRACKER.ENABLE_MOVE then
+				HDH_TRACKER.SetMoveAll(false)
+				HDH_TRACKER.SetMoveAll(true)
+			end
 		end)
 
 	elseif self == F.BODY.CONFIG_TRACKER.BTN_CANCEL then
@@ -1164,6 +1204,11 @@ function HDH_AT_OnClick_Button(self, button)
 				-- GetMainFrame():ChangeTrackerTabByTrackerId(newId)
 				HDH_TRACKER.InitVaribles()
 				main.Dialog:AlertShow(L.ALRET_CONFIRM_COPY:format(copyName))
+
+				if HDH_TRACKER.ENABLE_MOVE then
+					HDH_TRACKER.SetMoveAll(false)
+					HDH_TRACKER.SetMoveAll(true)
+				end
 			else
 				main.Dialog:AlertShow(L.PLEASE_INPUT_NAME)
 
@@ -1182,8 +1227,13 @@ function HDH_AT_OnClick_Button(self, button)
 		if value ~= newValue then
 			F.BTN_PREV_NEXT.Value:SetText(newValue)
 			DB:SwapTracker(value, newValue)
+			HDH_TRACKER.InitVaribles()
 			main:LoadTrackerList(main:GetCurTraits())
 			main:ChangeBody(BODY_TRACKER_EDIT, main:GetTrackerIndex(newValue))
+		end
+		if HDH_TRACKER.ENABLE_MOVE then
+			HDH_TRACKER.SetMoveAll(false)
+			HDH_TRACKER.SetMoveAll(true)
 		end
 
 	elseif self == F.BTN_PREV_NEXT.BtnNext then
@@ -1193,8 +1243,14 @@ function HDH_AT_OnClick_Button(self, button)
 		if newValue ~= value then
 			F.BTN_PREV_NEXT.Value:SetText(newValue)
 			DB:SwapTracker(value, newValue)
+			HDH_TRACKER.InitVaribles()
 			main:LoadTrackerList(main:GetCurTraits())
 			main:ChangeBody(BODY_TRACKER_EDIT, main:GetTrackerIndex(newValue))
+		end
+
+		if HDH_TRACKER.ENABLE_MOVE then
+			HDH_TRACKER.SetMoveAll(false)
+			HDH_TRACKER.SetMoveAll(true)
 		end
 
 	elseif self == F.BODY.CONFIG_DETAIL.BTN_SAVE then
@@ -2376,6 +2432,8 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	-- DEFAULT
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.DROPDOWN,       L.ICON_ORDER,         "ui.%s.common.order_by")
 	HDH_AT_DropDown_Init(comp, DDP_ICON_ORDER_LIST, HDH_AT_OnSelected_Dropdown)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER,       L.ICON_NUMBER_OF_HORIZONTAL,           "ui.%s.common.column_count")
+	comp:Init(1, 1, 20, true, false, nil, L.ROW_N_COL_N)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.ICON_ORDER_DISPLAY_V,           "ui.%s.common.reverse_v")
 	comp:Init({
 		{true, L.UPWARD},
@@ -2390,8 +2448,6 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:Init(1, 0, 500, true, true, 20)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER,       L.ICON_MARGIN_HORIZONTAL,           "ui.%s.common.margin_h")
 	comp:Init(1, 0, 500, true, true, 20)
-	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER,       L.ICON_NUMBER_OF_HORIZONTAL,           "ui.%s.common.column_count")
-	comp:Init(1, 1, 20, true, false, nil, L.ROW_N_COL_N)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_GAME_TOOPTIP,           "ui.%s.common.show_tooltip")
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_WHEN_NONCOMBAT,           "ui.%s.common.always_show")

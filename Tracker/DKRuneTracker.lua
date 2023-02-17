@@ -20,26 +20,26 @@ HDH_DK_RUNE_TRACKER.className = "HDH_DK_RUNE_TRACKER"
 HDH_DK_RUNE_TRACKER.POWER_INFO = POWER_INFO
 	
 -- 매 프레임마다 bar frame 그려줌, 콜백 함수
-local function DK_OnUpdateCooldown(self)
-	local spell = self:GetParent():GetParent().spell
-	if not spell then self:Hide() return end
+-- local function DK_OnUpdateCooldown(self)
+-- 	local spell = self:GetParent():GetParent().spell
+-- 	if not spell then self:Hide() return end
 	
-	spell.curTime = GetTime()
-	if spell.curTime - (spell.delay or 0) < HDH_TRACKER.ONUPDATE_FRAME_TERM then return end -- 10프레임
-	spell.delay = spell.curTime
-	spell.remaining = spell.endTime - spell.curTime
+-- 	spell.curTime = GetTime()
+-- 	if spell.curTime - (spell.delay or 0) < HDH_TRACKER.ONUPDATE_FRAME_TERM then return end -- 10프레임
+-- 	spell.delay = spell.curTime
+-- 	spell.remaining = spell.endTime - spell.curTime
 
-	if spell.remaining > 0 and spell.duration > 0 then
-		self:GetParent():GetParent():GetParent().parent:UpdateTimeText(self:GetParent():GetParent().timetext, spell.remaining);
-		if self:GetParent():GetParent():GetParent().parent.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE 
-		      and self:GetParent():GetParent():GetParent().parent.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
-			self:SetValue(spell.endTime - (spell.curTime - spell.startTime))
-		end
-	end
-	-- if self:GetParent():GetParent():GetParent().parent.option.bar.enable and self:GetParent():GetParent().spell.duration > HDH_C_TRACKER.GlobalCooldown then
-		-- self:GetParent():GetParent().bar:SetValue(self:GetParent():GetParent():GetParent().parent.option.bar.fill_bar and GetTime() or spell.startTime+spell.remaining);
-	-- end
-end
+-- 	if spell.remaining > 0 and spell.duration > 0 then
+-- 		self:GetParent():GetParent():GetParent().parent:UpdateTimeText(self:GetParent():GetParent().timetext, spell.remaining);
+-- 		if self:GetParent():GetParent():GetParent().parent.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE 
+-- 		      and self:GetParent():GetParent():GetParent().parent.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
+-- 			self:SetValue(spell.endTime - (spell.curTime - spell.startTime))
+-- 		end
+-- 	end
+-- 	-- if self:GetParent():GetParent():GetParent().parent.option.bar.enable and self:GetParent():GetParent().spell.duration > HDH_C_TRACKER.GlobalCooldown then
+-- 		-- self:GetParent():GetParent().bar:SetValue(self:GetParent():GetParent():GetParent().parent.option.bar.fill_bar and GetTime() or spell.startTime+spell.remaining);
+-- 	-- end
+-- end
 
 function HDH_DK_RUNE_TRACKER:CreateData()
 	local trackerId = self.id
@@ -118,7 +118,7 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 		self:SetGlow(f, false)
 		f:Show()
 		if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then
-			self:UpdateBarValue(f, false);
+			self:UpdateBarValue(f, HDH_TRACKER.ENABLE_MOVE)
 		end
 		
 	else
@@ -187,7 +187,7 @@ function HDH_DK_RUNE_TRACKER:Update_Layout()
 	for i = 1 , cnt do
 		f = self.frame.icon[i]
 		if f and f.spell then
-			if f:IsShown() then
+			if HDH_TRACKER.ENABLE_MOVE or f:IsShown() then
 				f:ClearAllPoints()
 				f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
 				show_index = show_index + 1
@@ -249,7 +249,7 @@ function HDH_DK_RUNE_TRACKER:Update() -- HDH_TRACKER override
 end
 
 function HDH_DK_RUNE_TRACKER:InitIcons()
-	if HDH_TRACKER.ENABLE_MOVE then return end
+	-- if HDH_TRACKER.ENABLE_MOVE then return end
 	local trackerId = self.id
 	local id, name, _, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
 	self.aura_filter = aura_filter

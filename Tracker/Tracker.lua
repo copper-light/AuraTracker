@@ -508,6 +508,14 @@ function HDH_TRACKER:Release()
 	self.timer = nil
 end
 
+function HDH_TRACKER:GetElementSize()
+	if self.frame.icon then
+		return #self.frame.icon
+	else
+		return 0
+	end
+end
+
 function HDH_TRACKER:Modify(newName, newType, newUnit)
 	-- HDH_DB_Modify(self.name, newName, newType, newUnit)
 	-- HDH_AURA_TRACKER.ModifyList(self.id, newId)
@@ -534,7 +542,7 @@ function HDH_TRACKER:IsHaveData()
 	if aura_filter ~=nil and aura_filter ~= DB.AURA_FILTER_REG then
 		cnt = HDH_TRACKER.MAX_ICONS_COUNT;
 	else
-		cnt = DB:GetTrackerElementSize(self.id)   or 0;
+		cnt = DB:GetTrackerElementSize(self.id) or 0;
 	end
 	return (cnt > 0) and cnt or false;
 end
@@ -1140,6 +1148,7 @@ function HDH_TRACKER:SetMove(move)
 			self.frame:EnableMouse(true)
 			self.frame:SetMovable(true)
 			cnt = self:CreateDummySpell(cnt);
+
 			self:ConnectMoveHandler(cnt);
 			self:ShowTracker();
 			self:UpdateIcons()

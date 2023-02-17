@@ -233,7 +233,7 @@ function HDH_STAGGER_TRACKER:Update() -- HDH_TRACKER override
 end
 
 function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
-	if HDH_TRACKER.ENABLE_MOVE then return end
+	-- if HDH_TRACKER.ENABLE_MOVE then return end
 	local trackerId = self.id
 	local id, name, _, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
 	self.aura_filter = aura_filter
