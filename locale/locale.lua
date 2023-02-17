@@ -1,5 +1,6 @@
 HDH_AT_L = {}
 local L = HDH_AT_L
+
 L.DISPLAY_ID_IN_TOOPTIP = "Display the ID in the tooltip"
 L.SELECT = "Select"
 L.NOTHING_LIST = "Empty"

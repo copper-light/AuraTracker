@@ -1,6 +1,4 @@
-if GetLocale() ~= "koKR" then
-    return
-end
+if GetLocale() ~= "koKR" then return end
 local L = HDH_AT_L
 
 L.DISPLAY_ID_IN_TOOPTIP = "툴팁에 ID 표시"
@@ -270,7 +268,6 @@ L.ONLY_FOR_CONFIG_OF_AURA_TRACKER = "추적 유형: 버프/디버프 전용 설�
 L.TRAITS_IN_USE = "사용 특성"
 L.MINIMUM_WINDOW = "최소화"
 L.MAXIMUM_WINDOW = "최대화"
-
 L.PLEASE_SELECT_CONFIG_TYPE = "사용할 설정 유형을 선택해주세요.\n('UI 설정 > 설정 유형'메뉴에서 변경 가능)"
 L.DESC_USE_GLOBAL_CONFIG = "※ 다른 추적창들과 같은 설정을 공유하는 공용 설정을 사용합니다."
 L.DESC_USE_SEVERAL_CONFIG = "※ 현재 추적창만 적용되는 고유 설정을 사용합니다."
