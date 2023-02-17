@@ -423,7 +423,7 @@ function HDH_C_TRACKER:Update_Usable(f)
 		f.border:SetAlpha(self.ui.icon.off_alpha)
 		f.border:SetVertexColor(0,0,0)
 	else
-		if spell.duration == 0 or (spell.inRange and not f.spell.isNotEnoughMana)  then
+		if spell.duration < HDH_C_TRACKER.GlobalCooldown or (spell.inRange and not f.spell.isNotEnoughMana)  then
 			f.icon:SetAlpha(self.ui.icon.on_alpha)
 			f.border:SetAlpha(self.ui.icon.on_alpha)
 			f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
@@ -752,6 +752,8 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.cooldown1:Hide()
 		f.iconSatCooldown:Hide()
 		f.iconSatCooldown.spark:Hide()
+		f.iconSatCooldown:SetSize(f.icon:GetSize())
+		f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 	end
 end
 

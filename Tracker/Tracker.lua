@@ -524,14 +524,14 @@ function HDH_TRACKER:Modify(newName, newType, newUnit)
 	end
 end
 
-function HDH_TRACKER:CreateData(spec)
+function HDH_TRACKER:CreateData()
 	-- interface
 end
 
 function HDH_TRACKER:IsHaveData()
-	_, _, _, _, aura_filter = DB:GetTrackerInfo(self.id)
+	_, _, t_type, _, aura_filter = DB:GetTrackerInfo(self.id)
 	local cnt;
-	if aura_filter ~= DB.AURA_FILTER_REG then
+	if aura_filter ~=nil and aura_filter ~= DB.AURA_FILTER_REG then
 		cnt = HDH_TRACKER.MAX_ICONS_COUNT;
 	else
 		cnt = DB:GetTrackerElementSize(self.id)   or 0;
@@ -854,6 +854,8 @@ function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:Hide() 
 		f.cd = f.cooldown2
 		f.cooldown1:Hide()
+		f.iconSatCooldown:SetSize(f.icon:GetSize())
+		f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 	end
 end
 
@@ -1075,7 +1077,7 @@ function HDH_TRACKER:CreateDummySpell(count)
 			end
 		end
 		if self.type == HDH_TRACKER.TYPE.BUFF then spell.isBuff = true
-												else spell.isBuff = false end
+											  else spell.isBuff = false end
 		if ui.icon.cooldown == DB.COOLDOWN_CIRCLE then
 			f.cd:SetCooldown(spell.startTime,spell.duration)
 		elseif ui.icon.cooldown ~= DB.COOLDOWN_NONE then
@@ -1415,10 +1417,11 @@ function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
 	f = f.iconframe;
 	
 	self:ActionButton_SetupOverlayGlow(f)
-	if f.SpellActivationAlert.animOut:IsPlaying() then
-		f.SpellActivationAlert.animOut:Stop();
-	end
-	if not f.SpellActivationAlert:IsShown() and not f.SpellActivationAlert.animIn:IsPlaying() then
+	-- if f.SpellActivationAlert.animOut:IsPlaying() then
+	-- 	f.SpellActivationAlert.animOut:Stop();
+	-- end
+	f.SpellActivationAlert.animOut:Stop();
+	if not f.SpellActivationAlert:IsShown() then
 		f.SpellActivationAlert.animIn:Play();
 	end
 end
@@ -1429,11 +1432,12 @@ function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
 		return;
 	end
 
-	if f.SpellActivationAlert.animIn:IsPlaying() then
-		f.SpellActivationAlert.animIn:Stop();
-	end
+	-- 반복적으로 호출되면 왜 인지 모르겠는데 튀는 현상 있어서 그냥 안씀
+	-- if f.SpellActivationAlert.animIn:IsPlaying() then
+	-- 	f.SpellActivationAlert.animIn:Stop();
+	-- end
 
-	if f:IsVisible() and not f.SpellActivationAlert.animOut:IsPlaying() then
+	if f:IsVisible() then
 		f.SpellActivationAlert.animOut:Play();
 	else
 		-- f.SpellActivationAlert.animOut:OnFinished();	--We aren't shown anyway, so we'll instantly hide it.

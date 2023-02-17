@@ -1042,31 +1042,43 @@ function HDH_AT_OnClick_Button(self, button)
 			F.DD_TRANSIT:SetSelectedValue(curTraits)
 		end
 		main:ChangeBody(BODY_ELEMENTS, index)
+
+		if not main.DIALOG_SELECT_DISPLAY_TYPE then
+			main.DIALOG_SELECT_DISPLAY_TYPE = CreateFrame("Frame", main:GetName().."DialogSelectDisplayType", main, "HDH_AT_DialogSelectDisplayTypeTemplate")
+
+			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1:SetScript("OnClick", function(self) 
+				self:GetParent().CheckButton2:SetChecked(false)
+			end)
+
+			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2:SetScript("OnClick", function(self) 
+				self:GetParent().CheckButton1:SetChecked(false)
+			end)
+		end
+
+		if not trackerObj:IsHaveData() then
+			trackerObj:CreateData()
+		end
 		 
 		-- 트래커 고유 설정 변경해야하는 트래커 유형
 		if not perType and (className == "HDH_COMBO_POINT_TRACKER" or className == "HDH_ESSENCE_TRACKER" or className == "HDH_DK_RUNE_TRACKER") then
-			if not main.DIALOG_SELECT_DISPLAY_TYPE then
-				main.DIALOG_SELECT_DISPLAY_TYPE = CreateFrame("Frame", main:GetName().."DialogSelectDisplayType", main, "HDH_AT_DialogSelectDisplayTypeTemplate")
-				main.DIALOG_SELECT_DISPLAY_TYPE.Button:SetScript("OnClick", function(self)
-					local trackerId = self:GetParent().trackerId
-					if self:GetParent().CheckButton1:GetChecked() then
-						DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON)
-					else
-						DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_BAR)
-					end
-					
-					HDH_TRACKER.InitVaribles()
-					self:GetParent():Hide()
-				end)
+			main.DIALOG_SELECT_DISPLAY_TYPE.HeaderText:SetText(L.PLEASE_SELECT_DISPLAY_TYPE)
+			main.DIALOG_SELECT_DISPLAY_TYPE.DescIconText:SetText(L.DESC_CONFIG_ICON)
+			main.DIALOG_SELECT_DISPLAY_TYPE.DescBarText:SetText(L.DESC_CONFIG_BAR)
+			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1.Text:SetText(L.USE_DISPLAY_ICON) 
+			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2.Text:SetText(L.USE_DISPLAY_BAR) 
+			
+			main.DIALOG_SELECT_DISPLAY_TYPE.Button:SetScript("OnClick", function(self)
+				local trackerId = self:GetParent().trackerId
+				if self:GetParent().CheckButton1:GetChecked() then
+					DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON)
+				else
+					DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_BAR)
+				end
+				
+				HDH_TRACKER.InitVaribles()
+				self:GetParent():Hide()
+			end)
 
-				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1:SetScript("OnClick", function(self) 
-					self:GetParent().CheckButton2:SetChecked(false)
-				end)
-
-				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2:SetScript("OnClick", function(self) 
-					self:GetParent().CheckButton1:SetChecked(false)
-				end)
-			end
 			main.DIALOG_SELECT_DISPLAY_TYPE.trackerId = id
 			local color = trackerObj.POWER_INFO[type].color
 			local texture = trackerObj.POWER_INFO[type].texture
@@ -1076,12 +1088,45 @@ function HDH_AT_OnClick_Button(self, button)
 					_G[ (main.DIALOG_SELECT_DISPLAY_TYPE:GetName() .. "TextureBorder".. i) ]:SetVertexColor(unpack(color))
 					_G[ (main.DIALOG_SELECT_DISPLAY_TYPE:GetName() .. "Bar".. i) ]:SetVertexColor(unpack(color))
 				end
+				_G[main.DIALOG_SELECT_DISPLAY_TYPE:GetName().."Bar"..i]:Show()
+				_G[main.DIALOG_SELECT_DISPLAY_TYPE:GetName().."Texture"..i]:Show()
+				_G[ (main.DIALOG_SELECT_DISPLAY_TYPE:GetName() .. "TextureBorder".. i) ]:Show()
 			end
+
 			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1:SetChecked(true)
 			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2:SetChecked(false)
 			main.DIALOG_SELECT_DISPLAY_TYPE:Show()
 		else
-			HDH_TRACKER.InitVaribles()
+			if F.BODY.CONFIG_TRACKER.is_creation and className ~= "HDH_POWER_TRACKER" and className ~= "HDH_STAGGER_TRACKER" then
+				main.DIALOG_SELECT_DISPLAY_TYPE.HeaderText:SetText(L.PLEASE_SELECT_CONFIG_TYPE)
+				main.DIALOG_SELECT_DISPLAY_TYPE.DescIconText:SetText(L.DESC_USE_GLOBAL_CONFIG)
+				main.DIALOG_SELECT_DISPLAY_TYPE.DescBarText:SetText(L.DESC_USE_SEVERAL_CONFIG)
+				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1.Text:SetText(L.USE_GLOBAL_CONFIG) 
+				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2.Text:SetText(L.USE_SEVERAL_CONFIG)
+				main.DIALOG_SELECT_DISPLAY_TYPE.trackerId = id
+
+				for i = 1, 5 do
+					_G[main.DIALOG_SELECT_DISPLAY_TYPE:GetName().."Bar"..i]:Hide()
+					_G[main.DIALOG_SELECT_DISPLAY_TYPE:GetName().."Texture"..i]:Hide()
+					_G[ (main.DIALOG_SELECT_DISPLAY_TYPE:GetName() .. "TextureBorder".. i) ]:Hide()
+				end
+
+				main.DIALOG_SELECT_DISPLAY_TYPE.Button:SetScript("OnClick", function(self)
+					local trackerId = self:GetParent().trackerId
+					if self:GetParent().CheckButton2:GetChecked() then
+						DB:CopyGlobelToTracker(trackerId)
+					end
+					
+					HDH_TRACKER.InitVaribles()
+					self:GetParent():Hide()
+				end)
+
+				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1:SetChecked(true)
+				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2:SetChecked(false)
+				main.DIALOG_SELECT_DISPLAY_TYPE:Show()
+			else
+				HDH_TRACKER.InitVaribles()
+			end
 		end
 		
 	elseif self == F.BODY.CONFIG_TRACKER.BTN_DELETE then

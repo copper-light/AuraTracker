@@ -57,13 +57,14 @@ function HDH_DK_RUNE_TRACKER:CreateData()
 	end
 
 	for i = 1 , MAX_RUNES do
-		local elemIdx = DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, isAlways, isValue, isItem)
-		DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
+		DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, isAlways, isValue, isItem)
+		DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 	end 
 
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 6)
+	DB:SetTrackerValue(trackerId, 'ui.%s.common.reverse_h', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.order_by', DB.ORDERBY_CD_ASC)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 40)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
@@ -264,12 +265,12 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 	local iconIdx = 0
 	self.frame.pointer = {}
 	self.frame:UnregisterAllEvents()
-	
 	self.talentId = GetSpecialization()
 
 	if not self:IsHaveData() then
 		self:CreateData()
 	end
+
 	local elemSize = DB:GetTrackerElementSize(trackerId)
 
 	for i = 1 , elemSize do

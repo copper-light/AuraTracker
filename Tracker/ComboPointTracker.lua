@@ -82,56 +82,77 @@ local function OnUpdateBar(self)
 	end
 end
 
-function HDH_COMBO_POINT_TRACKER:CreateData(elemIdx)
+function HDH_COMBO_POINT_TRACKER:CreateData()
+	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
 	local trackerId = self.id
-	local key = self.POWER_INFO[self.type].power_type .. elemIdx
 	local id = 0
-	local name = self.POWER_INFO[self.type].power_type .. elemIdx
+	local key
+	local name
 	local texture = self.POWER_INFO[self.type].texture;
 	local isAlways = true
 	local isValue = HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type
 	local isItem = false
+	local isFirstCreated = false
+	for elemIdx = 1, power_max do
+		if not self:IsHaveData(elemIdx) then
+			key = self.POWER_INFO[self.type].power_type .. elemIdx
+			name = self.POWER_INFO[self.type].power_type .. elemIdx
+			DB:SetTrackerElement(trackerId, elemIdx, key, id, name, texture, isAlways, isValue, isItem)
+			DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
+			if elemIdx == 1 then
+				isCreatedData = true
+			end
+		end
+	end 
 
-	DB:SetTrackerElement(trackerId, elemIdx, key, id, name, texture, isAlways, isValue, isItem)
-	DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
-	DB:CopyGlobelToTracker(trackerId)
-	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON)
-	DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 10)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 40)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.to_fill', true)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.cooldown_progress', DB.COOLDOWN_RIGHT)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.location', DB.BAR_LOCATION_R)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', self.POWER_INFO[self.type].color)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.show_spark', true)
-	DB:SetTrackerValue(trackerId, 'ui.%s.font.name_location', DB.FONT_LOCATION_HIDE)
-	DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_HIDE)
-	DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 40)
-	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', self.POWER_INFO[self.type].color)
+	if isFirstCreated then
+		DB:CopyGlobelToTracker(trackerId)
+		DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON)
+		DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 10)
+		DB:SetTrackerValue(trackerId, 'ui.%s.common.reverse_h', false)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 40)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.to_fill', true)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.cooldown_progress', DB.COOLDOWN_RIGHT)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.location', DB.BAR_LOCATION_R)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', self.POWER_INFO[self.type].color)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.show_spark', true)
+		DB:SetTrackerValue(trackerId, 'ui.%s.font.name_location', DB.FONT_LOCATION_HIDE)
+		DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_HIDE)
+		DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 40)
+		DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', self.POWER_INFO[self.type].color)
 
-	if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type then
-		DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_BAR_R)
-		DB:SetTrackerValue(trackerId, 'ui.%s.icon.cooldown', DB.COOLDOWN_RIGHT)
-		DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', true)
-		local r,g,b = unpack(self.POWER_INFO[self.type].color)
-		DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', {r,g,b, 0.35})
-		DB:SetTrackerValue(trackerId, 'ui.%s.bar.full_color', self.POWER_INFO[self.type].color)
-	else
-		DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_C)
+		if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type then
+			DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_BAR_R)
+			DB:SetTrackerValue(trackerId, 'ui.%s.icon.cooldown', DB.COOLDOWN_RIGHT)
+			DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', true)
+			local r,g,b = unpack(self.POWER_INFO[self.type].color)
+			DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', {r,g,b, 0.35})
+			DB:SetTrackerValue(trackerId, 'ui.%s.bar.full_color', self.POWER_INFO[self.type].color)
+		else
+			DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_C)
+		end
+		self:UpdateSetting();
 	end
-
-	self:UpdateSetting();
 end
 
-function HDH_COMBO_POINT_TRACKER:IsHaveData(idx)
-	idx = idx or 1
-	local key = DB:GetTrackerElement(self.id, idx)
-	if (self.POWER_INFO[self.type].power_type .. idx) == key then
-		return true
+function HDH_COMBO_POINT_TRACKER:IsHaveData(index)
+	if index then
+		local key = DB:GetTrackerElement(self.id, index)
+		if (self.POWER_INFO[self.type].power_type .. index) ~= key then
+			return false
+		end
 	else
-		return false
+		for i = 1 , UnitPowerMax('player', self.POWER_INFO[self.type].power_index) do
+			local key = DB:GetTrackerElement(self.id, i)
+			if (self.POWER_INFO[self.type].power_type .. i) ~= key then
+				return false
+			end
+		end 
 	end
+	
+	return true
 end
 
 function HDH_COMBO_POINT_TRACKER:Release() -- HDH_TRACKER override
@@ -245,6 +266,8 @@ function HDH_COMBO_POINT_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.cooldown1:Hide()
 		f.iconSatCooldown:Hide()
 		f.iconSatCooldown.spark:Hide()
+		f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, 0.93)
+		f.iconSatCooldown:SetSize(f.icon:GetSize())
 	end
 end
 
@@ -532,10 +555,11 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
 	local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue
 	local trackerId = self.id
+	
+	if not self:IsHaveData() then
+		self:CreateData()
+	end
 	for i = 1, power_max do
-		if not self:IsHaveData(i) then
-			self:CreateData(i)
-		end
 		elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 		glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
 

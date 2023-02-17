@@ -70,51 +70,64 @@ function HDH_ESSENCE_TRACKER:CreateData()
 	local isItem = false
 	local r,g,b,a = unpack(self.POWER_INFO[self.type].color)
 	local max_power = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-
+	local isFirstCreated = false
 	if DB:GetTrackerElementSize(trackerId) > max_power then
 		DB:TrancateTrackerElements(trackerId)
 	end
 
 	for i = 1 , max_power do
-		local elemIdx = DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, isAlways, isValue, isItem)
-		DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
-	end 
-
-	DB:CopyGlobelToTracker(trackerId)
-	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON)
-	DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 6)
-	DB:SetTrackerValue(trackerId, 'ui.%s.common.reverse_h', false)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 40)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.to_fill', true)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.cooldown_progress', DB.COOLDOWN_RIGHT)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)	
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.show_spark', true)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', true)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', {r,g,b, 0.35})
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.full_color', self.POWER_INFO[self.type].color)
-	DB:SetTrackerValue(trackerId, 'ui.%s.font.name_location', DB.FONT_LOCATION_HIDE)
-	DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_location', DB.FONT_LOCATION_TR)
-	DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_format', DB.TIME_TYPE_CEIL)
-	DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_HIDE)
-	DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_BAR_R)
-	DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_color_5s', {1,1,0, 1})
-	DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_color', {1,1,0, 1})
-	DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 40)
-	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', self.POWER_INFO[self.type].color)
-	DB:SetTrackerValue(trackerId, 'ui.%s.icon.cooldown', DB.COOLDOWN_RIGHT)
-
-	self:UpdateSetting();
-end
-
-function HDH_ESSENCE_TRACKER:IsHaveData()
-	for i = 1 , UnitPowerMax('player', self.POWER_INFO[self.type].power_index) do
-		local key = DB:GetTrackerElement(self.id, i)
-		if (self.POWER_INFO[self.type].power_type .. i) ~= key then
-			return false
+		if not self:IsHaveData(i) then
+			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, isAlways, isValue, isItem)
+			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
+			if i == i then
+				isFirstCreated = true
+			end
 		end
 	end 
 
+	if isFirstCreated then
+		DB:CopyGlobelToTracker(trackerId)
+		DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON)
+		DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 6)
+		DB:SetTrackerValue(trackerId, 'ui.%s.common.reverse_h', false)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 40)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.to_fill', true)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.cooldown_progress', DB.COOLDOWN_RIGHT)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.texture', 3)	
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.show_spark', true)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', true)
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', {r,g,b, 0.35})
+		DB:SetTrackerValue(trackerId, 'ui.%s.bar.full_color', self.POWER_INFO[self.type].color)
+		DB:SetTrackerValue(trackerId, 'ui.%s.font.name_location', DB.FONT_LOCATION_HIDE)
+		DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_location', DB.FONT_LOCATION_TR)
+		DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_format', DB.TIME_TYPE_CEIL)
+		DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_HIDE)
+		DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_BAR_R)
+		DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_color_5s', {1,1,0, 1})
+		DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_color', {1,1,0, 1})
+		DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 40)
+		DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', self.POWER_INFO[self.type].color)
+		DB:SetTrackerValue(trackerId, 'ui.%s.icon.cooldown', DB.COOLDOWN_RIGHT)
+		self:UpdateSetting();
+	end
+end
+
+function HDH_ESSENCE_TRACKER:IsHaveData(index)
+	if index then
+		local key = DB:GetTrackerElement(self.id, index)
+		if (self.POWER_INFO[self.type].power_type .. index) ~= key then
+			return false
+		end
+	else
+		for i = 1 , UnitPowerMax('player', self.POWER_INFO[self.type].power_index) do
+			local key = DB:GetTrackerElement(self.id, i)
+			if (self.POWER_INFO[self.type].power_type .. i) ~= key then
+				return false
+			end
+		end 
+	end
+	
 	return true
 end
 

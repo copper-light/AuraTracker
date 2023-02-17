@@ -142,14 +142,14 @@
 				<FontString name ="$parentText" parentKey="DescIconText" inherits="Font_Yellow_S" justifyV="TOP" text="※ 아이콘 이미지는 '추적 설정 > 주문별 상세설정 > 아이콘 변경' 메뉴에서 변경 가능합니다.">
 					<Size x="160"  />
 					<Anchors>
-						<Anchor point="LEFTTOP" relativePoint="CENTER" relativeTo="$parent" x="-180" y="-40"/>
+						<Anchor point="LEFTTOP" relativePoint="CENTER" relativeTo="$parent" x="-180" y="20"/>
 					</Anchors>
 				</FontString>
 
 				<FontString name ="$parentText" parentKey="DescBarText" inherits="Font_Yellow_S" justifyV="TOP" text="※ 바 텍스처와 색상은 'UI 설정 > 바' 메뉴에서 변경 가능합니다.">
 					<Size x="160"  />
 					<Anchors>
-						<Anchor point="LEFTTOP" relativePoint="CENTER" relativeTo="$parent" x="20" y="-40"/>
+						<Anchor point="LEFTTOP" relativePoint="CENTER" relativeTo="$parent" x="20" y="20"/>
 					</Anchors>
 				</FontString>
 
@@ -161,15 +161,15 @@
 					</Anchors>
 				</Texture>
 
-				<Texture name="$parentBar5" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar">
+				<Texture name="$parentBar5" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar1">
 					<Size x="25" y="13" />
 					<Color r="0.5" g="0.8" b="0.2" />
 					<Anchors>
-						<Anchor point="LEFT" relativePoint="CENTER" x="30" y="0"/>
+						<Anchor point="LEFT" relativePoint="CENTER" x="30" y="-40"/>
 					</Anchors>
 				</Texture>
 
-				<Texture name="$parentBar4" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar">
+				<Texture name="$parentBar4" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar2">
 					<Size x="25" y="13" />
 					<Color r="0.5" g="0.8" b="0.2" />
 					<Anchors>
@@ -177,7 +177,7 @@
 					</Anchors>
 				</Texture>
 
-				<Texture name="$parentBar3" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar">
+				<Texture name="$parentBar3" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar3">
 					<Size x="25" y="13" />
 					<Color r="0.5" g="0.8" b="0.2" />
 					<Anchors>
@@ -185,7 +185,7 @@
 					</Anchors>
 				</Texture>
 
-				<Texture name="$parentBar2" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar">
+				<Texture name="$parentBar2" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar4">
 					<Size x="25" y="13" />
 					<Color r="0.3" g="0.3" b="0.3" />
 					<Anchors>
@@ -193,7 +193,7 @@
 					</Anchors>
 				</Texture>
 
-				<Texture name="$parentBar1" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar">
+				<Texture name="$parentBar1" file="Interface/AddOns/HDH_AuraTracker/Texture/Minimalist" parentKey="Bar5">
 					<Size x="25" y="13" />
 					<Color r="0.3" g="0.3" b="0.3" />
 					<Anchors>
@@ -205,7 +205,7 @@
 					<Size x="25" y="25" />
 					<Color  r="1" g="1" b="1" a="0.5" />
 					<Anchors>
-						<Anchor point="RIGHT" relativePoint="CENTER" x="-30" y="0"/>
+						<Anchor point="RIGHT" relativePoint="CENTER" x="-30" y="-40"/>
 					</Anchors>
 					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
 				</Texture>
@@ -249,7 +249,7 @@
 					<Size x="25" y="25" />
 					<Color  r="0.3" g="0.3" b="0.3" a="0.5" />
 					<Anchors>
-						<Anchor point="RIGHT" relativePoint="CENTER" x="-30" y="0"/>
+						<Anchor point="RIGHT" relativePoint="CENTER" x="-30" y="-40"/>
 					</Anchors>
 					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
 				</Texture>
@@ -295,7 +295,7 @@
 
 			<CheckButton parentKey="CheckButton1" inherits="HDH_AT_CheckButtonTemplate" >
 				<Anchors>
-					<Anchor point="LEFT" relativePoint="CENTER" relativeTo="$parent" x="-150" y="40"/>
+					<Anchor point="LEFT" relativePoint="CENTER" relativeTo="$parent" x="-170" y="40"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>self.Text:SetText(HDH_AT_L.USE_DISPLAY_ICON)</OnLoad>
@@ -304,7 +304,7 @@
 
 			<CheckButton parentKey="CheckButton2"  inherits="HDH_AT_CheckButtonTemplate" >
 				<Anchors>
-					<Anchor point="LEFT" relativePoint="CENTER" relativeTo="$parent" x="50" y="40"/>
+					<Anchor point="LEFT" relativePoint="CENTER" relativeTo="$parent" x="25" y="40"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>self.Text:SetText(HDH_AT_L.USE_DISPLAY_BAR)</OnLoad>
@@ -327,7 +327,7 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>
-				self.HeaderText:SetText(HDH_AT_L.PLASE_SELECT_DISPLAY_TYPE)
+				self.HeaderText:SetText(HDH_AT_L.PLEASE_SELECT_DISPLAY_TYPE)
 				self.DescIconText:SetText(HDH_AT_L.DESC_CONFIG_ICON)
 				self.DescBarText:SetText(HDH_AT_L.DESC_CONFIG_BAR)
 			</OnLoad>
@@ -2092,105 +2092,6 @@
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTexture2" x="-5" y="0"/>
 				</Anchors>
 			</CheckButton>
-		</Frames>
-
-		<Scripts>
-		</Scripts>
-	</Frame>
-
-	<Frame name="HDH_AT_SelectConfigTypeTemplate" virtual="true">
-		<Layers>
-			<Layer level="ARTWORK">
-				<Texture name="$parentBg" parentKey="Background">
-					<Size y="25" />
-					<!-- <Color r="1" g="0.8" b="0"/> -->
-					<Color r="0.2" g="0.2" b="0.2" a="0.5"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-
-		<Frames>
-			<Button name="$parentButtonSave" parentKey="Button" inherits="HDH_AT_ButtonTemplate" text="모든 추적창 공용 설정">
-				<Size x="100" y="22"/>
-				<Anchors>
-					<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parentBg"  x="3" y="0" />
-					<Anchor point="RIGHT" relativePoint="CENTER" relativeTo="$parentBg" x="0" y="0" />
-					<Anchor point="TOP" relativePoint="TOP" relativeTo="$parentBg" x="0" y="-3" />
-					<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parentBg" x="0" y="3" />
-				</Anchors>
-
-				<ButtonText name="$parentText"/>
-				<NormalFont style="Font_White_S"/>
-				<HighlightFont style="Font_Yellow_S"/>
-				<DisabledFont style="Font_Gray_S"/>
-				<NormalTexture>
-					<Color r="1" g="0.8" b="0" a="0.8"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-					</Anchors>
-				</NormalTexture>
-				<HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
-					<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
-				</HighlightTexture>
-				<DisabledTexture>
-					<Color r="1" g="0.8" b="0" a="0"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-					</Anchors>
-				</DisabledTexture>
-
-				<Scripts>
-					<OnLoad>
-						self:SetText(HDH_AT_L.USE_GLOBAL_CONFIG)
-					</OnLoad>
-				</Scripts>
-			</Button>
-
-			<Button name="$parentButtonSave2" parentKey="Button" inherits="HDH_AT_ButtonTemplate" text="">
-				<Size x="100" y="22" />
-				<Anchors>
-					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parentBg"  x="-3" y="0" />
-					<Anchor point="LEFT" relativePoint="CENTER" relativeTo="$parentBg" x="0" y="0" />
-					<Anchor point="TOP" relativePoint="TOP" relativeTo="$parentBg" x="0" y="-3" />
-					<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parentBg" x="0" y="3" />
-				</Anchors>
-
-				<ButtonText name="$parentText"/>
-				<NormalFont style="Font_White_S"/>
-				<HighlightFont style="Font_Yellow_S"/>
-				<DisabledFont style="Font_Gray_S"/>
-				<NormalTexture>
-					<Color r="1" g="0.8" b="0" a="0.8"/>
-					<!-- <Color r="1" g="0.8" b="0" a="1"/> -->
-					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-					</Anchors>
-				</NormalTexture>
-				<HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
-					<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
-				</HighlightTexture>
-				<DisabledTexture>
-					<Color r="1" g="0.8" b="0" a="0"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-					</Anchors>
-				</DisabledTexture>
-
-				<Scripts>
-					<OnLoad>
-						self:SetText(HDH_AT_L.USE_SEVERAL_CONFIG)
-						self:Disable()
-					</OnLoad>
-				</Scripts>
-			</Button>
 		</Frames>
 
 		<Scripts>
