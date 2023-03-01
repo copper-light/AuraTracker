@@ -151,7 +151,7 @@ function HDH_STAGGER_TRACKER:CreateDummySpell(count)
 	spell.endTime = 0
 	spell.startTime = 0
 	spell.remaining = 0
-	spell.showValue = true
+	spell.showValue = f.spell.showValue
 	spell.v1 = health_max
 	spell.max = health_max;
 	spell.splitValues = f.spell.splitValues
@@ -161,7 +161,11 @@ function HDH_STAGGER_TRACKER:CreateDummySpell(count)
 		f:SetScript("OnUpdate",nil);
 		-- f.bar:SetMinMaxValues(0, power_max);
 		-- f.bar:SetValue(spell.v1);
-		f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(spell.v1,true));
+		if spell.showValue then
+			f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(spell.v1,true));
+		else
+			f.v1:SetText('')
+		end
 		-- f.bar:Show();
 		local bar
 		for i = 1, #f.bar.bar do

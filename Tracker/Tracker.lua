@@ -1237,11 +1237,7 @@ function HDH_TRACKER:UpdateMoveFrame(isDragging)
 		self.frame.moveFrame.text:SetPoint("TOPLEFT", self.frame.moveFrame.active, "TOPLEFT", 0, 1)
 		self.frame.moveFrame.text:SetPoint("BOTTOMRIGHT", self.frame.moveFrame.active, "BOTTOMRIGHT", 0, -1)
 	else
-		if self.ui.common.reverse_v then
-			self.frame.moveFrame.text:SetPoint("TOP", self.frame.moveFrame, "BOTTOM", 0, -4)
-		else
-			self.frame.moveFrame.text:SetPoint("BOTTOM", self.frame.moveFrame, "TOP", 0, 4)
-		end
+		self.frame.moveFrame.text:SetPoint("BOTTOM", self.frame.moveFrame, "TOP", 0, 4)
 		if select(1, self.frame.moveFrame.active:GetSize()) > 100 then
 			self.frame.moveFrame.active:SetPoint("LEFT", left, "LEFT", 0, 0)
 			self.frame.moveFrame.active:SetPoint("RIGHT", right, "RIGHT", 0, 0)
@@ -1385,14 +1381,14 @@ local function CreateMoveFrame(self)
 	self.frame.moveFrame = tf
 	t:SetPoint("TOPLEFT")
 	t:SetPoint("BOTTOMRIGHT")
-	t:SetColorTexture(1,1,1,0.7)
+	t:SetColorTexture(1,1,1,0.5)
 	t:SetAlpha(0)
 	self.frame.moveFrame.active = t
 
 	local t = tf:CreateTexture(nil, 'BORDER')
 	t:SetPoint("TOPLEFT", self.frame.moveFrame.active, "TOPLEFT", 1, -1)
 	t:SetPoint("BOTTOMRIGHT", self.frame.moveFrame.active, "BOTTOMRIGHT", -1 , 1)
-	t:SetColorTexture(0,0,0,0.7)
+	t:SetColorTexture(0,0,0,0.5)
 	t:SetAlpha(0)
 	self.frame.moveFrame.active2 = t
 
@@ -2103,7 +2099,7 @@ local function VersionUpdateDB()
 		ui.common.hide_in_raid = false
 		for _, id in ipairs(DB:GetTrackerIds()) do
 			location = DB:GetLocation(id)
-			ui = DB:GetTrackerUI(id)
+			ui = DB:GetTrackerUI(id) or DB:GetTrackerUI()
 
 			ui.common.hide_in_raid = false
 			

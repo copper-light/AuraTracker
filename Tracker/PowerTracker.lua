@@ -305,7 +305,7 @@ function HDH_POWER_TRACKER:CreateDummySpell(count)
 	spell.endTime = 0
 	spell.startTime = 0
 	spell.remaining = 0
-	spell.showValue = true
+	spell.showValue = f.spell.showValue
 	spell.v1 = power_max
 	spell.max = power_max;
 	spell.splitValues = f.spell.splitValues
@@ -314,7 +314,11 @@ function HDH_POWER_TRACKER:CreateDummySpell(count)
 		f:SetScript("OnUpdate",nil);
 		-- f.bar:SetMinMaxValues(0, power_max);
 		-- f.bar:SetValue(spell.v1);
-		f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(spell.v1, self.ui.font.v1_abbreviate))
+		if spell.showValue then
+			f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(spell.v1, self.ui.font.v1_abbreviate))
+		else
+			f.v1:SetText('')
+		end
 		-- f.bar:Show();
 		local bar
 		for i = 1, #f.bar.bar do

@@ -49,3 +49,4 @@ if not LibStub or LibStub.minor < LIBSTUB_MINOR then
 	
 	setmetatable(LibStub, { __call = LibStub.GetLibrary })
 end
+

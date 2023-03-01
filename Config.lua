@@ -587,14 +587,21 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		local tId = self.trackerId
 		if self.bodyType == BODY_TRACKER_NEW then
 			tId = nil
-		end
-		for _, t in pairs(HDH_TRACKER.GetList()) do
-			if t.frame.moveFrame then
-				if t.id == tId then
-					t.frame.moveFrame.isSelected = true
-					t:UpdateMoveFrame()
-				else
+			for _, t in pairs(HDH_TRACKER.GetList()) do
+				if t.frame.moveFrame then
 					t.frame.moveFrame.isSelected = false
+					t:UpdateMoveFrame()
+				end
+			end
+		elseif trackerIndex then
+			for _, t in pairs(HDH_TRACKER.GetList()) do
+				if t.frame.moveFrame then
+					if t.id == tId then
+						t.frame.moveFrame.isSelected = true
+						t:UpdateMoveFrame()
+					else
+						t.frame.moveFrame.isSelected = false
+					end
 				end
 			end
 		end
@@ -602,7 +609,6 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 end
 
 local function LoadDB(trackerId, comp)
-	-- local trackerId = GetMainFrame():GetCurTrackerIdx()
 	local dbValue = DB:GetTrackerValue(trackerId, comp.dbKey)
 	if comp.type == COMP_TYPE.CHECK_BOX then
 		comp:SetChecked(dbValue)
@@ -897,6 +903,14 @@ local function HDH_AT_OnEventTrackerElement(self, elemIdx)
 
 	elseif string.find(name, "ButtonCancel") then
 		self:GetParent():ChangeReadMode()
+	end
+
+	if HDH_TRACKER.ENABLE_MOVE then
+		local t= HDH_TRACKER.Get(trackerId)
+		if t then
+			t:SetMove(false)
+			t:SetMove(true)
+		end
 	end
 end
 
@@ -2606,6 +2620,7 @@ function HDH_AT_ConfigFrameMixin:SetupCommend()
 end
 
 function HDH_AT_ConfigFrame_OnShow(self)
+	self.ErrorReset:Show()
 	local IsLoaded = select(1, GetSpecializationInfo(GetSpecialization()))
 	if IsLoaded then
 		if GetSpecialization() == 5 then
@@ -2622,6 +2637,7 @@ function HDH_AT_ConfigFrame_OnShow(self)
 	else
 		self:Hide()
 	end
+	self.ErrorReset:Hide()
 end
 
 function HDH_AT_ConfigFrame_OnLoad(self)

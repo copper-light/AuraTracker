@@ -285,3 +285,4 @@ end
 for target, v in pairs(AceSerializer.embeds) do
 	AceSerializer:Embed(target)
 end
+

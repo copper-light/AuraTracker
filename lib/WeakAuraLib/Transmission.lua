@@ -118,3 +118,4 @@ function WeakAuraLib_StringToTable(inString, fromChat)
   end
   return deserialized;
 end
+

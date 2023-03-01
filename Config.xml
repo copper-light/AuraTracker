@@ -22,6 +22,33 @@
 
         <Frames>
 
+			<Frame name="$parentReset" parentKey="ErrorReset" inherits="HDH_AT_BackgroundTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+				</Anchors>
+				<Frames>
+					<Button name="$parentBtnReset" inherits="HDH_AT_ButtonTemplate" hidden="false">
+						<Size x="125" y="22" />
+						<Anchors>
+							<Anchor point="CENTER" relativePoint="CENTER" x="0" y="0" />
+							<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								self:SetText(HDH_AT_L.RESET_ADDON)
+							</OnLoad>
+							<OnClick>
+								self:GetParent():GetParent().Dialog:AlertShow(HDH_AT_L.ALERT_RESET, self:GetParent():GetParent().Dialog.DLG_TYPE.YES_NO, function() 
+									HDH_AT_ConfigDB:Reset()
+									ReloadUI()
+								end)
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+
             <Button name="$parentDropDownTraits" inherits="HDH_AT_DropDownTrackerTemplate">
 				<Size><AbsDimension x="112" y="40" /></Size>
                 <Anchors>
@@ -494,7 +521,6 @@
 										</Scripts>
 									</Frame>
 									
-
 									<Button name="$parentDDLConfigMode" inherits="HDH_AT_DropDownOptionTemplate" hidden="true">
 										<Size x="125" y="22" />
 										<Anchors>

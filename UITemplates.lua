@@ -1229,24 +1229,11 @@ function HDH_AT_SliderTemplateMixin_OnClick(self)
     end
 
     if self:GetParent().value ~= value then
-        self:GetParent():SetValue(value)
-        -- self:GetParent().handler(self:GetParent(), self:GetParent().value)
+        if self:GetParent():SetValue(value) and self:GetParent().handler then
+            self:GetParent().handler(self:GetParent(), self:GetParent().value)
+        end
     end
-
-    
 end
-
--- function HDH_AT_SliderMixin:Init(value, min, max, enableInt, dynamic, range, format)
---     -- self.format = format or (enableInt and "%d") or "%.1f"
---     self.min = min or 0  
---     self.max = max or 20
---     self.enableInt = enableInt or false
---     self.dynamic = dynamic or false
---     self.range = range or 10
---     self:UpdateMinMaxValues(value)
---     self:SetValue(value)
---     -- HDH_AT_OnMouseUp_Slider(self)
--- end
 
 function HDH_AT_SliderTemplateMixin:Init(value, min, max, a, b, c, format)
     self.format = format or ( (max > 1) and "%d") or "%.1f"
@@ -1285,9 +1272,9 @@ function HDH_AT_SliderTemplateMixin:SetValue(value)
         self.value = value
         self.Bar:SetWidth(math.max((value - self.minValue) * self.tickWidth, 0.01))
         self.EditBox:SetText(self.format:format(self.value))
-        if self.handler then
-            self.handler(self, value)
-        end
+        return true
+    else
+        return false
     end
 end
 
@@ -1300,7 +1287,9 @@ function HDH_AT_SliderTemplateMixin:OnUpdate()
     end
 
     local value = (self.range * (new_x / self.width)) + self.minValue
-    self:SetValue(value)
+    if self:SetValue(value) and self.handler then
+        self.handler(self, self.value)
+    end
 end
 
 function HDH_AT_SliderTemplateMixin:GetMinMaxValues()
@@ -1315,7 +1304,9 @@ function HDH_AT_SliderTemplateMixin_OnEnterPressed(self)
     local value = tonumber(self:GetText()) 
     local min, max = self:GetParent():GetMinMaxValues()
     if (value ~= nil) then
-        self:GetParent():SetValue(value)
+        if self:GetParent():SetValue(value) and self:GetParent().handler then
+            self:GetParent().handler(self:GetParent(), self:GetParent().value)
+        end
     else
         self:GetParent().EditBox:SetText(self:GetParent().format:format(self:GetParent().value))
     end

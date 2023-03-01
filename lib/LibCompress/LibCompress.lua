@@ -1248,3 +1248,4 @@ end
 function LibCompress:fcs32final(uFcs32)
 	return bit_bnot(uFcs32)
 end
+
