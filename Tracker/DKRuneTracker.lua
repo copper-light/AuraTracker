@@ -205,7 +205,9 @@ function HDH_DK_RUNE_TRACKER:Update_Layout()
 			end
 		end
 	end
-	if HDH_TRACKER.ENABLE_MOVE or ret > 0 or UnitAffectingCombat("player") or self.ui.common.always_show  then
+
+	if  (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
+			and (HDH_TRACKER.ENABLE_MOVE or ret > 0 or UnitAffectingCombat("player") or self.ui.common.always_show) then
 		self:ShowTracker();
 	else
 		self:HideTracker();

@@ -443,6 +443,8 @@ function HDH_AT_DropDownMixin:SelectClear()
             for i, item in ipairs(items) do
                 if item.CheckButton then
                     item.CheckButton:SetChecked(false)
+                    item.CheckButton:Enable()
+                    item.Text:SetFontObject("Font_White_S")
                 end
             end
             self.selectedValueCount = 0
@@ -1204,3 +1206,125 @@ function HDH_AT_SwitchFrameTemplateMixin:GetSelectedValue()
     return self.value
 end
 
+
+------------------------------------------
+-- HDH_AT_SliderTemplateMixin
+------------------------------------------
+
+HDH_AT_SliderTemplateMixin = {}
+
+function HDH_AT_SliderTemplateMixin_OnClick(self)
+    local tick = 0
+    local value 
+    if self:GetParent().maxValue > 1 then
+        tick = 1
+    else
+        tick = 0.1
+    end
+
+    if self == self:GetParent().Left then
+        value = self:GetParent().value - tick
+    else
+        value = self:GetParent().value + tick
+    end
+
+    if self:GetParent().value ~= value then
+        self:GetParent():SetValue(value)
+        -- self:GetParent().handler(self:GetParent(), self:GetParent().value)
+    end
+
+    
+end
+
+-- function HDH_AT_SliderMixin:Init(value, min, max, enableInt, dynamic, range, format)
+--     -- self.format = format or (enableInt and "%d") or "%.1f"
+--     self.min = min or 0  
+--     self.max = max or 20
+--     self.enableInt = enableInt or false
+--     self.dynamic = dynamic or false
+--     self.range = range or 10
+--     self:UpdateMinMaxValues(value)
+--     self:SetValue(value)
+--     -- HDH_AT_OnMouseUp_Slider(self)
+-- end
+
+function HDH_AT_SliderTemplateMixin:Init(value, min, max, a, b, c, format)
+    self.format = format or ( (max > 1) and "%d") or "%.1f"
+    self.width = self:GetWidth() - 35
+    self:SetMinMaxValues(min, max)
+    self:SetValue(value)
+end
+
+function HDH_AT_SliderTemplateMixin:SetMinMaxValues(minValue, maxValue)
+    self.minValue = minValue or 0
+    self.maxValue = maxValue or 30
+    self.range = maxValue - minValue
+    self.tickWidth = self.width / self.range
+    self.value = self.value or 0
+    if minValue > self.value then
+        self:SetValue(minValue)
+    elseif maxValue < self.value then
+        self:SetValue(maxValue)
+    end
+end
+
+function HDH_AT_SliderTemplateMixin:SetValue(value)
+    if value < self.minValue then
+        value = self.minValue
+    elseif value > self.maxValue then
+        value = self.maxValue
+    end
+
+    if self.maxValue > 1 then
+        value = math.floor(value+0.5)
+    else
+        value = math.floor((value * 10) + 0.5) / 10
+    end
+    
+    if self.value ~= value then
+        self.value = value
+        self.Bar:SetWidth(math.max((value - self.minValue) * self.tickWidth, 0.01))
+        self.EditBox:SetText(self.format:format(self.value))
+        if self.handler then
+            self.handler(self, value)
+        end
+    end
+end
+
+function HDH_AT_SliderTemplateMixin:OnUpdate()
+    local new_x = select(1, self.Anchor:GetCenter()) - 1 - self:GetLeft() - 17
+    if new_x < 0 then
+        new_x = 0
+    elseif new_x > (self.width) then
+        new_x = self.width
+    end
+
+    local value = (self.range * (new_x / self.width)) + self.minValue
+    self:SetValue(value)
+end
+
+function HDH_AT_SliderTemplateMixin:GetMinMaxValues()
+    return self.minValue, self.maxValue
+end
+
+function HDH_AT_SliderTemplateMixin:SetHandler(handler)
+    self.handler = handler
+end
+
+function HDH_AT_SliderTemplateMixin_OnEnterPressed(self)
+    local value = tonumber(self:GetText()) 
+    local min, max = self:GetParent():GetMinMaxValues()
+    if (value ~= nil) then
+        self:GetParent():SetValue(value)
+    else
+        self:GetParent().EditBox:SetText(self:GetParent().format:format(self:GetParent().value))
+    end
+end
+
+function HDH_AT_SliderTemplateMixin_OnEditFocusLost(self)
+    self:SetText(self:GetParent().format:format(self:GetParent().value))
+end
+
+function HDH_AT_SliderTemplateMixin_OnEditFocusGained(self)
+    self:SetText(self:GetParent().value)
+end

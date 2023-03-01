@@ -186,7 +186,9 @@ function HDH_ESSENCE_TRACKER:Update() -- HDH_TRACKER override
 	end
 
 	self:UpdateIcons();
-	if UnitAffectingCombat("player") or power < power_max or self.ui.common.always_show then
+
+	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
+			and (UnitAffectingCombat("player") or power < power_max or self.ui.common.always_show) then
 		self:ShowTracker();
 		local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
 		for i = 1, power_max do

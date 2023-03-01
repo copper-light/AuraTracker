@@ -541,7 +541,9 @@ function HDH_COMBO_POINT_TRACKER:Update() -- HDH_TRACKER override
 		end
 	end
 	self:UpdateIcons();
-	if UnitAffectingCombat("player") or power > 0 or self.ui.common.always_show then
+
+	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
+			and (UnitAffectingCombat("player") or power > 0 or self.ui.common.always_show) then
 		self:ShowTracker();
 	else
 		self:HideTracker();

@@ -98,8 +98,8 @@ local DEFAULT_DISPLAY = {
         location_fix = false,
 
         column_count = 5,
-        margin_v = 4, 
-        margin_h = 4, 
+        margin_v = 2, 
+        margin_h = 2, 
         default_color = false,
     },
 
@@ -116,11 +116,10 @@ local DEFAULT_DISPLAY = {
         able_buff_cancel = false, 
         cooldown = CONFIG.COOLDOWN_UP,
         size = 40, 
-        
         on_alpha = 1, 
         off_alpha = 0.5,
         active_border_color = {0,1,0,1}, 
-        -- debuff_color = {0,0,0,1},
+        border_size = 1, 
         cooldown_bg_color = {0,0,0,0.75},
         desaturation = true, 
         spark_color = {1,1,1,1},
@@ -129,9 +128,7 @@ local DEFAULT_DISPLAY = {
     -- 바 설정
     bar = { 
         to_fill = false, 
-        -- reverse_progress = false, 
         show_spark = true,
-
         color = {0.3,1,0.3, 1}, 
         use_full_color = false, 
         full_color = {0.3,1,0.3, 1}, 
@@ -146,7 +143,6 @@ local DEFAULT_DISPLAY = {
 
     -- 글자 설정
     font = { 
-        -- show_cooldown = true
         cd_size= 15, 
         cd_location = CONFIG.FONT_LOCATION_TR, 
         cd_format = CONFIG.TIME_TYPE_CEIL, -- 쿨 다운
@@ -247,8 +243,8 @@ function HDH_AT_ConfigDB:InsertTracker(name, type, unit, aura_filter, aura_caste
         id = #HDH_AT_DB.tracker + 1,
         element = {},
         location = {
-            x = UIParent:GetWidth()/2, 
-            y = UIParent:GetHeight()/2
+            x = 0, 
+            y = 0
         }
     })
     self:UpdateTracker(#HDH_AT_DB.tracker, name, type, unit, aura_filter, aura_caster, trait)
@@ -499,10 +495,18 @@ end
 
 function HDH_AT_ConfigDB:GetKey(trackerId, key)
     if (string.find(key, "%%s")) then
-        if HDH_AT_DB.ui[trackerId] then
-            return string.format(key, trackerId)
+        if (string.find(key, "ui")) then
+            if HDH_AT_DB.ui[trackerId] then
+                return string.format(key, trackerId)
+            else
+                return string.format(key, "global_ui")
+            end
         else
-            return string.format(key, "global_ui")
+            if trackerId then
+                return string.format(key, trackerId)
+            else
+                return nil
+            end
         end
     else
         return key
@@ -524,7 +528,9 @@ end
 
 function HDH_AT_ConfigDB:SetTrackerValue(trackerId, key, value)
     key = self:GetKey(trackerId, key)
-    self:SetValue(key, value)
+    if key then
+        self:SetValue(key, value)
+    end
 end
 
 function HDH_AT_ConfigDB:GetTrackerValue(trackerId, key)

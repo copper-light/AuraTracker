@@ -979,8 +979,12 @@
         <Scripts>
 			<OnLoad function="HDH_AT_ConfigFrame_OnLoad"/>
             <OnShow function="HDH_AT_ConfigFrame_OnShow"/>
-            <OnMouseDown>self:StartMoving()</OnMouseDown>
-			<OnMouseUp>self:StopMovingOrSizing()</OnMouseUp>
+            <OnMouseDown>
+				self:StartMoving()
+			</OnMouseDown>
+			<OnMouseUp>
+				self:StopMovingOrSizing()
+			</OnMouseUp>
         </Scripts>
     </Frame>
 

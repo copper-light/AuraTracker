@@ -258,7 +258,7 @@ do
 				end
 				
 				if not self.ui.common.default_color or f.spell.dispelType == nil then 
-					f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
+					f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
 				else 
 					f.border:SetVertexColor(
 						DebuffTypeColor[f.spell.dispelType or ""].r, 
@@ -353,7 +353,9 @@ do
 			self.frame:Hide() return 
 		end
 		self.GetAurasFunc(self)
-		if (self:UpdateIcons() > 0) or UnitAffectingCombat("player") or self.ui.common.always_show then 
+
+		if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
+				and ((self:UpdateIcons() > 0) or UnitAffectingCombat("player") or self.ui.common.always_show) then 
 			self:ShowTracker();
 		else
 			self:HideTracker();
@@ -393,7 +395,7 @@ do
 				iconIdx = iconIdx + 1
 				f = self.frame.icon[iconIdx]
 				if f:GetParent() == nil then f:SetParent(self.frame) end
-				self.frame.pointer[tostring(elemId)] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
+				self.frame.pointer[elemKey] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
 				spell = {}
 				
 				spell.glow = glowType

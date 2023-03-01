@@ -225,7 +225,9 @@ function HDH_STAGGER_TRACKER:Update() -- HDH_TRACKER override
 		self:UpdateIcons()
 		if f.spell.v1 > 0 then show = true end
 	end
-	if HDH_TRACKER.ENABLE_MOVE or UnitAffectingCombat("player") or show or self.ui.common.always_show then
+
+	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
+			and (UnitAffectingCombat("player") or show or self.ui.common.always_show) then
 		self:ShowTracker();
 	else
 		self:HideTracker();

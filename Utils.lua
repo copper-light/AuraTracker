@@ -165,17 +165,17 @@ do
 				if amount < 1000 then
 					return amount
 				elseif amount < 10000 then
-					return format("%.1fk", amount/1000);
+					return format("%.1fK", amount/1000);
 				elseif amount < 1000000 then
-					return format("%dk", amount/1000);
+					return format("%dK", amount/1000);
 				elseif amount <= 10000000 then
-					return format("%.1fm",amount/1000000);
+					return format("%.1fM",amount/1000000);
 				elseif amount <= 100000000 then
-					return format("%dm",amount/1000000);
+					return format("%dM",amount/1000000);
 				elseif amount <= 10000000000 then
-					return format("%.1fb",amount/1000000000);
+					return format("%.1fB",amount/1000000000);
 				else
-					return format("%db",amount/1000000000);
+					return format("%dB",amount/1000000000);
 				end
 			else
 				return HDH_AT_UTIL.CommaValue(amount);
@@ -249,5 +249,26 @@ do
 		end
 
 		return ret[1], ret[2], ret[3], ret[4] or 1
+	end
+
+	function HDH_AT_UTIL.AdjustLocation(x, y)
+		local w, h = UIParent:GetSize()
+
+		x = math.floor(x + 0.1 - (w / 2))
+		y = math.floor(y + 0.1 - (h / 2))
+
+		-- if x > 0 then
+		-- 	x = math.floor(x + 0.1)
+		-- else
+		-- 	x = math.ceil(x - 0.1)
+		-- end
+
+		-- if y > 0 then
+		-- 	y = math.floor(y + 0.1)
+		-- else
+		-- 	y = math.ceil(y - 0.1)
+		-- end
+
+		return x, y
 	end
 end

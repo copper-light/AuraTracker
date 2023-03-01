@@ -46,6 +46,17 @@
 			<Color r="0" g="0" b="0"/>
 		</Shadow>
 	</Font>
+
+	<Font name="Font_Red_S" font="Fonts\2002.TTF" virtual="true">
+		<Color r="0.9" g="0.1" b="0.1"/>
+		<FontHeight>
+		  <AbsValue val="11"/>
+		</FontHeight>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
 	
 	<Font name="Font_White_M" font="Fonts\2002.TTF" virtual="true">
 		<Color r="0.9" g="0.9" b="0.9"/>
@@ -1707,7 +1718,7 @@
 		<!-- <HighlightFont style="Font_Yellow_M"/> -->
 	</Button>
 
-	<Slider name="HDH_AT_SliderTemplate" mixin="HDH_AT_SliderMixin" inherits="PropertySliderTemplate" virtual ="true" >
+	<Slider name="HDH_AT_SliderTemplate2" mixin="HDH_AT_SliderMixin" inherits="PropertySliderTemplate" virtual ="true" >
 		<Size><AbsDimension x="105" y="17"/></Size>
 		<Layers> 
 			<Layer level="ARTWORK">
@@ -2148,4 +2159,137 @@
 		</Layers>
 	</Frame>
 
+	<Frame name="HDH_AT_SliderTemplate" mixin="HDH_AT_SliderTemplateMixin" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBg" parentKey="Background">
+					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture parentKey="Bar">
+					<Size x="1" y="16" />
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
+					<Anchors>
+						<Anchor point="LEFT" x="17" y="0"/>
+					</Anchors>
+				</Texture>
+
+				<Texture name="$parentBar" parentKey="Bar">
+					<Size x="50" y="16" />
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
+					<Anchors>
+						<Anchor point="LEFT" x="18" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="OVERAY">
+				<Texture name="$parentBar" parentKey="AchorPoint" hidden="true" alphaMode="ADD">
+					<Size x="3" y="18" />
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentBar" relativePoint="RIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+
+		<Frames>
+			<Button parentKey="Left" inherits="HDH_AT_ButtonTemplate" virtual="true" text="◀">
+				<Size x="17" y="20"/>
+				<Anchors>
+					<Anchor point="LEFT" x="0" y="0"/>
+					<Anchor point="LEFT" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnClick function="HDH_AT_SliderTemplateMixin_OnClick"/>
+					<OnEnter>
+						self:GetParent().AchorPoint:Show()
+					</OnEnter>
+					<OnLeave>
+						self:GetParent().AchorPoint:Hide()
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button parentKey="Right" inherits="HDH_AT_ButtonTemplate" virtual="true" text="▶">
+				<Size x="17" y="20"/>
+				<Anchors>
+					<Anchor point="Right" x="0" y="0"/>
+					<Anchor point="Right" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnClick function="HDH_AT_SliderTemplateMixin_OnClick"/>
+					<OnEnter>
+						self:GetParent().AchorPoint:Show()
+					</OnEnter>
+					<OnLeave>
+						self:GetParent().AchorPoint:Hide()
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button parentKey="Anchor" inherits="HDH_AT_ButtonTemplate" virtual="true" text=""  movable="true">
+				<Size x="11" y="20"/>
+				<Anchors>
+					<Anchor point="center" relativeTo="$parentBar" relativePoint="RIGHT" x="0" y="0"/>
+				</Anchors>
+				<NormalTexture>
+					<Color r="1" g="0.8" b="0" a="0"/>
+				</NormalTexture>
+
+				<HighlightTexture>
+					<Color r="1" g="0.8" b="0" a="0"/>
+				</HighlightTexture>
+
+				<Scripts>
+					<OnEnter>
+						self:GetParent().AchorPoint:Show()
+					</OnEnter>
+					<OnLeave>
+						self:GetParent().AchorPoint:Hide()
+					</OnLeave>
+					<OnMouseDown>
+						self:StartMoving()
+						self:GetParent().AchorPoint:Show()
+						self:GetParent():SetScript("OnUpdate", self:GetParent().OnUpdate)
+					</OnMouseDown>
+					<OnMouseUp>
+						self:GetParent():SetScript("OnUpdate", nil)
+						<!-- self:GetParent().AchorPoint:Hide() -->
+						self:StopMovingOrSizing()
+						self:ClearAllPoints()
+						self:SetPoint("CENTER", self:GetParent().Bar, "RIGHT", 0, 0)
+					</OnMouseUp>
+				</Scripts>
+			</Button>
+
+			<EditBox name="$parentEdit" parentKey="EditBox" inherits="InputBoxScriptTemplate" enableMouse="true" autoFocus="false" >
+				<Size x="80" y="20" />
+				<Anchors>
+					<Anchor point="CENTER"  relativePoint="CENTER" x="0" y="0"/>
+				</Anchors>
+				<FontString inherits="Font_White_S" justifyH="CENTER" />
+				<Scripts>
+					<OnEditFocusGained function="HDH_AT_SliderTemplateMixin_OnEditFocusGained"/>/>
+					<OnEnterPressed function="HDH_AT_SliderTemplateMixin_OnEnterPressed"/>
+					<OnEditFocusLost function="HDH_AT_SliderTemplateMixin_OnEditFocusLost"/>
+					<OnEnter>
+						self:GetParent().AchorPoint:Show()
+					</OnEnter>
+					<OnLeave>
+						self:GetParent().AchorPoint:Hide()
+					</OnLeave>
+				</Scripts>
+			</EditBox>
+		</Frames>
+	</Frame>
+
 </Ui> 
+

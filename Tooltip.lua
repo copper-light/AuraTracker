@@ -18,6 +18,7 @@ local function addLine(tooltip, id)
     end
 end
 
+
 hooksecurefunc(GameTooltip, "SetUnitBuff", function(self, ...)
 	if not HDH_AT_DB.show_tooltip_id then return end
     local id = select(10, UnitBuff(...))
@@ -87,21 +88,10 @@ hooksecurefunc(GameTooltip, "SetUnitBuffByAuraInstanceID", function(self,...)
     if id then addLine(self, id) end
 end)
 
-
--- GameTooltip:HookScript("OnTooltipSetSpell", function(self)
--- 	if not HDH_AT_DB.show_tooltip_id then return end
---     local id = select(3, self:GetSpell())
---     if id then addLine(self, "주문", id) end
--- end)
-
 hooksecurefunc(GameTooltip, 'SetBagItem', function(self, ...)
     if not HDH_AT_DB.show_tooltip_id then return end
     local id = select(3, self:GetItem())
     if id then addLine(self, id) end
  end)
-
-hooksecurefunc(GameTooltip, 'SetItemByID', function(self, ...)
-    -- print("SetItemByID",  ...)
-end)
 
  

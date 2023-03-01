@@ -581,7 +581,23 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 			self.DETAIL_ETC_TAB[2]:Disable()
 			ChangeTab(self.DETAIL_ETC_TAB, 1)
 		end
+	end
 
+	if HDH_TRACKER.ENABLE_MOVE then
+		local tId = self.trackerId
+		if self.bodyType == BODY_TRACKER_NEW then
+			tId = nil
+		end
+		for _, t in pairs(HDH_TRACKER.GetList()) do
+			if t.frame.moveFrame then
+				if t.id == tId then
+					t.frame.moveFrame.isSelected = true
+					t:UpdateMoveFrame()
+				else
+					t.frame.moveFrame.isSelected = false
+				end
+			end
+		end
 	end
 end
 
@@ -591,7 +607,7 @@ local function LoadDB(trackerId, comp)
 	if comp.type == COMP_TYPE.CHECK_BOX then
 		comp:SetChecked(dbValue)
 	elseif comp.type == COMP_TYPE.SLIDER then
-		comp:UpdateValue(tonumber(dbValue))
+		comp:SetValue(tonumber(dbValue))
 	elseif comp.type == COMP_TYPE.COLOR_PICKER then
 		comp:SetColorRGBA(unpack(dbValue or {1,1,1,1}))
 	elseif comp.type == COMP_TYPE.DROPDOWN or comp.type == COMP_TYPE.SWITCH then
@@ -645,16 +661,26 @@ local function ShowGrid(frame, show)
 			t = frame.GridFrame:CreateTexture(nil, "BACKGROUND");
 			t:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg.blp");
 			t:SetVertexColor(1,0,0, 0.5);
-			t:SetSize(3,3);
+			t:SetSize(1,1);
 			t:SetPoint("LEFT",UIParent,"LEFT",0,0);
 			t:SetPoint("RIGHT",UIParent,"RIGHT",0,0);
 			
 			t = frame.GridFrame:CreateTexture(nil, "BACKGROUND");
 			t:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg.blp");
 			t:SetVertexColor(1,0,0, 0.5);
-			t:SetSize(3,3);
+			t:SetSize(1,1);
 			t:SetPoint("TOP",UIParent,"TOP",0,0);
 			t:SetPoint("BOTTOM",UIParent,"BOTTOM",0,0);
+
+			local text = frame.GridFrame:CreateFontString(nil, 'OVERLAY')
+			text:ClearAllPoints()
+			text:SetFontObject("Font_White_M")
+			text:SetWidth(190)
+			text:SetHeight(70)
+			text:SetJustifyH("CENTER")
+			text:SetJustifyV("CENTER")
+			text:SetPoint("CENTER",UIParent,"CENTER", 0, 10);
+			text:SetText("(0,0)")
 		end
 		frame.GridFrame:Show();
 	else
@@ -700,6 +726,9 @@ function HDH_AT_UI_OnCheck(self)
 	
 	elseif self == F.BODY.CONFIG_UI.CB_DISPLAY_WHEN_NONCOMBAT then
 		HDH_TRACKER.InitVaribles(DB:HasUI(trackerId) and trackerId)
+
+	elseif self == F.BODY.CONFIG_UI.SW_DISPLAY_WHEN_IN_RAID then
+		HDH_TRACKER.Updates(DB:HasUI(trackerId) and trackerId)
 
 	elseif UTIL.HasValue(CHANGE_ICON_CB_LIST, self) then
 		for _, cb in pairs(CHANGE_ICON_CB_LIST) do
@@ -1175,7 +1204,8 @@ function HDH_AT_OnClick_Button(self, button)
 			DB:DeleteTracker(id)
 			-- HDH_TRACKER.Delete(idx)
 			-- HDH_TRACKER.Reload(idx)
-			main:UpdateFrame()
+			-- main:UpdateFrame()
+			main:LoadTrackerList(trait)
 			-- main:LoadTrackerList(trait)
 			main:ChangeBody(BODY_TRACKER_NEW)
 			HDH_TRACKER.InitVaribles()
@@ -2432,6 +2462,17 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	-- DEFAULT
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.DROPDOWN,       L.ICON_ORDER,         "ui.%s.common.order_by")
 	HDH_AT_DropDown_Init(comp, DDP_ICON_ORDER_LIST, HDH_AT_OnSelected_Dropdown)
+
+	-- comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER,       L.LOCATION_X,           "tracker.%s.location.x")
+
+	-- local x = UIParent:GetWidth() / 2
+	-- local y = UIParent:GetHeight() / 2
+	-- -- print(-x, x)
+	-- comp:Init(0, -x, x)
+
+	-- comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER,       L.LOCATION_Y,           "tracker.%s.location.y")
+	-- comp:Init(0, -y, y)
+
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER,       L.ICON_NUMBER_OF_HORIZONTAL,           "ui.%s.common.column_count")
 	comp:Init(1, 1, 20, true, false, nil, L.ROW_N_COL_N)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.ICON_ORDER_DISPLAY_V,           "ui.%s.common.reverse_v")
@@ -2445,9 +2486,9 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 		{false, L.TO_THE_RIGHT}
 	}, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER, 	L.ICON_MARGIN_VERTICAL,          "ui.%s.common.margin_v")
-	comp:Init(1, 0, 500, true, true, 20)
+	comp:Init(1, 0, 50, true, true, 20)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER,       L.ICON_MARGIN_HORIZONTAL,           "ui.%s.common.margin_h")
-	comp:Init(1, 0, 500, true, true, 20)
+	comp:Init(1, 0, 50, true, true, 20)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_GAME_TOOPTIP,           "ui.%s.common.show_tooltip")
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_WHEN_NONCOMBAT,           "ui.%s.common.always_show")
@@ -2456,6 +2497,13 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 		{false, L.IN_COMBAT}
 	}, HDH_AT_OnSelected_Dropdown)
 	self.F.BODY.CONFIG_UI.CB_DISPLAY_WHEN_NONCOMBAT = comp
+
+	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_WHEN_IN_RAID,           "ui.%s.common.hide_in_raid")
+	comp:Init({
+		{false, L.ON},
+		{true, L.OFF}
+	}, HDH_AT_OnSelected_Dropdown)
+	self.F.BODY.CONFIG_UI.SW_DISPLAY_WHEN_IN_RAID = comp
 
 	-------------------------------------------------------------------------------------
 	-- ICON
@@ -2467,6 +2515,8 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:Init(0, 0, 1)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SLIDER,     L.INACTIVED_ICON_ALPHA,       "ui.%s.icon.off_alpha")
 	comp:Init(0, 0, 1)
+	-- comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SLIDER,     L.ACTIVED_ICON_BORDER_COLOR,       "ui.%s.icon.border_size")
+	-- comp:Init(0, 0, 10)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,     L.ACTIVED_ICON_BORDER_COLOR,       "ui.%s.icon.active_border_color")
 	
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,       L.ICON_SPARK_COLOR,         "ui.%s.icon.spark_color")
@@ -2490,9 +2540,9 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	-------------------------------------------------------------------------------------
 	-- BAR 
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SLIDER, 	L.WIDTH_SIZE,          "ui.%s.bar.width")
-	comp:Init(0, 10, 500, true, true, 20)
+	comp:Init(0, 10, 300, true, true, 20)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SLIDER,       L.HEIGHT_SIZE,           "ui.%s.bar.height")
-	comp:Init(0, 10, 500, true, true, 20)
+	comp:Init(0, 10, 300, true, true, 20)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.DROPDOWN,       L.BAR_TEXTURE,         "ui.%s.bar.texture")
 	HDH_AT_DropDown_Init(comp, DDP_BAR_TEXTURE_LIST, HDH_AT_OnSelected_Dropdown, nil, "HDH_AT_DropDownOptionTextureItemTemplate")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.DROPDOWN,       L.LOCATION_BAR,         "ui.%s.bar.location")
@@ -2665,8 +2715,8 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 
 	elseif component_type == COMP_TYPE.SLIDER then
 		component = CreateFrame("Slider", (parent:GetName()..'Slider'..parent.row.."_"..parent.col), parent, "HDH_AT_SliderTemplate")
-		component:SetSize(115, 17)
-		component:SetPoint('LEFT', frame, 'RIGHT', 20, -4)
+		component:SetSize(115, 20)
+		component:SetPoint('LEFT', frame, 'RIGHT', 20, 0)
 		component:SetHandler(HDH_AT_OnChangedSlider)
 		component:Init(10, 0, 100, true, true, 10)
 

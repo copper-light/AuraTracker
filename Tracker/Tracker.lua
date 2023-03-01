@@ -114,65 +114,17 @@ function HDH_TRACKER:OnUpdateBarValue(elapsed)
 	UpdateCooldown(self:GetParent(), elapsed);
 end
 
-local function OnMouseDown(self)
-	local curT = HDH_TRACKER.Get(self:GetParent().id)
-	if not curT then curT = HDH_TRACKER.Get(self:GetParent():GetParent().id) end
-	for k,v in pairs(HDH_TRACKER.GetList()) do
-		if v.frame.text then
-			if v.frame ~= curT.frame then
-				v.frame.text:Hide()
-			end
-		end
-	end
-end
-
-local function OnMouseUp(self)
-	for k,v in pairs(HDH_TRACKER.GetList()) do
-		if v.frame.text then
-			v.frame.text:Show()
-		end
-	end
-end
-
-local function OnDragUpdate(self)
-	local t = HDH_TRACKER.Get(self:GetParent().id)
-	if not t then t = HDH_TRACKER.Get(self:GetParent():GetParent().id) end
-	t.frame.text:SetText(("%s"):format(t.frame.text.text))
-	-- t.frame.text:SetText(("%s\n|cffffffff(%d, %d)"):format(t.frame.text.text, t.frame:GetLeft(),t.frame:GetBottom()))
-end
-
--- 프레임 이동 시킬때 드래그 시작 콜백 함수
-local function OnDragStart(self)
-	local t = HDH_AURA_TRACKER.Get(self:GetParent().id)
-	if not t then t = HDH_AURA_TRACKER.Get(self:GetParent():GetParent().id) end
-	t.frame:StartMoving()
-end
-
--- 프레임 이동 시킬때 드래그 끝남 콜백 함수
-local function OnDragStop(self)
-	local t = HDH_TRACKER.Get(self:GetParent().id)
-	if not t then t = HDH_TRACKER.Get(self:GetParent():GetParent().id) end
-	t.frame:StopMovingOrSizing()
-	if t then
-		t.location.x = t.frame:GetLeft()
-		t.location.y = t.frame:GetBottom()
-		t.frame:ClearAllPoints()
-		t.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT" , t.location.x , t.location.y)
-	end
-	OnMouseUp(self)
-end
-
-
 -------------------------------------------
 -- icon frame struct
 -------------------------------------------
 
 local function frameBaseSettings(f)
+	-- local border = 2
 	f:SetClampedToScreen(true)
 	f:SetMouseClickEnabled(false);
 	f.iconframe = CreateFrame("Frame", nil, f);
-	f.iconframe:SetPoint('TOPLEFT', f, 'TOPLEFT', 0, 0)
-	f.iconframe:SetPoint('BOTTOMRIGHT', f, 'BOTTOMRIGHT', 0, 0)
+	f.iconframe:SetPoint('CENTER', f, 'CENTER', 0, 0)
+	f.iconframe:SetPoint('CENTER', f, 'CENTER', 0, 0)
 	f.iconframe:Show();
 	
 	f.icon = f.iconframe:CreateTexture(nil, 'BACKGROUND')
@@ -244,9 +196,7 @@ local function frameBaseSettings(f)
 	f.iconSatCooldown.spark:Hide()
 	
 	f.border = CreateFrame("Frame", nil, f.iconframe):CreateTexture(nil, 'OVERLAY')
-	f.border:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/border.blp]])
-	f.border:SetVertexColor(0,0,0)
-	-- f.border:SetAllPoints(f);
+	f.border:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/border2.blp]])
 end
 
 --------------------------------------------
@@ -382,6 +332,9 @@ function HDH_TRACKER.UpdateSettings(trackerId)
 			t:UpdateSetting()
 			t:UpdateIcons()
 			t:Update()
+			if HDH_TRACKER.ENABLE_MOVE then
+				t:UpdateMoveFrame()
+			end
 		end
 	else
 		for k, t in pairs(HDH_TRACKER.GetList()) do
@@ -389,6 +342,9 @@ function HDH_TRACKER.UpdateSettings(trackerId)
 				t:UpdateSetting()
 				t:UpdateIcons()
 				t:Update()
+				if HDH_TRACKER.ENABLE_MOVE then
+					t:UpdateMoveFrame()
+				end
 			end
 		end
 	end
@@ -459,7 +415,7 @@ function HDH_TRACKER:Init(id, name, type, unit)
 	-- self:InitVariblesOption()
 	-- self:InitVariblesAura()
 	self.frame:ClearAllPoints()
-	self.frame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT" , self.location.x, self.location.y)
+	self.frame:SetPoint("CENTER", UIParent, "CENTER" , self.location.x, self.location.y)
 	self.frame:SetSize(self.ui.icon.size, self.ui.icon.size)
 	self:InitIcons()
 end
@@ -573,8 +529,9 @@ function HDH_TRACKER:UpdateSetting()
 		end
 	end	
 	self:LoadOrderFunc()
-	self.location.x = self.frame:GetLeft()
-	self.location.y = self.frame:GetBottom()
+	local x, y = UTIL.AdjustLocation(self.frame:GetLeft() + (self.ui.icon.size/2), self.frame:GetBottom()+(self.ui.icon.size/2))
+	self.location.x = x
+	self.location.y = y
 end
 
 
@@ -748,15 +705,20 @@ function HDH_TRACKER:UpdateArtBar(f)
 
 		f.bar:ClearAllPoints();
 		if op.location == DB.BAR_LOCATION_T then     
-			f.bar:SetPoint("BOTTOM",f, hide_icon and "BOTTOM" or "TOP",0,1); 
+			f.bar:SetPoint("BOTTOM",f, hide_icon and "BOTTOM" or "TOP", 0, 1); 
 		elseif op.location == DB.BAR_LOCATION_B then 
-			f.bar:SetPoint("TOP",f, hide_icon and "TOP" or "BOTTOM",0,-1); 
+			f.bar:SetPoint("TOP",f, hide_icon and "TOP" or "BOTTOM", 0, -1); 
 		elseif op.location == DB.BAR_LOCATION_L then 
-			f.bar:SetPoint("RIGHT",f, hide_icon and "RIGHT" or "LEFT",-1,0); 
+			f.bar:SetPoint("RIGHT",f, hide_icon and "RIGHT" or "LEFT", -1, 0); 
 		else 
-			f.bar:SetPoint("LEFT",f, hide_icon and "LEFT" or "RIGHT",1,0); 
+			f.bar:SetPoint("LEFT",f, hide_icon and "LEFT" or "RIGHT", 1, 0); 
 		end
-		f.bar:SetSize(op.width,op.height);
+
+		if hide_icon then
+			f:GetSize(bar)
+		end
+
+		f.bar:SetSize(op.width-2, op.height-2);
 		f.bar:SetStatusBarColor(unpack(op.color));
 		f.bar.spark:Hide();
 		self:SetGameTooltip(f.bar, show_tooltip or false)
@@ -765,8 +727,6 @@ function HDH_TRACKER:UpdateArtBar(f)
 		end
 	end
 end
-
-
 
 function HDH_TRACKER:ConnectMoveHandler(count)
 	if not count then return end
@@ -1072,7 +1032,8 @@ function HDH_TRACKER:CreateDummySpell(count)
 		if not spell then spell = {} f.spell = spell end
 		spell.always = true
 		spell.id = 0
-		spell.count = 1 + i
+		spell.count = i
+		spell.overlay = 0
 		spell.duration = 50 * i
 		spell.happenTime = 0;
 		spell.glow = false
@@ -1115,43 +1076,436 @@ function HDH_TRACKER:CreateDummySpell(count)
 	return count;
 end
 
+function HDH_TRACKER:UpdateMoveFrame(isDragging)
+	local x, y, w, h, editingY, editingX
+	local top, bottom, left, right
+	local col_size = math.min(self.ui.common.column_count, #self.frame.icon)
+	editingY = 0	
+	editingX = 0
+	if self.ui.common.display_mode == DB.DISPLAY_ICON then
+		if self.ui.common.reverse_v then
+			top = self.frame.icon[#self.frame.icon]
+			bottom = self.frame.icon[1]
+		else
+			top = self.frame.icon[1]
+			bottom = self.frame.icon[#self.frame.icon]
+		end
+
+		if self.ui.common.reverse_h then
+			left = self.frame.icon[col_size]
+			right = self.frame.icon[1]
+		else
+			left = self.frame.icon[1]
+			right = self.frame.icon[col_size]
+		end
+
+	elseif self.ui.common.display_mode == DB.DISPLAY_BAR then
+		if self.ui.bar.location == DB.BAR_LOCATION_T or self.ui.bar.location == DB.BAR_LOCATION_B then
+			if self.ui.common.reverse_h then
+				editingX = -(self.ui.bar.width - self.ui.icon.size) /2
+			else
+				editingX = (self.ui.bar.width - self.ui.icon.size) /2
+			end
+		else
+			if self.ui.common.reverse_v then
+				editingY = ((self.ui.bar.height - self.ui.icon.size) /2)
+			else
+				editingY = - ((self.ui.bar.height - self.ui.icon.size) /2)
+			end
+		end
+
+		if self.ui.common.reverse_v then
+			top = self.frame.icon[#self.frame.icon].bar.bg
+			bottom = self.frame.icon[1].bar.bg
+		else
+			top = self.frame.icon[1].bar.bg
+			bottom = self.frame.icon[#self.frame.icon].bar.bg
+		end
+
+		if self.ui.common.reverse_h then
+			left = self.frame.icon[col_size].bar.bg
+			right = self.frame.icon[1].bar.bg
+		else
+			left = self.frame.icon[1].bar.bg
+			right = self.frame.icon[col_size].bar.bg
+		end
+	else
+		if self.ui.bar.location == DB.BAR_LOCATION_T or self.ui.bar.location == DB.BAR_LOCATION_B then
+			if self.ui.common.reverse_h then
+				editingX = -math.max(0, (self.ui.bar.width - self.ui.icon.size) /2) 
+			else
+				editingX = math.max(0,  (self.ui.bar.width - self.ui.icon.size) /2)
+			end
+		else
+			if self.ui.common.reverse_v then
+				editingY = math.max(0, (self.ui.bar.height - self.ui.icon.size) /2) 
+			else
+				editingY = - math.max(0,  (self.ui.bar.height - self.ui.icon.size) /2)
+			end
+		end
+
+		if self.ui.common.reverse_v then
+			if self.ui.bar.location == DB.BAR_LOCATION_T then
+				top = self.frame.icon[#self.frame.icon].bar.bg
+				bottom = self.frame.icon[1]
+			elseif self.ui.bar.location == DB.BAR_LOCATION_B then
+				editingY = editingY + self.ui.bar.height
+				top = self.frame.icon[#self.frame.icon]
+				bottom = self.frame.icon[1].bar.bg
+			else
+				if self.ui.icon.size > self.ui.bar.height then
+					top = self.frame.icon[#self.frame.icon]
+					bottom = self.frame.icon[1]
+				else
+					top = self.frame.icon[#self.frame.icon].bar.bg
+					bottom = self.frame.icon[1].bar.bg
+				end
+			end
+		else
+			if self.ui.bar.location == DB.BAR_LOCATION_T then
+				editingY = editingY - self.ui.bar.height
+				top = self.frame.icon[1].bar.bg
+				bottom = self.frame.icon[#self.frame.icon]
+			elseif self.ui.bar.location == DB.BAR_LOCATION_B then
+				top = self.frame.icon[1]
+				bottom = self.frame.icon[#self.frame.icon].bar.bg
+			else
+				if self.ui.icon.size > self.ui.bar.height then
+					top = self.frame.icon[1]
+					bottom = self.frame.icon[#self.frame.icon]
+				else
+					top = self.frame.icon[1].bar.bg
+					bottom = self.frame.icon[#self.frame.icon].bar.bg
+				end
+			end
+		end
+
+		if self.ui.common.reverse_h then
+			if self.ui.bar.location == DB.BAR_LOCATION_L then
+				left = self.frame.icon[col_size].bar.bg
+				right = self.frame.icon[1]
+			elseif self.ui.bar.location == DB.BAR_LOCATION_R then
+				editingX = editingX - self.ui.bar.width
+				left = self.frame.icon[col_size]
+				right = self.frame.icon[1].bar.bg
+			else
+				if self.ui.icon.size > self.ui.bar.width then
+					left = self.frame.icon[col_size]
+					right = self.frame.icon[1]
+				else
+					left = self.frame.icon[col_size].bar.bg
+					right = self.frame.icon[1].bar.bg
+				end
+			end
+		else
+			if self.ui.bar.location == DB.BAR_LOCATION_L then
+				editingX = editingX + self.ui.bar.width
+				left = self.frame.icon[1].bar.bg
+				right = self.frame.icon[col_size]
+			elseif self.ui.bar.location == DB.BAR_LOCATION_R then
+				left = self.frame.icon[1]
+				right = self.frame.icon[col_size].bar.bg
+			else
+				if self.ui.icon.size > self.ui.bar.width then
+					left = self.frame.icon[1]
+					right = self.frame.icon[col_size]
+				else
+					left = self.frame.icon[1].bar.bg
+					right = self.frame.icon[col_size].bar.bg
+				end
+			end
+		end
+	end
+
+	self.frame.moveFrame.active:ClearAllPoints()
+	self.frame.moveFrame.active:SetPoint("TOP", top, "TOP", 0, 0)
+	self.frame.moveFrame.active:SetPoint("BOTTOM", bottom, "BOTTOM", 0, 0)
+	self.frame.moveFrame.active:SetPoint("LEFT", left, "LEFT", 0, 0)
+	self.frame.moveFrame.active:SetPoint("RIGHT", right, "RIGHT", 0, 0)
+
+	if not isDragging then
+		self.frame.moveFrame:ClearAllPoints()
+		self.frame.moveFrame:SetSize(self.frame.moveFrame.active:GetSize())
+		self.frame.moveFrame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", self.frame.moveFrame.active:GetLeft(), self.frame.moveFrame.active:GetBottom())
+
+		self.frame.moveFrame.editingX = editingX
+		self.frame.moveFrame.editingY = editingY
+	end
+
+	self.frame.moveFrame.text:ClearAllPoints();
+	if self.frame.moveFrame.isSelected or isDragging then
+		self.frame.moveFrame.text:SetPoint("TOPLEFT", self.frame.moveFrame.active, "TOPLEFT", 0, 1)
+		self.frame.moveFrame.text:SetPoint("BOTTOMRIGHT", self.frame.moveFrame.active, "BOTTOMRIGHT", 0, -1)
+	else
+		if self.ui.common.reverse_v then
+			self.frame.moveFrame.text:SetPoint("TOP", self.frame.moveFrame, "BOTTOM", 0, -4)
+		else
+			self.frame.moveFrame.text:SetPoint("BOTTOM", self.frame.moveFrame, "TOP", 0, 4)
+		end
+		if select(1, self.frame.moveFrame.active:GetSize()) > 100 then
+			self.frame.moveFrame.active:SetPoint("LEFT", left, "LEFT", 0, 0)
+			self.frame.moveFrame.active:SetPoint("RIGHT", right, "RIGHT", 0, 0)
+		else
+			self.frame.moveFrame.text:SetWidth(100)
+		end
+	end
+end
+
+local function OnMouseDown_MoveFrame(self)
+	local cur = HDH_TRACKER.Get(self:GetParent().id)
+	self.isDragging = true
+	self:StartMoving()
+	cur:UpdateMoveFrame()
+	local x, y= self:GetCenter()
+	self.preX = math.ceil(x)
+	self.preY = math.ceil(y)
+	
+	local trackerList = HDH_TRACKER.GetList()
+	for _, t in pairs(trackerList) do
+		if t.id ~= self:GetParent().id then
+			if t.frame.moveFrame then
+				t.frame.moveFrame.isSelected = false
+				t:UpdateMoveFrame()
+			end
+		end
+	end
+end
+
+local function OnMouseUp_MoveFrame(self)
+	self.isDragging = false
+	self:StopMovingOrSizing() 
+	local x, y= self:GetCenter()
+	if math.ceil(x) ~= self.preX or self.preY ~= math.ceil(y) then
+		self.isSelected = true
+	else
+		self.isSelected = not self.isSelected
+	end
+	local cur = HDH_TRACKER.Get(self:GetParent().id)
+	cur:UpdateMoveFrame()
+
+	if HDH_AT_ConfigFrame.trackerId ~= self:GetParent().id then
+		local index = HDH_AT_ConfigFrame:GetTrackerIndex(self:GetParent().id)
+		if index then
+			HDH_AT_ConfigFrame:ChangeBody(nil, index)
+		end
+	end
+end
+
+local function OnUpdate_MoveFrame(self)
+	local t = HDH_TRACKER.Get(self:GetParent().id)
+
+	if self.isDragging then
+		local x, y
+		if t.ui.common.reverse_h then
+			x = self:GetRight() - (t.ui.icon.size / 2)
+		else
+			x = self:GetLeft() + (t.ui.icon.size / 2)
+		end
+
+		if t.ui.common.reverse_v then
+			y = self:GetBottom() + (t.ui.icon.size / 2) 
+		else
+			y = self:GetTop() - (t.ui.icon.size / 2)
+		end
+		y = y + self.editingY
+		x = x + self.editingX
+		x, y = UTIL.AdjustLocation(x, y)
+		t.location.x = x
+		t.location.y = y
+		t.frame:SetPoint("CENTER", UIParent, "CENTER" , t.location.x , t.location.y)
+		t:UpdateMoveFrame(self.isDragging)
+	end
+
+	local otherSelected = false
+	for _, t in pairs(HDH_TRACKER.GetList()) do
+		if t.frame.moveFrame and t.id ~= self:GetParent().id and (t.frame.moveFrame.isSelected or t.frame.moveFrame.isDragging) then
+			otherSelected = true
+			break
+		end
+	end
+	if otherSelected then
+		t.frame.moveFrame.text:Hide()
+	else
+		t.frame.moveFrame.text:Show()
+	end
+
+	if self.isSelected or self.isDragging then
+		if self.isDragging then
+			t.frame.moveBtn1:Hide()
+			t.frame.moveBtn2:Hide()
+			t.frame.moveBtn3:Hide()
+			t.frame.moveBtn4:Hide()
+		else
+			t.frame.moveBtn1:Show()
+			t.frame.moveBtn2:Show()
+			t.frame.moveBtn3:Show()
+			t.frame.moveBtn4:Show()
+		end
+		t.frame.moveFrame.active:SetAlpha(1)
+		t.frame.moveFrame.active2:SetAlpha(1)
+		t.frame.coord:Show()
+		x, y = UTIL.AdjustLocation(t.frame.moveFrame.active:GetLeft(), t.frame.moveFrame.active:GetTop())
+		t.frame.coord:SetText(("%d,%d"):format(x, y))
+	else
+		t.frame.moveBtn1:Hide()
+		t.frame.moveBtn2:Hide()
+		t.frame.moveBtn3:Hide()
+		t.frame.moveBtn4:Hide()
+		t.frame.moveFrame.active:SetAlpha(0)
+		t.frame.moveFrame.active2:SetAlpha(0)
+		t.frame.coord:Hide()
+	end
+end
+
+local function OnClick_MoveButton(self)
+	local t = HDH_AURA_TRACKER.Get(self:GetParent():GetParent().id)
+	t.location.x = t.location.x + (self.x or 0)
+	t.location.y = t.location.y + (self.y or 0)
+	t.frame:SetPoint("CENTER", UIParent, "CENTER" , t.location.x , t.location.y)
+	t:UpdateMoveFrame(self.isDragging)
+end
+
+local function CreateMoveFrame(self)
+	local tf = CreateFrame("Frame", nil, self.frame)
+	tf:SetFrameStrata("MEDIUM")
+	tf:SetFrameLevel(10000)
+
+	tf:SetPoint("TOPLEFT")
+	tf:SetPoint("BOTTOMRIGHT")
+
+	-- local t = tf:CreateTexture(nil, 'BACKGROUND')
+	-- self.frame.moveFrame = tf
+	-- t:SetPoint("TOPLEFT")
+	-- t:SetPoint("BOTTOMRIGHT")
+	-- t:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/Border2")
+	-- t:SetAlpha(1)
+	-- self.frame.moveFrame.border = t
+
+	local t = tf:CreateTexture(nil, 'BACKGROUND')
+	self.frame.moveFrame = tf
+	t:SetPoint("TOPLEFT")
+	t:SetPoint("BOTTOMRIGHT")
+	t:SetColorTexture(1,1,1,0.7)
+	t:SetAlpha(0)
+	self.frame.moveFrame.active = t
+
+	local t = tf:CreateTexture(nil, 'BORDER')
+	t:SetPoint("TOPLEFT", self.frame.moveFrame.active, "TOPLEFT", 1, -1)
+	t:SetPoint("BOTTOMRIGHT", self.frame.moveFrame.active, "BOTTOMRIGHT", -1 , 1)
+	t:SetColorTexture(0,0,0,0.7)
+	t:SetAlpha(0)
+	self.frame.moveFrame.active2 = t
+
+	t = tf:CreateTexture(nil, 'ARTWORK')
+	t:SetColorTexture(1,0,0,1)
+	t:SetSize(7,1)
+	t:SetPoint("CENTER", self.frame, "CENTER", 0, 0)
+
+	t = tf:CreateTexture(nil, 'ARTWORK')
+	t:SetColorTexture(1,0,0,1)
+	t:SetSize(1,7)
+	t:SetPoint("CENTER", self.frame, "CENTER", 0, 0)
+
+	t = tf:CreateTexture(nil, 'ARTWORK')
+	t:SetColorTexture(1,0,0,1)
+	t:SetSize(7,2)
+	t:SetPoint("TOPLEFT", self.frame.moveFrame.active, "TOPLEFT", 0, 0)
+
+	t = tf:CreateTexture(nil, 'ARTWORK')
+	t:SetColorTexture(1,0,0,1)
+	t:SetSize(2,7)
+	t:SetPoint("TOPLEFT", self.frame.moveFrame.active, "TOPLEFT", 0, 0)
+
+	local text = tf:CreateFontString(nil, 'OVERLAY')
+	self.frame.coord = text
+	text:SetPoint("TOPLEFT", self.frame.moveFrame.active, "TOPLEFT", 4, -4)
+	text:SetFontObject("Font_Yellow_S")
+	text:SetWidth(190)
+	text:SetHeight(70)
+	text:SetJustifyH("LEFT")
+	text:SetJustifyV("TOP")
+
+	tf = CreateFrame("Frame", nil, self.frame.moveFrame)
+	tf:SetFrameStrata("HIGH")
+	local text = tf:CreateFontString(nil, 'OVERLAY')
+	self.frame.moveFrame.text = text
+	text:ClearAllPoints()
+	text:SetFontObject("Font_Yellow_S")
+	text:SetWidth(190)
+	text:SetHeight(10)
+	
+	text:SetJustifyH("CENTER")
+	text:SetText("["..self.name.."]")
+	text:SetMaxLines(1) 
+	
+	local btn = CreateFrame("Button", nil, self.frame.moveFrame, "HDH_AT_ButtonTemplate")
+	btn:SetFrameStrata("HIGH")
+	btn:SetText("◀")
+	btn:SetSize(20, 20)
+	btn:SetPoint("TOPRIGHT", self.frame.moveFrame.active, "BOTTOM", 0, 0)
+	btn:SetScript("OnClick", OnClick_MoveButton)
+	btn.x = -1
+	self.frame.moveBtn1 = btn
+
+	btn = CreateFrame("Button", nil, self.frame.moveFrame, "HDH_AT_ButtonTemplate")
+	btn:SetFrameStrata("HIGH")
+	btn:SetText("▶")
+	btn:SetSize(20, 20)
+	btn:SetPoint("TOPLEFT", self.frame.moveFrame.active, "BOTTOM", 0, 0)
+	btn:SetScript("OnClick", OnClick_MoveButton)
+	btn.x = 1
+	self.frame.moveBtn2 = btn
+
+	btn = CreateFrame("Button", nil, self.frame.moveFrame, "HDH_AT_ButtonTemplate")
+	btn:SetFrameStrata("HIGH")
+	btn:SetText("▲")
+	btn:SetSize(20, 20)
+	btn:SetPoint("BOTTOMLEFT", self.frame.moveFrame.active, "RIGHT", 0, 0)
+	btn:SetScript("OnClick", OnClick_MoveButton)
+	btn.y = 1
+	self.frame.moveBtn3 = btn
+
+	btn = CreateFrame("Button", nil, self.frame.moveFrame, "HDH_AT_ButtonTemplate")
+	btn:SetFrameStrata("HIGH")
+	btn:SetText("▼")
+	btn:SetSize(20, 20)
+	btn:SetPoint("TOPLEFT", self.frame.moveFrame.active, "RIGHT", 0, 0)
+	btn:SetScript("OnClick", OnClick_MoveButton)
+	btn.y = -1
+	self.frame.moveBtn4 = btn
+
+	self.frame.moveFrame:SetScript("OnMouseDown", OnMouseDown_MoveFrame)
+	self.frame.moveFrame:SetScript("OnUpdate", OnUpdate_MoveFrame)
+	self.frame.moveFrame:SetScript("OnMouseUp", OnMouseUp_MoveFrame)
+
+	self.frame.moveBtn1:Hide()
+	self.frame.moveBtn2:Hide()
+	self.frame.moveBtn3:Hide()
+	self.frame.moveBtn4:Hide()
+end
+
 function HDH_TRACKER:SetMove(move)
 	if not self.frame then return end
 	if move then
 		local cnt = self:IsHaveData();
 		if cnt then
-			if not self.frame.text then
-				local tf = CreateFrame("Frame", nil, self.frame)
-				tf:SetFrameStrata("HIGH")
-				--tf.SetAllPoints(frame)
-				local text = tf:CreateFontString(nil, 'OVERLAY')
-				self.frame.text = text
-				text:ClearAllPoints()
-				text:SetFontObject("Font_Yellow_M")
-				text:SetWidth(190)
-				text:SetHeight(70)
-				--text:SetAlpha(0.7)
-				
-				text:SetJustifyH("LEFT")
-				text.text = ("["..self.name.."]")
-				text:SetMaxLines(6) 
-			end
-			self.frame.text:ClearAllPoints();
-			if self.ui.common.reverse_v then
-				self.frame.text:SetPoint("TOPLEFT", self.frame, "BOTTOMLEFT", 0, 20)
-			else
-				self.frame.text:SetPoint("BOTTOMLEFT", self.frame, "TOPLEFT", 0, -20)
+			if not self.frame.moveFrame then
+				CreateMoveFrame(self)
 			end
 			self.frame.id = self.id
 			self.frame.name = self.name
-			self.frame.text:Show()
 			self.frame:EnableMouse(true)
 			self.frame:SetMovable(true)
+			self.frame.moveFrame:SetFrameLevel(self.id * 100)
+			self.frame.moveFrame:EnableMouse(true)
+			self.frame.moveFrame:SetMovable(true)
+			self.frame.moveFrame.isDragging = false
+			self.frame.moveFrame.isSelected = self.frame.moveFrame.isSelected or false
+			self.frame.moveFrame:Show()
 			cnt = self:CreateDummySpell(cnt);
-
-			self:ConnectMoveHandler(cnt);
 			self:ShowTracker();
 			self:UpdateIcons()
+			self:UpdateMoveFrame()
 		end
 	else
 		self.frame:Hide();
@@ -1159,11 +1513,14 @@ function HDH_TRACKER:SetMove(move)
 		self.frame.id = nil
 		self.frame:EnableMouse(false)
 		self.frame:SetMovable(false)
-		self.frame:SetScript('OnUpdate', nil)
 		if self.frame.text then 
 			self.frame.text:Hide() 
 			self.frame.text:GetParent():SetParent(nil) 
 			self.frame.text = nil
+			
+		end
+		if self.frame.moveFrame then
+			self.frame.moveFrame:Hide()
 		end
 		self:ReleaseIcons()
 		self:InitIcons()
@@ -1283,32 +1640,20 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	local op_common = self.ui.common
 
 	f:SetSize(op_icon.size,op_icon.size)
-	f.iconframe:SetSize(op_icon.size,op_icon.size);
+	f.iconframe:SetSize(op_icon.size * 0.92, op_icon.size * 0.92);
 	self:SetGameTooltip(f, op_common.show_tooltip or false)
 	
-	f.border:SetWidth(op_icon.size*1.3)
-	f.border:SetHeight(op_icon.size*1.3)
+	f.border:SetWidth(op_icon.size)
+	f.border:SetHeight(op_icon.size)
 	f.border:SetPoint('CENTER', f.iconframe, 'CENTER', 0, 0)
 
 	if op_icon.cooldown == DB.COOLDOWN_CIRCLE then
 		f.cooldown2:SetSwipeColor(unpack(op_icon.cooldown_bg_color))
 	else
-		-- f.cooldown1:SetStatusBarColor(unpack(op_icon.cooldown_bg_color))
-		-- f.cooldown2:SetSwipeColor(unpack(op_icon.cooldown_bg_color))
 		f.cooldown1:SetStatusBarColor(0,0,0,0)
 		f.cooldown2:SetSwipeColor(0,0,0,0)
 	end
 	
-	-- f.cooldown2:SetDrawEdge(false);
-	-- f.cooldown2.textureImg:SetTexture(unpack(op_icon.cooldown_bg_color));
-	
-	--f.cooldown2:SetSwipeTexture(f.cooldown2.textureImg:GetTexture(),1,1,1);
-	--local tmp = f:CreateTexture(nil,"OVERLAY")
-	--tmp:SetTexture();
-	
-	
-
-	--f.overlay.animIn:Play()
 	if 4 > op_icon.size*0.08 then
 		op_icon.margin = 4
 	else
@@ -1749,6 +2094,27 @@ local function VersionUpdateDB()
 		end
 		DB:SetVersion(2.6)
 	end
+
+	if DB:GetVersion() == 2.6 then
+		local ui = DB:GetTrackerUI()
+		local location
+		local x, y 
+
+		ui.common.hide_in_raid = false
+		for _, id in ipairs(DB:GetTrackerIds()) do
+			location = DB:GetLocation(id)
+			ui = DB:GetTrackerUI(id)
+
+			ui.common.hide_in_raid = false
+			
+			location.x = location.x + (ui.icon.size /2)
+			location.y = location.y + (ui.icon.size /2)
+			x, y = UTIL.AdjustLocation(location.x, location.y)
+			location.x = x
+			location.y = y
+		end
+		DB:SetVersion(2.7)
+	end
 end
 
 local function PLAYER_ENTERING_WORLD()
@@ -1759,6 +2125,7 @@ local function PLAYER_ENTERING_WORLD()
 		HDH_AT_ADDON_FRAME:RegisterEvent('PLAYER_REGEN_DISABLED')
 		HDH_AT_ADDON_FRAME:RegisterEvent('PLAYER_REGEN_ENABLED')
 		HDH_AT_ADDON_FRAME:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
+		HDH_AT_ADDON_FRAME:RegisterEvent('GROUP_ROSTER_UPDATE')
 		HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_CONFIG_UPDATED') -- 특성 빌드 설정 변경 완료 됐을때
 		HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_CONFIG_DELETED') -- 특성 빌드 설정 변경 완료 됐을때
 		-- HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_CONFIG_LIST_UPDATED') -- 특성 빌드 설정 변경 완료 됐을때
@@ -1811,6 +2178,11 @@ local function OnEvent(self, event, ...)
 		if not HDH_TRACKER.ENABLE_MOVE then
 			HDH_TRACKER.Updates()
 		end
+
+	elseif event == 'GROUP_ROSTER_UPDATE' then
+		if not HDH_TRACKER.ENABLE_MOVE then
+			HDH_TRACKER.Updates()
+		end
 	
 	elseif event == "PLAYER_ENTERING_WORLD" then
 		-- self:UnregisterEvent('PLAYER_ENTERING_WORLD')
@@ -1853,4 +2225,3 @@ end
 HDH_AT_ADDON_FRAME = CreateFrame("Frame", "HDH_AT_iconframe", UIParent) -- 애드온 최상위 프레임
 HDH_AT_ADDON_FRAME:SetScript("OnEvent", OnEvent)
 OnLoad(HDH_AT_ADDON_FRAME)
-

@@ -367,6 +367,7 @@ function HDH_POWER_TRACKER:UpdateArtBar(f) -- HDH_TRACKER override
 		end
 		if not f.bar then
 			f.bar = CreateFrame("Frame", nil, f);
+			f.bar.bg = f.bar
 			f.bar.margin = POWRE_BAR_SPLIT_MARGIN;--------------------------------------------- margin
 		end
 		if hide_icon then f.iconframe:Hide();
@@ -405,21 +406,18 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 		end
 	end
 	
-	if bf.bar == nil then bf.bar ={} end
+	if bf.bar == nil then bf.bar = {} end
 	bf:ClearAllPoints();
-	if bar_op.location == HDH_TRACKER.BAR_LOCATION_T then  
-		bf:SetSize(bar_op.height,bar_op.width);
-		bf:SetPoint("BOTTOM",f, hide_icon and "BOTTOM" or "TOP",0,1); 
-	elseif bar_op.location == HDH_TRACKER.BAR_LOCATION_B then 
-		bf:SetSize(bar_op.height,bar_op.width);
-		bf:SetPoint("TOP",f, hide_icon and "TOP" or "BOTTOM",0,-1); 
-	elseif bar_op.location == HDH_TRACKER.BAR_LOCATION_L then 
-		bf:SetSize(bar_op.width,bar_op.height);
-		bf:SetPoint("RIGHT",f, hide_icon and "RIGHT" or "LEFT",-1,0); 
+	if bar_op.location == DB.BAR_LOCATION_T then
+		bf:SetPoint("BOTTOM",f, hide_icon and "BOTTOM" or "TOP",0, 0); 
+	elseif bar_op.location == DB.BAR_LOCATION_B then 
+		bf:SetPoint("TOP",f, hide_icon and "TOP" or "BOTTOM",0, 0); 
+	elseif bar_op.location == DB.BAR_LOCATION_L then 
+		bf:SetPoint("RIGHT",f, hide_icon and "RIGHT" or "LEFT", 0, 0); 
 	else
-		bf:SetSize(bar_op.width,bar_op.height);
-		bf:SetPoint("LEFT",f, hide_icon and "LEFT" or "RIGHT",1,0); 
+		bf:SetPoint("LEFT",f, hide_icon and "LEFT" or "RIGHT", 0, 0); 
 	end
+	bf:SetSize(bar_op.width, bar_op.height);
 	
 	local cnt = (#split == 0) and 1 or (#split +1);
 	local bar
@@ -450,12 +448,14 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 		
 		bar:ClearAllPoints();
 		if bar_op.cooldown_progress == DB.COOLDOWN_LEFT then
-			local w = ( bf:GetWidth() - (bf.margin * #split) ) * (gap/powerMax);
-			bar:SetSize(w, bf:GetHeight());
+			local w = ( bf:GetWidth() - (self.ui.common.margin_h * #split) ) * (gap/powerMax);
+			bar:SetSize(w - 2, bf:GetHeight() - 2);
 			if i == 1 then 
-				bar:SetPoint("RIGHT",0,0)
+				bar:SetPoint("RIGHT", -1, 0)
+			elseif i == cnt then
+				bar:SetPoint("LEFT", 1, 0)
 			else
-				bar:SetPoint("RIGHT", bf.bar[i-1], "LEFT", -bf.margin, 0)
+				bar:SetPoint("RIGHT", bf.bar[i-1], "LEFT", -self.ui.common.margin_h -1, 0)
 			end
 			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture); 
 			bar:SetOrientation("Horizontal"); 
@@ -470,13 +470,15 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			end
 			
 		elseif bar_op.cooldown_progress == DB.COOLDOWN_RIGHT then
-			local w = ( bf:GetWidth() - (bf.margin * #split) ) * (gap/powerMax);
-			bar:SetSize(w, bf:GetHeight());
+			local w = ( bf:GetWidth() - (self.ui.common.margin_h * #split) ) * (gap/powerMax);
+			bar:SetSize(w - 2, bf:GetHeight() - 2);
 
 			if i == 1 then 
-				bar:SetPoint("LEFT",0,0)
+				bar:SetPoint("LEFT", 1, 0)
+			elseif i == cnt then
+				bar:SetPoint("RIGHT", -1, 0)
 			else
-				bar:SetPoint("LEFT", bf.bar[i-1], "RIGHT", bf.margin, 0)
+				bar:SetPoint("LEFT", bf.bar[i-1], "RIGHT", self.ui.common.margin_h + 1, 0)
 			end
 			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture); 
 			bar:SetOrientation("Horizontal"); 
@@ -491,12 +493,14 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			end
 
 		elseif bar_op.cooldown_progress == DB.COOLDOWN_UP then
-			local h = ( bf:GetHeight() - (bf.margin * #split) ) * (gap/powerMax);
-			bar:SetSize(bf:GetWidth(), h);
+			local h = ( bf:GetHeight() - (self.ui.common.margin_v * #split) ) * (gap/powerMax);
+			bar:SetSize(bf:GetWidth() - 2, h - 2);
 			if i == 1 then 
-				bar:SetPoint("BOTTOM", 0, 0)
+				bar:SetPoint("BOTTOM", 0, 1)
+			elseif i == cnt then
+				bar:SetPoint("TOP", 0, -1)
 			else
-				bar:SetPoint("BOTTOM", bf.bar[i-1], "TOP", 0, bf.margin)
+				bar:SetPoint("BOTTOM", bf.bar[i-1], "TOP", 0, self.ui.common.margin_v + 1)
 			end
 			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture_r); 
 			bar:SetOrientation("Vertical"); 
@@ -511,12 +515,14 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			
 
 		else -- bottom
-			local h = ( bf:GetHeight() - (bf.margin * #split) ) * (gap/powerMax);
-			bar:SetSize(bf:GetWidth(), h);
+			local h = ( bf:GetHeight() - (self.ui.common.margin_v * #split) ) * (gap/powerMax);
+			bar:SetSize(bf:GetWidth() - 2, h - 2);
 			if i == 1 then 
-				bar:SetPoint("TOP", 0, 0)
+				bar:SetPoint("TOP", 0, -1)
+			elseif i == cnt then
+				bar:SetPoint("BOTTOM", 0, 1)
 			else
-				bar:SetPoint("TOP", bf.bar[i-1], "BOTTOM", 0, -bf.margin)
+				bar:SetPoint("TOP", bf.bar[i-1], "BOTTOM", 0, -self.ui.common.margin_v - 1)
 			end
 			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture_r); 
 			bar:SetOrientation("Vertical"); 
@@ -577,7 +583,7 @@ function HDH_POWER_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 			f:Hide();
 		end
 	end
-	f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', 0, 0);
+	f:SetPoint('RIGHT');
 	return ret
 end
 
@@ -595,17 +601,17 @@ function HDH_POWER_TRACKER:Update() -- HDH_TRACKER override
 			if f.spell.max ~= f.spell.v1 then show = true end
 		elseif f.spell.v1 > 0 then show = true end
 	end
-	if HDH_TRACKER.ENABLE_MOVE or UnitAffectingCombat("player") or show or self.ui.common.always_show then
-		-- self.frame:Show()
+
+	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
+			and (HDH_TRACKER.ENABLE_MOVE or UnitAffectingCombat("player") or show or self.ui.common.always_show) then
 		self:ShowTracker();
 	else
-		-- self.frame:Hide()
 		self:HideTracker();
 	end
 end
 
 function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
-	if HDH_TRACKER.ENABLE_MOVE then return end
+	-- if HDH_TRACKER.ENABLE_MOVE then return end
 	local trackerId = self.id
 	local id, name, _, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
 	self.aura_filter = aura_filter

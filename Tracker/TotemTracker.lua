@@ -59,7 +59,9 @@ do
 				end
 			end
 		end
-		if (self:UpdateIcons() > 0) or self.ui.common.always_show or UnitAffectingCombat("player") then
+
+		if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
+				and ((self:UpdateIcons() > 0) or self.ui.common.always_show or UnitAffectingCombat("player")) then
 			self:ShowTracker();
 		else
 			self:HideTracker();

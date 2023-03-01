@@ -3,7 +3,6 @@
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
 ## Version: 10.0.5.06
-## SavedVariables: DB_PROFILE, HDH_AT_PROFILE
 ## SavedVariablesPerCharacter: HDH_AT_DB
 
 locale\locale.lua

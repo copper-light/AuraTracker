@@ -575,7 +575,8 @@ function HDH_C_TRACKER:Update_Layout()
 		end
 	end
 	
-	if HDH_TRACKER.ENABLE_MOVE or show_index > 0 or always_show or UnitAffectingCombat("player") then
+	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
+			and (HDH_TRACKER.ENABLE_MOVE or show_index > 0 or always_show or UnitAffectingCombat("player")) then
 		self:ShowTracker();
 	else
 		self:HideTracker();
