@@ -584,23 +584,33 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 	end
 
 	if HDH_TRACKER.ENABLE_MOVE then
-		local tId = self.trackerId
-		if self.bodyType == BODY_TRACKER_NEW then
-			tId = nil
-			for _, t in pairs(HDH_TRACKER.GetList()) do
-				if t.frame.moveFrame then
-					t.frame.moveFrame.isSelected = false
-					t:UpdateMoveFrame()
-				end
+		local selectedMode= false
+		for _, t in pairs(HDH_TRACKER.GetList()) do
+			if t.frame.moveFrame and t.frame.moveFrame.isSelected then
+				selectedMode = true
+				break
 			end
-		elseif trackerIndex then
-			for _, t in pairs(HDH_TRACKER.GetList()) do
-				if t.frame.moveFrame then
-					if t.id == tId then
-						t.frame.moveFrame.isSelected = true
-						t:UpdateMoveFrame()
-					else
+		end
+
+		if selectedMode then
+			local tId = self.trackerId
+			if self.bodyType == BODY_TRACKER_NEW then
+				tId = nil
+				for _, t in pairs(HDH_TRACKER.GetList()) do
+					if t.frame.moveFrame then
 						t.frame.moveFrame.isSelected = false
+						t:UpdateMoveFrame()
+					end
+				end
+			elseif trackerIndex then
+				for _, t in pairs(HDH_TRACKER.GetList()) do
+					if t.frame.moveFrame then
+						if t.id == tId then
+							t.frame.moveFrame.isSelected = true
+							t:UpdateMoveFrame()
+						else
+							t.frame.moveFrame.isSelected = false
+						end
 					end
 				end
 			end
@@ -1425,6 +1435,14 @@ function HDH_AT_OnClick_Button(self, button)
 		DB:SetTrackerElementSplitValues(trackerId, elemIdx, values)
 		main:LoadDetailFrame(BODY_DETAIL_ETC, trackerId, elemIdx)
 		HDH_TRACKER.InitVaribles(trackerId)
+
+		if HDH_TRACKER.ENABLE_MOVE then
+			local t = HDH_TRACKER.Get(trackerId)
+			if t then
+				t:SetMove(false)
+				t:SetMove(true)
+			end
+		end
 	end
 	
 end
@@ -1845,7 +1863,6 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			splitbar:RemovePointer(i)
 		end
 		
-
 		if CLASS.POWER_INFO and trackerType ~= HDH_TRACKER.TYPE.STAGGER then
 			local max = UnitPowerMax('player', CLASS.POWER_INFO[trackerType].power_index)
 			if max then

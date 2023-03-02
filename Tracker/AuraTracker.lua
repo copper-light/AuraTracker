@@ -58,15 +58,22 @@ do
 	
 	function HDH_AURA_TRACKER.GetAuras(self)
 		local curTime = GetTime()
-		local name, count, duration, endTime, caster, id, v1, v2, v3
+		local name, count, duration, endTime, source, id, v1, v2, v3
 		local ret = 0;
 		local f
 
 		for i = 1, 40 do 
 			-- name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod
-			name, _, count, dispelType, duration, endTime, caster, _, _, id, _, _, _, _, _, v1, v2, v3 = UnitAura(self.unit, i, self.filter)
+			name, _, count, dispelType, duration, endTime, source, _, _, id, _, _, _, _, _, v1, v2, v3 = UnitAura(self.unit, i, self.filter)
 			if not id then break end
-			f = self.frame.pointer[tostring(id)] or self.frame.pointer[name]
+
+			if self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
+				if source == 'player' then
+					f = self.frame.pointer[tostring(id)] or self.frame.pointer[name]
+				end
+			else
+				f = self.frame.pointer[tostring(id)] or self.frame.pointer[name]
+			end
 			if f and f.spell then		
 				spell = f.spell
 				
@@ -104,17 +111,22 @@ do
 	end
 	
 	function HDH_AURA_TRACKER.GetAurasAll(self)
+		local name, icon, count, dispelType, duration, endTime, source, id, canApplyAura, isBossDebuff, castByPlayer 
 		local curTime = GetTime()
 		local ret = 1;
 		local f
 		for i = 1, 40 do 
-			name, icon, count, dispelType, duration, endTime, caster, _, _, id, canApplyAura, isBossDebuff, castByPlayer = UnitAura(self.unit, i, self.filter)
+			name, icon, count, dispelType, duration, endTime, source, _, _, id, canApplyAura, isBossDebuff, castByPlayer = UnitAura(self.unit, i, self.filter)
 			if not id then break end
 			if self.aura_filter == DB.AURA_FILTER_ONLY_BOSS then
 				if not castByPlayer and (self.isRaiding or (isBossDebuff)) then
 					f = self.frame.icon[ret];
 				else
 					f = nil;
+				end
+			elseif self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
+				if source == 'player' then
+					f = self.frame.icon[ret];
 				end
 			else
 				f = self.frame.icon[ret];
@@ -384,9 +396,6 @@ do
 			self.GetAurasFunc = HDH_AURA_TRACKER.GetAurasAll
 			if #(self.frame.icon) > 0 then self:ReleaseIcons() end
 		else
-			if aura_caster == DB.AURA_CASTER_ONLY_MINE then
-				self.filter = self.filter .. "|PLAYER"
-			end
 			for i = 1, elemSize do
 				elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 				glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)

@@ -458,8 +458,9 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 				bar:SetPoint("RIGHT", -1, 0)
 			elseif i == cnt then
 				bar:SetPoint("LEFT", 1, 0)
+				bar:SetPoint("RIGHT", bf.bar[i-1], "LEFT", -self.ui.common.margin_h - 2, 0)
 			else
-				bar:SetPoint("RIGHT", bf.bar[i-1], "LEFT", -self.ui.common.margin_h -1, 0)
+				bar:SetPoint("RIGHT", bf.bar[i-1], "LEFT", -self.ui.common.margin_h - 2, 0)
 			end
 			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture); 
 			bar:SetOrientation("Horizontal"); 
@@ -481,8 +482,9 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 				bar:SetPoint("LEFT", 1, 0)
 			elseif i == cnt then
 				bar:SetPoint("RIGHT", -1, 0)
+				bar:SetPoint("LEFT", bf.bar[i-1], "RIGHT", self.ui.common.margin_h + 2, 0)
 			else
-				bar:SetPoint("LEFT", bf.bar[i-1], "RIGHT", self.ui.common.margin_h + 1, 0)
+				bar:SetPoint("LEFT", bf.bar[i-1], "RIGHT", self.ui.common.margin_h + 2, 0)
 			end
 			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture); 
 			bar:SetOrientation("Horizontal"); 
@@ -503,8 +505,9 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 				bar:SetPoint("BOTTOM", 0, 1)
 			elseif i == cnt then
 				bar:SetPoint("TOP", 0, -1)
+				bar:SetPoint("BOTTOM", bf.bar[i-1], "TOP", 0, self.ui.common.margin_v + 2)
 			else
-				bar:SetPoint("BOTTOM", bf.bar[i-1], "TOP", 0, self.ui.common.margin_v + 1)
+				bar:SetPoint("BOTTOM", bf.bar[i-1], "TOP", 0, self.ui.common.margin_v + 2)
 			end
 			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture_r); 
 			bar:SetOrientation("Vertical"); 
@@ -525,8 +528,9 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 				bar:SetPoint("TOP", 0, -1)
 			elseif i == cnt then
 				bar:SetPoint("BOTTOM", 0, 1)
+				bar:SetPoint("TOP", bf.bar[i-1], "BOTTOM", 0, -self.ui.common.margin_v - 2)
 			else
-				bar:SetPoint("TOP", bf.bar[i-1], "BOTTOM", 0, -self.ui.common.margin_v - 1)
+				bar:SetPoint("TOP", bf.bar[i-1], "BOTTOM", 0, -self.ui.common.margin_v - 2)
 			end
 			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture_r); 
 			bar:SetOrientation("Vertical"); 
