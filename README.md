@@ -1,3 +1,7 @@
+# Destribute addon
+* Curseforge : [Site link](https://www.curseforge.com/wow/addons/auratracker)
+* Inven(wow) : [Site link](https://wow.inven.co.kr/dataninfo/addonpds/detail.php?idx=9396&rurl=%2Fdataninfo%2Faddonpds%2Flist.php%3F)
+
 # 앞으로 해야될 것들..
 * 영문화 : 문법 교정 및 더 짧게 수정
 * 트랜짓 드롭다운 목록 정리 보기 좋게 오더링하도록 수정 필요
