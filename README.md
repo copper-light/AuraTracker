@@ -1,6 +1,6 @@
 # Download latest releases
-* [Curseforge (In English) - https://www.curseforge.com/wow/addons/auratracker](https://www.curseforge.com/wow/addons/auratracker)
-* [WoW Inven (In Korean) - https://wow.inven.co.kr](https://wow.inven.co.kr/dataninfo/addonpds/detail.php?idx=9396&rurl=%2Fdataninfo%2Faddonpds%2Flist.php%3F)
+* [Curseforge (In English)](https://www.curseforge.com/wow/addons/auratracker)
+* [WoW Inven (In Korean)](https://wow.inven.co.kr/dataninfo/addonpds/detail.php?idx=9396&rurl=%2Fdataninfo%2Faddonpds%2Flist.php%3F)
 
 # 앞으로 해야될 것들..
 * 영문화 : 문법 교정 및 더 짧게 수정
@@ -51,12 +51,14 @@
 ## 설정 방법
 - 설정창 팝업 명령어는 /at , /auratracker , /ㅁㅅ
 
-### Release 버전 다운로드
-- inven : https://wow.inven.co.kr/dataninfo/addonpds/detail.php?listtype=favor&idx=9396&rurl=%2Fdataninfo%2Faddonpds%2Flist.php%3Flisttype%3Dfavor
-- curseforge : https://www.curseforge.com/wow/addons/auratracker
-
-
 ## 업데이트 사항
+
+### [2023.03.03] v10.0.5.07
+- [기능추가] 공격대일때 기능 비활성화하는 설정 추가
+- [오류수정] 내주문만 추적하는 기능이 옳바르게 동작하지 않던 문제 수정
+- [오류 수정] 아이콘 크기 및 이동 좌표에 대한 보정 오차 수정 -> 오차 수정으로 인하여 아이콘 크기 2px 정도 작아짐
+- 이동 옵션에 대한 사용성 개선
+- 그 외 기능 안정화
 
 #### [2023.02.18] v10.0.5.06
 - [기능추가] 새로운 추적창 생성 시 공용설정, 개별설정 중 선택 팝업 추가
