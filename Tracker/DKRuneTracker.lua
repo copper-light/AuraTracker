@@ -47,7 +47,7 @@ function HDH_DK_RUNE_TRACKER:CreateData()
 	local id = 0
 	local name = self.POWER_INFO[self.type].power_type
 	local texture = self.POWER_INFO[self.type].texture;
-	local isAlways = true
+	local display = DB.SPELL_ALWAYS_DISPLAY
 	local isValue = false
 	local isItem = false
 	local r,g,b,a = unpack(self.POWER_INFO[self.type].color)
@@ -57,7 +57,7 @@ function HDH_DK_RUNE_TRACKER:CreateData()
 	end
 
 	for i = 1 , MAX_RUNES do
-		DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, isAlways, isValue, isItem)
+		DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, display, isValue, isItem)
 		DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 	end 
 
@@ -125,7 +125,7 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 		if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then self:UpdateBarValue(f, true); end
 		f.icon:SetDesaturated(nil)
 		f.timetext:SetText("");
-		if self.ui.display_mode ~= DB.DISPLAY_BAR and f.spell.always then 
+		if self.ui.display_mode ~= DB.DISPLAY_BAR and (f.spell.display == DB.SPELL_ALWAYS_DISPLAY)then 
 			f.icon:SetAlpha(self.ui.icon.on_alpha)
 			f.border:SetAlpha(self.ui.icon.on_alpha)
 			f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
@@ -195,13 +195,17 @@ function HDH_DK_RUNE_TRACKER:Update_Layout()
 									else col = col + size_w + margin_h end
 				if f.spell.remaining > 0 then ret = ret + 1 end -- 비전투라도 쿨이 돌고 잇는 스킬이 있으면 화면에 출력하기 위해서 체크함
 			else
-				-- if self.option.base.fix then
-				-- 	f:ClearAllPoints()
-				-- 	f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-				-- 	show_index = show_index + 1
-				-- 	if i % line == 0 then row = row + size_h + margin_v; col = 0
-				-- 					else col = col + size_w + margin_h end
-				-- end
+				if f.spell.display == DB.SPELL_HIDE_AS_SPACE and self.ui.common.order_by == DB.ORDERBY_REG then
+					show_index = show_index + 1
+					f:ClearAllPoints()
+					f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
+					if show_index % line == 0 then 
+						row = row + size_h + margin_v
+						col = 0
+					else 
+						col = col + size_w + margin_h
+					end
+				end
 			end
 		end
 	end
@@ -260,7 +264,7 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 		return 
 	end
 
-	local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue
+	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue
 	
 	local spell 
 	local f
@@ -276,7 +280,7 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 	local elemSize = DB:GetTrackerElementSize(trackerId)
 
 	for i = 1 , elemSize do
-		elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
+		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 		glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
 			
 		iconIdx = iconIdx + 1
@@ -290,7 +294,7 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 
 		spell.showValue = isValue
 		-- spell.glowV1= auraList[i].GlowV1
-		spell.always = isAlways
+		spell.display = display
 		-- spell.showValue = auraList[i].ShowValue -- 수치표시
 		-- spell.v1_hp =  auraList[i].v1_hp -- 수치 체력 단위표시
 		spell.v1 = 0 -- 수치를 저장할 변수

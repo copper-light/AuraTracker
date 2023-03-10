@@ -22,9 +22,8 @@ HDH_STAGGER_TRACKER.className = 'HDH_STAGGER_TRACKER';
 HDH_TRACKER.TYPE.STAGGER = 22
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.STAGGER, HDH_STAGGER_TRACKER)
 
-local function STAGGER_TRACKER_OnUpdate(self)
+local function STAGGER_TRACKER_OnUpdate(self, elapsed)
 	self.spell.curTime = GetTime()
-	
 	if self.spell.curTime - (self.spell.delay or 0) < HDH_TRACKER.BAR_UP_ANI_TERM then return end 
 	self.spell.delay = self.spell.curTime
 	local curValue = UnitStagger('player') or 0;
@@ -84,16 +83,16 @@ function HDH_STAGGER_TRACKER:CreateData()
 	local id = 0
 	local name = STAGGER_KEY
 	local texture = HDH_STAGGER_TRACKER.POWER_INFO[1].texture;
-	local isAlways = true
+	local display = DB.SPELL_ALWAYS_DISPLAY
 	local isValue = true
 	local isItem = false
 
 	if DB:GetTrackerElementSize(trackerId) > 0 then
 		DB:TrancateTrackerElements(trackerId)
 	end
-	local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, isAlways, isValue, isItem)
+	local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
 	DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
-	DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_COUNT, DB.CONDITION_GT, 59)
+	DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_COUNT, DB.CONDITION_GT_OR_EQ, 60)
 
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON_AND_BAR)
@@ -142,7 +141,7 @@ function HDH_STAGGER_TRACKER:CreateDummySpell(count)
 	end
 	f:ClearAllPoints()
 	spell = {}
-	spell.always = true
+	spell.display = DB.SPELL_ALWAYS_DISPLAY
 	spell.id = 0
 	spell.count = 100
 	spell.duration = 0
@@ -248,7 +247,7 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 		return 
 	end
 
-	local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue, splitValues
+	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitValues
 	local elemSize = DB:GetTrackerElementSize(trackerId)
 	local spell 
 	local f
@@ -265,7 +264,7 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 	end
 	if self:IsHaveData() then
 		for i = 1 , elemSize do
-			elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
+			elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 			glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
 			splitValues = DB:GetTrackerElementSplitValues(trackerId, i)
 
@@ -278,7 +277,7 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.glowCondtion = glowCondition
 			spell.glowValue = (glowValue and tonumber(glowValue)) or 0
 			spell.showValue = isValue
-			spell.always = isAlways
+			spell.display = display
 			spell.v1 = 0 -- 수치를 저장할 변수
 			spell.aniEnable = true;
 			spell.aniTime = 8;

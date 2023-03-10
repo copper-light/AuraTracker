@@ -76,7 +76,7 @@ do
 		self.aura_filter = aura_filter
 		self.aura_caster = aura_caster
 		if not id then return end
-		local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue
+		local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue
 		local elemSize = DB:GetTrackerElementSize(trackerId)
 		local spell 
 		local f
@@ -87,54 +87,44 @@ do
 			if #(self.frame.icon) > 0 then self:ReleaseIcons() end
 		else
 			for i = 1, elemSize do
-				elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
+				elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 				glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
 
-				-- if not self:IsIgnoreSpellByTalentSpell(auraList[i]) then
-				iconIdx = iconIdx + 1
-				f = self.frame.icon[iconIdx]
-				if f:GetParent() == nil then f:SetParent(self.frame) end
-				self.frame.pointer[elemKey or tostring(elemId)] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
-				spell = {}
-				
-				spell.glow = glowType
-				spell.glowCondtion = glowCondition
-				spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-
-				spell.showValue = isValue
-				-- spell.glowV1= auraList[i].GlowV1
-				spell.always = isAlways
-				-- spell.showValue = auraList[i].ShowValue -- 수치표시
-				-- spell.v1_hp =  auraList[i].v1_hp -- 수치 체력 단위표시
-				spell.v1 = 0 -- 수치를 저장할 변수
-				spell.aniEnable = true;
-				spell.aniTime = 8;
-				spell.aniOverSec = false;
-				spell.no = i
-				spell.name = elemName
-				spell.icon = texture
-				-- if not auraList[i].defaultImg then auraList[i].defaultImg = texture; 
-				-- elseif auraList[i].defaultImg ~= auraList[i].texture then spell.fix_icon = true end
-				spell.id = tonumber(elemId)
-				spell.count = 0
-				spell.duration = 0
-				spell.remaining = 0
-				spell.overlay = 0
-				spell.endTime = 0
-				spell.is_buff = isBuff;
-				spell.isUpdate = false
-				spell.isItem =  isItem
-				f.spell = spell
-				f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-				f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-				f.iconSatCooldown:SetDesaturated(nil)
-				-- f.icon:SetDesaturated(1)
-				-- f.icon:SetAlpha(self.ui.icon.off_alpha)
-				-- f.border:SetAlpha(self.ui.icon.off_alpha)
-				self:ChangeCooldownType(f, self.ui.icon.cooldown)
-				self:SetGlow(f, false)
-
-				self.frame.pointer[spell.name] = f;
+				if self:IsOk(elemId, elemName, false) then 
+					iconIdx = iconIdx + 1
+					f = self.frame.icon[iconIdx]
+					if f:GetParent() == nil then f:SetParent(self.frame) end
+					self.frame.pointer[elemKey or tostring(elemId)] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
+					spell = {}
+					spell.glow = glowType
+					spell.glowCondtion = glowCondition
+					spell.glowValue = (glowValue and tonumber(glowValue)) or 0
+					spell.showValue = isValue
+					spell.display = display
+					spell.v1 = 0 -- 수치를 저장할 변수
+					spell.aniEnable = true;
+					spell.aniTime = 8;
+					spell.aniOverSec = false;
+					spell.no = i
+					spell.name = elemName
+					spell.icon = texture
+					spell.id = tonumber(elemId)
+					spell.count = 0
+					spell.duration = 0
+					spell.remaining = 0
+					spell.overlay = 0
+					spell.endTime = 0
+					spell.is_buff = isBuff;
+					spell.isUpdate = false
+					spell.isItem =  isItem
+					f.spell = spell
+					f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+					f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+					f.iconSatCooldown:SetDesaturated(nil)
+					self:ChangeCooldownType(f, self.ui.icon.cooldown)
+					self:SetGlow(f, false)
+					self.frame.pointer[spell.name] = f;
+				end
 			end
 			for i = #(self.frame.icon) , iconIdx+1, -1  do
 				self:ReleaseIcon(i)

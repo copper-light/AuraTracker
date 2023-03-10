@@ -271,4 +271,78 @@ do
 
 		return x, y
 	end
+
+	local Queue = {first = 0, last = -1, size = 0, capacity = 0}
+	Queue.__index = Queue
+
+	function Queue:Push(value)
+		local last = self.last + 1
+		self.last = last
+		self[last] = value
+		local gap = self.last - self.first
+		if gap >= self.capacity then
+			self[self.first] = nil;
+			self.first = self.first + 1;
+		end
+		self.size = math.min(self.capacity, self.size + 1)
+	end
+
+	function Queue:Pop(idx)
+		local first = self.first;
+		local last = self.last;
+		local value
+
+		if idx then
+			idx = first + idx - 1;
+			if idx > last or not self[idx] then return end
+			local value = self[idx];
+			
+			for i = idx, last do
+				self[i] = self[i+1]
+			end
+			self.last = last -1
+
+			self.size = math.max(self.size -1, 0)
+			return value;
+		else
+			if first > last then return end
+			self.last = last -1
+			value = self[first];
+			first = first + 1;
+			self[first] = nil;
+			self.size = math.max(self.size -1, 0)
+			return value;
+		end
+	end
+
+	function Queue:Get(idx)
+		idx = self.first + idx - 1;
+		if idx > self.last or not self[idx] then return end
+		local value = self[idx];
+		return value;
+	end
+
+	function Queue:GetSize()
+		return self.size;
+	end
+
+	function Queue:Print()
+		if self.first > self.last then error("list is empty") end
+		local idx = self.first;
+		local str = "";
+		while idx <= self.last do
+			if not self[idx] then break end
+			str = str .. "@@"..self[idx]
+			idx = idx + 1;
+		end
+		return str;
+	end
+	
+	function HDH_AT_UTIL.CreateQueue(capacity)
+		local newQ = {}
+		setmetatable(newQ, Queue)
+		newQ.capacity = capacity
+		return newQ
+	end
+
 end

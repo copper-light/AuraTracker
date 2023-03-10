@@ -17,7 +17,7 @@ HDH_TRACKER.TYPE = {}
 -- Properties
 --------------------------------------------
 HDH_TRACKER.ENABLE_MOVE = false
-HDH_TRACKER.ONUPDATE_FRAME_TERM = 0.016;
+HDH_TRACKER.ONUPDATE_FRAME_TERM = 0.05;
 HDH_TRACKER.ANI_SHOW = 1
 HDH_TRACKER.ANI_HIDE = 2
 HDH_TRACKER.FONT_STYLE = "fonts/2002.ttf";
@@ -728,32 +728,6 @@ function HDH_TRACKER:UpdateArtBar(f)
 	end
 end
 
-function HDH_TRACKER:ConnectMoveHandler(count)
-	if not count then return end
-	for i=1, count do
-		f = self.frame.icon[i]
-		f:SetScript('OnDragStart', OnDragStart)
-		f:SetScript('OnDragStop', OnDragStop)
-		f:SetScript('OnMouseDown', OnMouseDown)
-		f:SetScript('OnMouseUp', OnMouseUp)
-		f:SetScript('OnUpdate', OnDragUpdate)
-		f:RegisterForDrag('LeftButton')
-		f:EnableMouse(true);
-		f:SetMovable(true);
-		if f.bar then
-			f = f.bar;
-			f:SetScript('OnDragStart', OnDragStart)
-			f:SetScript('OnDragStop', OnDragStop)
-			f:SetScript('OnMouseDown', OnMouseDown)
-			f:SetScript('OnMouseUp', OnMouseUp)
-			f:SetScript('OnUpdate', OnDragUpdate)
-			f:RegisterForDrag('LeftButton')
-			f:EnableMouse(true);
-			f:SetMovable(true);
-		end
-	end
-end
-
 function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
 	if cooldown_type == DB.COOLDOWN_UP then 
 		f.cd = f.cooldown1
@@ -1009,6 +983,26 @@ function HDH_TRACKER:LoadOrderFunc()
 	end
 end
 
+function HDH_TRACKER:IsOk(id, name, isItem) -- 특성 스킬의 변경에 따른 스킬 표시 여부를 결정하기 위함
+	if not id or id == 0 then return false end
+	if isItem then 
+		local equipSlot = select(9,GetItemInfo(id)) -- 착용 가능한 장비인가요? (착용 불가능이면, nil)
+		if equipSlot and equipSlot ~="" then 
+			self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
+			return IsEquippedItem(id) -- 착용중인가요?
+		else
+			return true
+		end
+	end
+	if IsPlayerSpell(id) then return true end
+	local selected = HDH_AT_UTIL.IsTalentSpell(name); -- true / false / nil: not found talent
+	if selected == nil then
+		return true;
+	else
+		return selected;
+	end
+end
+
 function HDH_TRACKER:CreateDummySpell(count)
 	local icons =  self.frame.icon
 	local ui = self.ui
@@ -1030,7 +1024,7 @@ function HDH_TRACKER:CreateDummySpell(count)
 		prevf = f
 		spell = f.spell
 		if not spell then spell = {} f.spell = spell end
-		spell.always = true
+		spell.display = DB.SPELL_ALWAYS_DISPLAY
 		spell.id = 0
 		spell.count = i
 		spell.overlay = 0
@@ -1412,10 +1406,20 @@ local function CreateMoveFrame(self)
 	t:SetSize(2,7)
 	t:SetPoint("TOPLEFT", self.frame.moveFrame.active, "TOPLEFT", 0, 0)
 
+	t = tf:CreateTexture(nil, 'ARTWORK')
+	t:SetColorTexture(1,0,0,1)
+	t:SetSize(7,2)
+	t:SetPoint("BOTTOMRIGHT", self.frame.moveFrame.active, "BOTTOMRIGHT", 0, 0)
+
+	t = tf:CreateTexture(nil, 'ARTWORK')
+	t:SetColorTexture(1,0,0,1)
+	t:SetSize(2,7)
+	t:SetPoint("BOTTOMRIGHT", self.frame.moveFrame.active, "BOTTOMRIGHT", 0, 0)
+
 	local text = tf:CreateFontString(nil, 'OVERLAY')
 	self.frame.coord = text
 	text:SetPoint("TOPLEFT", self.frame.moveFrame.active, "TOPLEFT", 4, -4)
-	text:SetFontObject("Font_Yellow_S")
+	text:SetFontObject("Font_Yellow_S_B")
 	text:SetWidth(190)
 	text:SetHeight(70)
 	text:SetJustifyH("LEFT")
@@ -1426,7 +1430,7 @@ local function CreateMoveFrame(self)
 	local text = tf:CreateFontString(nil, 'OVERLAY')
 	self.frame.moveFrame.text = text
 	text:ClearAllPoints()
-	text:SetFontObject("Font_Yellow_S")
+	text:SetFontObject("Font_Yellow_S_B")
 	text:SetWidth(190)
 	text:SetHeight(10)
 	
@@ -1628,19 +1632,25 @@ local function ChangeFontLocation(f, fontf, location, op_font)
 end
 
 -- bar 세부 속성 세팅하는 함수 (나중에 option 을 통해 바 값을 변경할수 있기에 따로 함수로 지정해둠)
+
+ICON_BORDER_VALUE = {0.120, 0.15, 0.18, 0.21, 0.24, 0.27, 0.30, 0.33, 0.36, 0.39}
+ICON_SIZE_VALUE =   {0.075, 0.10, 0.14, 0.21, 0.23, 0.30, 0.34, 0.37, 0.40, 0.42}
 function HDH_TRACKER:UpdateIconSettings(f)
 	local icon = f.icon
 	local op_icon = self.ui.icon
 	local op_font = self.ui.font
 	local op_bar = self.ui.bar
 	local op_common = self.ui.common
-
-	f:SetSize(op_icon.size,op_icon.size)
-	f.iconframe:SetSize(op_icon.size * 0.92, op_icon.size * 0.92);
+	local b = 0
+	local border = 0.2355 * (1 - (ICON_BORDER_VALUE[op_icon.border_size] or 0))
+	local size = 1 - (0.455 * (ICON_SIZE_VALUE[op_icon.border_size] or 0))
+	f:SetSize(op_icon.size, op_icon.size)
+	f.iconframe:SetSize(op_icon.size * size, op_icon.size * size);
 	self:SetGameTooltip(f, op_common.show_tooltip or false)
-	
+
 	f.border:SetWidth(op_icon.size)
 	f.border:SetHeight(op_icon.size)
+	f.border:SetTexCoord(border, 1 - border, border, 1 - border)
 	f.border:SetPoint('CENTER', f.iconframe, 'CENTER', 0, 0)
 
 	if op_icon.cooldown == DB.COOLDOWN_CIRCLE then
@@ -1841,8 +1851,9 @@ function HDH_TRACKER:SetGlow(f, bool)
 			elseif f.spell.glow == DB.GLOW_CONDITION_VALUE then
 				value = f.spell.v1
 			end
+			value = value or 0
 			if f.spell.glowCondtion == DB.CONDITION_GT_OR_EQ then
-				active =  (value >= f.spell.glowValue)
+				active = (value >= f.spell.glowValue)
 			elseif f.spell.glowCondtion == DB.CONDITION_LT_OR_EQ then
 				active =  (value <= f.spell.glowValue)
 			elseif f.spell.glowCondtion == DB.CONDITION_EQ then
@@ -2111,6 +2122,33 @@ local function VersionUpdateDB()
 		end
 		DB:SetVersion(2.7)
 	end
+
+	if DB:GetVersion() == 2.7 then
+		local ui = DB:GetTrackerUI()
+		ui.icon.border_size = 2
+		local element
+		for _, trackerId in ipairs(DB:GetTrackerIds()) do
+			if DB:hasTrackerUI(trackerId) then
+				ui = DB:GetTrackerUI(trackerId)
+				ui.icon.border_size = 2
+			end
+
+			for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
+				if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
+					element = HDH_AT_DB.tracker[trackerId].element[elemIdx]
+					if element.isAlways then
+						element.display = DB.SPELL_ALWAYS_DISPLAY
+					else
+						element.display = DB.SPELL_HIDE
+					end
+				end
+			end
+		end
+		HDH_AT_DB.show_latest_spell = true
+		DB:SetVersion(2.8)
+	end
+
+		
 end
 
 local function PLAYER_ENTERING_WORLD()

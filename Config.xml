@@ -226,7 +226,7 @@
 							<ScrollFrame name="$parentTraitsSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
 								<Size><AbsDimension x="135" y="200"/></Size>
 								<Anchors>
-									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLabel" x="1" y="0" />
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLabel" x="0" y="0" />
 									<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$parentBottom" x="0" y="0" />
 								</Anchors>
 
@@ -303,18 +303,35 @@
 							<Layer level="BACKGROUND">
 							</Layer>
 						</Layers>
-						<!--Backdrop edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-							<TileSize><AbsValue val="20"/></TileSize>
-							<EdgeSize><AbsValue val="20"/></EdgeSize>
-						</Backdrop-->
 						<Frames>
+							<Button name="$parentBtnShowSpellList" inherits="HDH_AT_ButtonTemplate" hidden="false">
+								<Size x="95" y="20" />
+								<Anchors>
+									<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-10" y="7" />
+									<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+								</Anchors>
+								<Scripts>
+									<OnLoad>
+										self:SetText(HDH_AT_L.SHOW_LATEST_SPELL) 
+									</OnLoad>
+									<OnClick>
+										self:GetParent():GetParent():GetParent().LatestSpell:SetShown(
+											not self:GetParent():GetParent():GetParent().LatestSpell:IsShown()
+										)
+										if self:GetParent():GetParent():GetParent().LatestSpell:IsShown() then
+											self:GetParent():GetParent():GetParent():UpdateLatest()
+										end
+									</OnClick>
+								</Scripts>
+							</Button>
+
 							<ScrollFrame name="$parentSF" inherits="UIPanelScrollFrameTemplate">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
 										<Offset><AbsDimension x="10" y="-30"/></Offset>
 									</Anchor>
 									<Anchor point="BOTTOMRIGHT"  relativePoint="BOTTOMRIGHT">
-										<Offset><AbsDimension x="-25" y="25"/></Offset>
+										<Offset><AbsDimension x="-25" y="30"/></Offset>
 									</Anchor>
 								</Anchors>
 								
@@ -387,8 +404,8 @@
 												<AbsDimension x="400" y="25"/>
 											</Size>
 											<Anchors>
-												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent" x="0" y="5"/>
-												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-5" y="5"/>
+												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent" x="0" y="-1"/>
+												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-85" y="-1"/>
 											</Anchors>
 										</FontString>
 
@@ -730,7 +747,7 @@
 								<Layers>
 									<Layer level="artwork">
 										<FontString parentKey="Text" name="$parentText" inherits="Font_Yellow_M" text="반짝효과 설정 (택1)" justifyH="LEFT">
-											<Size x="200" y="25" />
+											<Size x="400" y="25" />
 											<Anchors>
 												<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-10"/>
 											</Anchors>
@@ -788,6 +805,19 @@
 										</HitRectInsets>
 										<Scripts>
 											<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_VALUE)</OnLoad>
+											<OnClick function="HDH_AT_UI_OnCheck" />
+										</Scripts>
+									</CheckButton>
+
+									<CheckButton name="$parentCBCondition5" inherits="HDH_AT_CheckButtonTemplate">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition4" x="0" y="0" />
+										</Anchors>
+										<HitRectInsets>
+											<AbsInset left="0" right="-50" top="0" bottom="0"/>
+										</HitRectInsets>
+										<Scripts>
+											<OnLoad>self.Text:SetText(HDH_AT_L.OFF)</OnLoad>
 											<OnClick function="HDH_AT_UI_OnCheck" />
 										</Scripts>
 									</CheckButton>
@@ -856,6 +886,78 @@
 										<Scripts>
 										</Scripts>
 									</EditBox>
+								</Frames>
+							</Frame>
+
+							<Frame name="$parentDisplay" inherits="HDH_AT_BackgroundTemplate">
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT"  relativeTo="$parentTop" x="0" y="0" />
+									<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT"  relativeTo="$parentBottom" x="0" y="0" />
+								</Anchors>
+
+								<Layers>
+									<Layer level="artwork">
+										<FontString parentKey="Text" name="$parentText" inherits="Font_Yellow_M" text="주문 표시 설정 (택1)" justifyH="LEFT">
+											<Size x="400" y="25" />
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-10"/>
+											</Anchors>
+										</FontString>
+									</Layer>
+								</Layers>
+
+								<Frames>
+									<CheckButton name="$parentCBCondition1" inherits="HDH_AT_CheckButtonTemplate">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-40" />
+											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+										</Anchors>
+										<HitRectInsets>
+											<AbsInset left="0" right="-50" top="0" bottom="0"/>
+										</HitRectInsets>
+										<Scripts>
+											<OnLoad>self.Text:SetText(HDH_AT_L.ALWAYS_SHOW)</OnLoad>
+											<OnClick function="HDH_AT_UI_OnCheck" />
+										</Scripts>
+									</CheckButton>
+
+									<CheckButton name="$parentCBCondition2" inherits="HDH_AT_CheckButtonTemplate">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition1" x="0" y="0" />
+										</Anchors>
+										<HitRectInsets>
+											<AbsInset left="0" right="-50" top="0" bottom="0"/>
+										</HitRectInsets>
+										<Scripts>
+											<OnLoad>self.Text:SetText(HDH_AT_L.HIDE_WHEN_DEACTIVE)</OnLoad>
+											<OnClick function="HDH_AT_UI_OnCheck" />
+										</Scripts>
+									</CheckButton>
+
+									<Frame name="$parentSwitchHideMode" inherits="HDH_AT_SwitchFrameTemplate">
+										<Size x="210" y="20"/>
+										<Anchors>
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="137" y="0" />
+										</Anchors>
+										<Scripts>
+											<OnShow>
+											</OnShow>
+										</Scripts>
+									</Frame>
+
+									<!-- <CheckButton name="$parentCBCondition3" inherits="HDH_AT_CheckButtonTemplate">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition2" x="0" y="0" />
+										</Anchors>
+										<HitRectInsets>
+											<AbsInset left="0" right="-50" top="0" bottom="0"/>
+										</HitRectInsets>
+										<Scripts>
+											<OnLoad>self.Text:SetText(HDH_AT_L.DISPLAY_WHEN_IN_ACTIVE_ELSE_OCCUP_SPACE)</OnLoad>
+											<OnClick function="HDH_AT_UI_OnCheck" />
+										</Scripts>
+									</CheckButton> -->
+									
 								</Frames>
 							</Frame>
 							
@@ -997,7 +1099,132 @@
 					</OnClick>
 				</Scripts>
 			</Button>
-			
+
+
+			<Frame name="$parentLatestSpell" parentKey="LatestSpell" inherits="HDH_AT_ConfigFrameTemplate"  movable="true" enableMouse="true" hidden="true">
+				<Size x="150"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="10" y="0" />
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="10" y="0" />
+				</Anchors>
+
+				<Frames>
+					<Frame name="$parentLabel" inherits="HDH_AT_BackgroundTemplate">
+						<Size><AbsDimension y="30"/></Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
+							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="0" y="0"/>
+						</Anchors>
+						<Layers>
+							<Layer level="artwork">
+								<FontString name="$parentText" parentKey="Title" inherits="Font_Yellow_M" text="최근 사용된 주문" justifyH="CENTER">
+									<Size y="20" />
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
+										<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad> 
+								self.Title:SetText(HDH_AT_L.LATEST_SPELL)
+							</OnLoad>
+						</Scripts>
+					</Frame>
+
+					<Frame name="$parentBody" inherits="HDH_AT_BackgroundTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLabel" x="0" y="0"/>
+							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+						</Anchors>
+
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString name="$parentText" parentKey="Desc" inherits="Font_Yellow_S" text="주문 목록으로 드래그하여 주문 추가 가능" justifyH="CENTER" justifyV="CENTER">
+									<Size y="20" />
+									<Color r="1" g="0.8" b="0" a="0.25"/>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
+										<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="25"/>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Frames>
+							<ScrollFrame name="$parentSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate">
+								<Size><AbsDimension x="150" y="200"/></Size>
+								<Anchors>
+									<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="-1" />
+									<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parent" x="0" y="25" />
+								</Anchors>
+
+								<Frames>
+									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-19" y="-20"/>
+											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-19" y="20"/>
+										</Anchors>
+									</Slider>
+								</Frames>
+
+								<ScrollChild>
+									<Frame name="$parentContents" hidden="false">
+										<Size><AbsDimension x="150" y="1"/></Size>
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="5" />
+										</Anchors>
+
+										<Frames>
+											
+										</Frames>
+									</Frame>
+								</ScrollChild>
+							</ScrollFrame>
+
+							<CheckButton name="$parentCBAutoPopup" inherits="HDH_AT_CheckButtonTemplate">
+								<Anchors>
+									<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="5" y="0" />
+									<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+								</Anchors>
+								<Scripts>
+									<OnLoad>self.Text:SetText(HDH_AT_L.AUTO_POPUP)</OnLoad>
+									<OnClick function="HDH_AT_UI_OnCheck" />
+								</Scripts>
+							</CheckButton>
+						</Frames>
+						<Scripts>
+							<OnLoad>
+								self.Desc:SetText(HDH_AT_L.LATEST_SPELL_LIST_DESC)
+							</OnLoad>
+						</Scripts>
+					</Frame>
+
+					
+
+					<Button name="$parentBtnClose" inherits="UIPanelButtonTemplate" text="X">
+						<Size><AbsDimension x="50" y="25"/></Size>
+						<Anchors>
+							<Anchor point="TOPRIGHT" x="-6" y="23" />
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								self:GetParent():Hide(); 
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+					</OnLoad>
+					<OnShow function="HDH_AT_OnShow_LatestSpell"/>
+					<OnHide function="HDH_AT_OnHide_LatestSpell"/>
+					<OnMouseDown>self:GetParent():StartMoving()</OnMouseDown>
+					<OnMouseUp>self:GetParent():StopMovingOrSizing()</OnMouseUp>
+				</Scripts>
+			</Frame>
+
 			<Frame name="$parentAlertDialog" parentKey="Dialog" inherits="HDH_AT_DialogFrameTemplate"/>
 
         </Frames>
@@ -1005,6 +1232,7 @@
         <Scripts>
 			<OnLoad function="HDH_AT_ConfigFrame_OnLoad"/>
             <OnShow function="HDH_AT_ConfigFrame_OnShow"/>
+			<OnHide function="HDH_AT_ConfigFrame_OnHide"/>
             <OnMouseDown>
 				self:StartMoving()
 			</OnMouseDown>
@@ -1070,7 +1298,14 @@
 			</Button>
 		</Frames>
 		<Scripts>
-			<OnShow>_G[self:GetName().."Text"]:SetText("AuraTracker v"..GetAddOnMetadata("HDH_AuraTracker", "Version")) </OnShow>
+			<OnShow>
+				_G[self:GetName().."Text"]:SetText("AuraTracker v"..GetAddOnMetadata("HDH_AuraTracker", "Version"))
+			</OnShow>
+			<OnHide>
+				if not HDH_AT_ConfigFrame:IsShown() then
+					HDH_AT_ConfigFrame_OnHide(HDH_AT_ConfigFrame)
+				end
+			</OnHide>
 			<OnMouseDown>self:StartMoving()</OnMouseDown>
 			<OnMouseUp>self:StopMovingOrSizing()</OnMouseUp>
 		</Scripts>

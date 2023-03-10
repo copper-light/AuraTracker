@@ -153,7 +153,7 @@ local function HDH_POWER_OnUpdate(self)
 	local maxValue = UnitPowerMax('player', self.spell.power_index);
 	self.spell.v1 = curValue;
 	self.spell.count = math.ceil(self.spell.v1 / maxValue * 100);
-	-- if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
+	if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
 	self.counttext:SetText(self.spell.count .. "%"); 
 	-- else self.counttext:SetText(nil) end
 	if self.spell.showValue then 
@@ -230,14 +230,14 @@ function HDH_POWER_TRACKER:CreateData()
 	local id = 0
 	local name = POWER_INFO[self.type].power_type
 	local texture = POWER_INFO[self.type].texture;
-	local isAlways = true
+	local display = DB.SPELL_ALWAYS_DISPLAY
 	local isValue = true
 	local isItem = false
 
 	if DB:GetTrackerElementSize(trackerId) > 0 then
 		DB:TrancateTrackerElements(trackerId)
 	end
-	local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, isAlways, isValue, isItem)
+	local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
 	DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 
 	local maxValue = UnitPowerMax('player', POWER_INFO[self.type].power_index)
@@ -296,7 +296,7 @@ function HDH_POWER_TRACKER:CreateDummySpell(count)
 	end
 	f:ClearAllPoints()
 	spell = {}
-	spell.always = true
+	spell.display = DB.SPELL_ALWAYS_DISPLAY
 	spell.id = 0
 	spell.count = 100
 	spell.duration = 0
@@ -580,7 +580,7 @@ function HDH_POWER_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 			-- f.name:SetText(f.spell.name);
 		end
 	else
-		if f.spell.always then
+		if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then
 			f.icon:SetDesaturated(1)
 			f.icon:SetAlpha(self.ui.icon.off_alpha)
 			f.border:SetAlpha(self.ui.icon.off_alpha)
@@ -628,7 +628,7 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 		return 
 	end
 	
-	local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue, splitValues
+	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitValues
 	local elemSize = DB:GetTrackerElementSize(trackerId)
 	local spell 
 	local f
@@ -645,7 +645,7 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 	end
 	if self:IsHaveData() then
 		for i = 1 , elemSize do
-			elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
+			elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 			glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
 			splitValues = DB:GetTrackerElementSplitValues(trackerId, i)
 			
@@ -658,7 +658,7 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.glowCondtion = glowCondition
 			spell.glowValue = (glowValue and tonumber(glowValue)) or 0
 			spell.showValue = isValue
-			spell.always = isAlways
+			spell.display = display
 			spell.v1 = 0 -- 수치를 저장할 변수
 			spell.aniEnable = true;
 			spell.aniTime = 8;

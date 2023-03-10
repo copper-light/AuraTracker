@@ -127,7 +127,7 @@ do -- HDH_HEALTH_TRACKER class
 		end
 		f:ClearAllPoints()
 		spell = {}
-		spell.always = true
+		spell.display = true
 		spell.id = 0
 		spell.count = 100
 		spell.duration = 0
@@ -281,7 +281,7 @@ do -- HDH_HEALTH_TRACKER class
 				-- f.name:SetText(f.spell.name);
 			end
 		else
-			if f.spell.always then
+			if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then
 				f.icon:SetDesaturated(1)
 				f.icon:SetAlpha(self.option.icon.off_alpha)
 				f.border:SetAlpha(self.option.icon.off_alpha)
@@ -339,7 +339,7 @@ do -- HDH_HEALTH_TRACKER class
 				spell.glow = auraList[i].Glow
 				spell.glowCount = auraList[i].GlowCount
 				spell.glowV1= auraList[i].GlowV1
-				spell.always = auraList[i].Always
+				spell.display = auraList[i].display
 				spell.showValue = auraList[i].ShowValue -- 수치표시
 				spell.v1_hp =  auraList[i].v1_hp -- 수치 체력 단위표시
 				spell.v1 = 0 -- 수치를 저장할 변수

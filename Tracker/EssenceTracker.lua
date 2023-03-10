@@ -65,7 +65,7 @@ function HDH_ESSENCE_TRACKER:CreateData()
 	local id = 0
 	local name = self.POWER_INFO[self.type].power_type
 	local texture = self.POWER_INFO[self.type].texture;
-	local isAlways = true
+	local display = DB.SPELL_ALWAYS_DISPLAY
 	local isValue = false
 	local isItem = false
 	local r,g,b,a = unpack(self.POWER_INFO[self.type].color)
@@ -77,7 +77,7 @@ function HDH_ESSENCE_TRACKER:CreateData()
 
 	for i = 1 , max_power do
 		if not self:IsHaveData(i) then
-			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, isAlways, isValue, isItem)
+			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, display, isValue, isItem)
 			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 			if i == i then
 				isFirstCreated = true

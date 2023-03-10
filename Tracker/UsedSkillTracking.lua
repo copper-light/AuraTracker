@@ -386,7 +386,7 @@ do -- HDH_USED_SKILL_TRACKER class
 			if not UI_LOCK and self.SpellList[line_id] and name then
 				local tracker = self.parent;
 				tracker.IsRecentUsedSkill = true;
-				tracker:Update(GetTime(),name,select(5,...));
+				tracker:Update(GetTime(), name, select(5,...));
 				self.SpellList[line_id] = nil;
 			end
 		elseif (event == 'UNIT_SPELLCAST_SENT')then

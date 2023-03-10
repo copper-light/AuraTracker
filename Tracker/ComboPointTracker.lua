@@ -198,7 +198,7 @@ function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 			iconf.spell.glow = false
 			iconf.spell.glowCount = 0
 			iconf.spell.glowV1= 0
-			iconf.spell.always = true
+			iconf.spell.display = DB.SPELL_ALWAYS_DISPLAY
 			iconf.spell.showValue = true;
 			iconf.icon:SetTexture(self.POWER_INFO[self.type].texture);
 			
@@ -465,7 +465,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 			-- end
 		else
 			if k <= UnitPowerMax('player', self.POWER_INFO[self.type].power_index) then 
-				if f.spell.always then 
+				if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then 
 					if not f.icon:IsDesaturated() then f.icon:SetDesaturated(1) end
 					f.icon:SetAlpha(self.ui.icon.off_alpha)
 					-- f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
@@ -493,6 +493,15 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 						col = col + size_w + margin_h 
 					end
 				else
+					if f.spell.display == DB.SPELL_HIDE_AS_SPACE and self.ui.common.order_by == DB.ORDERBY_REG then
+						i = i + 1
+						if i % column_count == 0 then 
+							row = row + size_h + margin_v
+							col = 0
+						else 
+							col = col + size_w + margin_h
+						end
+					end
 					f:Hide();
 				end
 			else
@@ -555,18 +564,16 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 	-- if HDH_TRACKER.ENABLE_MOVE then return end
 	local ret = 0
 	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-	local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue
+	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue
 	local trackerId = self.id
 	
 	if not self:IsHaveData() then
 		self:CreateData()
 	end
 	for i = 1, power_max do
-		elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
+		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 		glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
-
 		f = self.frame.icon[i]
-
 		spell = {}
 		spell.glow = glowType
 		spell.glowCondtion = glowCondition
@@ -574,7 +581,7 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 		spell.per = 0
 		spell.showValue = isValue
 		-- spell.glowV1= auraList[i].GlowV1
-		spell.always = isAlways
+		spell.display = display
 		-- spell.showValue = auraList[i].ShowValue -- 수치표시
 		-- spell.v1_hp =  auraList[i].v1_hp -- 수치 체력 단위표시
 		spell.v1 = 0 -- 수치를 저장할 변수

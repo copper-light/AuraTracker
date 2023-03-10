@@ -61,14 +61,18 @@ HDH_AT_AuraRowMixin.MODE = {}
 HDH_AT_AuraRowMixin.MODE.EMPTY = 1
 HDH_AT_AuraRowMixin.MODE.DATA = 2
 
-function HDH_AT_AuraRowMixin:Set(no, key, id, name, texture, always, glow, value, isItem, readOnly)
+function HDH_AT_AuraRowMixin:SetOnClickHandler(handler)
+    self.onClickHandler = handler
+end
+
+function HDH_AT_AuraRowMixin:Set(no, key, id, name, texture, display, glow, value, isItem, readOnly)
 	_G[self:GetName().."ButtonIcon"]:SetNormalTexture(texture or 0)
 	_G[self:GetName().."ButtonIcon"]:GetNormalTexture():SetTexCoord(0.08, 0.92, 0.08, 0.92);
 	_G[self:GetName().."TextNum"]:SetText(no)
 	_G[self:GetName().."TextName"]:SetText(name)
 	_G[self:GetName().."TextID"]:SetText(id.."")
     _G[self:GetName().."CheckButtonValue"]:SetChecked(value)
-	_G[self:GetName().."CheckButtonAlways"]:SetChecked(always)
+	_G[self:GetName().."CheckButtonAlways"]:SetChecked(display)
     _G[self:GetName().."CheckButtonGlow"]:SetChecked(glow)
 	_G[self:GetName().."EditBoxID"]:SetText(id or key or "")
 	_G[self:GetName().."CheckButtonIsItem"]:SetChecked(isItem)
@@ -221,7 +225,11 @@ function HDH_AT_OnClickRowFrame(self)
         _G[self:GetName().."CheckButtonIsItem"]:Show()
         _G[self:GetName().."EditBoxID"]:Show()
         _G[self:GetName().."EditBoxID"]:SetFocus()
+        if self.onClickHandler then
+            self.onClickHandler(self)
+        end
     end
+    
 end
 
 -- function HDH_OnEnterPressed(self)
@@ -1138,7 +1146,7 @@ function HDH_AT_SwitchFrameTemplateMixin:Init(itemList, onChangedHandler)
     if not itemList or #itemList == 0 then return end
     local size = #itemList
     local itemWidth, itemHeight = self:GetSize()
-    if itemWidth > 120 then
+    if itemWidth >= 250 then
         itemWidth = (itemWidth-12) / size
     else
         itemWidth = (itemWidth-6) / size
@@ -1278,6 +1286,10 @@ function HDH_AT_SliderTemplateMixin:SetValue(value)
     end
 end
 
+function HDH_AT_SliderTemplateMixin:GetValue()
+    return self.value
+end
+
 function HDH_AT_SliderTemplateMixin:OnUpdate()
     local new_x = select(1, self.Anchor:GetCenter()) - 1 - self:GetLeft() - 17
     if new_x < 0 then
@@ -1318,4 +1330,22 @@ end
 
 function HDH_AT_SliderTemplateMixin_OnEditFocusGained(self)
     self:SetText(self:GetParent().value)
+end
+
+
+------------------------------------
+-- HDH_AT_LatestSpellItemTemplateMixin
+------------------------------------
+HDH_AT_LatestSpellItemTemplateMixin = {}
+
+
+
+function HDH_AT_LatestSpellItemTemplateMixin:SetActive(bool)
+    if bool then
+        self.Background:Show()
+        self.Line:Hide()
+    else
+        self.Background:Hide()
+        self.Line:Show()
+    end
 end

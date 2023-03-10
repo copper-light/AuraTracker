@@ -498,7 +498,7 @@ function HDH_C_TRACKER:Update_Icon(f) -- f == f
 	else -- 쿨 안도는 중
 		if f.cd:IsShown() then f.cd:Hide() end
 		HDH_C_CheckEndSound(f);
-		if spell.always then 	
+		if spell.display == DB.SPELL_ALWAYS_DISPLAY then 	
 			if spell.isAble then
 				self:SetGlow(f, true);
 			else
@@ -526,6 +526,7 @@ function HDH_C_TRACKER:Update_Layout()
 	local reverse_v = self.ui.common.reverse_v -- 상하반전
 	local reverse_h = self.ui.common.reverse_h -- 좌우반전
 	local show_index = 0 -- 몇번째로 아이콘을 출력했는가?
+	local display_index = 0 -- 몇번째로 아이콘을 출력했는가?
 	local col = 0  -- 열에 대한 위치 좌표값 = x
 	local row = 0  -- 행에 대한 위치 좌표값 = y
 	local always_show = self.ui.common.always_show
@@ -553,7 +554,8 @@ function HDH_C_TRACKER:Update_Layout()
 			if HDH_TRACKER.ENABLE_MOVE or f:IsShown() then
 				f:ClearAllPoints()
 				f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-				if i % line == 0 then 
+				display_index = display_index + 1
+				if display_index % line == 0 then 
 					row = row + size_h + margin_v
 					col = 0			
 				else 
@@ -564,12 +566,16 @@ function HDH_C_TRACKER:Update_Layout()
 					show_index = show_index + 1
 				end -- 비전투라도 쿨이 돌고 잇는 스킬이 있으면 화면에 출력하기 위해서 체크함
 			else
-				if self.ui.common.location_fix then
+				if f.spell.display == DB.SPELL_HIDE_AS_SPACE and self.ui.common.order_by == DB.ORDERBY_REG then
+					display_index = display_index + 1
 					f:ClearAllPoints()
 					f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-					show_index = show_index + 1
-					if i % line == 0 then row = row + size_h + margin_v; col = 0
-								else col = col + size_w + margin_h end
+					if display_index % line == 0 then 
+						row = row + size_h + margin_v
+						col = 0
+					else 
+						col = col + size_w + margin_h
+					end
 				end
 			end
 		end
@@ -585,7 +591,7 @@ end
 
 function HDH_C_TRACKER:UpdateAllSlot()
 	self.slot_pointer = {}
-	for i=1,120 do
+	for i=1, 120 do
 		local type, id, subtype = GetActionInfo(i)
 		id = ADJUST_ID[id] or id;
 		if type and self.frame.pointer[id] then
@@ -800,7 +806,7 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 		local spell = {}
 		spell.name = ""
 		spell.icon = nil
-		spell.always = true
+		spell.display = DB.SPELL_ALWAYS_DISPLAY
 		spell.id = 0
 		spell.glow = false
 		spell.count = 3+i
@@ -865,26 +871,6 @@ function HDH_C_TRACKER:Update() -- HDH_TRACKER override
 	self:UpdateIcons();
 end
 
-function HDH_C_TRACKER:IsOk(id, name, isItem) -- 특성 스킬의 변경에 따른 스킬 표시 여부를 결정하기 위함
-	if not id or id == 0 then return false end
-	if isItem then 
-		local equipSlot = select(9,GetItemInfo(id)) -- 착용 가능한 장비인가요? (착용 불가능이면, nil)
-		if equipSlot and equipSlot ~="" then 
-			self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
-			return IsEquippedItem(id) -- 착용중인가요?
-		else
-			return true
-		end
-	end
-	if IsPlayerSpell(id) then return true end
-	local selected = HDH_AT_UTIL.IsTalentSpell(name); -- true / false / nil: not found talent
-	if selected == nil then
-		return true;
-	else
-		return selected;
-	end
-end
-
 function HDH_C_TRACKER:IsSwitchByHappenTime(icon1, icon2) 
 	if not icon1.spell and not icon2.spell then return end
 	local s1 = icon1.spell
@@ -927,7 +913,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 		return 
 	end
 
-	local elemKey, elemId, elemName, texture, defaultImg, isAlways, glowType, isValue, isItem, glowCondition, glowValue
+	local elemKey, elemId, elemName, texture, defaultImg, display, glowType, isValue, isItem, glowCondition, glowValue
 	local elemSize = DB:GetTrackerElementSize(trackerId)
 	local spell 
 	local f
@@ -938,7 +924,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	self.frame:UnregisterAllEvents()
 	
 	for i = 1 , elemSize do
-		elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
+		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 		glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
 		defaultImg = DB:GetTrackerElementDefaultImage(trackerId, i)
 
@@ -964,7 +950,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.glowCondtion = glowCondition
 			spell.glowValue = (glowValue and tonumber(glowValue)) or 0
 			spell.showValue = isValue
-			spell.always = isAlways
+			spell.display = display
 			spell.isItem = (isItem or false)
 
 			spell.duration = 0

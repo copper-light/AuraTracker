@@ -3,7 +3,7 @@ local L = HDH_AT_L
 local CONFIG = HDH_AT_ConfigDB
 local UTIL = HDH_AT_UTIL
 
-CONFIG.VERSION = 2.6
+CONFIG.VERSION = 2.8
 
 CONFIG.ANI_HIDE = 1
 CONFIG.ANI_SHOW = 2
@@ -80,6 +80,10 @@ CONFIG.GLOW_CONDITION_ACTIVE = 1
 CONFIG.GLOW_CONDITION_TIME = 2
 CONFIG.GLOW_CONDITION_COUNT = 3
 CONFIG.GLOW_CONDITION_VALUE = 4
+
+CONFIG.SPELL_ALWAYS_DISPLAY = 1
+CONFIG.SPELL_HIDE = 2
+CONFIG.SPELL_HIDE_AS_SPACE = 3
 
 CONFIG.CONDITION_GT_OR_EQ = 1
 CONFIG.CONDITION_LT_OR_EQ = 2
@@ -176,6 +180,7 @@ local DEFAULT_DISPLAY = {
 HDH_AT_DB = {
     version = CONFIG.VERSION,
     show_tooltip_id = true,
+    show_latest_spell = true,
     ui = {
         global_ui = DEFAULT_DISPLAY
     },
@@ -334,7 +339,7 @@ end
 function HDH_AT_ConfigDB:GetTrackerElement(trackerId, elementIndex)
     if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elementIndex] then
         local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
-        return element.key, element.id, element.name, element.texture, element.isAlways, element.glowType, element.isValue,  element.isItem
+        return element.key, element.id, element.name, element.texture, element.display, element.glowType, element.isValue, element.isItem
     else
         return nil
     end
@@ -379,17 +384,17 @@ function HDH_AT_ConfigDB:IsReadOnlyTrackerElement(trackerId, elementIndex)
     return false
 end
 
-function HDH_AT_ConfigDB:AddTrackerElement(trackerId, key, id, name, texture, isAlways, isValue, isItem)
+function HDH_AT_ConfigDB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
     if not HDH_AT_DB.tracker[trackerId].element then
         HDH_AT_DB.tracker[trackerId].element = {}
     end
     local elementIndex = #HDH_AT_DB.tracker[trackerId].element + 1
     HDH_AT_DB.tracker[trackerId].element[elementIndex] = {}
-    HDH_AT_ConfigDB:SetTrackerElement(trackerId, elementIndex, key, id, name, texture, isAlways, isValue, isItem)
+    HDH_AT_ConfigDB:SetTrackerElement(trackerId, elementIndex, key, id, name, texture, display, isValue, isItem)
     return elementIndex
 end
 
-function HDH_AT_ConfigDB:SetTrackerElement(trackerId, elementIndex, key, id, name, texture, isAlways, isValue, isItem)
+function HDH_AT_ConfigDB:SetTrackerElement(trackerId, elementIndex, key, id, name, texture, display, isValue, isItem)
     if not HDH_AT_DB.tracker[trackerId].element[elementIndex] then
         HDH_AT_DB.tracker[trackerId].element[elementIndex] = {}
     end
@@ -397,7 +402,7 @@ function HDH_AT_ConfigDB:SetTrackerElement(trackerId, elementIndex, key, id, nam
 	element.key = key
 	element.id = id
 	element.name = name
-	element.isAlways = isAlways
+	element.display = display
 	element.texture = texture
     if not element.defaultTexture then element.defaultTexture = texture end
 	element.isItem = isItem
@@ -432,9 +437,14 @@ function HDH_AT_ConfigDB:GetTrackerElementDefaultImage(trackerId, elementIndex)
     return element.defaultTexture
 end
 
-function HDH_AT_ConfigDB:UpdateTrackerElementAlways(trackerId, elementIndex, bool)
+function HDH_AT_ConfigDB:GetTrackerElementDisplay(trackerId, elementIndex)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
-    element.isAlways = bool
+    return element.display or CONFIG.SPELL_ALWAYS_DISPLAY
+end
+
+function HDH_AT_ConfigDB:UpdateTrackerElementDisplay(trackerId, elementIndex, value)
+    local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
+    element.display = value
 end
 
 function HDH_AT_ConfigDB:UpdateTrackerElementGlow(trackerId, elementIndex, glowType, condition, value)

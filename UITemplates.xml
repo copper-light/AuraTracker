@@ -25,6 +25,17 @@
 		</Shadow>
 	</Font>
 
+	<Font name="Font_Yellow_S_B" font="Fonts\2002.TTF" outline="NORMAL" virtual="true">
+		<Color r="1" g="0.8" b="0"/>
+		<FontHeight>
+		  <AbsValue val="11"/>
+		</FontHeight>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+
     <Font name="Font_Yellow_S" font="Fonts\2002.TTF" virtual="true">
 		<Color r="1" g="0.8" b="0"/>
 		<FontHeight>
@@ -2236,7 +2247,7 @@
 			</Button>
 
 			<Button parentKey="Anchor" inherits="HDH_AT_ButtonTemplate" virtual="true" text=""  movable="true">
-				<Size x="11" y="20"/>
+				<Size x="17" y="20"/>
 				<Anchors>
 					<Anchor point="center" relativeTo="$parentBar" relativePoint="RIGHT" x="0" y="0"/>
 				</Anchors>
@@ -2289,6 +2300,63 @@
 				</Scripts>
 			</EditBox>
 		</Frames>
+	</Frame>
+
+	<Frame name="HDH_AT_LatestSpellItemTemplate" mixin="HDH_AT_LatestSpellItemTemplateMixin" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBg" parentKey="Background" hidden="true">
+					<Color r="1" g="0.8" b="0" a="0.5" />
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+				<Texture name="$parentIcon" parentKey="Icon">
+					<Size x="20" y="20" /> 
+					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="LEFT" x="2" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" />
+				</Texture>
+
+				<Texture parentKey="Line"  hidden="false">
+					<Size y="1" /> 
+					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+
+				<FontString name="$parentText" parentKey="Name" inherits="Font_Yellow_S" text="주문이름" justifyH="LEFT">
+					<Size x="70" y="10" />
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="RIGHT" relativeTo="$parentIcon" x="5" y="0"/>
+						<Anchor point="RIGHT" relativePoint="RIGHT" x="-3" y="0"/>
+					</Anchors>
+				</FontString>
+
+				<FontString parentKey="ID" inherits="Font_White_SS" text="주문아이디" justifyH="LEFT">
+					<Size x="50" y="10" />
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="RIGHT" relativeTo="$parentIcon" x="5" y="0"/>
+					</Anchors>
+				</FontString>
+
+				<FontString parentKey="Type" inherits="Font_White_SS" text="주문유형" justifyH="RIGHT">
+					<Size x="20" y="10" />
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="RIGHT" relativeTo="$parentIcon" x="0" y="0"/>
+						<Anchor point="RIGHT" relativePoint="RIGHT" x="-3" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
 	</Frame>
 
 </Ui> 

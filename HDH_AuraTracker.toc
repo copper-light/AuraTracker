@@ -2,11 +2,11 @@
 ## Title: HDH_AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
-## Version: 10.0.5.06
+## Version: 10.0.5.08
 ## SavedVariablesPerCharacter: HDH_AT_DB
 
-locale\locale.lua
-locale\locale_koKR.lua
+Locale\locale.lua
+Locale\locale_koKR.lua
 
 Utils.lua
 UITemplates.xml
@@ -24,8 +24,8 @@ Tracker\EssenceTracker.lua
 Tracker\StaggerTracker.lua
 
 # https://www.wowace.com/projects/libcompress
-lib\LibCompress\LibStub.lua
-lib\LibCompress\LibCompress.lua
-lib\AceSerializer-3.0\AceSerializer-3.0.lua
-lib\WeakAuraLib\Transmission.lua
+Lib\LibCompress\LibStub.lua
+Lib\LibCompress\LibCompress.lua
+Lib\AceSerializer-3.0\AceSerializer-3.0.lua
+Lib\WeakAuraLib\Transmission.lua
 Config.xml

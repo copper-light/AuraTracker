@@ -58,9 +58,10 @@ do
 	
 	function HDH_AURA_TRACKER.GetAuras(self)
 		local curTime = GetTime()
-		local name, count, duration, endTime, source, id, v1, v2, v3
+		local name, count, duration, endTime, source, id, v1, v2, v3, dispelType
 		local ret = 0;
 		local f
+		local spell
 
 		for i = 1, 40 do 
 			-- name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod
@@ -127,6 +128,8 @@ do
 			elseif self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
 				if source == 'player' then
 					f = self.frame.icon[ret];
+				else
+					f = nil;
 				end
 			else
 				f = self.frame.icon[ret];
@@ -313,7 +316,7 @@ do
 				self:SetGlow(f, true)
 			else
 				f.timetext:SetText(nil);
-				if f.spell.always then 
+				if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then 
 					f.icon:SetDesaturated(1)
 					f.icon:SetAlpha(self.ui.icon.off_alpha)
 					f.border:SetAlpha(self.ui.icon.off_alpha)
@@ -325,21 +328,21 @@ do
 					f.iconSatCooldown:Hide() 
 					if display_mode ~= DB.DISPLAY_ICON and f.bar then 
 						if not f.bar:IsShown() then f.bar:Show(); end
-						-- f.bar:SetMinMaxValues(0,1); 
-						-- f.bar:SetValue(0); 
 						f.name:SetText(f.spell.name);
-						-- f.name:SetTextColor(1,1,1,0.35);
 						self:UpdateBarValue(f, true);
 					end--f.bar:Hide();
 					f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
 					i = i + 1
-					if i % column_count == 0 then row = row + size_h + margin_v; col = 0
-								     else col = col + size_w + margin_h end
+					if i % column_count == 0 then 
+						row = row + size_h + margin_v; col = 0
+					else 
+						col = col + size_w + margin_h 
+					end
 					f:Show()
 					
 					self:SetGlow(f, f.spell.glow == DB.GLOW_CONDITION_TIME)
 				else
-					if self.ui.common.location_fix then
+					if f.spell.display == DB.SPELL_HIDE_AS_SPACE and self.ui.common.order_by == DB.ORDERBY_REG then
 						i = i + 1
 						if i % column_count == 0 then row = row + size_h + margin_v; col = 0
 										 else col = col + size_w + margin_h end
@@ -381,7 +384,7 @@ do
 		self.aura_filter = aura_filter
 		self.aura_caster = aura_caster
 		if not id then return end
-		local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem, glowCondition, glowValue
+		local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, hideMode
 		local elemSize = DB:GetTrackerElementSize(trackerId)
 		local spell 
 		local f
@@ -397,25 +400,20 @@ do
 			if #(self.frame.icon) > 0 then self:ReleaseIcons() end
 		else
 			for i = 1, elemSize do
-				elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
+				elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
+				display, hideMode = DB:GetTrackerElementDisplay(trackerId, i)
 				glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
-
-				-- if not self:IsIgnoreSpellByTalentSpell(elemId) then
 				iconIdx = iconIdx + 1
 				f = self.frame.icon[iconIdx]
 				if f:GetParent() == nil then f:SetParent(self.frame) end
 				self.frame.pointer[elemKey] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
 				spell = {}
-				
 				spell.glow = glowType
 				spell.glowCondtion = glowCondition
 				spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-
 				spell.showValue = isValue
-				-- spell.glowV1= auraList[i].GlowV1
-				spell.always = isAlways
-				-- spell.showValue = auraList[i].ShowValue -- 수치표시
-				-- spell.v1_hp =  auraList[i].v1_hp -- 수치 체력 단위표시
+				spell.display = display
+				spell.hideMode = hideMode
 				spell.v1 = 0 -- 수치를 저장할 변수
 				spell.aniEnable = true;
 				spell.aniTime = 8;
@@ -423,8 +421,6 @@ do
 				spell.no = i
 				spell.name = elemName
 				spell.icon = texture
-				-- if not auraList[i].defaultImg then auraList[i].defaultImg = texture; 
-				-- elseif auraList[i].defaultImg ~= auraList[i].texture then spell.fix_icon = true end
 				spell.id = tonumber(elemId)
 				spell.count = 0
 				spell.duration = 0
@@ -438,9 +434,6 @@ do
 				f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 				f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 				f.iconSatCooldown:SetDesaturated(nil)
-				-- f.icon:SetDesaturated(1)
-				-- f.icon:SetAlpha(self.ui.icon.off_alpha)
-				-- f.border:SetAlpha(self.ui.icon.off_alpha)
 				self:ChangeCooldownType(f, self.ui.icon.cooldown)
 				self:SetGlow(f, false)
 			end
