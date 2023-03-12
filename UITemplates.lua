@@ -451,8 +451,8 @@ function HDH_AT_DropDownMixin:SelectClear()
             for i, item in ipairs(items) do
                 if item.CheckButton then
                     item.CheckButton:SetChecked(false)
-                    item.CheckButton:Enable()
-                    item.Text:SetFontObject("Font_White_S")
+                    -- item.CheckButton:Enable()
+                    -- item.Text:SetFontObject("Font_White_S")
                 end
             end
             self.selectedValueCount = 0
@@ -593,7 +593,7 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
 
             itemFrame:SetPoint("TOPLEFT", listFrame, "TOPLEFT", 1, -totalHeight)
             itemFrame:SetPoint("RIGHT", listFrame, "RIGHT", -1, 0)
-            _G[itemFrame:GetName().."Text"]:SetText(name)
+            itemFrame.Text:SetText(name)
             if texture then
                 local t = _G[itemFrame:GetName().."Texture"]
                 if frame.useAtlasSize then
@@ -1338,8 +1338,6 @@ end
 ------------------------------------
 HDH_AT_LatestSpellItemTemplateMixin = {}
 
-
-
 function HDH_AT_LatestSpellItemTemplateMixin:SetActive(bool)
     if bool then
         self.Background:Show()
@@ -1347,5 +1345,81 @@ function HDH_AT_LatestSpellItemTemplateMixin:SetActive(bool)
     else
         self.Background:Hide()
         self.Line:Show()
+    end
+end
+
+
+-------------------------------------
+--  HDH_AT_CheckButton2TemplateMixin
+-------------------------------------
+
+HDH_AT_CheckButton2TemplateMixin = {}
+
+function HDH_AT_CheckButton2_OnClick(self)
+    self:SetChecked(not (self.isChecked or false))
+    if self.OnClickfunc then
+        self.OnClickfunc(self)
+    end
+end
+
+function HDH_AT_CheckButton2TemplateMixin:HiddenBackground(bool)
+    self.isHideBackground = bool
+
+    if bool then
+        self.Deactive1:Hide()
+        self.DeactiveBorderTop:Hide()
+        self.DeactiveBorderLeft:Hide()
+        self.DeactiveBorderBottom:Hide()
+        self.DeactiveBorderRight:Hide()
+    else
+        self.Deactive1:Show()
+        self.DeactiveBorderTop:Show()
+        self.DeactiveBorderLeft:Show()
+        self.DeactiveBorderBottom:Show()
+        self.DeactiveBorderRight:Show()
+    end
+end
+
+function HDH_AT_CheckButton2TemplateMixin:SetChecked(bool)
+    if bool then
+        if not self.isHideBackground then
+            self.Active1:Show()
+            self.ActiveBorderTop:Show()
+            self.ActiveBorderLeft:Show()
+            self.ActiveBorderRight:Show()
+            self.ActiveBorderBottom:Show()
+        end
+        self.CheckMarker:Show()
+        self.CheckMarker:SetFontObject("Font_White_M")
+        self.Text:SetFontObject("Font_Yellow_S")
+        self.Active2:Show()
+    else
+        self.Text:SetFontObject("Font_White_S")
+        self.Active1:Hide()
+        self.CheckMarker:Hide()
+        self.ActiveBorderTop:Hide()
+        self.ActiveBorderLeft:Hide()
+        self.ActiveBorderRight:Hide()
+        self.ActiveBorderBottom:Hide()
+        self.Active2:Hide()
+    end
+
+    self.Active1:Hide()
+    -- self.CheckMarker:Hide()
+    self.ActiveBorderTop:Hide()
+    self.ActiveBorderLeft:Hide()
+    self.ActiveBorderRight:Hide()
+    self.ActiveBorderBottom:Hide()
+    
+    self.isChecked = bool
+end
+
+function HDH_AT_CheckButton2TemplateMixin:GetChecked()
+    return self.isChecked or false
+end
+
+function HDH_AT_CheckButton2TemplateMixin:SetScript(scriptTypeName, func)
+    if scriptTypeName == "OnClick" then
+        self.OnClickfunc = func
     end
 end

@@ -71,11 +71,14 @@ do
 			if self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
 				if source == 'player' then
 					f = self.frame.pointer[tostring(id)] or self.frame.pointer[name]
+				else
+					f = nil
 				end
 			else
 				f = self.frame.pointer[tostring(id)] or self.frame.pointer[name]
 			end
-			if f and f.spell then		
+			if f and f.spell then
+
 				spell = f.spell
 				
 				if not StaggerID[id] then -- 시간차가 아니면
@@ -271,7 +274,6 @@ do
 						f.icon:SetDesaturated(nil)
 					end
 				end
-				
 				if not self.ui.common.default_color or f.spell.dispelType == nil then 
 					f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
 				else 
@@ -389,11 +391,13 @@ do
 		local spell 
 		local f
 		local iconIdx = 0;
-		local isBuff = (self.type == HDH_TRACKER.TYPE.BUFF);
 		self.frame.pointer = {}
 
-		if isBuff then self.filter = "HELPFUL";
-		else self.filter = "HARMFUL"; end
+		if self.type == HDH_TRACKER.TYPE.BUFF then 
+			self.filter = "HELPFUL"
+		else 
+			self.filter = "HARMFUL"
+		end
 
 		if aura_filter == DB.AURA_FILTER_ALL or aura_filter == DB.AURA_FILTER_ONLY_BOSS then
 			self.GetAurasFunc = HDH_AURA_TRACKER.GetAurasAll
@@ -427,7 +431,7 @@ do
 				spell.remaining = 0
 				spell.overlay = 0
 				spell.endTime = 0
-				spell.is_buff = isBuff;
+				-- spell.is_buff = isBuff;
 				spell.isUpdate = false
 				spell.isItem =  isItem
 				f.spell = spell

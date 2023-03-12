@@ -123,7 +123,7 @@ local DEFAULT_DISPLAY = {
         on_alpha = 1, 
         off_alpha = 0.5,
         active_border_color = {0,1,0,1}, 
-        border_size = 1, 
+        border_size = 2, 
         cooldown_bg_color = {0,0,0,0.75},
         desaturation = true, 
         spark_color = {1,1,1,1},
@@ -317,6 +317,10 @@ function HDH_AT_ConfigDB:GetTrackerIdsByTraits(talentId, traitId)
     end
 
     return ret --tracker.id, tracker.name, tracker.type, tracker.unit, tracker.aura_type
+end
+
+function HDH_AT_ConfigDB:GetTracker(trackerId)
+    return HDH_AT_DB.tracker[trackerId]
 end
 
 function HDH_AT_ConfigDB:GetTrackerInfo(trackerId)
@@ -598,22 +602,52 @@ function HDH_AT_ConfigDB:CopyTracker(trackerId, copyName)
     return newId
 end
 
+function HDH_AT_ConfigDB:AppendProfile(supportTrackerList, data)
+    local ids = self:GetTrackerIds()
+    local id = #ids
+    local match = false
+    local talentID
+    for _, config in ipairs(data) do
+        id = id + 1
+       
+        match = false
+        for _, trait in ipairs(config.tracker.trait) do
+            for i = 1, MAX_TALENT_TABS do
+                talentId, _, _, _ = GetSpecializationInfo(i)
+                if talentId == nil then
+                    break
+                end
+                if trait == talentId then
+                    match = true
+                    break
+                end
+            end
+            if match then
+                break
+            end
+        end
+        if not match then
+            talentID = select(1,GetSpecializationInfo(GetSpecialization()))
+            config.tracker.trait = {talentID}
+        end
+        if supportTrackerList[config.tracker.type] then
+            config.tracker.id = id
+            HDH_AT_DB.tracker[id] = config.tracker
+            HDH_AT_DB.ui[id] = config.ui
+        end
+    end
+end
 
 function HDH_AT_ConfigDB:VaildationProfile(data)
     if not data.version then
         return false
     end
 
-    if not data.ui or not data.ui.global_ui then
+    if HDH_AT_DB.version ~= data.version then
         return false
     end
-
-    if not data.tracker then
-        return false
-    end
-
-    for _, t in ipairs(data.tracker) do
-        if not t.name then
+    for _, config in ipairs(data) do
+        if not config.ui or not config.tracker then
             return false
         end
     end

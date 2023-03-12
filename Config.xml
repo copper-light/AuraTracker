@@ -67,9 +67,20 @@
 				</Anchors>
 				<Frames>
 					<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="true">
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture>
+									<Color r="0" g="0" b="0" a="0.3"/>
+									<Anchors>
+										<Anchor point="TOPLEFT" x="-1" y="17" />
+										<Anchor point="BOTTOMRIGHT" x="1" y="-16" />
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
 						<Anchors>
-							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="-10" y="-18"/>
-							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="-10" y="18"/>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="-16" y="-18"/>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="-16" y="16"/>
 						</Anchors>
 					</Slider>
 				</Frames>
@@ -584,25 +595,24 @@
 								</Anchors>
 								<Frames>
 							
-									<CheckButton name="$parentCBMove" inherits="HDH_AT_CheckButtonTemplate">
+									<CheckButton name="$parentCBMove" inherits="HDH_AT_CheckButton2Template">
 										<Anchors>
 											<Anchor point="LEFT" relativePoint="LEFT" x="10" y="0" />
 											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 										</Anchors>
 										<Scripts>
 											<OnLoad>self.Text:SetText(HDH_AT_L.MOVE_UI)</OnLoad>
-											<OnClick function="HDH_AT_UI_OnCheck" />
+											<OnClick function="HDH_AT_UI_OnCheck" inherit="prepend" />
 										</Scripts>
 									</CheckButton>
 
-									<CheckButton name="$parentCBShowIdInTooltip" inherits="HDH_AT_CheckButtonTemplate">
+									<CheckButton name="$parentCBShowIdInTooltip" inherits="HDH_AT_CheckButton2Template">
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="LEFT" x="90" y="0" />
-											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBMove" x="5" y="0" />
 										</Anchors>
 										<Scripts>
 											<OnLoad>self.Text:SetText(HDH_AT_L.DISPLAY_ID_IN_TOOPTIP)</OnLoad>
-											<OnClick function="HDH_AT_UI_OnCheck" />
+											<OnClick function="HDH_AT_UI_OnCheck" inherit="prepend" />
 										</Scripts>
 									</CheckButton>
 								</Frames>
@@ -756,90 +766,80 @@
 								</Layers>
 
 								<Frames>
-									<CheckButton name="$parentCBCondition1" inherits="HDH_AT_CheckButtonTemplate">
+									<CheckButton name="$parentCBCondition1" inherits="HDH_AT_CheckButton2Template">
+										<Size x="180" y="20"/>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-40" />
 											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 										</Anchors>
-										<HitRectInsets>
-											<AbsInset left="0" right="-50" top="0" bottom="0"/>
-										</HitRectInsets>
 										<Scripts>
 											<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_ACTIVE)</OnLoad>
-											<OnClick function="HDH_AT_UI_OnCheck" />
+											<OnClick function="HDH_AT_UI_OnCheck" inherit="prepend" />
 										</Scripts>
 									</CheckButton>
 
-									<CheckButton name="$parentCBCondition2" inherits="HDH_AT_CheckButtonTemplate">
+									<CheckButton name="$parentCBCondition2" inherits="HDH_AT_CheckButton2Template">
+										<Size x="180" y="20"/>
 										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition1" x="0" y="0" />
+											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition1" x="0" y="-2" />
 										</Anchors>
-										<HitRectInsets>
-											<AbsInset left="0" right="-50" top="0" bottom="0"/>
-										</HitRectInsets>
 										<Scripts>
 											<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_TIME)</OnLoad>
-											<OnClick function="HDH_AT_UI_OnCheck" />
+											<OnClick function="HDH_AT_UI_OnCheck" inherit="prepend"/>
 										</Scripts>
 									</CheckButton>
 
-									<CheckButton name="$parentCBCondition3" inherits="HDH_AT_CheckButtonTemplate">
+									<CheckButton name="$parentCBCondition3" inherits="HDH_AT_CheckButton2Template">
+										<Size x="180" y="20"/>
 										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition2" x="0" y="0" />
+											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition2" x="0" y="-2" />
 										</Anchors>
-										<HitRectInsets>
-											<AbsInset left="0" right="-50" top="0" bottom="0"/>
-										</HitRectInsets>
 										<Scripts>
 											<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_COUNT)</OnLoad>
-											<OnClick function="HDH_AT_UI_OnCheck" />
+											<OnClick function="HDH_AT_UI_OnCheck" inherit="prepend"/>
 										</Scripts>
 									</CheckButton>
 
-									<CheckButton name="$parentCBCondition4" inherits="HDH_AT_CheckButtonTemplate">
+									<CheckButton name="$parentCBCondition4" inherits="HDH_AT_CheckButton2Template">
+										<Size x="180" y="20"/>
 										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition3" x="0" y="0" />
+											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition3" x="0" y="-2" />
 										</Anchors>
-										<HitRectInsets>
-											<AbsInset left="0" right="-50" top="0" bottom="0"/>
-										</HitRectInsets>
 										<Scripts>
 											<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_VALUE)</OnLoad>
-											<OnClick function="HDH_AT_UI_OnCheck" />
+											<OnClick function="HDH_AT_UI_OnCheck" inherit="prepend"/>
 										</Scripts>
 									</CheckButton>
 
-									<CheckButton name="$parentCBCondition5" inherits="HDH_AT_CheckButtonTemplate">
+									<CheckButton name="$parentCBCondition5" inherits="HDH_AT_CheckButton2Template">
+										<Size x="180" y="20"/>
 										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition4" x="0" y="0" />
+											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition4" x="0" y="-2" />
 										</Anchors>
-										<HitRectInsets>
-											<AbsInset left="0" right="-50" top="0" bottom="0"/>
-										</HitRectInsets>
 										<Scripts>
 											<OnLoad>self.Text:SetText(HDH_AT_L.OFF)</OnLoad>
-											<OnClick function="HDH_AT_UI_OnCheck" />
+											<OnClick function="HDH_AT_UI_OnCheck" inherit="prepend"/>
 										</Scripts>
 									</CheckButton>
 
 									<Button name="$parentDDCondition2" inherits="HDH_AT_DropDownOptionTemplate">
-										<Size x="50" y="22" />
+										<Size x="50" y="20" />
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="125" y="0" />
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="2" y="0" />
 										</Anchors>
 									</Button>
 
 									<Button name="$parentDDCondition3" inherits="HDH_AT_DropDownOptionTemplate">
-										<Size x="50" y="22" />
+										<Size x="50" y="20" />
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition3" x="125" y="0" />
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition3" x="2" y="0" />
 										</Anchors>
 									</Button>
 
 									<Button name="$parentDDCondition4" inherits="HDH_AT_DropDownOptionTemplate">
-										<Size x="50" y="22" />
+										<Size x="50" y="20" />
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition4" x="125" y="0" />
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition4" x="2" y="0" />
 										</Anchors>
 									</Button>
 
@@ -848,7 +848,7 @@
 											<AbsDimension x="70" y="26"/>
 										</Size>
 										<Anchors>
-											<Anchor point="LEFT" relativeTo="$parentDDCondition2" relativePoint="RIGHT" x="25" y="0" />
+											<Anchor point="LEFT" relativeTo="$parentDDCondition2" relativePoint="RIGHT" x="7" y="0" />
 										</Anchors>
 										<Layers>
 											<Layer level="artwork">
@@ -870,7 +870,7 @@
 											<AbsDimension x="70" y="26"/>
 										</Size>
 										<Anchors>
-											<Anchor point="LEFT" relativeTo="$parentDDCondition3" relativePoint="RIGHT" x="25" y="0" />
+											<Anchor point="LEFT" relativeTo="$parentDDCondition3" relativePoint="RIGHT" x="7" y="0" />
 										</Anchors>
 										<Scripts>
 										</Scripts>
@@ -881,7 +881,7 @@
 											<AbsDimension x="70" y="26"/>
 										</Size>
 										<Anchors>
-											<Anchor point="LEFT" relativeTo="$parentDDCondition4" relativePoint="RIGHT" x="25" y="0" />
+											<Anchor point="LEFT" relativeTo="$parentDDCondition4" relativePoint="RIGHT" x="7" y="0" />
 										</Anchors>
 										<Scripts>
 										</Scripts>
@@ -907,27 +907,23 @@
 								</Layers>
 
 								<Frames>
-									<CheckButton name="$parentCBCondition1" inherits="HDH_AT_CheckButtonTemplate">
+									<CheckButton name="$parentCBCondition1" inherits="HDH_AT_CheckButton2Template">
+										<Size x="150" y="20" />
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-40" />
 											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 										</Anchors>
-										<HitRectInsets>
-											<AbsInset left="0" right="-50" top="0" bottom="0"/>
-										</HitRectInsets>
 										<Scripts>
 											<OnLoad>self.Text:SetText(HDH_AT_L.ALWAYS_SHOW)</OnLoad>
 											<OnClick function="HDH_AT_UI_OnCheck" />
 										</Scripts>
 									</CheckButton>
 
-									<CheckButton name="$parentCBCondition2" inherits="HDH_AT_CheckButtonTemplate">
+									<CheckButton name="$parentCBCondition2" inherits="HDH_AT_CheckButton2Template">
+										<Size x="150" y="20" />
 										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition1" x="0" y="0" />
+											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition1" x="0" y="-2" />
 										</Anchors>
-										<HitRectInsets>
-											<AbsInset left="0" right="-50" top="0" bottom="0"/>
-										</HitRectInsets>
 										<Scripts>
 											<OnLoad>self.Text:SetText(HDH_AT_L.HIDE_WHEN_DEACTIVE)</OnLoad>
 											<OnClick function="HDH_AT_UI_OnCheck" />
@@ -937,7 +933,7 @@
 									<Frame name="$parentSwitchHideMode" inherits="HDH_AT_SwitchFrameTemplate">
 										<Size x="210" y="20"/>
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="137" y="0" />
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="2" y="0" />
 										</Anchors>
 										<Scripts>
 											<OnShow>
@@ -1100,7 +1096,6 @@
 				</Scripts>
 			</Button>
 
-
 			<Frame name="$parentLatestSpell" parentKey="LatestSpell" inherits="HDH_AT_ConfigFrameTemplate"  movable="true" enableMouse="true" hidden="true">
 				<Size x="150"/>
 				<Anchors>
@@ -1183,14 +1178,15 @@
 								</ScrollChild>
 							</ScrollFrame>
 
-							<CheckButton name="$parentCBAutoPopup" inherits="HDH_AT_CheckButtonTemplate">
+							<CheckButton name="$parentCBAutoPopup" inherits="HDH_AT_CheckButton2Template">
+								<Size x="150" y="20" />
 								<Anchors>
-									<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="5" y="0" />
-									<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+									<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="5" y="5" />
+									<Anchor point="RIGHT" relativePoint="RIGHT" x="-5" y="5" />
 								</Anchors>
 								<Scripts>
 									<OnLoad>self.Text:SetText(HDH_AT_L.AUTO_POPUP)</OnLoad>
-									<OnClick function="HDH_AT_UI_OnCheck" />
+									<OnClick function="HDH_AT_UI_OnCheck" inherit="prepend" />
 								</Scripts>
 							</CheckButton>
 						</Frames>
@@ -1200,8 +1196,6 @@
 							</OnLoad>
 						</Scripts>
 					</Frame>
-
-					
 
 					<Button name="$parentBtnClose" inherits="UIPanelButtonTemplate" text="X">
 						<Size><AbsDimension x="50" y="25"/></Size>
@@ -1295,6 +1289,9 @@
 						HDH_AT_ConfigFrame:Show(); self:GetParent():Hide();
 					</OnClick>
 				</Scripts>
+				<NormalFont style="Font_Yellow_L"/>
+				<HighlightFont style="Font_Yellow_L"/>
+				<NormalFont style="Font_Yellow_L"/>
 			</Button>
 		</Frames>
 		<Scripts>

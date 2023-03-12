@@ -84,8 +84,9 @@ local UI_CONFIG_TAB_LIST= {
 	{name=L.BAR, type="BUTTON"}, 		        --7
 
 	{name=L.PROFILE, type="LABEL"},
+	{name=L.IMPORT_PROFILE, type="BUTTON"},         -- 9
+	{name=L.EXPORT_PROFILE, type="BUTTON"},         -- 10
 	{name=L.RESET, type="BUTTON"},         -- 8
-	{name=L.SHARE, type="BUTTON"},         -- 9
 }
 
 local DETAIL_ETC_CONFIG_TAB_LIST= {
@@ -155,6 +156,11 @@ elseif MyClass == "EVOKER" then
 end
 
 table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.TOTEM, totemName})
+
+GET_TRACKER_TYPE_NAME = {}
+for _, v in ipairs(DDP_TRACKER_LIST) do
+	GET_TRACKER_TYPE_NAME[v[1]] = v[2]
+end
 
 local UNIT_TO_LABEL = {
 	player = L.UNIT_PLAYER,
@@ -550,6 +556,10 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		ChangeTab(bottom_list, 2)
 		ChangeTab(tracker_list, self.trackerIndex)
 		ChangeTab(ui_list, self.subType)
+
+		if self.subType == 9 then
+			self:LoadTrackerListForExport()
+		end
 
 	elseif self.bodyType == BODY_DETAIL_GLOW then
 		self.F.BODY.CONFIG_TRACKER_ELEMENTS:Hide()
@@ -1397,28 +1407,50 @@ function HDH_AT_OnClick_Button(self, button)
 		main:ChangeBody(BODY_ELEMENTS)
 
 	elseif self == F.BODY.CONFIG_UI.BTN_EXPORT_STRING then
-		local data = WeakAuraLib_TableToString(HDH_AT_DB, true)
-		F.BODY.CONFIG_UI.ED_EXPORT_STRING:SetText(data)
+		local list = main.UI_TAB[9].content.List
+		local exportTracker = {}
+		local tracker
+		for _, item in ipairs(list) do
+			if not item.id then break end
+			if item:GetChecked() then
+				tracker = DB:GetTracker(item.id)
+				tracker = UTIL.Deepcopy(tracker)
+				tracker.trait = item.trait
+				table.insert(exportTracker, {
+					tracker = tracker, 
+					ui = UTIL.Deepcopy((DB:GetTrackerUI(item.id) or DB:GetTrackerUI()))
+				})
+			end
+		end
+		exportTracker.version = DB:GetVersion()
+		exportTracker.adoon_version = GetAddOnMetadata("HDH_AuraTracker", "Version")
 
-		main.Dialog:AlertShow(L.DIALOG_CREATE_SHARE_STRING)
+		if #exportTracker > 0 then
+			local data = WeakAuraLib_TableToString(exportTracker, true)
+			F.BODY.CONFIG_UI.ED_EXPORT_STRING:SetText(data)
+			main.Dialog:AlertShow(L.DIALOG_CREATE_SHARE_STRING)
+		else
+			main.Dialog:AlertShow(L.PLEASE_SELECT_TRACKER_FOR_EXPORT)
+		end
 
 	elseif self == F.BODY.CONFIG_UI.BTN_IMPORT_STRING then
 		local data = F.BODY.CONFIG_UI.ED_IMPORT_STRING:GetText()
 		data = WeakAuraLib_StringToTable(data, true)
-		
 		if not data then
 			main.Dialog:AlertShow(L.SHARE_STRING_IS_WRONG)
 			return 
 		end
 
 		if not DB:VaildationProfile(data) then
-			main.Dialog:AlertShow(L.SHARE_STRING_IS_WRONG)
+			local adoon_version = data.adoon_version or "Unknown"
+			main.Dialog:AlertShow(L.NOT_COMPATIBLE_DB_VERSION:format(adoon_version))
 			return 
 		end
 
-		main.Dialog:AlertShow(L.REPLACE_PROFILE, main.Dialog.DLG_TYPE.YES_NO, function() 	
+		main.Dialog:AlertShow(L.DO_YOU_WANT_IMPORT_PROFILE, main.Dialog.DLG_TYPE.YES_NO, function() 	
 			local data = F.BODY.CONFIG_UI.ED_IMPORT_STRING:GetText()
-			HDH_AT_DB = WeakAuraLib_StringToTable(data, true)
+			data = WeakAuraLib_StringToTable(data, true)
+			DB:AppendProfile(DDP_TRACKER_LIST, data)
 			ReloadUI()
 		end)
 
@@ -1684,21 +1716,38 @@ end
 
 function HDH_AT_ConfigFrameMixin:UpdateTraitsSelector(idx)
 	local ddm = self.F.DD_TRACKER_TRANSIT
-	local check
-	for i = (idx or 1), #ddm.item do
+	local isAlwaysChecked
+	local startIndex = 1
+	local endIndex = #ddm.item
+	local isAlwaysChecked = false
+	if idx then
+		for i = idx, 1, -1 do
+			if ddm.item[i].value == -1 then
+				startIndex = i + 1
+				break
+			end
+		end
+
+		for i = idx, endIndex do
+			if ddm.item[i].value == -1 then
+				endIndex = i - 1
+				break
+			end
+		end
+
+		if startIndex ~= idx then
+			ddm.item[startIndex].CheckButton:SetChecked(false)
+		end
+	end
+	
+	for i = startIndex, endIndex do
 		itemFrame = ddm.item[i]
-		
 		if (GetSpecializationInfoByID(itemFrame.value)) then
-			check = itemFrame.CheckButton:GetChecked()
+			isAlwaysChecked = itemFrame.CheckButton:GetChecked()
 		else
 			if itemFrame.value ~= -1 then
-				if check then
-					itemFrame.CheckButton:Disable()
+				if isAlwaysChecked then
 					itemFrame.CheckButton:SetChecked(false)
-					itemFrame.Text:SetFontObject("Font_Gray_S")
-				else
-					itemFrame.CheckButton:Enable()
-					itemFrame.Text:SetFontObject("Font_White_S")
 				end
 			end
 		end
@@ -1813,7 +1862,92 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerElementConfig(trackerId, startRowIdx
 					else break end
 		i = i + 1
 	end
-	
+end
+
+function HDH_AT_ConfigFrameMixin:LoadTrackerListForExport()
+	local content = self.UI_TAB[9].content
+	local ids = DB:GetTrackerIds()
+	local item, iconIndex
+	local id, name, type, trait, icon
+	local talentCache = {}
+	local talentList = {}
+	local talentID
+
+	content.List = content.List or {}
+
+	local label = self.F.BODY.CONFIG_UI.LABEL_EXPORT
+
+	if not content.SelectAll then
+		content.SelectAll = CreateFrame("Button", nil, label, "HDH_AT_CheckButton2Template")
+		content.SelectAll:SetPoint("TOPLEFT", label, "BOTTOMLEFT", 0, -1)
+		content.SelectAll:SetPoint("RIGHT", label, "RIGHT", 0, 0)
+		content.SelectAll:SetHeight(20)
+		content.SelectAll.Text:SetText(L.SELECT_ALL)
+		content.SelectAll:SetScript("OnClick", function(self)
+			local list = GetMainFrame().UI_TAB[9].content.List
+			for _, comp in ipairs(list) do
+				comp:SetChecked(self:GetChecked())
+			end
+		end)
+	end
+
+	content.SelectAll:SetChecked(false)
+
+	for index, id in ipairs(ids) do
+		if not content.List[index] then
+			item = CreateFrame("Button", "HDH_AT_CheckButtonForExport"..index, content.SelectAll, "HDH_AT_CheckButtonForExportTemplate")
+			item:SetPoint("TOPLEFT", content.SelectAll, "TOPLEFT", 0, -((index) * 22))
+			item:SetPoint("RIGHT", content.SelectAll,"RIGHT", 0, 0)
+			item:SetHeight(20)
+			item:SetScript("OnClick", function(self)
+				local list = GetMainFrame().UI_TAB[9].content.List
+				local selectAll = GetMainFrame().UI_TAB[9].content.SelectAll
+				local count = 0
+				for _, comp in ipairs(list) do
+					if comp:GetChecked() then count = count + 1 end
+				end
+				selectAll:SetChecked(count == #list)
+			end)
+			item.IconList = {item.Icon1, item.Icon2, item.Icon3, item.Icon4}
+			content.List[index] = item
+		end
+		item = content.List[index]
+		id, name, type, _, _, _, trait = DB:GetTrackerInfo(id)
+		talentCache = {}
+		talentList = {}
+		for _, t in ipairs(trait) do
+			talentID = GetTalentIdByTraits(t)
+			icon = select(4, GetSpecializationInfoByID(talentID))
+			if icon and not talentCache[talentID] then
+				talentCache[talentID] = icon
+				table.insert(talentList, icon)
+			end
+		end
+
+		iconIndex = 0
+		table.sort(talentList, function(a,b) return a > b end)
+		for _, t in ipairs(talentList) do
+			iconIndex = iconIndex + 1
+			item.IconList[iconIndex]:SetTexture(t)
+			item.IconList[iconIndex]:Show()
+		end
+		
+		for i = iconIndex + 1 , 4 do
+			item.IconList[i]:Hide()
+		end
+		
+		item.Text:SetText(name.." ("..GET_TRACKER_TYPE_NAME[type]..")")
+		item:SetChecked(false)
+		item.id = id
+		item.trait = talentList
+		item:Show()
+	end
+
+	for i = #ids+1, #content.List do
+		content.List[i]:Hide()
+		item.id = nil
+		item.trait = nil
+	end
 end
 
 function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx, button)
@@ -2684,10 +2818,6 @@ local function DBSync(comp, comp_type, key)
 	end
 end
 
-function HDH_AT_ConfigFrameMixin:AddSplitPoint()
-
-end
-
 function HDH_AT_ConfigFrameMixin:InitFrame()
     self.F = {}
 	local F = self.F
@@ -2767,20 +2897,20 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	table.insert(CHANGE_ICON_CB_LIST, comp)
 	local component1 = CreateFrame("EditBox", (comp:GetName()..'EditBox'), comp, "InputBoxTemplate")
 	component1:SetSize(130, 26)
-	component1:SetPoint('TOPLEFT', comp, 'BOTTOMLEFT', 10, 0)
+	component1:SetPoint('TOPLEFT', comp, 'BOTTOMLEFT', 5, -3)
 	component1:SetText(value or "")
 	component1:SetAutoFocus(false)
 	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_EB_SPELL = component1
 
-	local component2 = CreateFrame("CheckButton", (comp:GetName()..'CheckButtonIsItem'), comp, "HDH_AT_CheckButtonTemplate")
-	component2:SetSize(26, 26)
-	component2:SetPoint('TOPLEFT', component1, 'BOTTOMLEFT', -8, 0)
+	local component2 = CreateFrame("CheckButton", (comp:GetName()..'CheckButtonIsItem'), comp, "HDH_AT_CheckButton2Template")
+	component2:SetPoint('TOPLEFT', component1, 'BOTTOMLEFT', -5, 0)
 	component2.Text:SetText(L.ITEM_TOOLTIP)
+	component2:SetSize(82,20)
 	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CB_IS_ITEM = component2
 
 	local component3 = CreateFrame("Button", (comp:GetName()..'BUTTOM'), comp, "HDH_AT_ButtonTemplate")
-	component3:SetSize(50, 26)
-	component3:SetPoint('LEFT', component2, 'RIGHT', 63, 0)
+	component3:SetSize(52, 24)
+	component3:SetPoint('LEFT', component2, 'RIGHT', 2, 0)
 	component3:SetText(L.SEARCH)
 	component3:SetScript("OnClick", HDH_AT_OnClick_Button)
 	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_BTN_SEARCH = component3
@@ -3035,29 +3165,34 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SWITCH,       L.USE_DEFAULT_BORDER_COLOR,           "ui.%s.common.default_color")
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 	
-	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.BUTTON,       L.RESET_ADDON)
-	comp:SetText(L.RESET)
-	self.F.BODY.CONFIG_UI.BTN_RESET = comp
+	------------------------------------------------------- import
+	-- comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.SPLIT_LINE, L.IMPORT_SHARE_STRING)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.BUTTON,       L.IMPORT_SHARE_STRING)
+	comp:SetText(L.APPLY_SHARE_STRING)
+	self.F.BODY.CONFIG_UI.BTN_IMPORT_STRING = comp
+	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.EDIT_BOX)
+	comp:SetSize(220,26)
+	comp:SetFontObject("Font_White_XS")
+	comp:SetMaxLetters(0)
+	self.F.BODY.CONFIG_UI.ED_IMPORT_STRING = comp
 
-	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.SPLIT_LINE,       L.EXPORT_SHARE_STRING)
+	------------------------------------------------------- export
+	-- comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.SPLIT_LINE,       L.EXPORT_SHARE_STRING)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.BUTTON,       L.EXPORT_SHARE_STRING)
 	comp:SetText(L.CREATE_SHARE_STRING)
 	self.F.BODY.CONFIG_UI.BTN_EXPORT_STRING = comp
 	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX)
-	comp:SetSize(200,26)
+	comp:SetSize(220,26)
 	comp:SetMaxLetters(0)
 	comp:SetFontObject("Font_White_XS")
 	self.F.BODY.CONFIG_UI.ED_EXPORT_STRING = comp
-	
-	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.SPLIT_LINE, L.IMPORT_SHARE_STRING, nil, 5)
-	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.BUTTON,       L.IMPORT_SHARE_STRING, nil, 6)
-	comp:SetText(L.APPLY_SHARE_STRING)
-	self.F.BODY.CONFIG_UI.BTN_IMPORT_STRING = comp
-	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX, nil, nil, 7)
-	comp:SetSize(200,26)
-	comp:SetFontObject("Font_White_XS")
-	comp:SetMaxLetters(0)
-	self.F.BODY.CONFIG_UI.ED_IMPORT_STRING = comp
+	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.SPLIT_LINE,       L.PLEASE_SELECT_TRACKER_FOR_EXPORT)
+	self.F.BODY.CONFIG_UI.LABEL_EXPORT = comp
+
+	------------------------------------------------------- reset
+	comp = HDH_AT_CreateOptionComponent(tabUIList[10].content, COMP_TYPE.BUTTON,       L.RESET_ADDON)
+	comp:SetText(L.RESET)
+	self.F.BODY.CONFIG_UI.BTN_RESET = comp
 end
 
 function HDH_AT_ConfigFrameMixin:SetupCommend()
@@ -3188,29 +3323,22 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		frame.text:SetNonSpaceWrap(false)
 		frame.text:SetJustifyV('CENTER')
 		frame.text:SetText(option_name)
-
-		if component_type == COMP_TYPE.SPLIT_LINE then
-			frame:SetSize(parent:GetParent():GetWidth()-70, COMP_HEIGHT)
-			frame.text:SetPoint('RIGHT', frame, 'RIGHT', 0, 0)
-			frame.text:SetJustifyH('CENTER')
-		else
-			frame:SetSize(COMP_WIDTH, COMP_HEIGHT)
-			frame.text:SetPoint('RIGHT', frame, 'RIGHT', 15, 0)
-			frame.text:SetJustifyH('LEFT')
-		end
+		frame:SetSize(COMP_WIDTH, COMP_HEIGHT)
+		frame.text:SetPoint('RIGHT', frame, 'RIGHT', 15, 0)
+		frame.text:SetJustifyH('LEFT')
 	else
 		frame:SetSize(1, COMP_HEIGHT)
 		frame:SetPoint('TOPLEFT', parent, 'TOPLEFT', MARGIN_X + x, MARGIN_Y + y)
 	end
 
 	if component_type == COMP_TYPE.CHECK_BOX then
-		component = CreateFrame("CheckButton", (parent:GetName()..'CheckButton'..parent.row.."_"..parent.col), parent, "OptionsBaseCheckButtonTemplate")
+		component = CreateFrame("Button", (parent:GetName()..'Button'..parent.row.."_"..parent.col), parent, "HDH_AT_CheckButton2Template")
 		component:SetPoint('LEFT', frame, 'RIGHT', 18, 0)
 		component:SetScript("OnClick", HDH_AT_UI_OnCheck)
 
 	elseif component_type == COMP_TYPE.BUTTON then
 		component = CreateFrame("Button", (parent:GetName()..'Button'..parent.row.."_"..parent.col), parent, "HDH_AT_ButtonTemplate")
-		component:SetSize(110, 26)
+		component:SetSize(110, 22)
 		component:SetPoint('LEFT', frame, 'RIGHT', 25, 0)
 		component:SetText(value or 'None')
 		component:SetScript("OnClick", HDH_AT_OnClick_Button)
@@ -3252,9 +3380,9 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		-- component:SetHandler(HDH_AT_OnSeletedColor)
 	
 	elseif component_type == COMP_TYPE.IMAGE_CHECKBUTTON then
-		component = CreateFrame("CheckButton", (parent:GetName()..'ImageCheckButton'..parent.row.."_"..parent.col), parent, "HDH_AT_CheckButtonImageTemplate")
-		component:SetSize(26, 26)
-		component:SetPoint('LEFT', frame, 'RIGHT', 0, 0)
+		component = CreateFrame("Button", (parent:GetName()..'ImageCheckButton'..parent.row.."_"..parent.col), parent, "HDH_AT_CheckButtonImageTemplate")
+		component:SetSize(20, 20)
+		component:SetPoint('LEFT', frame, 'RIGHT', 10	, 0)
 		component:SetScript("OnClick", HDH_AT_UI_OnCheck)
 		-- component:SetHandler(HDH_AT_OnSeletedColor)
 
@@ -3271,10 +3399,15 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	elseif component_type == COMP_TYPE.SPLIT_LINE then
 		component = CreateFrame("Frame", (parent:GetName()..'Line'..parent.row.."_"..parent.col), parent, "HDH_AT_LineFrameTemplate")
 		component:SetSize(255, 26)
-		component:SetPoint('LEFT', frame, 'LEFT', 0, 0)
+		component:SetPoint('LEFT', frame, 'LEFT', 10, 0)
 		-- component:SetPoint('RIGHT', parent, 'RIGHT', -10, 0)
 		-- component:SetHandler(HDH_AT_OnSeletedColor)
-
+		
+		frame.text:ClearAllPoints()
+		frame.text:SetPoint('LEFT', component, 'LEFT', 5, 0)
+		frame.text:SetPoint('RIGHT', component, 'RIGHT', -5, 0)
+		frame.text:SetJustifyH('CENTER')
+		
 	elseif component_type == COMP_TYPE.SWITCH then
 		component = CreateFrame("Frame", (parent:GetName()..'Line'..parent.row.."_"..parent.col), parent, "HDH_AT_SwitchFrameTemplate")
 		component:SetSize(115, 20)

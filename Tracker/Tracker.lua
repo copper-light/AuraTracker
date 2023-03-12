@@ -2147,8 +2147,6 @@ local function VersionUpdateDB()
 		HDH_AT_DB.show_latest_spell = true
 		DB:SetVersion(2.8)
 	end
-
-		
 end
 
 local function PLAYER_ENTERING_WORLD()
