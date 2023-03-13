@@ -713,7 +713,9 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnLoad> </OnLoad>
+					<OnLoad>
+						self:HiddenBackground(true)
+					</OnLoad>
 					<!-- <OnClick> HDH_OnAlways(self:GetParent():GetParent():GetAttribute("unit"),self:GetParent():GetAttribute("no"),self:GetChecked())</OnClick> -->
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
@@ -734,7 +736,9 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnLoad> </OnLoad>
+					<OnLoad>
+						self:HiddenBackground(true)
+					</OnLoad>
 					<!-- <OnClick> HDH_OnAlways(self:GetParent():GetParent():GetAttribute("unit"),self:GetParent():GetAttribute("no"),self:GetChecked())</OnClick> -->
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
@@ -755,7 +759,9 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnLoad> </OnLoad>
+					<OnLoad>
+						self:HiddenBackground(true)
+					</OnLoad>
 					<!-- <OnClick> HDH_OnAlways(self:GetParent():GetParent():GetAttribute("unit"),self:GetParent():GetAttribute("no"),self:GetChecked())</OnClick> -->
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
@@ -852,7 +858,10 @@
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentButtonAdd" x="-5" y="0" />
 				</Anchors>
 				<Scripts>
-					<OnLoad> self.Text:SetText(HDH_AT_L.ITEM)</OnLoad>
+					<OnLoad>
+						self.Text:SetText(HDH_AT_L.ITEM)
+						self:HiddenBackground(true)
+					</OnLoad>
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 						GameTooltip:AddLine(HDH_AT_L.ITEM_TOOLTIP);
@@ -1249,6 +1258,16 @@
 				</Texture>
 			</Layer>
 
+			<Layer level="BORDER">
+				<Texture name="$parentOn" parentKey="Active" alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight"  hidden="true">
+					<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+
 			<Layer level="ARTWORK">
 				<FontString name ="$parentText" parentKey="Text" inherits="Font_White_S" text="특성" justifyH="CENTER">
 					<Size><AbsDimension x="100" y="36" /></Size>
@@ -1257,16 +1276,6 @@
 						<Anchor point="BOTTOMRIGHT" x="-5" y="0" />
 					</Anchors>
 				</FontString>
-			</Layer>
-
-			<Layer level="OVERLAY">
-				<Texture name="$parentOn" parentKey="Active" alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight"  hidden="true">
-					<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
-					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-					</Anchors>
-				</Texture>
 			</Layer>
 		</Layers>
 		
@@ -1291,7 +1300,7 @@
 			<Layer level="BORDER">
                 <Texture name="$parentBg"  parentKey="BG" >
                     <!-- <Color r="1" g="0.8" b="0" a="0.5"/> -->
-                    <Color r="0" g="0" b="0" a="0.7	"/>
+                    <Color r="0" g="0" b="0" a="0.5	"/>
                     <Anchors>
                         <Anchor point="TOPLEFT" x="0" y="0" />
                         <Anchor point="BOTTOMRIGHT" x="0" y="0" />
@@ -1528,7 +1537,7 @@
 
                 <Texture name="$parentBg"  parentKey="BG" >
                     <!-- <Color r="1" g="0.8" b="0" a="0.5"/> -->
-                    <Color r="0" g="0" b="0" a="0.3"/>
+                    <Color r="0" g="0" b="0" a="0.1"/>
                     <Anchors>
                         <Anchor point="TOPLEFT" x="0" y="0" />
                         <Anchor point="BOTTOMRIGHT" x="0" y="0" />
@@ -1588,7 +1597,7 @@
     </Button>
 
 	<Frame name="HDH_AT_CheckButtonItemTemplate" virtual="true">
-		<Size x="109" y="22" />
+		<Size x="110" y="22" />
 
 		<Layers>
 			<Layer level="ARTWORK">
@@ -1602,7 +1611,7 @@
                     </Anchors>
                 </Texture>
 
-				<Texture name="$parentOn" alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight"  hidden="true">
+				<Texture name="$parentOn" hidden="true">
 					<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
 					<Anchors>
 						<Anchor point="TOPLEFT" x="0" y="0"/>
@@ -1621,10 +1630,10 @@
 		</Layers>
 		<Frames>
 			<CheckButton parentKey="CheckButton" inherits="HDH_AT_CheckButton2Template" >
-				<Size x="109" y="20" />
+				<Size x="110" y="20" />
 				<Anchors>
-					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent" x="2" y="1"/>
-					<!-- <Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parent" x="0" y="0"/> -->
+					<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parent" x="2" y="1"/>
+					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parent" x="-1" y="0"/>
 				</Anchors>
 				<!-- <NormalFont style="Font_White_M"/> -->
 				<!-- <HighlightFont style="Font_Yellow_M"/> -->
@@ -1633,6 +1642,7 @@
 		<Scripts>
 			<OnLoad>
 				self.Text = self.CheckButton.Text
+				<!-- self.CheckButton:HiddenBackground(true) -->
 			</OnLoad>
 		</Scripts>
 		<!-- <DisabledFont style="Font_White_S"/> -->
@@ -1640,71 +1650,75 @@
 
 	<Button name="HDH_AT_SplitItemTemplate" virtual="true">
 		<Size x="100" y="30" />
-        <Anchors>
+        <!-- <Anchors>
             <Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parent" x="0" y="0"/>
             <Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parent" x="0" y="0"/>
-        </Anchors>
+        </Anchors> -->
 		<Layers>
-            <Layer level="BACKGROUND"  textureSubLevel="0">
-				<Texture >
-                    <!-- <Color r="1" g="0.8" b="0" a="0.5"/> -->
-					<!-- <Color r="0.5" g="0.5" b="0.5" a="0.5"/> -->
-                    <!-- <Color r="0" g="0" b="0" a="0.7"/> -->
-                    <Anchors>
-                        <Anchor point="TOPLEFT" x="0" y="0" />
-                        <Anchor point="BOTTOMRIGHT" x="0" y="0" />
-                    </Anchors>
-                </Texture>
-			</Layer>
-
 			<Layer level="BACKGROUND"  textureSubLevel="1">
 				<Texture name="$parentTexture" useAtlasSize="true" parentKey="Texture">
                     <!-- <Size><AbsDimension x="111" y="36" /></Size>
 					
                     <TexCoords left="0.1" right=".9" top="0.36" bottom="0.64" /> -->
 					<Anchors>
-						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="1" y="-1"/>
-						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-1" y="1"/>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-1"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="1"/>
 					</Anchors>
-					<TexCoords left="0.08" right="0.92" top="0.2" bottom="0.48" /> 
-				</Texture>
+					<TexCoords left="0.08" right="0.92" top="0.2" bottom="0.495" />
+				</Texture>	
 			</Layer>
 			<Layer level="BORDER"  textureSubLevel="1">
-				<Texture name="$parentBg2">
-                    <!-- <Color r="1" g="0.8" b="0" a="0.5"/> -->
-					<!-- <Color r="0.2" g="0.2" b="0.2" a="0.5"/> -->
-                    <Color r="0" g="0" b="0" a="0.2"/>
-                    <Anchors>
-                        <Anchor point="TOPLEFT" x="0" y="0" />
-                        <Anchor point="BOTTOMRIGHT" x="0" y="0" />
-                    </Anchors>
-                </Texture>
-				
                 <Texture name="$parentBg">
-                    <!-- <Color r="1" g="0.8" b="0" a="0.5"/> -->
-					<Color r="0.1" g="0.1" b="0.1" a="0.5"/>
-                    <!-- <Color r="0" g="0" b="0" a="0.3"/> -->
+					<Color r="0.1" g="0.1" b="0.1" a="0.5" />
                     <Anchors>
-                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="1" y="-1"/>
-						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-1" y="1"/>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="0"/>
                     </Anchors>
                 </Texture>
             </Layer>
 
 			<Layer level="ARTWORK">
-				<!-- <Texture name="$parentTexture" file="Interface\ICONS\INV_Misc_QuestionMark">
-					<Size><AbsDimension x="18" y="18" /></Size>
-					<Anchors>
-						<Anchor point="LEFT" relativePoint="LEFT" x="2" y="0"/>
-					</Anchors>
-					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
-				</Texture> -->
+				<!-- <Texture name="$parentBg">
+					<Size y="2" />
+					<Color r="1" g="0.8" b="0" a="0.5" />
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="2" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="0"/>
+                    </Anchors>
+                </Texture>
+
+				<Texture name="$parentBg">
+					<Size y="2" />
+					<Color r="1" g="0.8" b="0" a="0.5" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="0"/>
+						<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="-2" y="0"/>
+                    </Anchors>
+                </Texture> -->
+
+				<!-- <Texture>
+					<Size x="4" />
+					<Color r="1" g="0.8" b="0" a="0.5" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-1"/>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="-2" y="1"/>
+                    </Anchors>
+                </Texture> -->
+
+				<!-- <Texture name="$parentBg">
+					<Size x="2" />
+					<Color r="0.3" g="0.3" b="0.3" a="0.5" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-1"/>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="-2" y="1"/>
+                    </Anchors>
+                </Texture> -->
 
 				<FontString name ="$parentText" parentKey="Text" inherits="Font_Yellow_S" text="특성" justifyH="CENTER">
 					<Size><AbsDimension x="100" y="36" /></Size>
                     <Anchors>
-                        <Anchor point="LEFT" relativePoint="LEFT" x="5" y="0"/>
-						<Anchor point="RIGHT" relativePoint="RIGHT" x="-5" y="0"/>
+                        <Anchor point="LEFT" relativePoint="LEFT" x="10" y="0"/>
+						<Anchor point="RIGHT" relativePoint="RIGHT" x="-10" y="0"/>
                     </Anchors>
                 </FontString>
 			</Layer>
@@ -2394,13 +2408,37 @@
 					</Anchors>
 				</Texture>
 
-				<!-- <Texture name="$parentCheckBox" parentKey="Deactive2" hidden="false">
-					<Size x="20" y="20" />
+				<Texture parentKey="DeactiveCheckBoxTop" hidden="true">
+					<Size x="16" y="2" />
 					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
 					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="TOPLEFT" x="2" y="-2"/>
 					</Anchors>
-				</Texture> -->
+				</Texture>
+
+				<Texture parentKey="DeactiveCheckBoxLeft" hidden="true">
+					<Size x="2" y="12" />
+					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="2" y="-4"/>
+					</Anchors>
+				</Texture>
+
+				<Texture parentKey="DeactiveCheckBoxRight" hidden="true">
+					<Size x="2" y="12" />
+					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="16" y="-4"/>
+					</Anchors>
+				</Texture>
+
+				<Texture parentKey="DeactiveCheckBoxBottom" hidden="true">
+					<Size x="16" y="2" />
+					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="2" y="-16"/>
+					</Anchors>
+				</Texture>
 
 				<!-- <Texture parentKey="CheckBox" hidden="false">
 					
@@ -2525,33 +2563,33 @@
 		<Layers>
 			<Layer level="ARTWORK">
 				<Texture name="$parentIcon1" parentKey="Icon1" file="Interface\ICONS\INV_Misc_QuestionMark">
-					<Size x="16" y="16" />
+					<Size x="14" y="14" />
 					<Anchors>
-						<Anchor point="RIGHT" relativePoint="RIGHT" x="-2" y="0"/>
+						<Anchor point="RIGHT" relativePoint="RIGHT" x="-3" y="0"/>
 					</Anchors>
 					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
 				</Texture>
 
 				<Texture name="$parentIcon2" parentKey="Icon2" file="Interface\ICONS\INV_Misc_QuestionMark">
-					<Size x="16" y="16" />
+					<Size x="14" y="14" />
 					<Anchors>
-						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentIcon1" x="-2" y="0"/>
+						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentIcon1" x="-1" y="0"/>
 					</Anchors>
 					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
 				</Texture>
 
 				<Texture name="$parentIcon3" parentKey="Icon3" file="Interface\ICONS\INV_Misc_QuestionMark">
-					<Size x="16" y="16" />
+					<Size x="14" y="14" />
 					<Anchors>
-						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentIcon2" x="-2" y="0"/>
+						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentIcon2" x="-1" y="0"/>
 					</Anchors>
 					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
 				</Texture>
 
 				<Texture name="$parentIcon4" parentKey="Icon4" file="Interface\ICONS\INV_Misc_QuestionMark">
-					<Size x="16" y="16" />
+					<Size x="14" y="14" />
 					<Anchors>
-						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentIcon3" x="-2" y="0"/>
+						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentIcon3" x="-1" y="0"/>
 					</Anchors>
 					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
 				</Texture>

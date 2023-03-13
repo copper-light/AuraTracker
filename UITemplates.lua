@@ -511,10 +511,12 @@ function HDH_AT_DropDownMixin:SetSelectedIndex(idx, show)
         if idx <= 0 or idx > #items then return end
         local seletedItemFrame = items[idx]
         for i, child in ipairs(items) do
-            if i ~= idx then 
-                _G[child:GetName().."On"]:Hide()
-            else
-                _G[child:GetName().."On"]:Show()
+            if _G[child:GetName().."On"] then
+                if i ~= idx then 
+                    _G[child:GetName().."On"]:Hide()
+                else
+                    _G[child:GetName().."On"]:Show()
+                end
             end
         end
 
@@ -591,7 +593,11 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
                 item[i] = itemFrame
             end
 
-            itemFrame:SetPoint("TOPLEFT", listFrame, "TOPLEFT", 1, -totalHeight)
+            if item[i-1] then
+                itemFrame:SetPoint("TOPLEFT", item[i-1], "BOTTOMLEFT", 0, 0)
+            else
+                itemFrame:SetPoint("TOPLEFT", listFrame, "TOPLEFT", 1, -1)
+            end
             itemFrame:SetPoint("RIGHT", listFrame, "RIGHT", -1, 0)
             itemFrame.Text:SetText(name)
             if texture then
@@ -1366,12 +1372,20 @@ function HDH_AT_CheckButton2TemplateMixin:HiddenBackground(bool)
     self.isHideBackground = bool
 
     if bool then
+        self.DeactiveCheckBoxTop:Show()
+        self.DeactiveCheckBoxRight:Show()
+        self.DeactiveCheckBoxLeft:Show()
+        self.DeactiveCheckBoxBottom:Show()
         self.Deactive1:Hide()
         self.DeactiveBorderTop:Hide()
         self.DeactiveBorderLeft:Hide()
         self.DeactiveBorderBottom:Hide()
         self.DeactiveBorderRight:Hide()
     else
+        self.DeactiveCheckBoxTop:Hide()
+        self.DeactiveCheckBoxRight:Hide()
+        self.DeactiveCheckBoxLeft:Hide()
+        self.DeactiveCheckBoxBottom:Hide()
         self.Deactive1:Show()
         self.DeactiveBorderTop:Show()
         self.DeactiveBorderLeft:Show()
@@ -1391,7 +1405,7 @@ function HDH_AT_CheckButton2TemplateMixin:SetChecked(bool)
         end
         self.CheckMarker:Show()
         self.CheckMarker:SetFontObject("Font_White_M")
-        self.Text:SetFontObject("Font_Yellow_S")
+        -- self.Text:SetFontObject("Font_Yellow_S")
         self.Active2:Show()
     else
         self.Text:SetFontObject("Font_White_S")
@@ -1404,8 +1418,8 @@ function HDH_AT_CheckButton2TemplateMixin:SetChecked(bool)
         self.Active2:Hide()
     end
 
-    self.Active1:Hide()
-    -- self.CheckMarker:Hide()
+    -- self.Active1:Hide()
+    -- -- self.CheckMarker:Hide()
     self.ActiveBorderTop:Hide()
     self.ActiveBorderLeft:Hide()
     self.ActiveBorderRight:Hide()

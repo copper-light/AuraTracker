@@ -2887,11 +2887,13 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.DETAIL_ETC_TAB = self:AppendUITab(DETAIL_ETC_CONFIG_TAB_LIST, self.F.BODY.CONFIG_DETAIL.ETC.MENU, self.F.BODY.CONFIG_DETAIL.ETC.CONTENTS)
 	
 	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON, L.USE_DEFAULT_ICON, nil, 1, 1)
+	comp:HiddenBackground(true)
 	comp.Icon:SetTexture(nil)
 	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CB_ION_DEFAULT = comp
 	table.insert(CHANGE_ICON_CB_LIST, comp)
 
 	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON, L.USE_SEARCH_ICON, nil, 2, 1)
+	comp:HiddenBackground(true)
 	comp.Icon:SetTexture("Interface/Icons/INV_Misc_QuestionMark")
 	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON = comp
 	table.insert(CHANGE_ICON_CB_LIST, comp)
@@ -2906,6 +2908,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	component2:SetPoint('TOPLEFT', component1, 'BOTTOMLEFT', -5, 0)
 	component2.Text:SetText(L.ITEM_TOOLTIP)
 	component2:SetSize(82,20)
+	component2:HiddenBackground(true)
 	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CB_IS_ITEM = component2
 
 	local component3 = CreateFrame("Button", (comp:GetName()..'BUTTOM'), comp, "HDH_AT_ButtonTemplate")
@@ -2928,6 +2931,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 		col_idx = (col_idx % 3)
 		col_idx = col_idx + 1
 		comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON,     nil, nil, row_idx, col_idx)
+		comp:HiddenBackground(true)
 		comp.Icon:SetTexture(texture)
 		table.insert(CHANGE_ICON_CB_LIST, comp)
 		if col_idx == 3 then
