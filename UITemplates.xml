@@ -2451,7 +2451,39 @@
 
 			<Layer level="BORDER">
 
-				<Texture name="$parentBg" parentKey="ActiveBorderTop" hidden="true">
+				<Texture parentKey="ActiveBorderTop" hidden="true">
+					<Size x="16" y="2" />
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="2" y="-2"/>
+					</Anchors>
+				</Texture>
+
+				<Texture parentKey="ActiveBorderLeft" hidden="true">
+					<Size x="2" y="12" />
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="2" y="-4"/>
+					</Anchors>
+				</Texture>
+
+				<Texture parentKey="ActiveBorderBottom" hidden="true">
+					<Size x="2" y="12" />
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="16" y="-4"/>
+					</Anchors>
+				</Texture>
+
+				<Texture parentKey="ActiveBorderRight" hidden="true">
+					<Size x="16" y="2" />
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="2" y="-16"/>
+					</Anchors>
+				</Texture>
+
+				<!-- <Texture name="$parentBg" parentKey="ActiveBorderTop" hidden="true">
 					<Size y="2" />
 					<Color r="2" g="0.8" b="0" a="0.5" />
 					<Anchors>
@@ -2485,10 +2517,10 @@
 						<Anchor point="TOPRIGHT" x="0" y="-2"/>
 						<Anchor point="BOTTOMRIGHT" x="0" y="2"/>
 					</Anchors>
-				</Texture>
+				</Texture> -->
 				
 				<Texture name="$parentBg" parentKey="Active1" hidden="true">
-					<Color r="1" g="0.8" b="0" a="0.5" />
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
 					<Anchors>
 						<Anchor point="TOPLEFT" x="18" y="-2"/>
 						<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
@@ -2510,7 +2542,7 @@
 
 				<Texture name="$parentActiveCheckBox" parentKey="Active2" hidden="true">
 					<Size x="16" y="16" />
-					<Color r="1" g="0.8" b="0" a="0.8" />
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
 					<Anchors>
 						<Anchor point="TOPLEFT" x="2" y="-2"/>
 					</Anchors>
@@ -2519,7 +2551,7 @@
 			</Layer>
 
 			<Layer level="OVERLAY">
-				<FontString parentKey="CheckMarker" inherits="Font_White_M" text="v" justifyH="CENTER" justifyV="CENTER" hidden="true">
+				<FontString parentKey="CheckMarker" inherits="Font_Yellow_M" text="v" justifyH="CENTER" justifyV="CENTER" hidden="true">
 					<Size x="20" y="15" />
 					<Anchors>
 						<Anchor point="LEFT" relativePoint="LEFT" x="0" y="1"/>

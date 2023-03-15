@@ -1153,12 +1153,12 @@ function HDH_AT_SwitchFrameTemplateMixin:Init(itemList, onChangedHandler)
     local size = #itemList
     local itemWidth, itemHeight = self:GetSize()
     if itemWidth >= 250 then
-        itemWidth = (itemWidth-12) / size
+        itemWidth = (itemWidth-10) / size
     else
-        itemWidth = (itemWidth-6) / size
+        itemWidth = (itemWidth-4) / size
     end
     
-    itemHeight = self:GetHeight() - 6
+    itemHeight = self:GetHeight() - 4
     local btn
     self.onChangedHandler = onChangedHandler
     self.list = self.list or {}
@@ -1174,7 +1174,7 @@ function HDH_AT_SwitchFrameTemplateMixin:Init(itemList, onChangedHandler)
         end
         btn = self.list[index]
         btn:ClearAllPoints()
-        btn:SetPoint("TOPLEFT", self, "TOPLEFT", ((itemWidth) * (index - 1)) + 3, -3)
+        btn:SetPoint("TOPLEFT", self, "TOPLEFT", ((itemWidth) * (index - 1)) + 2, -2)
         btn:SetSize(itemWidth, itemHeight)
         btn:SetText(value[2])
         btn.index = index
@@ -1398,15 +1398,18 @@ function HDH_AT_CheckButton2TemplateMixin:SetChecked(bool)
     if bool then
         if not self.isHideBackground then
             self.Active1:Show()
-            self.ActiveBorderTop:Show()
-            self.ActiveBorderLeft:Show()
-            self.ActiveBorderRight:Show()
-            self.ActiveBorderBottom:Show()
+           
         end
+
+        self.ActiveBorderTop:Show()
+        self.ActiveBorderLeft:Show()
+        self.ActiveBorderRight:Show()
+        self.ActiveBorderBottom:Show()
+
         self.CheckMarker:Show()
-        self.CheckMarker:SetFontObject("Font_White_M")
+        self.CheckMarker:SetFontObject("Font_Yellow_M")
         -- self.Text:SetFontObject("Font_Yellow_S")
-        self.Active2:Show()
+        -- self.Active2:Show()
     else
         self.Text:SetFontObject("Font_White_S")
         self.Active1:Hide()
@@ -1420,10 +1423,10 @@ function HDH_AT_CheckButton2TemplateMixin:SetChecked(bool)
 
     -- self.Active1:Hide()
     -- -- self.CheckMarker:Hide()
-    self.ActiveBorderTop:Hide()
-    self.ActiveBorderLeft:Hide()
-    self.ActiveBorderRight:Hide()
-    self.ActiveBorderBottom:Hide()
+    -- self.ActiveBorderTop:Hide()
+    -- self.ActiveBorderLeft:Hide()
+    -- self.ActiveBorderRight:Hide()
+    -- self.ActiveBorderBottom:Hide()
     
     self.isChecked = bool
 end
