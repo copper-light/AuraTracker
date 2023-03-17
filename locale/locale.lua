@@ -1,7 +1,7 @@
 HDH_AT_L = {}
 local L = HDH_AT_L
 
-L.DISPLAY_ID_IN_TOOPTIP = "Display the ID in the tooltip"
+L.DISPLAY_ID_IN_TOOPTIP = "Display ID in Tooltip"
 L.SELECT = "Select"
 L.NOTHING_LIST = "Empty"
 L.YES = "Yes"
@@ -241,6 +241,8 @@ L.APPLY_SHARE_STRING = "Apply config string"
 L.CREATE_SHARE_STRING = "Create config string"
 L.IMPORT_SHARE_STRING = "Import config string"
 L.SHARE_STRING = "Config string"
+L.EXPORT_PROFILE = "Export Profile"
+L.IMPORT_PROFILE = "Import Profile"
 L.EXPORT_SHARE_STRING = "Export config string"
 L.DIALOG_CREATE_SHARE_STRING = "The shared string has been generated.\nPlease use [Ctrl + C] to share."
 L.SHARE_STRING_IS_WRONG = "The shared string is incorrect.\nPlease check if the value is correct."

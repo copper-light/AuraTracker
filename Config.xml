@@ -596,6 +596,7 @@
 								<Frames>
 							
 									<CheckButton name="$parentCBMove" inherits="HDH_AT_CheckButton2Template">
+										<Size x="145" y="20" />
 										<Anchors>
 											<Anchor point="LEFT" relativePoint="LEFT" x="10" y="0" />
 											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
@@ -607,6 +608,7 @@
 									</CheckButton>
 
 									<CheckButton name="$parentCBShowIdInTooltip" inherits="HDH_AT_CheckButton2Template">
+										<Size x="145" y="20" />
 										<Anchors>
 											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBMove" x="5" y="0" />
 										</Anchors>
