@@ -2551,12 +2551,20 @@
 			</Layer>
 
 			<Layer level="OVERLAY">
-				<FontString parentKey="CheckMarker" inherits="Font_Yellow_M" text="v" justifyH="CENTER" justifyV="CENTER" hidden="true">
+				<!-- <FontString parentKey="CheckMarker" inherits="Font_Yellow_M" text="v" justifyH="CENTER" justifyV="CENTER" hidden="true">
 					<Size x="20" y="15" />
 					<Anchors>
 						<Anchor point="LEFT" relativePoint="LEFT" x="0" y="1"/>
 					</Anchors>
-				</FontString>
+				</FontString> -->
+
+				<Texture parentKey="CheckMarker" file="Interface/AddOns/HDH_AuraTracker/Texture/check" hidden="true">
+					<Size x="8" y="10" />
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="LEFT" x="6" y="0"/>
+					</Anchors>
+				</Texture>
 
 				<FontString parentKey="Text" inherits="Font_White_S" text="" justifyH="LEFT"  justifyV="CENTER">
 					<Size  y="20" />

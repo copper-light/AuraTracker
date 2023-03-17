@@ -699,6 +699,7 @@ function HDH_C_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
 end
 
 function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
+	local spark_size = f.iconframe:GetWidth() 
 	if not f.charges then
 		f.charges = CreateFrame("Cooldown", nil, f.iconframe, "CooldownFrameTemplate");
 		f.charges:SetDrawEdge(true);
@@ -719,7 +720,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown:SetPoint("BOTTOMLEFT", f.iconframe,"BOTTOMLEFT",0,0)
 		f.iconSatCooldown:SetPoint("BOTTOMRIGHT", f.iconframe,"BOTTOMRIGHT",0,0)
 		f.iconSatCooldown:SetHeight(self.ui.icon.size)
-		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
+		f.iconSatCooldown.spark:SetSize(spark_size, 7);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"TOP",0,0)
 		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
@@ -735,7 +736,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown:SetPoint("TOPLEFT", f.iconframe,"TOPLEFT",0,0)
 		f.iconSatCooldown:SetPoint("TOPRIGHT", f.iconframe,"TOPRIGHT",0,0)
 		f.iconSatCooldown:SetHeight(self.ui.icon.size)
-		f.iconSatCooldown.spark:SetSize(self.ui.icon.size*1.1, 8);
+		f.iconSatCooldown.spark:SetSize(spark_size, 7);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"BOTTOM",0,0)
 		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
@@ -751,7 +752,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown:SetPoint("TOPRIGHT", f.iconframe,"TOPRIGHT",0,0)
 		f.iconSatCooldown:SetPoint("BOTTOMRIGHT", f.iconframe,"BOTTOMRIGHT",0,0)
 		f.iconSatCooldown:SetWidth(self.ui.icon.size)
-		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
+		f.iconSatCooldown.spark:SetSize(7, spark_size);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"LEFT",0,0)
 		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
@@ -767,7 +768,7 @@ function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown:SetPoint("TOPLEFT", f.iconframe,"TOPLEFT",0,0)
 		f.iconSatCooldown:SetPoint("BOTTOMLEFT", f.iconframe,"BOTTOMLEFT",0,0)
 		f.iconSatCooldown:SetWidth(self.ui.icon.size)
-		f.iconSatCooldown.spark:SetSize(8, self.ui.icon.size*1.1);
+		f.iconSatCooldown.spark:SetSize(7, spark_size);
 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"RIGHT",0,0)
 		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))

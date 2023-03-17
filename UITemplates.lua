@@ -1407,7 +1407,7 @@ function HDH_AT_CheckButton2TemplateMixin:SetChecked(bool)
         self.ActiveBorderBottom:Show()
 
         self.CheckMarker:Show()
-        self.CheckMarker:SetFontObject("Font_Yellow_M")
+        -- self.CheckMarker:SetFontObject("Font_Yellow_M")
         -- self.Text:SetFontObject("Font_Yellow_S")
         -- self.Active2:Show()
     else
