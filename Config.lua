@@ -1666,7 +1666,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 	local traits
 	local trackerId
 	-- Tracker 목록 생성 및 트랜짓이 없는 않는 트래커 확인
-	traitList[#traitList+1] = {DDM_TRACKER_ALL, L.ALL_LIST, nil}
+	traitList[#traitList+1] = {DDM_TRACKER_ALL, L.ALL_LIST, nil, 0}
 	for _, id in ipairs(ids) do
 		traits = select(7, DB:GetTrackerInfo(id))
 		if #traits > 0 then
@@ -1678,7 +1678,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 						talentName = select(2, GetSpecializationInfoByID(talentID))
 						traitName = UTIL.GetTraitsName(traitID)
 						icon = SPEC_TEXTURE_FORMAT:format(SPEC_FORMAT_STRINGS[talentID])
-						traitList[#traitList+1] = {traitID, STR_TRANSIT_FORMAT:format(traitName, talentName), icon}
+						traitList[#traitList+1] = {traitID, STR_TRANSIT_FORMAT:format(traitName, talentName), icon, talentID}
 					else
 						
 						DB:ClearTraits(id)
@@ -1692,11 +1692,23 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 	end
 
 	if unusedTracker > 0 then
-		traitList[#traitList+1] = {DDM_TRACKER_UNUSED, L.UNUSED_LIST}
+		traitList[#traitList+1] = {DDM_TRACKER_UNUSED, L.UNUSED_LIST, 0 , 0}
 		self.Dialog:AlertShow(L.ALERT_UNUSED_LIST:format(unusedTracker))
 	end
 
 	F.DD_TRANSIT:UseAtlasSize(true)
+
+	-- for traitList then
+
+	table.sort(traitList, function(a, b) 
+		if (a[4] < b[4]) then
+			return true
+		elseif (a[4] > b[4]) then
+			return false
+		else
+			return (a[1] < b[1]) 
+		end
+	end)
 	HDH_AT_DropDown_Init(F.DD_TRANSIT, traitList, HDH_AT_OnSelected_Dropdown , nil, "HDH_AT_DropDownTrackerItemTemplate") --	HDH_AT_DropDownTrackerItemTemplate")
 
 	for _, item in ipairs(self:GetTalentList(true)) do

@@ -124,13 +124,16 @@ local function CT_UpdateSatIcon(tracker, f, spell)
 	end
 	
 	if spell.per > 0 then 
-		f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * spell.per * 100) /100
+		f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * spell.per * 10) /10
+		f.iconSatCooldown.curSize = f.iconSatCooldown.curSize - (f.iconSatCooldown.curSize % 0.5)
+		f.iconSatCooldown.curSize = math.max(f.iconSatCooldown.curSize, 0.1)
 		f.iconSatCooldown:Show()
 	else
 		spell.per = 0.1
 		f.iconSatCooldown.curSize = 1
 		f.iconSatCooldown:Hide()
 	end
+	
 	if (f.iconSatCooldown.curSize ~= f.iconSatCooldown.preSize) then
 		if (f.iconSatCooldown.curSize == 0) then f.iconSatCooldown:Hide() end
 		if tracker.ui.icon.cooldown == DB.COOLDOWN_LEFT then

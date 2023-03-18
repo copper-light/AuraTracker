@@ -466,7 +466,7 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			bar:SetOrientation("Horizontal"); 
 			bar:SetRotatesTexture(false);
 			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-			bar.spark:SetSize(19, bar_op.height*1.15);
+			bar.spark:SetSize(9, bar_op.height);
 			
 			if bar_op.to_fill then
 				bar:SetReverseFill(true)
@@ -490,7 +490,7 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			bar:SetOrientation("Horizontal"); 
 			bar:SetRotatesTexture(false);
 			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-			bar.spark:SetSize(19, bar_op.height*1.15);
+			bar.spark:SetSize(9, bar_op.height);
 			
 			if bar_op.to_fill then
 				bar:SetReverseFill(false)
@@ -513,7 +513,7 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			bar:SetOrientation("Vertical"); 
 			bar:SetRotatesTexture(true);
 			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-			bar.spark:SetSize(bar_op.width*1.15, 19);
+			bar.spark:SetSize(bar_op.width, 9);
 			if bar_op.to_fill then
 				bar:SetReverseFill(false)
 			else
@@ -536,7 +536,7 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			bar:SetOrientation("Vertical"); 
 			bar:SetRotatesTexture(true);
 			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-			bar.spark:SetSize(bar_op.width*1.15, 19);
+			bar.spark:SetSize(bar_op.width, 9);
 			if bar_op.to_fill then
 				bar:SetReverseFill(true)
 			else

@@ -68,26 +68,29 @@ local function UpdateCooldown(f, elapsed)
 						f.iconSatCooldown.spark:Hide()
 					end
 				end
-				f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * spell.per * 10) /10 
+				f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * spell.per * 10) / 10
+				f.iconSatCooldown.curSize = f.iconSatCooldown.curSize - (f.iconSatCooldown.curSize % 0.5)
+				f.iconSatCooldown.curSize = math.max(f.iconSatCooldown.curSize, 0.1)
 				if (f.iconSatCooldown.curSize ~= f.iconSatCooldown.preSize) then
+					f.tex = 0.86 * spell.per
 					if (f.iconSatCooldown.curSize == 0) then f.iconSatCooldown:Hide() end
 					if tracker.ui.icon.cooldown == DB.COOLDOWN_LEFT then
-						spell.texcoord = 0.07 + (0.86 * spell.per)
+						spell.texcoord = 0.07 + (f.tex)
 						f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
 						-- spell.texcoord = math.ceil(spell.texcoord * 10) / 10
 						f.iconSatCooldown:SetTexCoord(0.07, spell.texcoord, 0.07, 0.93)
 					elseif tracker.ui.icon.cooldown == DB.COOLDOWN_RIGHT then
-						spell.texcoord = (0.93 - (0.86 * spell.per))
+						spell.texcoord = (0.93 - f.tex)
 						f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
 						-- spell.texcoord = math.ceil(spell.texcoord * 10) /10
 						f.iconSatCooldown:SetTexCoord(spell.texcoord, 0.93, 0.07, 0.93)
 					elseif tracker.ui.icon.cooldown == DB.COOLDOWN_UP then
-						spell.texcoord = (0.07 + (0.86 * spell.per))
+						spell.texcoord = (0.07 + f.tex)
 						f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
 						-- spell.texcoord = math.ceil(spell.texcoord * 10) /10
 						f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, spell.texcoord)
 					else
-						spell.texcoord = (0.93 - (0.86 * spell.per))
+						spell.texcoord = (0.93 - f.tex)
 						f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
 						-- spell.texcoord = math.ceil(spell.texcoord * 10) /10
 						f.iconSatCooldown:SetTexCoord(0.07, 0.93, spell.texcoord, 0.93)
