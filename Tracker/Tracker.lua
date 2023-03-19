@@ -2151,6 +2151,18 @@ local function VersionUpdateDB()
 		HDH_AT_DB.show_latest_spell = true
 		DB:SetVersion(2.8)
 	end
+
+	if DB:GetVersion() == 2.8 then
+		local ui = DB:GetTrackerUI()
+		ui.cooldown.show_global_cooldown = true
+		for _, id in ipairs(DB:GetTrackerIds()) do
+			if DB:hasTrackerUI(id) then
+				ui = DB:GetTrackerUI(id)
+				ui.cooldown.show_global_cooldown = true
+			end
+		end
+		DB:SetVersion(2.9)
+	end
 end
 
 local function PLAYER_ENTERING_WORLD()

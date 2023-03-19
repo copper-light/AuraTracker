@@ -89,7 +89,7 @@ function HDH_COMBO_POINT_TRACKER:CreateData()
 	local key
 	local name
 	local texture = self.POWER_INFO[self.type].texture;
-	local isAlways = true
+	local display = DB.SPELL_ALWAYS_DISPLAY
 	local isValue = HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type
 	local isItem = false
 	local isFirstCreated = false
@@ -97,10 +97,10 @@ function HDH_COMBO_POINT_TRACKER:CreateData()
 		if not self:IsHaveData(elemIdx) then
 			key = self.POWER_INFO[self.type].power_type .. elemIdx
 			name = self.POWER_INFO[self.type].power_type .. elemIdx
-			DB:SetTrackerElement(trackerId, elemIdx, key, id, name, texture, isAlways, isValue, isItem)
+			DB:SetTrackerElement(trackerId, elemIdx, key, id, name, texture, display, isValue, isItem)
 			DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 			if elemIdx == 1 then
-				isCreatedData = true
+				isFirstCreated = true
 			end
 		end
 	end 

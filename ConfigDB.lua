@@ -3,7 +3,7 @@ local L = HDH_AT_L
 local CONFIG = HDH_AT_ConfigDB
 local UTIL = HDH_AT_UTIL
 
-CONFIG.VERSION = 2.8
+CONFIG.VERSION = 2.9
 
 CONFIG.ANI_HIDE = 1
 CONFIG.ANI_SHOW = 2
@@ -112,7 +112,8 @@ local DEFAULT_DISPLAY = {
         use_not_enough_mana_color = true,
         not_enough_mana_color = {0.35, 0.35, 0.78, 1},
         use_out_range_color = true,
-        out_range_color = {0.53, 0.1, 0.1, 1}
+        out_range_color = {0.53, 0.1, 0.1, 1},
+        show_global_cooldown = true
     },
 
     -- 아이콘 설정

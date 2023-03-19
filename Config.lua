@@ -131,6 +131,7 @@ elseif MyClass == "PRIEST" then
 	totemName = L.PRIEST_TOTEM
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_INSANITY, L.POWER_INSANITY})
+	-- table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.PRIEST_SHADOWY_APPARITION, L.PRIEST_SHADOWY_APPARITION})
 elseif MyClass == "ROGUE" then
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY})
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_COMBO_POINTS, L.POWER_COMBO_POINTS})
@@ -3112,8 +3113,8 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_WHEN_IN_RAID,           "ui.%s.common.hide_in_raid")
 	comp:Init({
-		{false, L.ON},
-		{true, L.OFF}
+		{false, L.ALWAYS},
+		{true, L.HIDE}
 	}, HDH_AT_OnSelected_Dropdown)
 	self.F.BODY.CONFIG_UI.SW_DISPLAY_WHEN_IN_RAID = comp
 
@@ -3140,8 +3141,10 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.CANCEL_BUFF,         "ui.%s.icon.able_buff_cancel")
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
-
+ 
 	HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SPLIT_LINE, L.ONLY_FOR_CONFIG_OF_COOLDOWN_TRACKER)
+	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.DISPLAY_GLOBAL_COOLDOWN,         "ui.%s.cooldown.show_global_cooldown")
+	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.ICON_USE_NOT_ENOUGH_MANA_COLOR,         "ui.%s.cooldown.use_not_enough_mana_color")
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,       L.ICON_NOT_ENOUGH_MANA_COLOR,         "ui.%s.cooldown.not_enough_mana_color")

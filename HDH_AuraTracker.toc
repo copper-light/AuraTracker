@@ -2,7 +2,7 @@
 ## Title: HDH_AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
-## Version: 10.0.5.09.2
+## Version: 10.0.5.10
 ## SavedVariablesPerCharacter: HDH_AT_DB
 
 Locale\locale.lua
@@ -22,6 +22,7 @@ Tracker\ComboPointTracker.lua
 Tracker\DKRuneTracker.lua
 Tracker\EssenceTracker.lua
 Tracker\StaggerTracker.lua
+# Tracker\ShadowTracking.lua
 
 # https://www.wowace.com/projects/libcompress
 Lib\LibCompress\LibStub.lua

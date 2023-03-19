@@ -258,7 +258,7 @@ function HDH_C_TRACKER:Update_CountAndCooldown(f)
 	local spell = f.spell
 	local count, maxCharges, startTime, duration
 	local isUpdate = false
-	local show_global_cooldown = true --option.icon.show_global_cooldown
+	local show_global_cooldown = ui.cooldown.show_global_cooldown
 	local cooldown_type = ui.icon.cooldown
 	local display_mode = ui.common.display_mode 
 	spell.isCharging = false
