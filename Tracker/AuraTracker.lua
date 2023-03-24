@@ -1,41 +1,7 @@
 ﻿local DB = HDH_AT_ConfigDB
 HDH_AURA_TRACKER = {}
 HDH_AURA_TRACKER.BOSS_DEBUFF = {}
--- HDH_AURA_TRACKER.DISABLE_DEBUFF = {57724}
 local PLAY_SOUND = false
-
---------------------------------------------
--- OnUpdate
---------------------------------------------
--- function HDH_AURA_TRACKER:CheckCondition(f, remaining)
-	-- self:SetGlow(f, true);
--- end
-
--------------------------------------------
--- sound
--------------------------------------------
-
--- function HDH_PlaySoundFile(path, channel)
--- 	if PLAY_SOUND then
--- 		PlaySoundFile(path,channel)
--- 	end
--- end
-	
--- function HDH_OnShowCooldown(self)
--- 	local f = self:GetParent():GetParent();
--- 	if f.spell and f.spell.startSound and not OptionFrame:IsShown() then
--- 		if (f.spell.duration - f.spell.remaining) < 0.5 then
--- 			HDH_PlaySoundFile(f.spell.startSound,"SFX")
--- 		end
--- 	end
--- end
-
--- function HDH_OnHideCooldown(self)
--- 	local f = self:GetParent():GetParent();
--- 	if f.spell and f.spell.endSound and not OptionFrame:IsShown() then
--- 		HDH_PlaySoundFile(f.spell.endSound, "SFX")
--- 	end
--- end
 
 ------------------------------------------
  -- AURA TRACKER Class

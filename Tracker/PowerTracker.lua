@@ -7,99 +7,11 @@ local POWRE_BAR_SPLIT_MARGIN = 4;
 
 local MyClassKor, MyClass = UnitClass("player");
 
--- local POWRE_NAME = {}
--- local L_POWER_MANA = "자원:마나";
--- local L_POWER_RAGE = "자원:분노"
--- local L_POWER_FOCUS = "자원:집중"
--- local L_POWER_ENERGY = "자원:기력"
--- local L_POWER_RUNIC_POWER = "자원:룬마력"
--- local L_POWER_LUNAR_POWER = "자원:천공의힘"
--- local L_POWER_MAELSTROM = "자원:소용돌이"
--- local L_POWER_INSANITY = "자원:광기"
--- local L_POWER_FURY = "자원:격노"
--- local L_POWER_PAIN = "자원:고통"
-
 local POWER_INFO = {}
 local IS_REGEN_POWER = {} -- 자동으로 리젠되는 자원인가? 비전투중일때 자원바를 보이게 할것인가 판단하는 기준이됨
 IS_REGEN_POWER[0] = true; -- 마나
 IS_REGEN_POWER[2] = true; -- 집중
 IS_REGEN_POWER[3] = true; -- 기력
-
--- HDH_POWER["MANA"]		 = {tracker_name="자원:마나", 	color={0.25, 0.78, 0.92}, 	texture = "Interface/Icons/INV_Misc_Rune_03"};
--- HDH_POWER["RAGE"]		 = {tracker_name="자원:분노", 	color={0.77, 0.12, 0.23}, 	texture = "Interface/Icons/Ability_Warrior_Rampage"};
--- HDH_POWER["FOCUS"] 		 = {tracker_name="자원:집중", 	color={1.00, 0.50, 0.25}, 	texture = "Interface/Icons/Ability_Fixated_State_Orange"};
--- HDH_POWER["ENERGY"]		 = {tracker_name="자원:기력", 	color={1, 0.96, 0.41}, 	  	texture = "Interface/Icons/Ability_Priest_SpiritOfTheRedeemer"};
--- HDH_POWER["RUNIC_POWER"] = {tracker_name="자원:룬마력", 	color={0.77, 0.12, 0.23}, 	texture = "Interface/Icons/Spell_DeathKnight_FrozenRuneWeapon"};
--- HDH_POWER["LUNAR_POWER"] = {tracker_name="자원:천공의힘", 	color={0.30, 0.52, 0.90},	texture = "Interface/Icons/Spell_Nature_AbolishMagic"};
--- HDH_POWER["MAELSTROM"]	 = {tracker_name="자원:소용돌이", 	color={0.25, 0.78, 0.92},	texture = "Interface/Icons/Spell_Lightning_LightningBolt01"};
--- HDH_POWER["INSANITY"] 	 = {tracker_name="자원:광기", 	color={0.40, 0, 0.80},	  	texture = "Interface/Icons/Ability_Rogue_EnvelopingShadows"};
--- HDH_POWER["FURY"] 		 = {tracker_name="자원:격노", 	color={0.788, 0.259, 0.992},texture = "Interface/Icons/Ability_BossFelOrcs_Necromancer_Purple"};-- 17
--- HDH_POWER["PAIN"] 		 = {tracker_name="자원:고통",		color={1, 156/255, 0}, 		texture = "Interface/Icons/Ability_BossFelOrcs_Necromancer_Purple"}; -- 18
-
-
--- else TrackerTypeName[1] = "2차 자원(콤보)"; end
-
--- local POWER_MANA	 	= {power_type="MANA",		 	power_index =0,		color={0.25, 0.78, 0.92}, 		texture = "Interface/Icons/INV_Misc_Rune_03"};
--- local POWER_RAGE		= {power_type="RAGE", 			power_index =1,		color={0.77, 0.12, 0.23}, 		texture = "Interface/Icons/Ability_Warrior_Rampage"};
--- local POWER_FOCUS 		= {power_type="FOCUS", 			power_index =2,		color={1.00, 0.50, 0.25}, 		texture = "Interface/Icons/Ability_Fixated_State_Orange"};
--- local POWER_ENERGY		= {power_type="ENERGY",			power_index =3, 	color={1, 0.96, 0.41}, 	  		texture = "Interface/Icons/Spell_Holy_PowerInfusion"};
--- local POWER_RUNIC_POWER	= {power_type="RUNIC_POWER", 	power_index =6,		color={0, 0.82, 1}, 			texture = "Interface/Icons/Spell_DeathKnight_FrozenRuneWeapon"};
--- local POWER_LUNAR_POWER = {power_type="LUNAR_POWER",	power_index =8, 	color={0.30, 0.52, 0.90},		texture = "Interface/Icons/Ability_Druid_Eclipse"};
--- local POWER_MAELSTROM	= {power_type="MAELSTROM", 		power_index =11,	color={0.25, 0.5, 1},			texture = "Interface/Icons/Spell_Shaman_StaticShock"};
--- local POWER_INSANITY 	= {power_type="INSANITY", 		power_index =13,	color={0.70, 0.4, 0.90},	  	texture = "Interface/Icons/SPELL_SHADOW_TWISTEDFAITH"};
--- local POWER_FURY  		= {power_type="FURY",			power_index =17, 	color={0.788, 0.259, 0.992},	texture = "Interface/Icons/Spell_Shadow_SummonVoidWalker"};-- 17
--- local POWER_PAIN 		= {power_type="PAIN",			power_index =18,	color={1, 156/255, 0}, 			texture = "Interface/Icons/Ability_Warlock_FireandBrimstone"}; -- 18
-
--- local SPEC_INFO = {}
--- HDH_POWER_TRACKER.SPEC_INFO[62] = POWER_MANA-- Mage: Arcane
--- HDH_POWER_TRACKER.SPEC_INFO[63] = POWER_MANA -- Mage: Fire
--- HDH_POWER_TRACKER.SPEC_INFO[64] = POWER_MANA-- Mage: Frost
-
--- HDH_POWER_TRACKER.SPEC_INFO[65] = POWER_MANA-- Paladin: Holy
--- HDH_POWER_TRACKER.SPEC_INFO[66] = POWER_MANA-- Paladin: Protection
--- HDH_POWER_TRACKER.SPEC_INFO[70] = POWER_MANA-- Paladin: Retribution
-
--- HDH_POWER_TRACKER.SPEC_INFO[71] = POWER_RAGE-- Warrior: Arms
--- HDH_POWER_TRACKER.SPEC_INFO[72] = POWER_RAGE-- Warrior: Fury
--- HDH_POWER_TRACKER.SPEC_INFO[73] = POWER_RAGE-- Warrior: Protection
-
--- HDH_POWER_TRACKER.SPEC_INFO[102] = POWER_LUNAR_POWER -- Druid: Balance
--- HDH_POWER_TRACKER.SPEC_INFO[103] = POWER_ENERGY -- Druid: Feral
--- HDH_POWER_TRACKER.SPEC_INFO[104] = {TYPE = "RAGE", INDEX=1, TEXTURE="" } -- Druid: Guardian
--- HDH_POWER_TRACKER.SPEC_INFO[105] = {TYPE = "MANA", INDEX=0, TEXTURE="" } -- Druid: Restoration
-
--- HDH_POWER_TRACKER.SPEC_INFO[250] = {TYPE = "RUNIC_POWER", INDEX=6, TEXTURE="" }-- Death Knight: Blood
--- HDH_POWER_TRACKER.SPEC_INFO[251] = {TYPE = "RUNIC_POWER", INDEX=6, TEXTURE="" }-- Death Knight: Frost
--- HDH_POWER_TRACKER.SPEC_INFO[252] = {TYPE = "RUNIC_POWER", INDEX=6, TEXTURE="" }-- Death Knight: Unholy
-
--- HDH_POWER_TRACKER.SPEC_INFO[253] = {TYPE = "FOCUS", INDEX=2, TEXTURE="" }-- Hunter: Beast Mastery
--- HDH_POWER_TRACKER.SPEC_INFO[254] = {TYPE = "FOCUS", INDEX=2, TEXTURE="" }-- Hunter: Marksmanship
--- HDH_POWER_TRACKER.SPEC_INFO[255] = {TYPE = "FOCUS", INDEX=2, TEXTURE="" }-- Hunter: Survival
-
--- HDH_POWER_TRACKER.SPEC_INFO[256] = {TYPE = "MANA", INDEX=0, TEXTURE="" }-- Priest: Discipline
--- HDH_POWER_TRACKER.SPEC_INFO[257] = {TYPE = "MANA", INDEX=0, TEXTURE="" }-- Priest: Holy
--- HDH_POWER_TRACKER.SPEC_INFO[258] = {TYPE = "INSANITY", INDEX=13, TEXTURE="" }-- Priest: Shadow
-
--- HDH_POWER_TRACKER.SPEC_INFO[259] = {TYPE = "ENERGY", INDEX=3, TEXTURE="" }-- Rogue: Assassination
--- HDH_POWER_TRACKER.SPEC_INFO[260] = {TYPE = "ENERGY", INDEX=3, TEXTURE="" }-- Rogue: Combat
--- HDH_POWER_TRACKER.SPEC_INFO[261] = {TYPE = "ENERGY", INDEX=3, TEXTURE="" }-- Rogue: Subtlety
-
--- HDH_POWER_TRACKER.SPEC_INFO[262] = {TYPE = "MAELSTROM", INDEX=11, TEXTURE="" }-- Shaman: Elemental
--- HDH_POWER_TRACKER.SPEC_INFO[263] = {TYPE = "MAELSTROM", INDEX=11, TEXTURE="" }-- Shaman: Enhancement
--- HDH_POWER_TRACKER.SPEC_INFO[264] = {TYPE = "MANA", INDEX=0, TEXTURE="" }-- Shaman: Restoration
-
--- HDH_POWER_TRACKER.SPEC_INFO[265] = {TYPE = "MANA", INDEX=0, TEXTURE="" }-- Warlock: Affliction
--- HDH_POWER_TRACKER.SPEC_INFO[266] = {TYPE = "MANA", INDEX=0, TEXTURE="" }-- Warlock: Demonology
--- HDH_POWER_TRACKER.SPEC_INFO[267] = {TYPE = "MANA", INDEX=0, TEXTURE="" }-- Warlock: Destruction
-
--- HDH_POWER_TRACKER.SPEC_INFO[268] = {TYPE = "ENERGY", INDEX=3, TEXTURE="" }-- Monk: Brewmaster
--- HDH_POWER_TRACKER.SPEC_INFO[269] = {TYPE = "ENERGY", INDEX=3, TEXTURE="" }-- Monk: Windwalker
--- HDH_POWER_TRACKER.SPEC_INFO[270] = {TYPE = "MANA", INDEX=0, TEXTURE="" }-- Monk: Mistweaver
-
--- HDH_POWER_TRACKER.SPEC_INFO[577] = {TYPE = "FURY", INDEX=17, TEXTURE="" }-- Demon Hunter: Havoc
--- HDH_POWER_TRACKER.SPEC_INFO[581] = {TYPE = "PAIN", INDEX=18, TEXTURE="" }-- Demon Hunter: Vengeance
-
--- HDH_POWER_TRACKER.HDH_POWER_INDEX, HDH_POWER_TRACKER.HDH_POWER_NAME
 
 ------------------------------------
 -- HDH_POWER_TRACKER class

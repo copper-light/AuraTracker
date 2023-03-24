@@ -24,7 +24,6 @@ do
 		if ( slot <= MAX_TOTEMS ) then
 			for i =1, MAX_TOTEMS do
 				haveTotem, name, startTime, duration, icon = GetTotemInfo(i)
-				--option = self.frame.TotemPointer and self.frame.TotemPointer[name] or nil
 				if haveTotem then
 					if self.aura_filter == DB.AURA_FILTER_ALL then
 						f = self.frame.icon[ret];

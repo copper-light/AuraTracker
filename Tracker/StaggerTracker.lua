@@ -29,8 +29,6 @@ local function STAGGER_TRACKER_OnUpdate(self, elapsed)
 	local curValue = UnitStagger('player') or 0;
 	local health_max = UnitHealthMax("player");
 	local per = curValue/health_max;
-	-- print(self.spell.v1 ,curValue)
-	-- if (tonumber(self.v1:GetText()) or 0) == curValue then return; end
 	self.spell.v1 = curValue;
 	self.spell.count = (per * 100)
 	self.counttext:SetText(format("%d%%", math.ceil(self.spell.count or 0))); 
@@ -96,7 +94,6 @@ function HDH_STAGGER_TRACKER:CreateData()
 
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON_AND_BAR)
-	-- DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', HDH_STAGGER_TRACKER.POWER_INFO[self.type].color)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', true)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.location', DB.BAR_LOCATION_R)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 200)
@@ -114,7 +111,6 @@ function HDH_STAGGER_TRACKER:CreateData()
 
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 30)
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', {0, 0, 0, 1})
-	-- DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', HDH_STAGGER_TRACKER.POWER_INFO[self.type].color)
 	self:UpdateSetting();
 end
 
@@ -158,14 +154,11 @@ function HDH_STAGGER_TRACKER:CreateDummySpell(count)
 	f.cd:Hide();
 	if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 		f:SetScript("OnUpdate",nil);
-		-- f.bar:SetMinMaxValues(0, power_max);
-		-- f.bar:SetValue(spell.v1);
 		if spell.showValue then
 			f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(spell.v1,true));
 		else
 			f.v1:SetText('')
 		end
-		-- f.bar:Show();
 		local bar
 		for i = 1, #f.bar.bar do
 			bar = f.bar.bar[i];
@@ -184,44 +177,11 @@ function HDH_STAGGER_TRACKER:CreateDummySpell(count)
 	return 1;
 end
 
--- function HDH_STAGGER_TRACKER:UpdateIcons()  -- HDH_TRACKER override
-	-- local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
-	-- local f = self.frame.icon[1]
-	-- if f == nil or f.spell == nil then return end;
-	-- if f.spell.v1 > 0 then 
-		-- f.icon:SetDesaturated(nil)
-		-- f.icon:SetAlpha(self.option.icon.on_alpha)
-		-- f.border:SetAlpha(self.option.icon.on_alpha)
-		-- f.border:SetVertexColor(unpack(self.option.icon.buff_color)) 
-		-- ret = 1;
-		-- self:SetGlow(f, true)
-		-- f:Show();
-		-- if self.option.bar.enable and f.bar then
-			-- self:UpdateBarValue(f);
-			-- f.bar:Show();
-		-- end
-	-- else
-		-- if f.spell.always then
-			-- f.icon:SetDesaturated(1)
-			-- f.icon:SetAlpha(self.option.icon.off_alpha)
-			-- f.border:SetAlpha(self.option.icon.off_alpha)
-			-- f.border:SetVertexColor(0,0,0)
-			-- self:SetGlow(f, false)
-			-- f:Show();
-		-- else
-			-- f:Hide();
-		-- end
-	-- end
-	-- f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', 0, 0);
-	-- return ret
--- end
-
 function HDH_STAGGER_TRACKER:Update() -- HDH_TRACKER override
 	if not self.frame or not self.frame.icon or HDH_TRACKER.ENABLE_MOVE then return end
 	local f = self.frame.icon[1]
 	local show
 	if f and f.spell then
-		-- f.spell.type = UnitPowerType('player');
 		f.spell.v1 = UnitStagger('player') or 0;
 		f.spell.max = UnitHealthMax('player');
 		f.spell.count = (f.spell.v1/f.spell.max * 100);
@@ -238,7 +198,6 @@ function HDH_STAGGER_TRACKER:Update() -- HDH_TRACKER override
 end
 
 function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
-	-- if HDH_TRACKER.ENABLE_MOVE then return end
 	local trackerId = self.id
 	local id, name, _, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
 	self.aura_filter = aura_filter
@@ -285,9 +244,6 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.no = i
 			spell.name = elemName
 			spell.icon = texture
-			-- spell.power_index = POWER_INFO[self.type].power_index
-			-- if not auraList[i].defaultImg then auraList[i].defaultImg = texture; 
-			-- elseif auraList[i].defaultImg ~= auraList[i].texture then spell.fix_icon = true end
 			spell.id = tonumber(elemId)
 			spell.count = 0
 			spell.duration = 0
@@ -317,10 +273,6 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 			self:SetGlow(f, false)
 			self:UpdateArtBar(f)
 		end
-		
-		-- self.frame:SetScript("OnEvent", self.OnEvent)
-		-- self.frame:RegisterUnitEvent('UNIT_DISPLAYPOWER',"player")
-		-- self.frame:RegisterUnitEvent('UNIT_MAXPOWER',"player")
 	else
 		self.frame:UnregisterAllEvents()
 	end
@@ -339,15 +291,6 @@ end
 function HDH_STAGGER_TRACKER:PLAYER_ENTERING_WORLD()
 end
 
--- function HDH_STAGGER_TRACKER:OnEvent(event, unit, powerType)
--- 	if self == nil or self.parent == nil then return end
--- 	if ((event == 'UNIT_DISPLAYPOWER') or (event == 'UNIT_MAXPOWER')) then  -- (event == "UNIT_POWER")
--- 		if not HDH_TRACKER.ENABLE_MOVE then
--- 			self.parent:Update()
--- 			self.parent:UpdateBar(self.parent.frame.icon[1]);
--- 		end
--- 	end
--- end
 ------------------------------------
 -- HDH_STAGGER_TRACKER class
 ------------------------------------

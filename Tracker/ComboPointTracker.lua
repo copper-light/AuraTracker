@@ -2,42 +2,7 @@
 local DB = HDH_AT_ConfigDB
 local MyClassKor, MyClass = UnitClass("player");
 
--- local L_POWRE_ARCANE_CHARGES = "자원:비전_충전몰";
--- local L_POWRE_HOLY_POWER = "자원:신성한_힘"
--- local L_POWRE_COMBO_POINTS = "자원:연계_점수"
--- local L_POWRE_SOUL_SHARDS = "자원:영혼의_조각"
--- local L_POWRE_CHI = "자원:기"
-
 local POWER_INFO = {}
-
--- 지원하는 특성
--- local IS_USE_POWER = {}
-
--- IS_USE_POWER[62] = true; -- 비법
--- IS_USE_POWER[70] = true; -- 징기
--- IS_USE_POWER[269] = true; -- 풍운
--- IS_USE_POWER[265] = true; -- 고흑
--- IS_USE_POWER[266] = true; -- 악흑
--- IS_USE_POWER[267] = true; -- 파흑
--- IS_USE_POWER[103] = true; -- 야드
--- IS_USE_POWER[259] = true; -- 암살도적
--- IS_USE_POWER[260] = true; -- 전투도적
--- IS_USE_POWER[261] = true; -- 무법도적
-
--- local TrackerTypeName;
--- if MyClass == "MAGE" then TrackerTypeName = L_POWRE_ARCANE_CHARGES;
--- elseif MyClass == "PALADIN" then TrackerTypeName = L_POWRE_HOLY_POWER;
--- elseif MyClass == "WARRIOR" then
--- elseif MyClass == "DRUID" then TrackerTypeName = L_POWRE_COMBO_POINTS;
--- elseif MyClass == "DEATHKNIGHT" then
--- elseif MyClass == "HUNTER" then
--- elseif MyClass == "PRIEST" then
--- elseif MyClass == "ROGUE" then TrackerTypeName = L_POWRE_COMBO_POINTS;
--- elseif MyClass == "SHAMAN" then
--- elseif MyClass == "WARLOCK" then TrackerTypeName = L_POWRE_SOUL_SHARDS;
--- elseif MyClass == "MONK" then TrackerTypeName = L_POWRE_CHI;
--- elseif MyClass == "DEMONHUNTER" then
--- else TrackerTypeName = "2차 자원(콤보)"; end
 
 ------------------------------------
 -- HDH_COMBO_POINT_TRACKER class
@@ -173,10 +138,6 @@ end
 
 function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-	-- local max = 1;
-	-- if not self.option.base.merge_power_icon then
-	-- 	max = power_max;
-	-- end
 	for i = 1, power_max do
 		iconf = self.frame.icon[i]
 		if iconf then 
@@ -272,13 +233,6 @@ function HDH_COMBO_POINT_TRACKER:ChangeCooldownType(f, cooldown_type)
 	end
 end
 
--- function HDH_COMBO_POINT_TRACKER:UpdateSetting() -- HDH_TRACKER override
--- 	super.UpdateSetting(self)
--- 	-- for k, iconf in pairs(self.frame.icon) do
--- 	-- 	iconf.iconSatCooldown.spark:Hide()
--- 	-- end
--- end
-
 function HDH_COMBO_POINT_TRACKER:UpdateArtBar(f) -- HDH_TRACKER override
 	super.UpdateArtBar(self,f)
 	if f.bar then
@@ -328,8 +282,6 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 			if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS ~= self.type and HDH_TRACKER.TYPE.POWER_ESSENCE ~= self.type then
 				f.icon:SetDesaturated(nil)
 				f.icon:SetAlpha(self.ui.icon.on_alpha)
-				-- f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
-				-- f.iconSatCooldown:Show()
 				f.border:SetAlpha(self.ui.icon.on_alpha)
 				f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
 
@@ -459,11 +411,6 @@ function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 
 			ret = ret + 1
 
-			-- if self.ui.base.merge_power_icon then
-				-- f.v1:SetText(f.spell.v1);
-			-- else
-			-- f.v1:SetText("");
-			-- end
 		else
 			if k <= UnitPowerMax('player', self.POWER_INFO[self.type].power_index) then 
 				if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then 
@@ -581,10 +528,7 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 		spell.glowValue = (glowValue and tonumber(glowValue)) or 0
 		spell.per = 0
 		spell.showValue = isValue
-		-- spell.glowV1= auraList[i].GlowV1
 		spell.display = display
-		-- spell.showValue = auraList[i].ShowValue -- 수치표시
-		-- spell.v1_hp =  auraList[i].v1_hp -- 수치 체력 단위표시
 		spell.v1 = 0 -- 수치를 저장할 변수
 		spell.aniEnable = true;
 		spell.aniTime = 8;
@@ -593,8 +537,6 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 		spell.name = elemName
 		spell.icon = texture
 		spell.power_index = self.POWER_INFO[self.type].power_index
-		-- if not auraList[i].defaultImg then auraList[i].defaultImg = texture; 
-		-- elseif auraList[i].defaultImg ~= auraList[i].texture then spell.fix_icon = true end
 		spell.id = tonumber(elemId)
 		spell.count = 0
 		spell.duration = 0
@@ -609,9 +551,6 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 		f.spell = spell
 		f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 		f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-		-- f.icon:SetDesaturated(1)
-		-- f.icon:SetAlpha(self.ui.icon.off_alpha)
-		-- f.border:SetAlpha(self.ui.icon.off_alpha)
 
 		f:SetScript("OnUpdate", OnUpdateBar)
 		self:SetGlow(f, false)
