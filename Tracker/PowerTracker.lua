@@ -61,8 +61,8 @@ local function HDH_POWER_OnUpdate(self)
 	
 	if self.spell.curTime - (self.spell.delay or 0) < 0.02  then return end 
 	self.spell.delay = self.spell.curTime
-	local curValue = UnitPower('player', self.spell.power_index);
-	local maxValue = UnitPowerMax('player', self.spell.power_index);
+	local curValue = self:GetParent().parent:GetPower()
+	local maxValue = self:GetParent().parent:GetPowerMax()
 	self.spell.v1 = curValue;
 	self.spell.count = math.ceil(self.spell.v1 / maxValue * 100);
 	if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
@@ -135,6 +135,13 @@ function HDH_POWER_TRACKER:UpdateBarValue(f, non_animate)
 	end
 end
 
+function HDH_POWER_TRACKER:GetPower()
+	return UnitPower('player', POWER_INFO[self.type].power_index);
+end
+
+function HDH_POWER_TRACKER:GetPowerMax()
+	return UnitPowerMax('player', POWER_INFO[self.type].power_index)
+end
 
 function HDH_POWER_TRACKER:CreateData()
 	local trackerId = self.id
@@ -152,7 +159,7 @@ function HDH_POWER_TRACKER:CreateData()
 	local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
 	DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 
-	local maxValue = UnitPowerMax('player', POWER_INFO[self.type].power_index)
+	local maxValue = self:GetPowerMax()
 
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON_AND_BAR)
@@ -191,15 +198,15 @@ function HDH_POWER_TRACKER:IsHaveData()
 	end
 end
 
-function HDH_POWER_TRACKER:ChangeCooldownType(f, cooldown_type) -- 호출되지 말라고 빈함수
-end
+-- function HDH_POWER_TRACKER:ChangeCooldownType(f, cooldown_type) -- 호출되지 말라고 빈함수
+-- end
 
 function HDH_POWER_TRACKER:CreateDummySpell(count)
 	local icons =  self.frame.icon
 	local ui = self.ui
 	local curTime = GetTime()
 	local f, spell
-	local power_max = UnitPowerMax("player", POWER_INFO[self.type].power_index);
+	local power_max = self:GetPowerMax()
 	f = icons[1];
 	f:SetMouseClickEnabled(false);
 	if not f:GetParent() then f:SetParent(self.frame) end
@@ -303,7 +310,7 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 	local bf = f.bar;
 	local split = (f.spell and f.spell.splitValues) or {}
 	local nextIsNill = false;
-	bf.max = barMax or UnitPowerMax("player", POWER_INFO[self.type].power_index);
+	bf.max = barMax or self:GetPowerMax()
 	self.max = bf.max;
 	-- print(self.max)
 	-- 무결성 체크
@@ -339,7 +346,7 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 	local bar
 	for i = 1, cnt do
 		if bf.bar[i] == nil then
-			local newBar = CreateFrame("StatusBar",nil,bf);
+			local newBar = CreateFrame("StatusBar", nil, bf);
 			newBar.background = newBar:CreateTexture(nil,"BACKGROUND");
 			newBar.background:SetPoint('TOPLEFT', newBar, 'TOPLEFT', -1, 1)
 			newBar.background:SetPoint('BOTTOMRIGHT', newBar, 'BOTTOMRIGHT', 1, -1)
@@ -358,7 +365,6 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 		local gap = bar.mpMax - bar.mpMin;
 		-- bar:SetValue(value or 0)
 		bar:SetMinMaxValues(bar.mpMin, bar.mpMax);
-		bar:SetStatusBarColor(unpack(bar_op.color));
 		bar.spark:SetVertexColor(unpack(bar_op.spark_color or {1,1,1,1}))
 		bar.background:SetVertexColor(unpack(bar_op.bg_color));
 		
@@ -463,6 +469,7 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 		end
 		
 		bar:Show();
+		bar:SetStatusBarColor(unpack(bar_op.color));
 	end
 	
 	for i = cnt+1, #bf.bar do
@@ -513,8 +520,8 @@ function HDH_POWER_TRACKER:Update() -- HDH_TRACKER override
 	local show = false
 	if f and f.spell then
 		-- f.spell.type = UnitPowerType('player');
-		f.spell.v1 = UnitPower('player', f.spell.power_index);
-		f.spell.max = UnitPowerMax('player', f.spell.power_index);
+		f.spell.v1 = self:GetPower()
+		f.spell.max = self:GetPowerMax()
 		f.spell.count = (f.spell.v1/f.spell.max * 100);
 		self:UpdateIcons()
 		if IS_REGEN_POWER[f.spell.power_index] then
@@ -598,14 +605,16 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 			f.iconSatCooldown:SetDesaturated(nil)
 			self:ChangeCooldownType(f, self.ui.icon.cooldown)
 			self:SetGlow(f, false)
-			self:UpdateArtBar(f)
+			
 			f:SetScript("OnUpdate", HDH_POWER_OnUpdate);
 			f:Hide();
 			self:ActionButton_HideOverlayGlow(f)
+			self:UpdateArtBar(f)
 		end
 		self.frame:SetScript("OnEvent", self.OnEvent)
 		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE',"player")
 		self:Update()
+		
 	else
 		self.frame:UnregisterAllEvents()
 	end

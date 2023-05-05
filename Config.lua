@@ -138,7 +138,8 @@ elseif MyClass == "ROGUE" then
 elseif MyClass == "SHAMAN" then 
 	totemName = L.SHAMAN_TOTEM
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MAELSTROM, L.POWER_MAELSTROM})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MAELSTROM, L.POWER_ELE_MAELSTROM})
+	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM, L.POWER_ENH_MAELSTROM})
 elseif MyClass == "WARLOCK" then 
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
 	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_SOUL_SHARDS, L.POWER_SOUL_SHARDS})
@@ -598,7 +599,7 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 			self.DETAIL_ETC_TAB[1]:Disable()
 			self.DETAIL_ETC_TAB[2]:Disable()
 			ChangeTab(self.DETAIL_ETC_TAB, -1)
-		elseif CLASS:GetClassName() == "HDH_POWER_TRACKER" then
+		elseif CLASS:GetClassName() == "HDH_POWER_TRACKER" or CLASS:GetClassName() == "HDH_ENH_MAELSTROM_TRACKER" then
 			self.DETAIL_ETC_TAB[1]:Enable()
 			self.DETAIL_ETC_TAB[2]:Enable()
 			if #self.DETAIL_ETC_TAB >= self.subType then
@@ -1223,7 +1224,7 @@ function HDH_AT_OnClick_Button(self, button)
 			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2:SetChecked(false)
 			main.DIALOG_SELECT_DISPLAY_TYPE:Show()
 		else
-			if F.BODY.CONFIG_TRACKER.is_creation and className ~= "HDH_POWER_TRACKER" and className ~= "HDH_STAGGER_TRACKER" then
+			if F.BODY.CONFIG_TRACKER.is_creation and className ~= "HDH_POWER_TRACKER" and className ~= "HDH_STAGGER_TRACKER" and className ~= "HDH_ENH_MAELSTROM_TRACKER" then
 				main.DIALOG_SELECT_DISPLAY_TYPE.HeaderText:SetText(L.PLEASE_SELECT_CONFIG_TYPE)
 				main.DIALOG_SELECT_DISPLAY_TYPE.DescIconText:SetText(L.DESC_USE_GLOBAL_CONFIG)
 				main.DIALOG_SELECT_DISPLAY_TYPE.DescBarText:SetText(L.DESC_USE_SEVERAL_CONFIG)
@@ -2097,9 +2098,9 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			edList[i]:Hide()
 			splitbar:RemovePointer(i)
 		end
-		
-		if CLASS.POWER_INFO and trackerType ~= HDH_TRACKER.TYPE.STAGGER then
-			local max = UnitPowerMax('player', CLASS.POWER_INFO[trackerType].power_index)
+		local obj = HDH_TRACKER.Get(trackerId)
+		if obj.GetPowerMax and trackerType ~= HDH_TRACKER.TYPE.STAGGER then
+			local max = obj:GetPowerMax()
 			if max then
 				splitbar:SetMinMaxValues(0, max)
 			end

@@ -47,7 +47,7 @@ local function UpdateCooldown(f, elapsed)
 				f.cd:SetValue(spell.curTime) 
 			end
 		end
-		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
+		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar and f.bar.GetMinMaxValues then
 			local minV, maxV = f.bar:GetMinMaxValues();
 			f.bar:SetValue(tracker.ui.bar.to_fill and (maxV-spell.remaining) or (spell.remaining));
 			
