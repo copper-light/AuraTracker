@@ -848,20 +848,20 @@ function HDH_AT_ColorPickerMixin:SetHandler(handler, errorHandler)
 end
 
 local function OnSelectedColorPicker()
-    if ColorPickerFrame:IsShown() or ColorPickerFrame.buttonFrame == nil then return end
+    if ColorPickerFrame.buttonFrame == nil then return end
     self = ColorPickerFrame.buttonFrame
     local r, g, b  = ColorPickerFrame:GetColorRGB()
-    self:SetColorRGBA(r, g, b, OpacitySliderFrame:GetValue())
-    self.handler(self, r, g, b, OpacitySliderFrame:GetValue())
+    self:SetColorRGBA(r, g, b, ColorPickerFrame:GetColorAlpha())
+    self.handler(self, r, g, b, ColorPickerFrame:GetColorAlpha())
     ColorPickerFrame.buttonFrame = nil
 end
 
 local function OnCancelColorPicker()    
-    ColorPickerFrame.buttonFrame:SetColorRGBA(unpack(ColorPickerFrame.previousValues))
+    ColorPickerFrame.buttonFrame:SetColorRGBA(ColorPickerFrame:GetPreviousValues())
 end
 
 function HDH_AT_ColorPickerMixin:SetEnableAlpha(enableAlpha)
-    self.enableAlpha = enableAlpha
+    self.hasOpacity = enableAlpha
 end
 
 function HDH_AT_OnClickColorPicker(self)
@@ -874,19 +874,24 @@ function HDH_AT_OnClickColorPicker(self)
 	a = a and a or 1;
 	if self.enableAlpha then
 		ColorPickerFrame.opacity = a
-		OpacitySliderFrame:SetValue(a)
+		-- ColorPickerFrame.Content.ColorPicker:SetColorAlpha(a)
     end
     -- ColorPickerOkayButton:SetScript("OnClick", OnSelectedColorPicker)
-    ColorPickerFrame.func = (function() end)
-    ColorPickerFrame.cancelFunc = OnCancelColorPicker
+
+    local info = {};
     ColorPickerFrame.buttonFrame = self
-	ColorPickerFrame.previousValues = {r, g, b, a};
-	ColorPickerFrame.hasOpacity = self.enableAlpha;
-	ColorPickerFrame:SetColorRGB(r, g, b);
-	ColorPickerFrame:Show()
+    info.swatchFunc = (function () end);
+    info.cancelFunc = OnCancelColorPicker;
+	info.r = r 
+    info.g = g 
+    info.b = b
+    info.opacity = a 
+	info.hasOpacity = self.enableAlpha;
+	-- ColorPickerFrame:SetColorRGB(r, g, b);
+	ColorPickerFrame:SetupColorPickerAndShow(info);
 end
 
-ColorPickerOkayButton:HookScript("OnClick", OnSelectedColorPicker)
+ColorPickerFrame.Footer.OkayButton:HookScript("OnClick", OnSelectedColorPicker)
 
 -- hooksecurefunc(ColorPickerOkayButton, "OnClick", OnSelectedColorPicker)
 

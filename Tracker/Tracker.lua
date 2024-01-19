@@ -1768,6 +1768,7 @@ function HDH_TRACKER:ActionButton_ResizeOverlayGlow(f)
 end
 
 function HDH_TRACKER:ActionButton_ReleaseOverlayGlow(f)
+	border = f.border
 	f = f.iconframe
 	if not f.SpellActivationAlert then
 		return;
@@ -1775,22 +1776,27 @@ function HDH_TRACKER:ActionButton_ReleaseOverlayGlow(f)
 	f.SpellActivationAlert:Hide()
 	f.SpellActivationAlert:SetParent(nil)
 	f.SpellActivationAlert = nil
+	border:Show()
 end
 
 function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
+	border = f.border
 	f = f.iconframe;
 	
 	self:ActionButton_SetupOverlayGlow(f)
 	-- if f.SpellActivationAlert.animOut:IsPlaying() then
 	-- 	f.SpellActivationAlert.animOut:Stop();
 	-- end
-	f.SpellActivationAlert.animOut:Stop();
+	-- f.SpellActivationAlert.animOut:Stop();
 	if not f.SpellActivationAlert:IsShown() then
-		f.SpellActivationAlert.animIn:Play();
+		f.SpellActivationAlert:Show();
+		f.SpellActivationAlert.ProcStartAnim:Play();
+		border:Hide()
 	end
 end
 
 function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
+	border = f.border
 	f = f.iconframe
 	if not f.SpellActivationAlert then
 		return;
@@ -1802,14 +1808,15 @@ function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
 	-- end
 
 	if f:IsVisible() then
-		f.SpellActivationAlert.animOut:Play();
+		f.SpellActivationAlert:Hide();
+		border:Show();
 	else
 		-- f.SpellActivationAlert.animOut:OnFinished();	--We aren't shown anyway, so we'll instantly hide it.
 	end
 end
 
 function HDH_TRACKER:IsGlowing(f)
-	if f.SpellActivationAlert and (f.SpellActivationAlert:IsShown() or f.SpellActivationAlert.animIn:IsPlaying())then
+	if f.SpellActivationAlert and (f.SpellActivationAlert:IsShown())then
 		return true
 	else
 		return false
@@ -2020,6 +2027,7 @@ local function VersionUpdateDB()
 
 	if DB:GetVersion() == 2.4 then
 		local ui = DB:GetTrackerUI()
+		if ui.cooldown == nil then ui.cooldown = {} end
 		ui.cooldown.not_enough_mana_color = {0.35, 0.35, 0.78, 1}
 		ui.cooldown.out_range_color =  {0.53, 0.1, 0.1, 1}
 		ui.cooldown.use_not_enough_mana_color = true
@@ -2028,6 +2036,7 @@ local function VersionUpdateDB()
 		for _, id in ipairs(DB:GetTrackerIds()) do
 			if DB:hasTrackerUI(id) then
 				ui = DB:GetTrackerUI(id)
+				if ui.cooldown == nil then ui.cooldown = {} end
 				ui.cooldown.not_enough_mana_color = {0.35, 0.35, 0.78, 1}
 				ui.cooldown.out_range_color =  {0.53, 0.1, 0.1, 1}
 				ui.cooldown.use_not_enough_mana_color = true

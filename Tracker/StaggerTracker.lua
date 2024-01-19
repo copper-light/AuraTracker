@@ -1,9 +1,23 @@
 HDH_STAGGER_TRACKER = {}
 local DB = HDH_AT_ConfigDB
 local STAGGER_KEY = "STAGGER"
-local STAGGER_RED_TRANSITION = _G.STAGGER_RED_TRANSITION   -- wow global var : 0.6
-local STAGGER_YELLOW_TRANSITION = _G.STAGGER_YELLOW_TRANSITION -- wow global var : 0.3
+
+local STAGGER_STATES = {
+	RED 	= { key = "red", threshold = .60 },
+	YELLOW 	= { key = "yellow", threshold = .30 },
+	GREEN 	= { key = "green" }
+}
+
+local STAGGER_RED_TRANSITION = _G.STAGGER_RED_TRANSITION or 0.60  -- wow global var : 0.6
+local STAGGER_YELLOW_TRANSITION = _G.STAGGER_YELLOW_TRANSITION  or 0.30-- wow global var : 0.3
 local info = PowerBarColor[STAGGER_KEY]
+
+local STAGGER_GREEN_INDEX = _G.STAGGER_GREEN_INDEX or "green"
+local STAGGER_YELLOW_INDEX = _G.STAGGER_YELLOW_INDEX or "yellow"
+local STAGGER_RED_INDEX = _G.STAGGER_RED_INDEX or "red"
+
+
+
 HDH_STAGGER_TRACKER.POWER_INFO = {
 	{ texture = "Interface/Icons/Priest_icon_Chakra_green", color = {info[STAGGER_GREEN_INDEX].r, info[STAGGER_GREEN_INDEX].g, info[STAGGER_GREEN_INDEX].b, 1}},
 	{ texture = "Interface/Icons/Priest_icon_Chakra", 	    color = {info[STAGGER_YELLOW_INDEX].r, info[STAGGER_YELLOW_INDEX].g, info[STAGGER_YELLOW_INDEX].b, 1}},
@@ -26,11 +40,14 @@ local function STAGGER_TRACKER_OnUpdate(self, elapsed)
 	self.spell.curTime = GetTime()
 	if self.spell.curTime - (self.spell.delay or 0) < HDH_TRACKER.BAR_UP_ANI_TERM then return end 
 	self.spell.delay = self.spell.curTime
-	local curValue = UnitStagger('player') or 0;
+	-- local curValue = UnitStagger('player') or 0;
+	
+	curValue = (curValue or 0) + 1000
 	local health_max = UnitHealthMax("player");
 	local per = curValue/health_max;
 	self.spell.v1 = curValue;
 	self.spell.count = (per * 100)
+	if self.spell.count == math.huge then self.spell.count = 0; end
 	self.counttext:SetText(format("%d%%", math.ceil(self.spell.count or 0))); 
 	
 	if per > STAGGER_RED_TRANSITION then

@@ -1,8 +1,8 @@
-﻿## Interface:  100100
+﻿## Interface:  100205
 ## Title: HDH_AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
-## Version: 10.1.0.0
+## Version: 10.2.5.0
 ## SavedVariablesPerCharacter: HDH_AT_DB
 
 Locale\locale.lua
