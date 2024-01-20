@@ -805,6 +805,10 @@ function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
 	end
 end
 
+function HDH_TRACKER:Update()
+	-- interface
+end
+
 function HDH_TRACKER:UpdateTimeText(text, value)
 	if self.ui.font.cd_format == DB.TIME_TYPE_CEIL then value = value + 1; end
 	if value > 5 then text:SetTextColor(unpack(self.ui.font.cd_color)) 

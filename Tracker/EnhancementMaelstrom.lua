@@ -262,7 +262,7 @@ do
 		return ret
 	end
 
-	function HDH_POWER_TRACKER:Update() -- HDH_TRACKER override
+	function HDH_ENH_MAELSTROM_TRACKER:Update() -- HDH_TRACKER override
 		if not self.frame or not self.frame.icon or HDH_TRACKER.ENABLE_MOVE then return end
 		local f = self.frame.icon[1]
 		local show = false
