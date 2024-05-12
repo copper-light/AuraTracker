@@ -2,7 +2,7 @@
 ## Title: HDH_AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
-## Version: 10.2.7.0
+## Version: 10.2.7.2
 ## SavedVariablesPerCharacter: HDH_AT_DB
 ## AllowLoadGameType: cata
 
