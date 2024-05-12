@@ -605,7 +605,6 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
                 local t = _G[itemFrame:GetName().."Texture"]
                 if frame.useAtlasSize then
                     t:SetAtlas(texture)
-                    t:ClearAllPoints()
                 else
                     t:SetTexture(texture) 
                     t:ClearAllPoints()

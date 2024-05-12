@@ -1544,7 +1544,7 @@
 						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2"/>
 						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2"/>
 					</Anchors>
-					<TexCoords left="0.08" right="0.92" top="0.17" bottom="0.60" /> 
+					<TexCoords left="0.08" right="0.92" top="0.17" bottom="0.59" /> 
 				</Texture>
 
                 <Texture name="$parentBg"  parentKey="BG" >

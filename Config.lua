@@ -1766,7 +1766,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 						talentName, _, icon = select(2, HDH_AT_UTIL.GetSpecializationInfoByID(talentID))
 						traitName = UTIL.GetTraitsName(traitID)
 						texture = SPEC_FORMAT_STRINGS[talentID]
-						if texture then
+						if useAtlas and texture then
 							icon = SPEC_TEXTURE_FORMAT:format(texture)
 						end	
 						traitList[#traitList+1] = {traitID, STR_TRANSIT_FORMAT:format(traitName or "", talentName or ""), icon, talentID}
