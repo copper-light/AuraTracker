@@ -1,6 +1,14 @@
+-- if select(4, GetBuildInfo()) <= 100205 then return end
+
 local DB = HDH_AT_ConfigDB
 HDH_ENH_MAELSTROM_TRACKER = {}
-HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID = 344179
+
+if select(4, GetBuildInfo()) <= 49999 then -- 대격변
+	HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID = 53817
+else
+	HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID = 344179
+end
+
 
 ------------------------------------------
  -- AURA TRACKER Class
@@ -167,7 +175,14 @@ do
             DB:TrancateTrackerElements(trackerId)
         end
         local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
-        DB:SetTrackerElementSplitValues(trackerId, elemIdx, {50})
+
+
+		if select(4, GetBuildInfo()) <= 49999 then -- 대격변
+			DB:SetTrackerElementSplitValues(trackerId, elemIdx, {10,20,30,40})
+		else
+			DB:SetTrackerElementSplitValues(trackerId, elemIdx, {50})
+		end
+        
 		DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_VALUE, DB.CONDITION_GT_OR_EQ, 50)
 		DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 		
@@ -294,7 +309,11 @@ do
 			return 
 		end
 
-		self.powerMax = ((263 == select(1, GetSpecializationInfo(GetSpecialization()))) and 100) or 50
+		if select(4, GetBuildInfo()) <= 49999 then -- 대격변
+			self.powerMax = 50
+		else
+			self.powerMax = ((263 == select(1,  HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))) and 100) or 50
+		end
 		local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitValues
 		local elemSize = DB:GetTrackerElementSize(trackerId)
 		local spell 
@@ -305,7 +324,7 @@ do
 		self.frame.pointer = {}
 		self.frame:UnregisterAllEvents()
 		
-		self.talentId = GetSpecialization()
+		self.talentId = HDH_AT_UTIL.GetSpecialization()
 
 		if not self:IsHaveData() then
 			self:CreateData()

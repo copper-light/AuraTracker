@@ -854,10 +854,25 @@ local function OnSelectedColorPicker()
     self:SetColorRGBA(r, g, b, ColorPickerFrame:GetColorAlpha())
     self.handler(self, r, g, b, ColorPickerFrame:GetColorAlpha())
     ColorPickerFrame.buttonFrame = nil
+    ColorPickerFrame:Hide()
+
 end
 
-local function OnCancelColorPicker()    
-    ColorPickerFrame.buttonFrame:SetColorRGBA(ColorPickerFrame:GetPreviousValues())
+local function OnOKColorPicker()
+    if ColorPickerFrame:IsShown() then 
+        ColorPickerFrame:Hide() 
+        ColorPickerFrame.buttonFrame = nil
+    end
+end
+
+local function OnCancelColorPicker()
+    -- ColorPickerFrame.buttonFrame:SetColorRGBA(ColorPickerFrame:GetPreviousValues())
+    self = ColorPickerFrame.buttonFrame
+    local r, g, b, a  = ColorPickerFrame:GetPreviousValues()
+    self:SetColorRGBA(r, g, b, a)
+    self.handler(self, r, g, b, a)
+
+    ColorPickerFrame.buttonFrame = nil
 end
 
 function HDH_AT_ColorPickerMixin:SetEnableAlpha(enableAlpha)
@@ -878,22 +893,29 @@ function HDH_AT_OnClickColorPicker(self)
     end
     -- ColorPickerOkayButton:SetScript("OnClick", OnSelectedColorPicker)
 
+    ColorPickerFrame.func = HDH_OnSelectedColor
+
     local info = {};
     ColorPickerFrame.buttonFrame = self
+    -- info.swatchFunc = OnSelectedColorPicker;
     info.swatchFunc = (function () end);
     info.cancelFunc = OnCancelColorPicker;
+    -- info.opacityFunc = OnSelectedColorPicker;
 	info.r = r 
     info.g = g 
     info.b = b
     info.opacity = a 
 	info.hasOpacity = self.enableAlpha;
 	-- ColorPickerFrame:SetColorRGB(r, g, b);
+
+    if ColorPickerFrame.Footer then
+        ColorPickerFrame.Footer.OkayButton:HookScript("OnClick", OnSelectedColorPicker)
+    else
+        ColorPickerOkayButton:HookScript("OnClick", OnSelectedColorPicker)
+    end
+    
 	ColorPickerFrame:SetupColorPickerAndShow(info);
 end
-
-ColorPickerFrame.Footer.OkayButton:HookScript("OnClick", OnSelectedColorPicker)
-
--- hooksecurefunc(ColorPickerOkayButton, "OnClick", OnSelectedColorPicker)
 
 ------------------------------------------------------------------------
 --

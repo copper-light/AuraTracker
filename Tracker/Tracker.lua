@@ -1,4 +1,3 @@
-
 local DB = HDH_AT_ConfigDB
 local UTIL = HDH_AT_UTIL
 local L = HDH_AT_L
@@ -168,7 +167,8 @@ local function frameBaseSettings(f)
 	f.timetext:SetPoint('TOPLEFT', f, 'TOPLEFT', -10, -1)
 	f.timetext:SetPoint('BOTTOMRIGHT', f, 'BOTTOMRIGHT', 10, 0)
 	f.timetext:SetJustifyH('CENTER')
-	f.timetext:SetJustifyV('CENTER')
+	--f.timetext:SetJustifyV('CENTER')
+	f.timetext:SetJustifyV('MIDDLE')
 	f.timetext:SetNonSpaceWrap(false)
 	
 	f.v1 = tempf:CreateFontString(nil, 'OVERLAY')
@@ -285,6 +285,7 @@ end
 
 function HDH_TRACKER.InitVaribles(trackerId)
 	local id, name, type, unit
+	
 	if trackerId then
 		id, name, type, unit, _, _, _ = DB:GetTrackerInfo(trackerId)
 		tracker = HDH_TRACKER.Get(trackerId)
@@ -292,10 +293,10 @@ function HDH_TRACKER.InitVaribles(trackerId)
 	else
 		HDH_TRACKER.Delete()
 		local trackerIds = {}
-		if GetSpecialization() < 5 then
-			local talentID, _, _ = GetSpecializationInfo(GetSpecialization())
+		if HDH_AT_UTIL.GetSpecialization() < 5 then
+			local talentID, _, _ = HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization())
 			if talentID then
-				local currentTraitsValue = C_ClassTalents.GetLastSelectedSavedConfigID(talentID)
+				local currentTraitsValue = HDH_AT_UTIL.GetLastSelectedSavedConfigID(talentID)
 				trackerIds = DB:GetTrackerIdsByTraits(talentID, currentTraitsValue)
 				if not trackerIds or #trackerIds == 0 then return end
 			end
@@ -625,13 +626,16 @@ function HDH_TRACKER:UpdateArtBar(f)
 		if  font.name_location ~= DB.FONT_LOCATION_HIDE  then
 			if font.name_location == DB.FONT_LOCATION_BAR_L then
 				f.name:SetJustifyH("LEFT");
-				f.name:SetJustifyV("CENTER");
+				-- f.name:SetJustifyV("CENTER");
+				f.name:SetJustifyV('MIDDLE');
 			elseif font.name_location == DB.FONT_LOCATION_BAR_R then
 				f.name:SetJustifyH("RIGHT");
-				f.name:SetJustifyV("CENTER");
+				-- f.name:SetJustifyV("CENTER");
+				f.name:SetJustifyV('MIDDLE');
 			elseif font.name_location == DB.FONT_LOCATION_BAR_C then
 				f.name:SetJustifyH("CENTER");
-				f.name:SetJustifyV("CENTER");
+				-- f.name:SetJustifyV("CENTER");
+				f.name:SetJustifyV('MIDDLE');
 			elseif font.name_location == DB.FONT_LOCATION_BAR_T then
 				f.name:SetJustifyH("CENTER");
 				f.name:SetJustifyV("TOP");
@@ -855,13 +859,13 @@ function HDH_TRACKER:UpdateBarValue(f, isEnding)
 				f.bar:SetMinMaxValues(0,1); 
 				f.bar:SetValue(0); 
 				f.name:SetTextColor(unpack(self.ui.font.name_color_off));
-				if self.ui.common.default_color and f.spell.dispelType then
-					f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r,
-											DebuffTypeColor[f.spell.dispelType or ""].g,
-											DebuffTypeColor[f.spell.dispelType or ""].b)
-				else
-					f.bar:SetStatusBarColor(unpack(self.ui.bar.full_color));
-				end
+				-- if self.ui.common.default_color and f.spell.dispelType then
+				-- 	f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r,
+				-- 							DebuffTypeColor[f.spell.dispelType or ""].g,
+				-- 							DebuffTypeColor[f.spell.dispelType or ""].b)
+				-- else
+				-- 	f.bar:SetStatusBarColor(unpack(self.ui.bar.full_color));
+				-- end
 				f.bar.spark:Hide();
 			else
 				local maxV = f.spell.endTime - f.spell.startTime;
@@ -872,6 +876,8 @@ function HDH_TRACKER:UpdateBarValue(f, isEnding)
 					f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r,
 											DebuffTypeColor[f.spell.dispelType or ""].g,
 											DebuffTypeColor[f.spell.dispelType or ""].b)
+				elseif f.spell.remaining == maxV and self.ui.bar.use_full_color then
+					f.bar:SetStatusBarColor(unpack(self.ui.bar.full_color));
 				else
 					f.bar:SetStatusBarColor(unpack(self.ui.bar.color));
 				end
@@ -994,8 +1000,8 @@ end
 function HDH_TRACKER:IsOk(id, name, isItem) -- 특성 스킬의 변경에 따른 스킬 표시 여부를 결정하기 위함
 	if not id or id == 0 then return false end
 	if isItem then 
-		local equipSlot = select(9,GetItemInfo(id)) -- 착용 가능한 장비인가요? (착용 불가능이면, nil)
-		if equipSlot and equipSlot ~="" then 
+		local equipSlot = select(9,GetItemInfo(id)) -- 착용 가능한 장비인가요? (착용 불가능이면, nil, INVTYPE_NON_EQUIP_IGNORE)
+		if equipSlot and equipSlot ~= "" and equipSlot ~= "INVTYPE_NON_EQUIP_IGNORE" then 
 			self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
 			return IsEquippedItem(id) -- 착용중인가요?
 		else
@@ -1034,6 +1040,7 @@ function HDH_TRACKER:CreateDummySpell(count)
 		if not spell then spell = {} f.spell = spell end
 		spell.display = DB.SPELL_ALWAYS_DISPLAY
 		spell.id = 0
+		spell.no = i
 		spell.count = i
 		spell.overlay = 0
 		spell.duration = 50 * i
@@ -1596,7 +1603,8 @@ local function ChangeFontLocation(f, fontf, location, op_font)
 		fontf:SetPoint('TOPLEFT', parent, 'TOPLEFT', -100, 15)
 		fontf:SetPoint('BOTTOMRIGHT', parent, 'BOTTOMRIGHT', 100, -15)
 		fontf:SetJustifyH('CENTER')
-		fontf:SetJustifyV('CENTER')
+		-- fontf:SetJustifyV('CENTER')
+		fontf:SetJustifyV('MIDDLE')
 	elseif location == DB.FONT_LOCATION_OB then
 		fontf:SetPoint('TOPLEFT', parent, 'BOTTOMLEFT', -100, -1)
 		fontf:SetPoint('BOTTOMRIGHT', parent, 'BOTTOMRIGHT', 100, -40)
@@ -1612,7 +1620,8 @@ local function ChangeFontLocation(f, fontf, location, op_font)
 		fontf:SetPoint('BOTTOMRIGHT', parent, 'BOTTOMLEFT', -1, 0)
 		fontf:SetWidth(parent:GetWidth()+200);
 		fontf:SetJustifyH('RIGHT')
-		fontf:SetJustifyV('CENTER')
+		-- fontf:SetJustifyV('CENTER')
+		fontf:SetJustifyV('MIDDLE')
 	elseif location == DB.FONT_LOCATION_OR then
 		fontf:SetPoint('TOPLEFT', parent, 'TOPRIGHT', 1, 0)
 		fontf:SetPoint('BOTTOMLEFT', parent, 'BOTTOMRIGHT', 1, 0)
@@ -1623,17 +1632,20 @@ local function ChangeFontLocation(f, fontf, location, op_font)
 		fontf:SetPoint('LEFT', f.bar or parent, 'LEFT', 2, 0)
 		fontf:SetWidth(parent:GetWidth()+200);
 		fontf:SetJustifyH('LEFT')
-		fontf:SetJustifyV('CENTER')
+		-- fontf:SetJustifyV('CENTER')
+		fontf:SetJustifyV('MIDDLE')
 	elseif location == DB.FONT_LOCATION_BAR_C then
 		fontf:SetPoint('CENTER', f.bar or parent, 'CENTER', 0, 0)
 		fontf:SetWidth(parent:GetWidth()+200);
 		fontf:SetJustifyH('CENTER')
-		fontf:SetJustifyV('CENTER')
+		-- fontf:SetJustifyV('CENTER')
+		fontf:SetJustifyV('MIDDLE')
 	elseif location == DB.FONT_LOCATION_BAR_R then
 		fontf:SetPoint('RIGHT', f.bar or parent, 'RIGHT', -2, 0)
 		fontf:SetWidth(parent:GetWidth()+200);
 		fontf:SetJustifyH('RIGHT')
-		fontf:SetJustifyV('CENTER')
+		-- fontf:SetJustifyV('CENTER')
+		fontf:SetJustifyV('MIDDLE')
 	else
 		fontf:Hide()
 	end
@@ -1745,85 +1757,131 @@ end
 -- 애니메이션 관련
 -------------------------------------------
 
-function HDH_TRACKER:ActionButton_SetupOverlayGlow(f)
-	-- If we already have a SpellActivationAlert then just early return. We should already be setup
-	if f.SpellActivationAlert then
-		return;
-	end
-	local name = f:GetParent():GetName()..'g'..time()
-	f.SpellActivationAlert = CreateFrame("Frame", name, f, "ActionBarButtonSpellActivationAlert")
-	local frameWidth, frameHeight = f:GetSize();
-	f.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6);
-	f.SpellActivationAlert:SetPoint("CENTER", f, "CENTER", 0, 0);
-	-- f.SpellActivationAlert:SetPoint("TOPLEFT", f, "TOPLEFT", -frameWidth * 0.3, frameWidth * 0.3);
-	-- f.SpellActivationAlert:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", frameWidth * 0.3, -frameWidth * 0.3);
-	f.SpellActivationAlert:Hide()
-	-- button.SpellActivationAlert.animIn:Play();
-end
 
-function HDH_TRACKER:ActionButton_ResizeOverlayGlow(f)
-	f = f.iconframe
-	if not f.SpellActivationAlert then
-		return;
-	end
-	f.SpellActivationAlert:Hide()
-	local frameWidth, frameHeight = f:GetSize();
-	f.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6);
-end
+if select(4, GetBuildInfo()) <= 49999 then -- 대격변 코드
 
-function HDH_TRACKER:ActionButton_ReleaseOverlayGlow(f)
-	border = f.border
-	f = f.iconframe
-	if not f.SpellActivationAlert then
-		return;
+	function HDH_TRACKER:ActionButton_SetupOverlayGlow(f)
+		--interface
 	end
-	f.SpellActivationAlert:Hide()
-	f.SpellActivationAlert:SetParent(nil)
-	f.SpellActivationAlert = nil
-	border:Show()
-end
 
-function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
-	border = f.border
-	f = f.iconframe;
+	function HDH_TRACKER:ActionButton_ResizeOverlayGlow(f)
+		--interface
+	end
+
+	function HDH_TRACKER:ActionButton_ReleaseOverlayGlow(f)
+		--interface
+	end
+
+	function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
+		f = f.iconframe;
+		if ( f.overlay ) then
+			if ( f.overlay.animOut:IsPlaying() ) then f.overlay.animOut:Stop(); f.overlay.animIn:Play(); end
+		else
+			f.overlay = ActionButton_GetOverlayGlow();
+			local frameWidth, frameHeight = f:GetSize();
+			f.overlay:SetParent(f);
+			f.overlay:ClearAllPoints();
+			-- Make the height/width available before the next frame:
+			f.overlay:SetSize(frameWidth * 1.3, frameHeight * 1.3);
+			f.overlay:SetPoint("TOPLEFT", f, "TOPLEFT", -frameWidth * 0.3, frameHeight * 0.3);
+			f.overlay:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", frameWidth * 0.3, -frameHeight * 0.3);
+			f.overlay.animIn:Play();
+			if f.spell and f.spell.conditionSound and not OptionFrame:IsShown() then
+				HDH_PlaySoundFile(f.spell.conditionSound, "SFX")
+			end
+		end
+	end
 	
-	self:ActionButton_SetupOverlayGlow(f)
-	-- if f.SpellActivationAlert.animOut:IsPlaying() then
-	-- 	f.SpellActivationAlert.animOut:Stop();
-	-- end
-	-- f.SpellActivationAlert.animOut:Stop();
-	if not f.SpellActivationAlert:IsShown() then
-		f.SpellActivationAlert:Show();
-		f.SpellActivationAlert.ProcStartAnim:Play();
-		border:Hide()
+	function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
+		ActionButton_HideOverlayGlow(f.iconframe);
 	end
-end
-
-function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
-	border = f.border
-	f = f.iconframe
-	if not f.SpellActivationAlert then
-		return;
+	
+	function HDH_TRACKER:IsGlowing(f)
+		return f.overlay and true or false
 	end
 
-	-- 반복적으로 호출되면 왜 인지 모르겠는데 튀는 현상 있어서 그냥 안씀
-	-- if f.SpellActivationAlert.animIn:IsPlaying() then
-	-- 	f.SpellActivationAlert.animIn:Stop();
-	-- end
+else -- 용군단 코드
 
-	if f:IsVisible() then
-		f.SpellActivationAlert:Hide();
-		border:Show();
-	else
-		-- f.SpellActivationAlert.animOut:OnFinished();	--We aren't shown anyway, so we'll instantly hide it.
+	function HDH_TRACKER:ActionButton_SetupOverlayGlow(f)
+		-- If we already have a SpellActivationAlert then just early return. We should already be setup
+		if f.SpellActivationAlert then
+			return;
+		end
+		local name = f:GetParent():GetName()..'g'..time()
+		f.SpellActivationAlert = CreateFrame("Frame", name, f, "ActionBarButtonSpellActivationAlert")
+		local frameWidth, frameHeight = f:GetSize();
+		f.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6);
+		f.SpellActivationAlert:SetPoint("CENTER", f, "CENTER", 0, 0);
+		-- f.SpellActivationAlert:SetPoint("TOPLEFT", f, "TOPLEFT", -frameWidth * 0.3, frameWidth * 0.3);
+		-- f.SpellActivationAlert:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", frameWidth * 0.3, -frameWidth * 0.3);
+		f.SpellActivationAlert:Hide()
+		-- button.SpellActivationAlert.animIn:Play();
 	end
-end
-
-function HDH_TRACKER:IsGlowing(f)
-	if f.SpellActivationAlert and (f.SpellActivationAlert:IsShown())then
-		return true
-	else
-		return false
+	
+	function HDH_TRACKER:ActionButton_ResizeOverlayGlow(f)
+		f = f.iconframe
+		if not f.SpellActivationAlert then
+			return;
+		end
+		f.SpellActivationAlert:Hide()
+		local frameWidth, frameHeight = f:GetSize();
+		f.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6);
+	end
+	
+	function HDH_TRACKER:ActionButton_ReleaseOverlayGlow(f)
+		border = f.border
+		f = f.iconframe
+		if not f.SpellActivationAlert then
+			return;
+		end
+		f.SpellActivationAlert:Hide()
+		f.SpellActivationAlert:SetParent(nil)
+		f.SpellActivationAlert = nil
+		border:Show()
+	end
+	
+	function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
+		border = f.border
+		f = f.iconframe;
+		
+		self:ActionButton_SetupOverlayGlow(f)
+		-- if f.SpellActivationAlert.animOut:IsPlaying() then
+		-- 	f.SpellActivationAlert.animOut:Stop();
+		-- end
+		-- f.SpellActivationAlert.animOut:Stop();
+		if not f.SpellActivationAlert:IsShown() then
+			f.SpellActivationAlert:Show();
+			f.SpellActivationAlert.ProcStartAnim:Play();
+			border:Hide()
+		end
+	end
+	
+	function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
+		border = f.border
+		f = f.iconframe
+		if not f.SpellActivationAlert then
+			return;
+		end
+	
+		-- 반복적으로 호출되면 왜 인지 모르겠는데 튀는 현상 있어서 그냥 안씀
+		-- if f.SpellActivationAlert.animIn:IsPlaying() then
+		-- 	f.SpellActivationAlert.animIn:Stop();
+		-- end
+	
+		if f:IsVisible() then
+			f.SpellActivationAlert:Hide();
+			border:Show();
+		else
+			-- f.SpellActivationAlert.animOut:OnFinished();	--We aren't shown anyway, so we'll instantly hide it.
+		end
+	end
+	
+	function HDH_TRACKER:IsGlowing(f)
+		if f.SpellActivationAlert and (f.SpellActivationAlert:IsShown())then
+			return true
+		else
+			return false
+		end
 	end
 end
 
@@ -2222,7 +2280,7 @@ local function OnEvent(self, event, ...)
 	-- end
 	-- print( event, ...)
 	if event =='ACTIVE_TALENT_GROUP_CHANGED' then
-		-- HDH_AT_UTIL.IsTalentSpell(nil,nil,true);
+		HDH_AT_UTIL.IsTalentSpell(nil,nil,true)
 		HDH_TRACKER.InitVaribles()
 		HDH_TRACKER.Updates()
 		if HDH_AT_ConfigFrame and HDH_AT_ConfigFrame:IsShown() then 

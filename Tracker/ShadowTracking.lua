@@ -243,7 +243,7 @@ do
 		self.frame.pointer = {}
 		self.frame:UnregisterAllEvents()
 		
-		self.talentId = GetSpecialization()
+		self.talentId = HDH_AT_UTIL.GetSpecialization()
 
 		self.vampiricTouchCount = 0
 		self.shadowCount = 0

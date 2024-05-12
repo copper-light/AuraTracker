@@ -12,6 +12,34 @@ HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_RUNE, HDH_DK_RUNE_TRACKER)
 local POWER_INFO = {}
 POWER_INFO[HDH_TRACKER.TYPE.POWER_RUNE] 	= {power_type="RUNE", 	power_index = 5,	color={0.77, 0.12, 0.23, 1}, texture = "Interface/Icons/Spell_Deathknight_BloodPresence"};
 
+local OLD_DK_COLOR = {
+	{color = {1.0, 0.235, 0.240, 1}, texture = "Interface/Icons/Spell_Deathknight_BloodPresence"},
+	{color = {1.0, 0.235, 0.240, 1}, texture = "Interface/Icons/Spell_Deathknight_BloodPresence"},
+	{color = {0.25, 0.6, 1, 1}, texture = "Interface/Icons/Spell_Deathknight_FrostPresence"},
+	{color = {0.25, 0.6, 1, 1}, texture = "Interface/Icons/Spell_Deathknight_FrostPresence"},
+	{color = {0.062, 1, 0.006, 1}, texture = "Interface/Icons/Spell_Deathknight_UnholyPresence"},
+	{color = {0.062, 1, 0.006, 1}, texture = "Interface/Icons/Spell_Deathknight_UnholyPresence"}
+}
+
+local function adjuistColor(src, dst)
+	local r,g,b,a = unpack(src)
+	local ratio = max(r,g,b)
+
+	r,g,b,_ = unpack(dst)
+	r = r * ratio
+	g = g * ratio
+	b = b * ratio
+
+	return r,g,b,a
+end
+
+local RUN_INDEX = {}
+RUN_INDEX[1] = 1
+RUN_INDEX[2] = 2
+RUN_INDEX[3] = 5
+RUN_INDEX[4] = 6
+RUN_INDEX[5] = 3
+RUN_INDEX[6] = 4
 
 local super = HDH_C_TRACKER
 setmetatable(HDH_DK_RUNE_TRACKER, super) -- 상속
@@ -56,16 +84,27 @@ function HDH_DK_RUNE_TRACKER:CreateData()
 		DB:TrancateTrackerElements(trackerId)
 	end
 
-	for i = 1 , MAX_RUNES do
-		DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, display, isValue, isItem)
-		DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
-	end 
+	if select(4, GetBuildInfo()) >= 100000 then
+		for i = 1 , MAX_RUNES do
+			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, display, isValue, isItem)
+			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
+		end 
+	else
+		for i = 1 , MAX_RUNES do
+			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, OLD_DK_COLOR[i].texture, display, isValue, isItem)
+			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
+		end 
+	end
 
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 6)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.reverse_h', false)
-	DB:SetTrackerValue(trackerId, 'ui.%s.common.order_by', DB.ORDERBY_CD_ASC)
+
+	if select(4, GetBuildInfo()) >= 100000 then
+		DB:SetTrackerValue(trackerId, 'ui.%s.common.order_by', DB.ORDERBY_CD_ASC)
+	end
+
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 40)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.height', 20)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.to_fill', true)
@@ -96,6 +135,7 @@ function HDH_DK_RUNE_TRACKER:IsHaveData()
 
 	return true
 end
+
 
 function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 	if not f then return end
@@ -128,7 +168,14 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 		if self.ui.display_mode ~= DB.DISPLAY_BAR and (f.spell.display == DB.SPELL_ALWAYS_DISPLAY)then 
 			f.icon:SetAlpha(self.ui.icon.on_alpha)
 			f.border:SetAlpha(self.ui.icon.on_alpha)
-			f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
+
+			if select(4, GetBuildInfo()) >= 100000 then
+				f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
+			else
+				r,g,b,a = adjuistColor(self.ui.icon.active_border_color, OLD_DK_COLOR[f.spell.no].color)
+				f.border:SetVertexColor(r,g,b,a) 
+			end
+
 			f.counttext:SetText(nil)
 			f.iconSatCooldown:Hide()
 			f.iconSatCooldown.spark:Hide()
@@ -140,6 +187,68 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 		end
 	end
 	self:Update_Layout()
+end
+
+if select(4, GetBuildInfo()) < 100000 then
+
+	
+
+	function HDH_DK_RUNE_TRACKER:UpdateBarValue(f, isEnding)
+		if f.bar and f.name then
+			local r,g,b,a 
+			if self.ui.bar.to_fill then
+				if isEnding then
+					f.bar:SetMinMaxValues(0,1); 
+					f.bar:SetValue(1); 
+					f.name:SetTextColor(unpack(self.ui.font.name_color_off));
+					f.bar.spark:Hide();
+
+					if self.ui.bar.use_full_color then
+						r,g,b,a = adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color)
+					else
+						r,g,b,a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
+					end
+					f.bar:SetStatusBarColor(r,g,b,a);
+
+				else
+					r,g,b,a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
+					f.bar:SetStatusBarColor(r,g,b,a);
+					local maxV = f.spell.endTime - f.spell.startTime;
+					f.bar:SetMinMaxValues(0, maxV); 
+					f.bar:SetValue(maxV-f.spell.remaining);
+					f.name:SetTextColor(unpack(self.ui.font.name_color));
+					if self.ui.bar.show_spark and f.spell.duration > 0 then f.bar.spark:Show(); 
+					else f.bar.spark:Hide(); end
+				end
+			else
+				if isEnding then
+					r,g,b,a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
+
+					f.bar:SetMinMaxValues(0,1); 
+					f.bar:SetValue(0); 
+					f.name:SetTextColor(unpack(self.ui.font.name_color_off));
+					f.bar:SetStatusBarColor(r,g,b,a);
+					f.bar.spark:Hide();
+				else
+					local maxV = f.spell.endTime - f.spell.startTime;
+					f.bar:SetMinMaxValues(0, maxV); 
+					-- f.bar:SetMinMaxValues(f.spell.startTime, f.spell.endTime); 
+					f.bar:SetValue(f.spell.remaining); 
+					
+					if self.ui.bar.use_full_color and maxV == f.spell.remaining  then
+						r,g,b,a = adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color)
+					else
+						r,g,b,a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
+					end
+					f.bar:SetStatusBarColor(r,g,b,a);
+					
+					f.name:SetTextColor(unpack(self.ui.font.name_color));
+					if self.ui.bar.show_spark and f.spell.duration > 0 then f.bar.spark:Show(); 
+					else f.bar.spark:Hide(); end
+				end
+			end
+		end
+	end
 end
 
 function HDH_DK_RUNE_TRACKER:UpdateIcons()
@@ -221,6 +330,9 @@ end
 function HDH_DK_RUNE_TRACKER:UpdateRune(runeIndex, isEnergize)
 	local ret = false;
 	local start, duration, runeReady = GetRuneCooldown(runeIndex);
+	if select(4, GetBuildInfo()) < 100000 then
+		runeIndex = RUN_INDEX[runeIndex]
+	end
 	if self and self.frame.pointer[runeIndex] then
 		local spell = self.frame.pointer[runeIndex].spell
 		if start and spell then
@@ -271,7 +383,7 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 	local iconIdx = 0
 	self.frame.pointer = {}
 	self.frame:UnregisterAllEvents()
-	self.talentId = GetSpecialization()
+	self.talentId = HDH_AT_UTIL.GetSpecialization()
 
 	if not self:IsHaveData() then
 		self:CreateData()
@@ -327,7 +439,7 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 		f.spell = spell
 		f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 		f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-		
+
 		self:SetGlow(f, false)
 		f:Hide()
 	end

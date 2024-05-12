@@ -1,4 +1,6 @@
-﻿HDH_ESSENCE_TRACKER = {}
+﻿if select(4, GetBuildInfo()) <= 100205 then return end
+
+HDH_ESSENCE_TRACKER = {}
 local DB = HDH_AT_ConfigDB
 local POWRE_BAR_SPLIT_MARGIN = 5;
 local MyClassKor, MyClass = UnitClass("player");

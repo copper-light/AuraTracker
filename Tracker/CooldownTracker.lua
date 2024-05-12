@@ -4,6 +4,8 @@ HDH_C_TRACKER = {}
 HDH_C_TRACKER.GlobalCooldown = 2;
 HDH_C_TRACKER.EndCooldown = 0.0;
 
+local CombatSpellCache = {}
+
 -- 아이콘 변경을 위한 아이디 보정
 local ADJUST_ID = {};
 ADJUST_ID[274281] = 274281;--new moon
@@ -263,13 +265,20 @@ function HDH_C_TRACKER:Update_CountAndCooldown(f)
 	local display_mode = ui.common.display_mode 
 	spell.isCharging = false
 
-	if spell.isItem then
-		startTime, duration = GetItemCooldown(spell.id)
-		spell.count = GetItemCount(spell.id) or 0
-		if spell.count == 0 then isUpdate = true end
+	if not spell.isInnerCDItem then
+		if spell.isItem then
+			startTime, duration = C_Container.GetItemCooldown(spell.id)
+			spell.count = GetItemCount(spell.id) or 0
+			if spell.count == 0 then isUpdate = true end
+		else
+			startTime, duration = GetSpellCooldown(spell.key)
+			spell.count = GetSpellCount(spell.key) or 0
+		end
 	else
-		startTime, duration = GetSpellCooldown(spell.key)
-		spell.count = GetSpellCount(spell.key) or 0
+		startTime = spell.startTime
+		duration = spell.innerCooldown
+		spell.maxCharges = nil
+		spell.count = nil
 	end
 	if startTime then 
 		spell.endTime = startTime + duration
@@ -298,7 +307,9 @@ function HDH_C_TRACKER:Update_CountAndCooldown(f)
 		spell.remaining  = 0
 	end
 	
-	count, maxCharges, startTime, duration = GetSpellCharges(spell.key) -- 스킬의 중첩count과 충전charge은 다른 개념이다. 
+	if not spell.isInnerCDItem then
+		count, maxCharges, startTime, duration = GetSpellCharges(spell.key) -- 스킬의 중첩count과 충전charge은 다른 개념이다. 
+	end
 	if count then -- 충전류 스킬
 		spell.charges.count = count
 		if count ~= maxCharges then -- 글로벌 쿨 무시
@@ -375,10 +386,16 @@ function HDH_C_TRACKER:Update_Usable(f)
 	local use_not_enough_mana_color = self.ui.cooldown.use_not_enough_mana_color
 	local use_out_range_color = self.ui.cooldown.use_out_range_color
 
-	if spell.slot then
-		spell.inRange = IsActionInRange(spell.slot); -- 1:true,0:false,nil:non target
+	if not spell.isInnerCDItem then
+		if spell.slot then
+			spell.inRange = IsActionInRange(spell.slot); -- 1:true,0:false,nil:non target
+		else
+			spell.inRange = IsSpellInRange(spell.name,"target"); -- 1:true,0:false,nil:non target
+		end
 	else
-		spell.inRange = IsSpellInRange(spell.name,"target"); -- 1:true,0:false,nil:non target
+		spell.inRange = true
+		spell.isAble = true
+		spell.isNotEnoughMana = false
 	end
 	if spell.inRange == false or spell.inRange == 0 then
 		if use_out_range_color then
@@ -391,17 +408,16 @@ function HDH_C_TRACKER:Update_Usable(f)
 		spell.inRange  = false;
 	else
 		spell.inRange  = true;
-		if spell.isItem then
-			spell.isAble = IsUsableItem(spell.key)
-			spell.isNotEnoughMana = false;
-		else
-			isAble, isNotEnoughMana = IsUsableSpell(spell.key)
-			spell.isAble = isAble or isNotEnoughMana -- 사용 불가능인데, 마나 때문이라면 -> 사용 가능한 걸로 본다.
-			spell.isNotEnoughMana = isNotEnoughMana
+		if not spell.isInnerCDItem then
+			if spell.isItem then
+				spell.isAble = IsUsableItem(spell.key)
+				spell.isNotEnoughMana = false;
+			else
+				isAble, isNotEnoughMana = IsUsableSpell(spell.key)
+				spell.isAble = isAble or isNotEnoughMana -- 사용 불가능인데, 마나 때문이라면 -> 사용 가능한 걸로 본다.
+				spell.isNotEnoughMana = isNotEnoughMana
+			end
 		end
-		-- if preAble ~= spell.isAble then
-			-- isUpdate= true
-		-- end
 		
 		if f.spell.isNotEnoughMana then
 			if use_not_enough_mana_color then
@@ -430,6 +446,7 @@ function HDH_C_TRACKER:Update_Usable(f)
 			-- else f.icon:SetDesaturated(nil) end
 		end
 	end
+	
 	if f.icon:IsDesaturated() then
 		f.icon:SetVertexColor(1,1,1)
 		f.icon:SetAlpha(self.ui.icon.off_alpha)
@@ -446,6 +463,59 @@ function HDH_C_TRACKER:Update_Usable(f)
 		end
 	end
 	return isUpdate
+end
+
+function HDH_C_TRACKER:UpdateCombatSpellInfo(f, id)
+	if f.spell and f.spell.innerSpellId == id then
+		f.spell.startTime = GetTime()
+		f.spell.duration = f.spell.innerCooldown
+	end
+end
+
+function HDH_C_TRACKER:UpdateAuras(f)
+	local curTime = GetTime()
+	local name, count, duration, endTime, source, id, v1, v2, v3, dispelType, startTime
+	local ret = 0;
+	local spell = f.spell
+
+	for i = 1, 40 do 
+		-- name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod
+		name, _, count, dispelType, duration, endTime, source, _, _, id, _, _, _, _, _, v1, v2, v3 = UnitAura('player', i, 'HELPFUL')
+		if not id then break end
+		if f.spell.innerSpellId == id then
+			if spell.innerSpellEndtime ~= endTime or endTime == 0 then
+				spell.startTime = curTime
+				spell.duration = spell.innerCooldown
+				spell.innerSpellEndtime = endTime
+			end
+			-- if not StaggerID[id] then -- 시간차가 아니면
+			-- 	spell.v1 = (v1 ~= 0) and v1 or nil
+			-- else -- 시간차
+			-- 	spell.v1 = v2; 
+			-- end
+			
+			-- spell.count = 0
+			-- spell.overlay = 0
+			-- spell.id = id
+			-- spell.dispelType = dispelType
+
+			-- if spell.isUpdate then
+			-- 	spell.overlay = (spell.overlay or 0) + 1
+			-- else
+			-- 	spell.overlay = 1
+			-- end
+			-- if spell.endTime < curTime then 
+			-- 	spell.startTime = curTime
+			-- 	spell.duration = spell.innerCooldown
+			-- end
+			
+			-- spell.index = i; -- 툴팁을 위해, 순서
+			-- ret = ret + 1;
+			-- spell.isUpdate = true
+			break
+		end
+	end
+	return spell.startTime, spell.duration
 end
 
 function HDH_C_TRACKER:Update_Icon(f) -- f == f
@@ -812,6 +882,7 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 		spell.icon = nil
 		spell.display = DB.SPELL_ALWAYS_DISPLAY
 		spell.id = 0
+		spell.no = i
 		spell.glow = false
 		spell.count = 3+i
 		spell.duration = 50*i
@@ -923,6 +994,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	local f
 	local iconIdx = 0
 	local hasEquipItem = false
+	local hasInnerCDItem = false
 
 	self.frame.pointer = {};
 	self.frame:UnregisterAllEvents()
@@ -931,6 +1003,10 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 		glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
 		defaultImg = DB:GetTrackerElementDefaultImage(trackerId, i)
+		innerTrackingType, innerSpellId, innerCooldown =  DB:GetTrackerElementInnerCooldown(trackerId, i)
+		if innerSpellId then
+			hasInnerCDItem = true
+		end
 
 		if self:IsOk(elemId, elemName, isItem) then -- and not self:IsIgnoreSpellByTalentSpell(auraList[i])
 			iconIdx = iconIdx + 1
@@ -973,7 +1049,14 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.slot = nil -- self:GetSlot(spell.id);
 			-- if not auraList[i].defaultImg then auraList[i].defaultImg = auraList[i].Texture; 
 			-- if auraList[i].defaultImg ~= auraList[i].Texture then spell.fix_icon = true end
-			
+			if innerSpellId then
+				spell.isInnerCDItem = true
+				spell.innerSpellId = tonumber(innerSpellId)
+				spell.innerCooldown = tonumber(innerCooldown)
+				spell.innerTrackingType = innerTrackingType
+
+			end
+
 			f.spell = spell
 
 			if self.ui.common.display_mode ~= DB.DISPLAY_ICON then 
@@ -990,17 +1073,20 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 				f:SetScript("OnEvent", CT_OnEventIcon)
 			end
 			
-			if spell.isItem then
-				f:RegisterEvent("BAG_UPDATE");
-				f:RegisterEvent("BAG_UPDATE_COOLDOWN");
-			else
-				f:RegisterEvent("ACTIONBAR_UPDATE_USABLE");
-				f:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
-				f:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW");
-				f:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE");
+			if not spell.isInnerCDItem then
+				if spell.isItem then
+					f:RegisterEvent("BAG_UPDATE");
+					f:RegisterEvent("BAG_UPDATE_COOLDOWN");
+				else
+					f:RegisterEvent("ACTIONBAR_UPDATE_USABLE");
+					f:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
+					f:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW");
+					f:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE");
+				end
 			end
 		end
 	end
+
 	self:UpdateAllSlot();
 	for i = 1 , #self.frame.icon do
 		self:UpdateSlot(self.frame.icon[i].spell.slot);
@@ -1011,6 +1097,10 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	self.frame:RegisterEvent('ACTIONBAR_SLOT_CHANGED')
 	if #(self.frame.icon) > 0 then
 		self.frame:RegisterEvent('UNIT_PET');
+	end
+
+	if hasInnerCDItem then
+		self.frame:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
 	end
 	
 	for i = #self.frame.icon, iconIdx+1 , -1 do
@@ -1049,6 +1139,23 @@ function CT_OnEvent_Frame(self, event, ...)
 		tracker:RunTimer("PLAYER_EQUIPMENT_CHANGED", 0.5, HDH_C_TRACKER.InitIcons, tracker)
 	elseif event == "ACTIONBAR_SLOT_CHANGED" then
 		tracker:UpdateSlot(...);
+	elseif event == 'UNIT_AURA' then
+		local unit = select(1,...)
+		if unit == "player" then
+			tracker:Update()
+		end
+	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
+		local _, subEvent, _, srcGUID, srcName, _, _, _, _, _, _, spellID, spellName =  CombatLogGetCurrentEventInfo()
+		if srcGUID == UnitGUID('player') then
+			if subEvent == "SPELL_DAMAGE" or subEvent == "SPELL_HEAL" or subEvent == "SPELL_CAST_SUCCESS" or subEvent == "SPELL_SUMMON" or subEvent == "SPELL_CREATE" or subEvent == "SPELL_AURA_APPLIED" then
+				for i = 1, #self.icon do
+					if self.icon[i].spell.isInnerCDItem then
+						tracker:UpdateCombatSpellInfo(self.icon[i], spellID);
+						tracker:Update_Icon(self.icon[i]);
+					end
+				end
+			end
+		end
 	end
 end
 
@@ -1072,9 +1179,10 @@ function CT_OnEventIcon(self, event, ...)
 		tracker:ACTIVATION_OVERLAY_GLOW_SHOW(self, ...)
 	elseif event == "SPELL_ACTIVATION_OVERLAY_GLOW_HIDE" then
 		tracker:ACTIVATION_OVERLAY_GLOW_HIDE(self, ...)
-	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		CT_COMBAT_LOG_EVENT_UNFILTERED(self, ...)
 	end
+	-- elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
+	-- 	CT_COMBAT_LOG_EVENT_UNFILTERED(self, ...)
+	-- end
 end
 -------------------------------------------
 -------------------------------------------

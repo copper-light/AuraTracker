@@ -89,6 +89,8 @@ CONFIG.CONDITION_GT_OR_EQ = 1
 CONFIG.CONDITION_LT_OR_EQ = 2
 CONFIG.CONDITION_EQ = 3
 
+CONFIG.INNER_CD_BUFF = 1
+
 local DEFAULT_DISPLAY = { 
 
     -- 기본 설정
@@ -486,6 +488,24 @@ function HDH_AT_ConfigDB:GetTrackerElementSplitValues(trackerId, elementIndex)
         return nil
     end
 end
+
+function HDH_AT_ConfigDB:UpdateTrackerElementInnerCooldown(trackerId, elementIndex, innerTrackingType, innerSpellId, innerCooldown)
+    local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
+    element.innerTrackingType = innerTrackingType
+    element.innerSpellId = innerSpellId
+    element.innerCooldown = innerCooldown
+end
+
+function HDH_AT_ConfigDB:GetTrackerElementInnerCooldown(trackerId, elementIndex)
+    local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
+    if element then
+        return element.innerTrackingType, element.innerSpellId, element.innerCooldown
+    else
+        return nil
+    end
+end
+
+
 
 function HDH_AT_ConfigDB:hasTrackerUI(id)
     return HDH_AT_DB.ui[id] and true or false

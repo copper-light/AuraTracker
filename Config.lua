@@ -22,6 +22,7 @@ COMP_TYPE.EDITBOX_ADD_DEL = 10
 COMP_TYPE.SWITCH = 11
 COMP_TYPE.SPLIT_LINE = 12
 COMP_TYPE.MULTILINE_EDITBOX = 13
+COMP_TYPE.BLANK_LINE = 14
           
 local FRAME_WIDTH = 404
 local FRAME_MAX_H = 1000
@@ -93,6 +94,7 @@ local DETAIL_ETC_CONFIG_TAB_LIST= {
 	{name=L.DETAIL_CONIFG, type="LABEL"}, 
 	{name=L.CHANGE_ICON, type="BUTTON"}, --1
 	{name=L.SPLIT_POWER_BAR, type="BUTTON"}, --2
+	{name=L.INNER_COOLDOWN_ITEM, type="BUTTON"}, --3
 }
 
 local MyClassKor, MyClass = UnitClass("player");
@@ -104,64 +106,75 @@ local DDP_TRACKER_LIST = {
 
 local powerList = {}
 local totemName = L.TOTEM
-if MyClass == "MAGE" then 
-	totemName = L.MAGE_TOTEM
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, L.POWER_ARCANE_CHARGES})
-elseif MyClass == "PALADIN" then 
-	totemName = L.PALADIN_TOTEM
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_HOLY_POWER, L.POWER_HOLY_POWER})
-elseif MyClass == "WARRIOR" then 
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE})
-elseif MyClass == "DRUID" then 
-	totemName = L.DRUID_TOTEM
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_LUNAR, L.POWER_LUNAR})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_COMBO_POINTS, L.POWER_COMBO_POINTS})
-elseif MyClass == "DEATHKNIGHT" then 
-	totemName = L.DK_TOTEM
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_RUNIC, L.POWER_RUNIC})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_RUNE, L.POWER_RUNE})
-elseif MyClass == "HUNTER" then 
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_FOCUS, L.POWER_FOCUS})
-elseif MyClass == "PRIEST" then 
-	totemName = L.PRIEST_TOTEM
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_INSANITY, L.POWER_INSANITY})
-	-- table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.PRIEST_SHADOWY_APPARITION, L.PRIEST_SHADOWY_APPARITION})
-elseif MyClass == "ROGUE" then
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_COMBO_POINTS, L.POWER_COMBO_POINTS})
-elseif MyClass == "SHAMAN" then 
-	totemName = L.SHAMAN_TOTEM
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MAELSTROM, L.POWER_ELE_MAELSTROM})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM, L.POWER_ENH_MAELSTROM})
-elseif MyClass == "WARLOCK" then 
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_SOUL_SHARDS, L.POWER_SOUL_SHARDS})
-elseif MyClass == "MONK" then 
-	totemName = L.MONK_TOTEM
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_CHI, L.POWER_CHI})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.STAGGER, L.STAGGER})
-elseif MyClass == "DEMONHUNTER" then 
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_FURY, L.POWER_FURY})
-	-- table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_PAIN, L.POWER_PAIN}) -- 삭제됨
-elseif MyClass == "EVOKER" then
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA})
-	table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.POWER_ESSENCE, L.POWER_ESSENCE})
+
+local function HDH_AT_AddTrackerList(power_type, name)
+	if power_type then
+		table.insert(DDP_TRACKER_LIST, {power_type, name})
+	end
 end
 
-table.insert(DDP_TRACKER_LIST, {HDH_TRACKER.TYPE.TOTEM, totemName})
+if MyClass == "MAGE" then 
+	totemName = L.MAGE_TOTEM
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, L.POWER_ARCANE_CHARGES)
+elseif MyClass == "PALADIN" then 
+	totemName = L.PALADIN_TOTEM
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_HOLY_POWER, L.POWER_HOLY_POWER)
+elseif MyClass == "WARRIOR" then 
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE)
+elseif MyClass == "DRUID" then 
+	totemName = L.DRUID_TOTEM
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_LUNAR, L.POWER_LUNAR)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_COMBO_POINTS, L.POWER_COMBO_POINTS)
+elseif MyClass == "DEATHKNIGHT" then 
+	totemName = L.DK_TOTEM
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_RUNIC, L.POWER_RUNIC)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_RUNE, L.POWER_RUNE)
+elseif MyClass == "HUNTER" then 
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_FOCUS, L.POWER_FOCUS)
+elseif MyClass == "PRIEST" then 
+	totemName = L.PRIEST_TOTEM
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_INSANITY, L.POWER_INSANITY)
+	-- addTrackerList(HDH_TRACKER.TYPE.PRIEST_SHADOWY_APPARITION, L.PRIEST_SHADOWY_APPARITION})
+elseif MyClass == "ROGUE" then
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_COMBO_POINTS, L.POWER_COMBO_POINTS)
+elseif MyClass == "SHAMAN" then 
+	totemName = L.SHAMAN_TOTEM
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MAELSTROM, L.POWER_ELE_MAELSTROM)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM, L.POWER_ENH_MAELSTROM)
+elseif MyClass == "WARLOCK" then 
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_SOUL_SHARDS, L.POWER_SOUL_SHARDS)
+elseif MyClass == "MONK" then 
+	totemName = L.MONK_TOTEM
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_CHI, L.POWER_CHI)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.STAGGER, L.STAGGER)
+elseif MyClass == "DEMONHUNTER" then 
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_FURY, L.POWER_FURY)
+	-- addTrackerList(HDH_TRACKER.TYPE.POWER_PAIN, L.POWER_PAIN}) -- 삭제됨
+elseif MyClass == "EVOKER" then
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ESSENCE, L.POWER_ESSENCE)
+end
+
+if select(4, GetBuildInfo()) >= 100000 or MyClass == "SHAMAN" then
+	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.TOTEM, totemName)
+end
 
 GET_TRACKER_TYPE_NAME = {}
 for _, v in ipairs(DDP_TRACKER_LIST) do
-	GET_TRACKER_TYPE_NAME[v[1]] = v[2]
+	if v[1] ~= nil then
+		GET_TRACKER_TYPE_NAME[v[1]] = v[2]
+	end
 end
 
 local UNIT_TO_LABEL = {
@@ -427,14 +440,14 @@ local function GetTalentIdByTraits(searchTraitsId)
 	local traitIds
 	if not searchTraitsId then return nil end
 	for i = 1, MAX_TALENT_TABS do
-		talentId, _, _, _ = GetSpecializationInfo(i)
+		talentId, _, _, _ = HDH_AT_UTIL.GetSpecializationInfo(i)
 		if talentId == nil then
 			break
 		end
 		if searchTraitsId == talentId then
 			return talentId
 		end
-		traitIds = C_ClassTalents.GetConfigIDsBySpecID(talentId)
+		traitIds = HDH_AT_UTIL.GetConfigIDsBySpecID(talentId)
 		for _, v in pairs(traitIds) do
 			if v == searchTraitsId then
 				return talentId
@@ -599,11 +612,22 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		if trackerType == HDH_TRACKER.TYPE.STAGGER then
 			self.DETAIL_ETC_TAB[1]:Disable()
 			self.DETAIL_ETC_TAB[2]:Disable()
+			self.DETAIL_ETC_TAB[3]:Disable()
 			ChangeTab(self.DETAIL_ETC_TAB, -1)
 		elseif CLASS:GetClassName() == "HDH_POWER_TRACKER" or CLASS:GetClassName() == "HDH_ENH_MAELSTROM_TRACKER" then
 			self.DETAIL_ETC_TAB[1]:Enable()
 			self.DETAIL_ETC_TAB[2]:Enable()
+			self.DETAIL_ETC_TAB[3]:Disable()
 			if #self.DETAIL_ETC_TAB >= self.subType then
+				ChangeTab(self.DETAIL_ETC_TAB, self.subType)
+			else
+				ChangeTab(self.DETAIL_ETC_TAB, 1)
+			end
+		elseif trackerType == HDH_TRACKER.TYPE.COOLDOWN then
+			self.DETAIL_ETC_TAB[1]:Enable()
+			self.DETAIL_ETC_TAB[2]:Disable()
+			self.DETAIL_ETC_TAB[3]:Enable()
+			if self.subType ~= 2 then 
 				ChangeTab(self.DETAIL_ETC_TAB, self.subType)
 			else
 				ChangeTab(self.DETAIL_ETC_TAB, 1)
@@ -611,6 +635,7 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		else
 			self.DETAIL_ETC_TAB[1]:Enable()
 			self.DETAIL_ETC_TAB[2]:Disable()
+			self.DETAIL_ETC_TAB[3]:Disable()
 			ChangeTab(self.DETAIL_ETC_TAB, 1)
 		end
 	end
@@ -730,7 +755,8 @@ local function ShowGrid(frame, show)
 			text:SetWidth(190)
 			text:SetHeight(70)
 			text:SetJustifyH("CENTER")
-			text:SetJustifyV("CENTER")
+			-- text:SetJustifyV("CENTER")
+			text:SetJustifyV("MIDDLE")
 			text:SetPoint("CENTER",UIParent,"CENTER", 0, 10);
 			text:SetText("(0,0)")
 		end
@@ -1531,6 +1557,58 @@ function HDH_AT_OnClick_Button(self, button)
 				t:SetMove(true)
 			end
 		end
+
+	elseif self == F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_BTN_APPLY then
+		local trackerId = F.BODY.CONFIG_DETAIL.trackerId
+		local elemIdx = F.BODY.CONFIG_DETAIL.elemIdx
+		local innerCooldown =  F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_CD:GetText()
+		local innerSpellId = F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_SPELL_ID:GetText()
+
+		F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_CD:ClearFocus()
+		F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_SPELL_ID:ClearFocus()
+		innerCooldown = UTIL.Trim(innerCooldown)
+		if not innerCooldown or string.len(innerCooldown) == 0 then
+			main.Dialog:AlertShow(L.PLEASE_INPUT_INNER_TIME)
+			return
+		end
+
+		innerSpellId = UTIL.Trim(innerSpellId)
+		if not innerSpellId or string.len(innerSpellId) == 0 then
+			main.Dialog:AlertShow(L.PLEASE_INPUT_ID) 
+			return 
+		end
+
+		local name, id, texture = UTIL.GetInfo(innerSpellId, false)
+		if not id then
+			main.Dialog:AlertShow(L.NOT_FOUND_ID:format(innerSpellId)) 
+			return 
+		end
+
+		DB:UpdateTrackerElementInnerCooldown(trackerId, elemIdx, DB.INNER_CD_BUFF, innerSpellId, innerCooldown)
+		HDH_TRACKER.InitVaribles(trackerId)
+		main.Dialog:AlertShow(L.SAVED_CONFIG)
+	
+	elseif self == F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_BTN_DELETE then
+		local trackerId = F.BODY.CONFIG_DETAIL.trackerId
+		local elemIdx = F.BODY.CONFIG_DETAIL.elemIdx
+		main.Dialog:AlertShow(L.DO_YOU_WANT_TO_DELETE_THIS_ITEM:format(L.INNER_COOLDOWN_ITEM_CONFIG), main.Dialog.DLG_TYPE.YES_NO,
+			function()
+				F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_CD:SetText("")
+				F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_SPELL_ID:SetText("")
+				F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_CD:ClearFocus()
+				F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_SPELL_ID:ClearFocus()
+				DB:UpdateTrackerElementInnerCooldown(trackerId, elemIdx, nil, nil, nil)
+				HDH_TRACKER.InitVaribles(trackerId)
+
+				if HDH_TRACKER.ENABLE_MOVE then
+					HDH_TRACKER.SetMoveAll(false)
+					HDH_TRACKER.SetMoveAll(true)
+				end
+			end,
+			function()
+				F.BODY.CONFIG_UI.SW_CONFIG_MODE:SetSelectedIndex(DB.USE_GLOBAL_CONFIG)
+			end
+		)
 	end
 	
 end
@@ -1575,12 +1653,11 @@ end
 
 function HDH_AT_ConfigFrameMixin:GetTraits(talentId)
 	local ret = {}
-	talentId = talentId or GetSpecialization() --ClassTalentFrame.TalentsTab.LoadoutDropDown:GetSelectionID()
-	local ids = C_ClassTalents.GetConfigIDsBySpecID(talentId)
-
+	talentId = talentId or HDH_AT_UTIL.GetSpecialization() --ClassTalentFrame.TalentsTab.LoadoutDropDown:GetSelectionID()
+	local ids = HDH_AT_UTIL.GetConfigIDsBySpecID(talentId)
 	for i, v in pairs(ids) do
 		id = v
-		name = C_Traits.GetConfigInfo(v).name
+		name = HDH_AT_UTIL.GetConfigInfo(v).name
 		ret[i] = {id, name}
 	end
 	return ret
@@ -1590,12 +1667,15 @@ function HDH_AT_ConfigFrameMixin:GetTalentList(bigImage)
 	local ret = {}
 	bigImage = bigImage or false
 	for i = 1, MAX_TALENT_TABS do
-        id, name, desc, icon = GetSpecializationInfo(i)
+        id, name, desc, icon = HDH_AT_UTIL.GetSpecializationInfo(i)
 		if id == nil then
 			break
 		end
 		if bigImage then
-			icon = SPEC_TEXTURE_FORMAT:format(SPEC_FORMAT_STRINGS[id])
+			texture = SPEC_FORMAT_STRINGS[id]
+			if texture then
+				icon = SPEC_TEXTURE_FORMAT:format(texture)
+			end
 		end
 		ret[i] = {id, name, icon}
 	end
@@ -1678,10 +1758,13 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 					talentID = GetTalentIdByTraits(traitID)
 					if talentID then
 						cacheTraits[traitID] = true
-						talentName = select(2, GetSpecializationInfoByID(talentID))
+						talentName = select(2, HDH_AT_UTIL.GetSpecializationInfoByID(talentID))
 						traitName = UTIL.GetTraitsName(traitID)
-						icon = SPEC_TEXTURE_FORMAT:format(SPEC_FORMAT_STRINGS[talentID])
-						traitList[#traitList+1] = {traitID, STR_TRANSIT_FORMAT:format(traitName, talentName), icon, talentID}
+						texture = SPEC_FORMAT_STRINGS[talentID]
+						if texture then
+							icon = SPEC_TEXTURE_FORMAT:format(texture)
+						end
+						traitList[#traitList+1] = {traitID, STR_TRANSIT_FORMAT:format(traitName or "", talentName or ""), icon, talentID}
 					else
 						
 						DB:ClearTraits(id)
@@ -1701,8 +1784,6 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 
 	F.DD_TRANSIT:UseAtlasSize(true)
 
-	-- for traitList then
-
 	table.sort(traitList, function(a, b) 
 		if (a[4] < b[4]) then
 			return true
@@ -1712,6 +1793,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 			return (a[1] < b[1]) 
 		end
 	end)
+
 	HDH_AT_DropDown_Init(F.DD_TRANSIT, traitList, HDH_AT_OnSelected_Dropdown , nil, "HDH_AT_DropDownTrackerItemTemplate") --	HDH_AT_DropDownTrackerItemTemplate")
 
 	for _, item in ipairs(self:GetTalentList(true)) do
@@ -1757,7 +1839,7 @@ function HDH_AT_ConfigFrameMixin:UpdateTraitsSelector(idx)
 	
 	for i = startIndex, endIndex do
 		itemFrame = ddm.item[i]
-		if (GetSpecializationInfoByID(itemFrame.value)) then
+		if (HDH_AT_UTIL.GetSpecializationInfoByID(itemFrame.value)) then
 			isAlwaysChecked = itemFrame.CheckButton:GetChecked()
 		else
 			if itemFrame.value ~= -1 then
@@ -1932,7 +2014,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerListForExport()
 		talentList = {}
 		for _, t in ipairs(trait) do
 			talentID = GetTalentIdByTraits(t)
-			icon = select(4, GetSpecializationInfoByID(talentID))
+			icon = select(4, HDH_AT_UTIL.GetSpecializationInfoByID(talentID))
 			if icon and not talentCache[talentID] then
 				talentCache[talentID] = icon
 				table.insert(talentList, icon)
@@ -2108,6 +2190,11 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 		else
 			splitbar:SetMinMaxValues(0, 1)
 		end
+
+		-- Load Inner CD
+		local innerType, innerSpellId, innerCooldown = DB:GetTrackerElementInnerCooldown(trackerId, elemIdx)
+		F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_CD:SetText(innerCooldown or "")
+		F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_SPELL_ID:SetText(innerSpellId or "")
 	end
 end
 
@@ -2443,7 +2530,7 @@ local function OnMouseDown_LatestSpellItem(self)
 	GameTooltip:Hide()
 end
 
-local function OnMouseUp_LatestSpellItem(self)
+local function OnMouseUp_LatestSpellItem(self) -- here
 	local main = GetMainFrame()
 	local trackerId = main:GetCurTrackerId()
 	local tracker = HDH_TRACKER.Get(trackerId)
@@ -2453,25 +2540,34 @@ local function OnMouseUp_LatestSpellItem(self)
 	self:StopMovingOrSizing()
 	self:SetScript("OnUpdate", nil)
 
-	if main.F.BODY.CONFIG_TRACKER_ELEMENTS:IsShown() 
-			and (className == "HDH_AURA_TRACKER" or className == "HDH_C_TRACKER" or className == "HDH_TT_TRACKER") then	
+	if (className == "HDH_AURA_TRACKER" or className == "HDH_C_TRACKER" or className == "HDH_TT_TRACKER") then	
 		local left, bottom, w, h = main.F.BODY.CONFIG_TRACKER_ELEMENTS:GetBoundsRect()
 		local curX, curY = self:GetCenter()
 
 		if left <= curX and curX <= (left + w) and bottom <= curY and curY <= (bottom + h) then
-			local listFrame = main.F.BODY.CONFIG_TRACKER_ELEMENTS.CONTENTS
-			local elemIdx = (DB:GetTrackerElementSize(trackerId) or 0) + 1
-			local elem = listFrame.list[elemIdx]
-			if elem then
-				_G[elem:GetName().."EditBoxID"]:SetText(self.ID:GetText())
-				_G[elem:GetName().."CheckButtonIsItem"]:SetChecked(self.isItem or false)
-				main:AddTrackerElement(elem, trackerId, elemIdx)
+			if main.F.BODY.CONFIG_TRACKER_ELEMENTS:IsShown() then
+				local listFrame = main.F.BODY.CONFIG_TRACKER_ELEMENTS.CONTENTS
+				local elemIdx = (DB:GetTrackerElementSize(trackerId) or 0) + 1
+				local elem = listFrame.list[elemIdx]
+				if elem then
+					_G[elem:GetName().."EditBoxID"]:SetText(self.ID:GetText())
+					_G[elem:GetName().."CheckButtonIsItem"]:SetChecked(self.isItem or false)
+					main:AddTrackerElement(elem, trackerId, elemIdx)
 
-				if HDH_TRACKER.ENABLE_MOVE then
-					if tracker then
-						tracker:SetMove(false)
-						tracker:SetMove(true)
+					if HDH_TRACKER.ENABLE_MOVE then
+						if tracker then
+							tracker:SetMove(false)
+							tracker:SetMove(true)
+						end
 					end
+				end
+			elseif main.bodyType == BODY_DETAIL_ETC then
+				if main.DETAIL_ETC_TAB[3].content:IsShown() then -- inner cooldown
+					main.F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_SPELL_ID:SetText(self.ID:GetText())
+				elseif main.DETAIL_ETC_TAB[1].content:IsShown() then -- change texture
+					main.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_EB_SPELL:SetText(self.ID:GetText())
+					main.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_EB_SPELL:ClearFocus()
+					HDH_AT_OnClick_Button(main.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_BTN_SEARCH) 
 				end
 			end
 		end
@@ -2485,7 +2581,9 @@ function HDH_AT_OnShow_LatestSpell(self)
 		self:GetParent():RegisterEvent('UNIT_SPELLCAST_SENT')
 		self:GetParent():RegisterEvent('BAG_UPDATE_COOLDOWN')
 		self:GetParent():RegisterEvent('UNIT_AURA')
+		self:GetParent():RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
 	end
+	self:GetParent():UpdateLatest()
 end
 
 function HDH_AT_OnHide_LatestSpell(self)
@@ -2654,6 +2752,24 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 		end
 	elseif className == "HDH_C_TRACKER" then
 		f.queue = f.skillQueue 
+		if self.bodyType == BODY_DETAIL_ETC and self.DETAIL_ETC_TAB[3].content:IsShown() then
+			for i=1, #f.buffQueue do
+				id = f.buffQueue:Get(i)[3] 
+				if f.buffQueue.activeSpell[id] then
+					if f.queue.cache[id] then
+						local size = f.queue:GetSize()
+						for j = 1, size do
+							if f.queue:Get(j)[3] == id then
+								f.queue:Pop(j)
+								break
+							end
+						end
+					end
+					f.queue:Push(f.buffQueue:Get(i))
+					f.queue.cache[id] = true
+				end
+			end
+		end
 	elseif className == "HDH_TT_TRACKER" then
 		f.queue = f.totemQueue 
 	else
@@ -2773,8 +2889,8 @@ end
 function HDH_AT_ConfigFrameMixin:UpdateFrame()
 	local F = self.F
 	local ddm = F.DD_TRANSIT
-	local talentID = select(1, GetSpecializationInfo(GetSpecialization()))
-	local traitID = talentID and C_ClassTalents.GetLastSelectedSavedConfigID(talentID)
+	local talentID = select(1, HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))
+	local traitID = talentID and HDH_AT_UTIL.GetLastSelectedSavedConfigID(talentID)
 	local traitName = traitID and UTIL.GetTraitsName(traitID)
 	
 	self:LoadTraits()
@@ -2899,8 +3015,13 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.F.BODY.CONFIG_DETAIL.ETC.MENU = _G[self:GetName().."BodyDetailConfigETCMenuSFContents"]
 	self.F.BODY.CONFIG_DETAIL.ETC.CONTENTS = _G[self:GetName().."BodyDetailConfigETCSFContents"]
 
+
+	--------------------------------------------------------------------------------------------------------------------------------------------------
+	-- START: DETAIL_ETC_TAB
+	--------------------------------------------------------------------------------------------------------------------------------------------------
 	self.DETAIL_ETC_TAB = self:AppendUITab(DETAIL_ETC_CONFIG_TAB_LIST, self.F.BODY.CONFIG_DETAIL.ETC.MENU, self.F.BODY.CONFIG_DETAIL.ETC.CONTENTS)
 	
+	-- Change icon texture layer
 	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON, L.USE_DEFAULT_ICON, nil, 1, 1)
 	comp:HiddenBackground(true)
 	comp.Icon:SetTexture(nil)
@@ -2918,6 +3039,9 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	component1:SetText(value or "")
 	component1:SetAutoFocus(false)
 	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_EB_SPELL = component1
+	component1:SetScript("OnEditFocusGained", function() 
+		GetMainFrame().F.LATEST_SPELL_WINDOW:Show()
+	end)
 
 	local component2 = CreateFrame("CheckButton", (comp:GetName()..'CheckButtonIsItem'), comp, "HDH_AT_CheckButton2Template")
 	component2:SetPoint('TOPLEFT', component1, 'BOTTOMLEFT', -5, 0)
@@ -2943,25 +3067,57 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	local col_idx = 0
 	local row_idx = 5
 	for _, texture in ipairs(ICON_PRESET_LIST) do
-		col_idx = (col_idx % 3)
-		col_idx = col_idx + 1
-		comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON,     nil, nil, row_idx, col_idx)
-		comp:HiddenBackground(true)
-		comp.Icon:SetTexture(texture)
-		table.insert(CHANGE_ICON_CB_LIST, comp)
-		if col_idx == 3 then
-			row_idx = row_idx + 1
+		if comp == nil or comp.Icon:GetTexture() ~= nil then
+			col_idx = (col_idx % 3) + 1
+			comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON,     nil, nil, row_idx, col_idx)
+			comp:HiddenBackground(true)
+			comp.Icon:SetTexture(texture)
+			table.insert(CHANGE_ICON_CB_LIST, comp)
+			if col_idx == 3 then
+				row_idx = row_idx + 1
+			end
+		else
+			comp.Icon:SetTexture(texture)
 		end
 	end
 
-	-- self.DETAIL_ETC_TAB[2].content
+	if comp ~= nil and comp.Icon:GetTexture() == nil then
+		comp:Hide()
+	end
+
+	-- Split power bar layer
 	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[2].content, COMP_TYPE.SPLIT_LINE, L.THIS_IS_ONLY_SPLIT_POWER_BAR)
-	local comp = CreateFrame("Frame", (self.DETAIL_ETC_TAB[2].content:GetName()..'SplitBar'), self.DETAIL_ETC_TAB[2].content, "HDH_AT_SplitBarTemplate")
+	comp = CreateFrame("Frame", (self.DETAIL_ETC_TAB[2].content:GetName()..'SplitBar'), self.DETAIL_ETC_TAB[2].content, "HDH_AT_SplitBarTemplate")
 	comp:SetSize(230, 30)
 	comp:SetPoint('TOPLEFT', self.DETAIL_ETC_TAB[2].content, 'TOPLEFT', 20, -70)
 	comp:SetMinMaxValues(0, 1)
 	self.F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR = comp
 	-- INV_Jewelcrafting_DragonsEye03 INV_Jewelcrafting_DragonsEye04 INV_Jewelcrafting_DragonsEye05
+
+	-- inner cooldown item layer
+	HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[3].content, COMP_TYPE.SPLIT_LINE, L.COOLDOWN_ITEM_DESC)
+	self.F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_SWITCH = comp
+	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[3].content, COMP_TYPE.EDIT_BOX, L.INNER_COOLDOWN)
+	comp:SetNumeric(true)
+	self.F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_CD = comp
+	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[3].content, COMP_TYPE.EDIT_BOX, L.TRACKING_BUFF)
+	self.F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_SPELL_ID = comp
+	comp:SetScript("OnEditFocusGained", function() 
+		GetMainFrame().F.LATEST_SPELL_WINDOW:Show()
+	end)
+	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[3].content, COMP_TYPE.BUTTON, " ")
+	comp:SetText(L.APPLY)
+	comp:SetSize(55, 22)
+	self.F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_BTN_APPLY = comp
+	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[3].content, COMP_TYPE.BUTTON, " ")
+	comp:SetText(L.DELETE)
+	comp:SetSize(55, 22)
+	comp:SetPoint("LEFT", self.F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_BTN_APPLY, "RIGHT", 5, 0)
+	self.F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_BTN_DELETE = comp
+
+	--------------------------------------------------------------------------------------------------------------------------------------------------
+	-- END : DETAIL_ETC_TAB
+	--------------------------------------------------------------------------------------------------------------------------------------------------
 
 	self.F.BODY.CONFIG_DETAIL.BTN_SAVE = _G[self:GetName().."BodyDetailConfigBottomButtonApply"]
 	self.F.BODY.CONFIG_DETAIL.BTN_CLOSE = _G[self:GetName().."BodyDetailConfigBottomButtonClose"]
@@ -3138,12 +3294,16 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,       L.ICON_SPARK_COLOR,         "ui.%s.icon.spark_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER, L.COOLDOWN_COLOR,      "ui.%s.icon.cooldown_bg_color")
+
+	
+	HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.BLANK_LINE, ' ')
 	HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SPLIT_LINE, L.ONLY_FOR_CONFIG_OF_AURA_TRACKER)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.USE_DEFAULT_BORDER_COLOR,           "ui.%s.common.default_color")
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.CANCEL_BUFF,         "ui.%s.icon.able_buff_cancel")
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
  
+	HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.BLANK_LINE, ' ')
 	HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SPLIT_LINE, L.ONLY_FOR_CONFIG_OF_COOLDOWN_TRACKER)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.DISPLAY_GLOBAL_COOLDOWN,         "ui.%s.cooldown.show_global_cooldown")
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
@@ -3235,11 +3395,11 @@ function HDH_AT_ConfigFrameMixin:OnEvent(event, ...)
 		self:UpdateLatest()
 	elseif event == "BAG_UPDATE_COOLDOWN" then
 		local info, startTime, duration, enable, itemId
-		for bag = BACKPACK_CONTAINER, NUM_TOTAL_EQUIPPED_BAG_SLOTS do
+		for bag = BACKPACK_CONTAINER, NUM_TOTAL_EQUIPPED_BAG_SLOTS or 0 do
 			for slot = 1, C_Container.GetContainerNumSlots(bag) do
 				info = C_Container.GetContainerItemInfo(bag, slot)
 				if info then
-					startTime, duration = GetItemCooldown(info.itemID)
+					startTime, duration = C_Container.GetItemCooldown(info.itemID)
 					if duration > 1.5 and (GetTime() - startTime) < 1 then
 						table.insert(cacheUesdItem, info.itemID)
 					end
@@ -3258,6 +3418,15 @@ function HDH_AT_ConfigFrameMixin:OnEvent(event, ...)
 		self:UpdateLatest()
 	elseif event == "UNIT_AURA" then
 		self:UpdateLatest()
+	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
+		local _, event, _, srcGUID, srcName, _, _, _, _, _, _, spellID, spellName =  CombatLogGetCurrentEventInfo()
+		if srcGUID == UnitGUID('player') then
+			if event == "SPELL_DAMAGE" or event == "SPELL_HEAL" or event == "SPELL_CAST_SUCCESS" or event == "SPELL_SUMMON" or event == "SPELL_CREATE" then -- event == "SPELL_AURA_APPLIED" or 
+				name, _, icon = HDH_AT_UTIL.GetInfo(spellID, false)
+				table.insert(cacheCastSpell, spellID)
+				self:UpdateLatest()
+			end
+		end
 	end
 end
 
@@ -3270,9 +3439,9 @@ end
 
 function HDH_AT_ConfigFrame_OnShow(self)
 	self.ErrorReset:Show()
-	local IsLoaded = select(1, GetSpecializationInfo(GetSpecialization()))
-	if IsLoaded then
-		if GetSpecialization() == 5 then
+	local IsLoaded = select(1, HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))
+	-- if IsLoaded then
+		if HDH_AT_UTIL.GetSpecialization() == 5 then
 			self.Dialog:AlertShow(L.NOT_FOUND_TALENT)
 		end
 		self:SetClampedToScreen(true)
@@ -3283,17 +3452,18 @@ function HDH_AT_ConfigFrame_OnShow(self)
 		self:SetClampedToScreen(false)
 		self:SetWidth(FRAME_WIDTH)
 		self:UpdateFrame()
-	else
-		self:Hide()
-	end
+	-- else
+	-- 	self:Hide()
+	-- end
 
 	self.ErrorReset:Hide()
 
-	if self.F.LATEST_SPELL.CB_AUTO_POPUP:GetChecked() or self.F.LATEST_SPELL_WINDOW:IsShown() then
+	if self.F.LATEST_SPELL.CB_AUTO_POPUP:GetChecked() then
 		self:SetScript("OnEvent", self.OnEvent)
 		self:RegisterEvent('UNIT_SPELLCAST_SENT')
 		self:RegisterEvent('BAG_UPDATE_COOLDOWN')
 		self:RegisterEvent('UNIT_AURA')
+		self:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
 	end
 end
 
@@ -3342,7 +3512,8 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		frame:SetPoint('TOPLEFT', parent, 'TOPLEFT', MARGIN_X + x, MARGIN_Y + y)
 		frame.text:SetPoint('LEFT', frame, 'LEFT', COMP_MARGIN, 0)
 		frame.text:SetNonSpaceWrap(false)
-		frame.text:SetJustifyV('CENTER')
+		-- frame.text:SetJustifyV('CENTER')
+		frame.text:SetJustifyV('MIDDLE')
 		frame.text:SetText(option_name)
 		frame:SetSize(COMP_WIDTH, COMP_HEIGHT)
 		frame.text:SetPoint('RIGHT', frame, 'RIGHT', 15, 0)
@@ -3359,8 +3530,8 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 
 	elseif component_type == COMP_TYPE.BUTTON then
 		component = CreateFrame("Button", (parent:GetName()..'Button'..parent.row.."_"..parent.col), parent, "HDH_AT_ButtonTemplate")
-		component:SetSize(110, 22)
-		component:SetPoint('LEFT', frame, 'RIGHT', 25, 0)
+		component:SetSize(115, 22)
+		component:SetPoint('LEFT', frame, 'RIGHT', 20, 0)
 		component:SetText(value or 'None')
 		component:SetScript("OnClick", HDH_AT_OnClick_Button)
 	
@@ -3416,11 +3587,18 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		component.EditBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
 		component.EditBox:SetScript("OnEnterPressed", function(self) self:ClearFocus() end)
 		-- component:SetHandler(HDH_AT_OnSeletedColor)
+
+	elseif component_type == COMP_TYPE.BLANK_LINE then
+		component = CreateFrame("Frame", (parent:GetName()..'Line'..parent.row.."_"..parent.col), parent, "HDH_AT_BlankLineFrameTemplate")
+		component:SetSize(255, 26)
+		component:SetPoint('LEFT', frame, 'LEFT', 5, 0)
+		-- component:SetPoint('RIGHT', parent, 'RIGHT', -10, 0)
+		-- component:SetHandler(HDH_AT_OnSeletedColor)
 	
 	elseif component_type == COMP_TYPE.SPLIT_LINE then
 		component = CreateFrame("Frame", (parent:GetName()..'Line'..parent.row.."_"..parent.col), parent, "HDH_AT_LineFrameTemplate")
 		component:SetSize(255, 26)
-		component:SetPoint('LEFT', frame, 'LEFT', 10, 0)
+		component:SetPoint('LEFT', frame, 'LEFT', 5, 0)
 		-- component:SetPoint('RIGHT', parent, 'RIGHT', -10, 0)
 		-- component:SetHandler(HDH_AT_OnSeletedColor)
 		

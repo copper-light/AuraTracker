@@ -101,12 +101,12 @@
 								</Anchors>
 								<Layers> 
 									<Layer level="ARTWORK">
-										<Texture atlas="ui-hud-minimap-zoom-in" alphaMode="ADD" hidden="true">
+										<!-- <Texture atlas="ui-hud-minimap-zoom-in" alphaMode="ADD" hidden="true" >
 											<Size x="17" y="17"/>
 											<Anchors>
 												<Anchor point="LEFT" x="10" y="-1" />
 											</Anchors>
-										</Texture>
+										</Texture> -->
 									</Layer>
 								</Layers>
 								<Scripts>
@@ -769,7 +769,7 @@
 
 								<Frames>
 									<CheckButton name="$parentCBCondition1" inherits="HDH_AT_CheckButton2Template">
-										<Size x="180" y="20"/>
+										<Size x="200" y="20"/>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-40" />
 											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
@@ -781,7 +781,7 @@
 									</CheckButton>
 
 									<CheckButton name="$parentCBCondition2" inherits="HDH_AT_CheckButton2Template">
-										<Size x="180" y="20"/>
+										<Size x="200" y="20"/>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition1" x="0" y="-2" />
 										</Anchors>
@@ -792,7 +792,7 @@
 									</CheckButton>
 
 									<CheckButton name="$parentCBCondition3" inherits="HDH_AT_CheckButton2Template">
-										<Size x="180" y="20"/>
+										<Size x="200" y="20"/>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition2" x="0" y="-2" />
 										</Anchors>
@@ -803,7 +803,7 @@
 									</CheckButton>
 
 									<CheckButton name="$parentCBCondition4" inherits="HDH_AT_CheckButton2Template">
-										<Size x="180" y="20"/>
+										<Size x="200" y="20"/>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition3" x="0" y="-2" />
 										</Anchors>
@@ -814,7 +814,7 @@
 									</CheckButton>
 
 									<CheckButton name="$parentCBCondition5" inherits="HDH_AT_CheckButton2Template">
-										<Size x="180" y="20"/>
+										<Size x="200" y="20"/>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition4" x="0" y="-2" />
 										</Anchors>
@@ -854,8 +854,8 @@
 										</Anchors>
 										<Layers>
 											<Layer level="artwork">
-												<FontString name="$parentText" parentKey="Second" inherits="Font_Yellow_M" text="초" justifyH="LEFT">
-													<Size x="20" y="25" />
+												<FontString name="$parentText" parentKey="Second" inherits="Font_White_S" text="초" justifyH="LEFT">
+													<Size x="40" y="25" />
 													<Anchors>
 														<Anchor point="LEFT" relativePoint="RIGHT" x="2" y="0"/>
 													</Anchors>
@@ -910,7 +910,7 @@
 
 								<Frames>
 									<CheckButton name="$parentCBCondition1" inherits="HDH_AT_CheckButton2Template">
-										<Size x="150" y="20" />
+										<Size x="155" y="20" />
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-40" />
 											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
@@ -922,7 +922,7 @@
 									</CheckButton>
 
 									<CheckButton name="$parentCBCondition2" inherits="HDH_AT_CheckButton2Template">
-										<Size x="150" y="20" />
+										<Size x="155" y="20" />
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition1" x="0" y="-2" />
 										</Anchors>
