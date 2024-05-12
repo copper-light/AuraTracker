@@ -34,6 +34,8 @@ if select(4, GetBuildInfo()) >= 100000 then
 	HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES = 19
 	HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, HDH_COMBO_POINT_TRACKER)
 	POWER_INFO[HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES]	= {power_type="ARCANE_CHARGES",	power_index = 16,	color={2/255, 60/255, 189/255, 1}, texture = "Interface/Icons/Spell_Nature_WispSplode"};
+else
+	POWER_INFO[HDH_TRACKER.TYPE.POWER_COMBO_POINTS] 	= {power_type="COMBO_POINTS", 	power_index = 14,	color={0.77, 0.12, 0.23, 1}, texture = "Interface/Icons/INV_Misc_Gem_Pearl_05"};
 end
 
 HDH_COMBO_POINT_TRACKER.POWER_INFO = POWER_INFO;

@@ -600,12 +600,18 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
             end
             itemFrame:SetPoint("RIGHT", listFrame, "RIGHT", -1, 0)
             itemFrame.Text:SetText(name)
+
             if texture then
                 local t = _G[itemFrame:GetName().."Texture"]
                 if frame.useAtlasSize then
                     t:SetAtlas(texture)
+                    t:ClearAllPoints()
                 else
                     t:SetTexture(texture) 
+                    t:ClearAllPoints()
+                    t:SetPoint("LEFT", itemFrame,"LEFT", 4, 0)
+                    t:SetSize(itemFrame:GetHeight()-8, itemFrame:GetHeight()-8)
+                    t:SetTexCoord(0.1,0.9,0.1,0.9)
                 end
             end
             

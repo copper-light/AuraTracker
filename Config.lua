@@ -1665,7 +1665,9 @@ end
 
 function HDH_AT_ConfigFrameMixin:GetTalentList(bigImage)
 	local ret = {}
-	bigImage = bigImage or false
+	if bigImage == nil then
+		bigImage = false
+	end
 	for i = 1, MAX_TALENT_TABS do
         id, name, desc, icon = HDH_AT_UTIL.GetSpecializationInfo(i)
 		if id == nil then
@@ -1748,6 +1750,9 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 	local unusedTracker = 0
 	local traits
 	local trackerId
+
+	local useAtlas = select(4, GetBuildInfo()) >= 100000
+
 	-- Tracker 목록 생성 및 트랜짓이 없는 않는 트래커 확인
 	traitList[#traitList+1] = {DDM_TRACKER_ALL, L.ALL_LIST, nil, 0}
 	for _, id in ipairs(ids) do
@@ -1758,12 +1763,12 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 					talentID = GetTalentIdByTraits(traitID)
 					if talentID then
 						cacheTraits[traitID] = true
-						talentName = select(2, HDH_AT_UTIL.GetSpecializationInfoByID(talentID))
+						talentName, _, icon = select(2, HDH_AT_UTIL.GetSpecializationInfoByID(talentID))
 						traitName = UTIL.GetTraitsName(traitID)
 						texture = SPEC_FORMAT_STRINGS[talentID]
 						if texture then
 							icon = SPEC_TEXTURE_FORMAT:format(texture)
-						end
+						end	
 						traitList[#traitList+1] = {traitID, STR_TRANSIT_FORMAT:format(traitName or "", talentName or ""), icon, talentID}
 					else
 						
@@ -1782,7 +1787,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 		self.Dialog:AlertShow(L.ALERT_UNUSED_LIST:format(unusedTracker))
 	end
 
-	F.DD_TRANSIT:UseAtlasSize(true)
+	F.DD_TRANSIT:UseAtlasSize(useAtlas)
 
 	table.sort(traitList, function(a, b) 
 		if (a[4] < b[4]) then
@@ -1796,7 +1801,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 
 	HDH_AT_DropDown_Init(F.DD_TRANSIT, traitList, HDH_AT_OnSelected_Dropdown , nil, "HDH_AT_DropDownTrackerItemTemplate") --	HDH_AT_DropDownTrackerItemTemplate")
 
-	for _, item in ipairs(self:GetTalentList(true)) do
+	for _, item in ipairs(self:GetTalentList(useAtlas)) do
 		id, name, icon = unpack(item)
 		itemValues[#itemValues+1] = {-1, name, icon}
 		itemTemplates[#itemTemplates+1] = "HDH_AT_SplitItemTemplate"
@@ -1807,7 +1812,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 			itemTemplates[#itemTemplates+1] = "HDH_AT_CheckButtonItemTemplate"
 		end
 	end
-	ddm:UseAtlasSize(true)
+	ddm:UseAtlasSize(useAtlas)
 	HDH_AT_DropDown_Init(ddm, itemValues, HDH_AT_OnSelected_Dropdown, nil, itemTemplates, true, true)
 end
 
