@@ -1,10 +1,10 @@
-﻿## Interface:  100207
+﻿## Interface:  40400
 ## Title: HDH_AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
 ## Version: 10.2.7.0
 ## SavedVariablesPerCharacter: HDH_AT_DB
-## IconTexture: Interface\AddOns\HDH_AuraTracker\Texture\logo.blp
+## AllowLoadGameType: cata
 
 Locale\locale.lua
 Locale\locale_koKR.lua

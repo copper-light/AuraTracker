@@ -1,6 +1,90 @@
 HDH_AT_UTIL = {}
 
-do 
+----------------------------------
+do -- 애드온 버전 호환성
+----------------------------------
+    ------------------------------------------------------
+	if select(4, GetBuildInfo()) <= 49999 then -- 대격변
+	------------------------------------------------------
+		HDH_AT_UTIL.GetSpecialization = function()
+			return GetPrimaryTalentTree() or 5
+		end
+
+		HDH_AT_UTIL.GetSpecializationInfo = GetTalentTabInfo
+
+
+		HDH_AT_UTIL.GetLastSelectedSavedConfigID = function(talentID)
+			return GetActiveTalentGroup()
+		end
+
+		HDH_AT_UTIL.MAX_TALENT_TIERS = 4
+		HDH_AT_UTIL.NUM_TALENT_COLUMNS = 30
+
+		HDH_AT_UTIL.GetTalentInfoBySpecialization = function(spec, tier, column)
+			local name, id, row, col, learn_point, max  = GetTalentInfo(tier, column)
+			
+			return id, name, _,_,_,_,_,_,_,(learn_point > 0)
+		end
+
+		HDH_AT_UTIL.TALENTS_GROUP_LIST = {}
+		HDH_AT_UTIL.TALENTS_GROUP_LIST[1] = 'Primary Talents'
+		HDH_AT_UTIL.TALENTS_GROUP_LIST[2] = 'Secondary Talents'
+		HDH_AT_UTIL.GetConfigInfo = function(transitID)
+			if transitID > #HDH_AT_UTIL.TALENTS_GROUP_LIST then
+				return nil
+			end
+				
+			return {id = transitID, name = HDH_AT_UTIL.TALENTS_GROUP_LIST[transitID]}
+		end
+
+		HDH_AT_UTIL.GetSpecializationInfoByID = function(talentID)
+			for i = 1, MAX_TALENT_TABS do
+				id, name, _, icon = HDH_AT_UTIL.GetSpecializationInfo(i)
+				if id == talentID then
+					return id, name, _, icon
+				end
+			end
+		end
+
+		HDH_AT_UTIL.GetConfigIDsBySpecID = function(search_specID)
+			ret = {}
+			search_index = nil
+			for i = 1, HDH_AT_UTIL.MAX_TALENT_TIERS do
+				id, name = HDH_AT_UTIL.GetSpecializationInfo(i)
+				if id and id == search_specID then
+					search_index = i
+					break
+				end
+			end
+
+			for i = 1, 2 do
+				specIndex = GetPrimaryTalentTree(false, false, i)
+				if search_index == specIndex then
+					table.insert(ret, i)
+				end
+			end
+			return ret
+		end
+
+	-------------------------------------------
+	else -- 용군단
+    -------------------------------------------
+		HDH_AT_UTIL.GetSpecialization = GetSpecialization
+		HDH_AT_UTIL.GetSpecializationInfo = GetSpecializationInfo
+		HDH_AT_UTIL.GetLastSelectedSavedConfigID = C_ClassTalents.GetLastSelectedSavedConfigID
+		HDH_AT_UTIL.GetConfigInfo = C_Traits.GetConfigInfo
+		HDH_AT_UTIL.GetSpecializationInfoByID = GetSpecializationInfoByID
+		HDH_AT_UTIL.GetConfigIDsBySpecID = C_ClassTalents.GetConfigIDsBySpecID
+		HDH_AT_UTIL.GetTalentInfoBySpecialization = GetTalentInfoBySpecialization
+		HDH_AT_UTIL.NUM_TALENT_COLUMNS = NUM_TALENT_COLUMNS
+		HDH_AT_UTIL.MAX_TALENT_TIERS =  MAX_TALENT_TIERS
+	end 
+
+--------------------------
+end ----------------------
+--------------------------
+
+do
 	HDH_AT_UTIL.SpellCache = setmetatable({}, {
 		__index=function(t,v) 
 			local a = {GetSpellInfo(v)} 
@@ -22,13 +106,12 @@ do
 		return false
 	end
 
-
 	function HDH_AT_UTIL.GetTraitsName(id)
 		local traitName = nil
 		if id then
-			local info = C_Traits.GetConfigInfo(id)
+			local info = HDH_AT_UTIL.GetConfigInfo(id)
 			if not info then
-				if GetSpecializationInfoByID(id) then
+				if HDH_AT_UTIL.GetSpecializationInfoByID(id) then
 					traitName = HDH_AT_L.ALWAYS_USE
 				end
 			else
@@ -79,15 +162,18 @@ do
 	end
 
 	function HDH_AT_UTIL.IsTalentSpell(talent_name, spec, isReload)
-		spec = spec or GetSpecialization();
+		spec = spec or HDH_AT_UTIL.GetSpecialization();
+		if not spec then return nil end
 		if isReload or cashTalentSpell == nil then cashTalentSpell = {} end
 		if cashTalentSpell[spec] == nil or #(cashTalentSpell[spec]) == 0 then
 			cashTalentSpell[spec] = {};
-			for tier = 1, MAX_TALENT_TIERS do
-				for column = 1, NUM_TALENT_COLUMNS do
-					local id, name,_,_,_,_,_,_,_,selected = GetTalentInfoBySpecialization(spec,tier,column)
+			for tier = 1, HDH_AT_UTIL.MAX_TALENT_TIERS do
+				for column = 1, HDH_AT_UTIL.NUM_TALENT_COLUMNS do
+					local id, name,_,_,_,_,_,_,_,selected = HDH_AT_UTIL.GetTalentInfoBySpecialization(spec,tier,column)
 					if name then
 						cashTalentSpell[spec][name] = selected
+					else
+						break
 					end
 				end
 			end

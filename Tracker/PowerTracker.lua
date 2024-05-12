@@ -27,9 +27,6 @@ HDH_TRACKER.TYPE.POWER_RAGE = 6
 HDH_TRACKER.TYPE.POWER_FOCUS = 7
 HDH_TRACKER.TYPE.POWER_ENERGY = 8
 HDH_TRACKER.TYPE.POWER_RUNIC = 9
-HDH_TRACKER.TYPE.POWER_LUNAR = 10
-HDH_TRACKER.TYPE.POWER_MAELSTROM = 11
-HDH_TRACKER.TYPE.POWER_INSANITY = 12
 HDH_TRACKER.TYPE.POWER_FURY = 13
 HDH_TRACKER.TYPE.POWER_PAIN = 14  -- 용군단에서 삭제됨
 
@@ -38,9 +35,6 @@ HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_RAGE,      HDH_POWER_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_FOCUS,     HDH_POWER_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_ENERGY,    HDH_POWER_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_RUNIC, 	   HDH_POWER_TRACKER)
-HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_LUNAR,	   HDH_POWER_TRACKER)
-HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_MAELSTROM, HDH_POWER_TRACKER)
-HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_INSANITY,  HDH_POWER_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_FURY,      HDH_POWER_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_PAIN,	   HDH_POWER_TRACKER)
 
@@ -49,12 +43,26 @@ POWER_INFO[HDH_TRACKER.TYPE.POWER_RAGE]			= {power_type="RAGE", 			power_index =
 POWER_INFO[HDH_TRACKER.TYPE.POWER_FOCUS] 		= {power_type="FOCUS", 			power_index =2,		color={1.00, 0.50, 0.25, 1}, 	texture = "Interface/Icons/Ability_Fixated_State_Orange"};
 POWER_INFO[HDH_TRACKER.TYPE.POWER_ENERGY]		= {power_type="ENERGY",			power_index =3, 	color={1, 0.96, 0.41, 1}, 	  	texture = "Interface/Icons/Spell_Holy_PowerInfusion"};
 POWER_INFO[HDH_TRACKER.TYPE.POWER_RUNIC]    	= {power_type="RUNIC_POWER", 	power_index =6,		color={0, 0.82, 1, 1}, 			texture = "Interface/Icons/Spell_DeathKnight_FrozenRuneWeapon"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_LUNAR] 	    = {power_type="LUNAR_POWER",	power_index =8, 	color={0.30, 0.52, 0.90, 1},	texture = "Interface/Icons/Ability_Druid_Eclipse"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_MAELSTROM]	= {power_type="MAELSTROM", 		power_index =11,	color={0.25, 0.5, 1, 1},		texture = "Interface/Icons/Spell_Shaman_StaticShock"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_INSANITY] 	= {power_type="INSANITY", 		power_index =13,	color={0.70, 0.4, 0.90, 1},	  	texture = "Interface/Icons/SPELL_SHADOW_TWISTEDFAITH"};
+
 POWER_INFO[HDH_TRACKER.TYPE.POWER_FURY] 		= {power_type="FURY",			power_index =17, 	color={0.788, 0.259, 0.992, 1},	texture = "Interface/Icons/Spell_Shadow_SummonVoidWalker"};-- 17
 POWER_INFO[HDH_TRACKER.TYPE.POWER_PAIN] 		= {power_type="PAIN",			power_index =18,	color={1, 156/255, 0, 1}, 		texture = "Interface/Icons/Ability_Warlock_FireandBrimstone"}; -- 18
+
+if select(4, GetBuildInfo()) >= 100000 then -- 용군단
+	HDH_TRACKER.TYPE.POWER_LUNAR = 10
+	HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_LUNAR,	   HDH_POWER_TRACKER)
+	POWER_INFO[HDH_TRACKER.TYPE.POWER_LUNAR] 	    = {power_type="LUNAR_POWER",	power_index =8, 	color={0.30, 0.52, 0.90, 1},	texture = "Interface/Icons/Ability_Druid_Eclipse"};
+
+	HDH_TRACKER.TYPE.POWER_MAELSTROM = 11
+	HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_MAELSTROM, HDH_POWER_TRACKER)
+	POWER_INFO[HDH_TRACKER.TYPE.POWER_MAELSTROM]	= {power_type="MAELSTROM", 		power_index =11,	color={0.25, 0.5, 1, 1},		texture = "Interface/Icons/Spell_Shaman_StaticShock"};
+
+	HDH_TRACKER.TYPE.POWER_INSANITY = 12
+	HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_INSANITY,  HDH_POWER_TRACKER)
+	POWER_INFO[HDH_TRACKER.TYPE.POWER_INSANITY] 	= {power_type="INSANITY", 		power_index =13,	color={0.70, 0.4, 0.90, 1},	  	texture = "Interface/Icons/SPELL_SHADOW_TWISTEDFAITH"};
+end
+
 HDH_POWER_TRACKER.POWER_INFO = POWER_INFO;
+
 
 local function HDH_POWER_OnUpdate(self)
 	self.spell.curTime = GetTime()
@@ -73,7 +81,7 @@ local function HDH_POWER_OnUpdate(self)
 	else 
 		self.v1:SetText(nil) 
 	end
-	
+
 	if IS_REGEN_POWER[self.spell.power_index] then
 		if self.spell.v1 < maxValue then
 			if self.spell.isOn ~= true then
@@ -85,6 +93,7 @@ local function HDH_POWER_OnUpdate(self)
 				self:GetParent().parent:Update();
 				self.spell.isOn = false;
 			end
+			self:GetParent().parent:Update();
 		end
 	else
 		if self.spell.v1 > 0 then
@@ -279,6 +288,29 @@ end
 -- 	super.UpdateSetting(self)
 -- end
 
+function HDH_POWER_TRACKER:Update() -- HDH_TRACKER override
+	if not self.frame or not self.frame.icon or HDH_TRACKER.ENABLE_MOVE then return end
+	local f = self.frame.icon[1]
+	local show = false
+	if f and f.spell then
+		-- f.spell.type = UnitPowerType('player');
+		f.spell.v1 = self:GetPower()
+		f.spell.max = self:GetPowerMax()
+		f.spell.count = (f.spell.v1/f.spell.max * 100);
+		self:UpdateIcons()
+		if IS_REGEN_POWER[f.spell.power_index] then
+			if f.spell.max ~= f.spell.v1 then show = true end
+		elseif f.spell.v1 > 0 then show = true end
+	end
+
+	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
+			and (HDH_TRACKER.ENABLE_MOVE or UnitAffectingCombat("player") or show or self.ui.common.always_show) then
+		self:ShowTracker();
+	else
+		self:HideTracker();
+	end
+end
+
 function HDH_POWER_TRACKER:UpdateArtBar(f) -- HDH_TRACKER override
 	local ui = self.ui
 	local hide_icon = ui.common.display_mode == DB.DISPLAY_BAR
@@ -303,7 +335,7 @@ function HDH_POWER_TRACKER:UpdateArtBar(f) -- HDH_TRACKER override
 end
 
 -- barMax: 다른 클래스에서 호환성을 위해서 추가 파워트래킹에서는 사용안함
-function HDH_POWER_TRACKER:UpdateBar(f, barMax, value) 
+function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 	local bar_op = self.ui.bar;
 	local hide_icon = self.ui.common.display_mode == DB.DISPLAY_BAR
 	if not self:IsHaveData() or not f.bar then return end
@@ -514,29 +546,6 @@ function HDH_POWER_TRACKER:UpdateIcons()  -- HDH_TRACKER override
 	return ret
 end
 
-function HDH_POWER_TRACKER:Update() -- HDH_TRACKER override
-	if not self.frame or not self.frame.icon or HDH_TRACKER.ENABLE_MOVE then return end
-	local f = self.frame.icon[1]
-	local show = false
-	if f and f.spell then
-		-- f.spell.type = UnitPowerType('player');
-		f.spell.v1 = self:GetPower()
-		f.spell.max = self:GetPowerMax()
-		f.spell.count = (f.spell.v1/f.spell.max * 100);
-		self:UpdateIcons()
-		if IS_REGEN_POWER[f.spell.power_index] then
-			if f.spell.max ~= f.spell.v1 then show = true end
-		elseif f.spell.v1 > 0 then show = true end
-	end
-
-	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
-			and (HDH_TRACKER.ENABLE_MOVE or UnitAffectingCombat("player") or show or self.ui.common.always_show) then
-		self:ShowTracker();
-	else
-		self:HideTracker();
-	end
-end
-
 function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 	-- if HDH_TRACKER.ENABLE_MOVE then return end
 	local trackerId = self.id
@@ -557,7 +566,7 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 	self.frame.pointer = {}
 	self.frame:UnregisterAllEvents()
 	
-	self.talentId = GetSpecialization()
+	self.talentId = HDH_AT_UTIL.GetSpecialization()
 
 	if not self:IsHaveData() then
 		self:CreateData()

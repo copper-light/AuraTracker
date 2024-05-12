@@ -1,3 +1,5 @@
+if select(4, GetBuildInfo()) <= 100205 then return end
+
 HDH_STAGGER_TRACKER = {}
 local DB = HDH_AT_ConfigDB
 local STAGGER_KEY = "STAGGER"
@@ -233,7 +235,7 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 	self.frame.pointer = {}
 	self.frame:UnregisterAllEvents()
 	
-	self.talentId = GetSpecialization()
+	self.talentId = HDH_AT_UTIL.GetSpecialization()
 
 	if not self:IsHaveData() then
 		self:CreateData()

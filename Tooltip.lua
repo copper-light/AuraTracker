@@ -75,18 +75,18 @@ hooksecurefunc(GameTooltip, "SetSpellBookItem", function(self,...)
     if id then addLine(self, id) end
 end)
 
-hooksecurefunc(GameTooltip, "SetUnitDebuffByAuraInstanceID", function(self,...)
-	if not HDH_AT_DB.show_tooltip_id then return end
-    local id = C_UnitAuras.GetAuraDataByAuraInstanceID(...).spellId
-    if id then addLine(self, id) end
+-- hooksecurefunc(GameTooltip, "SetUnitDebuffByAuraInstanceID", function(self,...)
+-- 	if not HDH_AT_DB.show_tooltip_id then return end
+--     local id = C_UnitAuras.GetAuraDataByAuraInstanceID(...).spellId
+--     if id then addLine(self, id) end
     
-end)
+-- end)
 
-hooksecurefunc(GameTooltip, "SetUnitBuffByAuraInstanceID", function(self,...)
-	if not HDH_AT_DB.show_tooltip_id then return end
-    local id = C_UnitAuras.GetAuraDataByAuraInstanceID(...).spellId
-    if id then addLine(self, id) end
-end)
+-- hooksecurefunc(GameTooltip, "SetUnitBuffByAuraInstanceID", function(self,...)
+-- 	if not HDH_AT_DB.show_tooltip_id then return end
+--     local id = C_UnitAuras.GetAuraDataByAuraInstanceID(...).spellId
+--     if id then addLine(self, id) end
+-- end)
 
 hooksecurefunc(GameTooltip, 'SetBagItem', function(self, ...)
     if not HDH_AT_DB.show_tooltip_id then return end

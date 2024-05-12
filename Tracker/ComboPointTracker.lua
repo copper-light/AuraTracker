@@ -16,20 +16,25 @@ HDH_TRACKER.TYPE.POWER_COMBO_POINTS = 15
 HDH_TRACKER.TYPE.POWER_SOUL_SHARDS = 16
 HDH_TRACKER.TYPE.POWER_HOLY_POWER = 17
 HDH_TRACKER.TYPE.POWER_CHI = 18
-HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES = 19
+
 
 
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_COMBO_POINTS,   HDH_COMBO_POINT_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_SOUL_SHARDS,    HDH_COMBO_POINT_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_HOLY_POWER,     HDH_COMBO_POINT_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_CHI,      		HDH_COMBO_POINT_TRACKER)
-HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, HDH_COMBO_POINT_TRACKER)
+
 
 POWER_INFO[HDH_TRACKER.TYPE.POWER_COMBO_POINTS] 	= {power_type="COMBO_POINTS", 	power_index = 4,	color={0.77, 0.12, 0.23, 1}, texture = "Interface/Icons/INV_Misc_Gem_Pearl_05"}; -- INV_Misc_Gem_Pearl_04 INV_chaos_orb INV_Misc_Gem_Pearl_04 Spell_AnimaRevendreth_Orb
 POWER_INFO[HDH_TRACKER.TYPE.POWER_SOUL_SHARDS]		= {power_type="SOUL_SHARDS",	power_index = 7, 	color={201/255, 34/255, 1, 	 1}, texture = "Interface/Icons/inv_misc_enchantedpearlE"};
 POWER_INFO[HDH_TRACKER.TYPE.POWER_HOLY_POWER]		= {power_type="HOLY_POWER", 	power_index = 9,	color={1, 216/255, 47/255, 1}, texture = "Interface/Icons/Spell_Holy_SealOfWrath"}; -- Ability_Priest_SpiritOfTheRedeemer
 POWER_INFO[HDH_TRACKER.TYPE.POWER_CHI]				= {power_type="CHI", 			power_index = 12,	color={0, 196/255, 117/255, 1}, texture = "Interface/Icons/INV_Misc_Gem_Pearl_06"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES]	= {power_type="ARCANE_CHARGES",	power_index = 16,	color={2/255, 60/255, 189/255, 1}, texture = "Interface/Icons/Spell_Nature_WispSplode"};
+
+if select(4, GetBuildInfo()) >= 100000 then
+	HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES = 19
+	HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, HDH_COMBO_POINT_TRACKER)
+	POWER_INFO[HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES]	= {power_type="ARCANE_CHARGES",	power_index = 16,	color={2/255, 60/255, 189/255, 1}, texture = "Interface/Icons/Spell_Nature_WispSplode"};
+end
 
 HDH_COMBO_POINT_TRACKER.POWER_INFO = POWER_INFO;
 
@@ -153,7 +158,7 @@ function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 			iconf.spell.key = i
 			iconf.spell.id = 0
 			iconf.spell.happenTime = 0;
-			iconf.spell.no = 1
+			iconf.spell.no = i
 			iconf.spell.name = self.POWER_INFO[self.type].power_type .. i
 			iconf.spell.icon = self.POWER_INFO[self.type].texture
 			iconf.spell.glow = false
@@ -590,7 +595,7 @@ function HDH_COMBO_POINT_TRACKER:OnEvent(event, unit, powerType)
 		if not HDH_TRACKER.ENABLE_MOVE then
 			self.parent:InitIcons()
 		end
-	end	
+	end
 end
 ------------------------------------
 -- HDH_COMBO_POINT_TRACKER class
