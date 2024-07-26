@@ -38,6 +38,8 @@ local DefaultCooldownDB = {
 	}
 };
 
+local IsSpellInRange = IsSpellInRange or C_Spell.IsSpellInRange
+
 ------------------------------------
 -- HDH_C_TRACKER class
 ------------------------------------
@@ -223,7 +225,7 @@ function CT_OnUpdateIcon(self) -- 거리 체크는 onUpdate 에서 처리해야�
 			end
 		end
 	else
-		self.spell.newRange = IsSpellInRange(self.spell.name,"target"); -- 1 true, 0 false, nil not target
+		self.spell.newRange = C_Spell.IsSpellInRange(self.spell.name,"target"); -- 1 true, 0 false, nil not target
 	end
 
 	if self.spell.isCharging then --and self.spell.charges.duration > HDH_C_TRACKER.GlobalCooldown
