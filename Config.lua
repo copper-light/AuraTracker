@@ -1,6 +1,8 @@
 HDH_AT_ConfigFrameMixin = {}
 HDH_AT_ConfigFrameMixin.FRAME = {}
 
+local GetSpellLink = GetSpellLink or C_Spell.GetSpellLink
+
 local L = HDH_AT_L
 local DB = HDH_AT_ConfigDB
 local UTIL = HDH_AT_UTIL
