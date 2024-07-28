@@ -122,7 +122,7 @@ do -- HDH_USED_SKILL_TRACKER class
 		return ret;
 	end
 	
-	function HDH_USED_SKILL_TRACKER:UpdateIcons()
+	function HDH_USED_SKILL_TRACKER:UpdateAllIcons()
 		local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
 		local line = self.option.base.line or 10-- 한줄에 몇개의 아이콘 표시
 		local margin_h = self.option.icon.margin_h
@@ -271,7 +271,7 @@ do -- HDH_USED_SKILL_TRACKER class
 				end
 			end
 		end
-		self:UpdateIcons();
+		self:UpdateAllIcons();
 		
 		
 		if UnitAffectingCombat("player") then 

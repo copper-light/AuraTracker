@@ -334,7 +334,7 @@ function HDH_TRACKER.UpdateSettings(trackerId)
 		local t = HDH_TRACKER.Get(trackerId)
 		if t then
 			t:UpdateSetting()
-			t:UpdateIcons()
+			t:UpdateAllIcons()
 			t:Update()
 			if HDH_TRACKER.ENABLE_MOVE then
 				t:UpdateMoveFrame()
@@ -344,7 +344,7 @@ function HDH_TRACKER.UpdateSettings(trackerId)
 		for k, t in pairs(HDH_TRACKER.GetList()) do
 			if not DB:HasUI(k) then
 				t:UpdateSetting()
-				t:UpdateIcons()
+				t:UpdateAllIcons()
 				t:Update()
 				if HDH_TRACKER.ENABLE_MOVE then
 					t:UpdateMoveFrame()
@@ -1519,7 +1519,7 @@ function HDH_TRACKER:SetMove(move)
 			self.frame.moveFrame:Show()
 			cnt = self:CreateDummySpell(cnt);
 			self:ShowTracker();
-			self:UpdateIcons()
+			self:UpdateAllIcons()
 			self:UpdateMoveFrame()
 		end
 	else

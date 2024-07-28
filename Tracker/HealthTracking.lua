@@ -263,7 +263,7 @@ do -- HDH_HEALTH_TRACKER class
 		end
 	end
 	
-	function HDH_HEALTH_TRACKER:UpdateIcons()  -- HDH_TRACKER override
+	function HDH_HEALTH_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 		local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
 		local f = self.frame.icon[1]
 		if f == nil or f.spell == nil then return end;
@@ -305,7 +305,7 @@ do -- HDH_HEALTH_TRACKER class
 			f.spell.v1 = UnitHealth('player') or 0;
 			f.spell.max = UnitHealthMax('player');
 			f.spell.count = (f.spell.v1/f.spell.max * 100);
-			self:UpdateIcons()
+			self:UpdateAllIcons()
 			if f.spell.v1 < f.spell.max and not UnitIsDead("player") then show = true end
 		end
 		if UI_LOCK or self.option.icon.always_show or UnitAffectingCombat("player") or show then

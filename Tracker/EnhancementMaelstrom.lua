@@ -224,7 +224,7 @@ do
         end
     end
 
-	function HDH_ENH_MAELSTROM_TRACKER:UpdateIcons()  -- HDH_TRACKER override
+	function HDH_ENH_MAELSTROM_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 		local cooldown_type = self.ui.icon.cooldown
 		local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
 		local f = self.frame.icon[1]
@@ -287,7 +287,7 @@ do
 			f.spell.max = self:GetPowerMax()
 			f.spell.count = (f.spell.v1/f.spell.max * 100);
 			
-			if self:UpdateIcons() > 0 then
+			if self:UpdateAllIcons() > 0 then
 				show = true 
 			end
 		end

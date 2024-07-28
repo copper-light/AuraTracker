@@ -247,7 +247,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateArtBar(f) -- HDH_TRACKER override
 	end
 end
 
-function HDH_COMBO_POINT_TRACKER:UpdateIcons()  -- HDH_TRACKER override
+function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 	local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
 	local line = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
 	local reverse_v = self.ui.common.reverse_v -- 상하반전
@@ -504,7 +504,7 @@ function HDH_COMBO_POINT_TRACKER:Update() -- HDH_TRACKER override
 			ret = ret + 1
 		end
 	end
-	self:UpdateIcons();
+	self:UpdateAllIcons();
 
 	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
 			and (UnitAffectingCombat("player") or power > 0 or self.ui.common.always_show) then

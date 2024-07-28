@@ -187,7 +187,7 @@ function HDH_ESSENCE_TRACKER:Update() -- HDH_TRACKER override
 		end
 	end
 
-	self:UpdateIcons();
+	self:UpdateAllIcons();
 
 	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
 			and (UnitAffectingCombat("player") or power < power_max or self.ui.common.always_show) then

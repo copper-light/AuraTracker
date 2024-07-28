@@ -1,4 +1,7 @@
-﻿-- spell tooltip
+﻿
+local GetSpellBookItemInfo = GetSpellBookItemInfo or C_SpellBook.GetSpellBookItemInfo
+
+-- spell tooltip
 local function addLine(tooltip, id)
     local found = false
 	local idText = "ID: |cffffffff" .. id
@@ -66,7 +69,12 @@ end)
 hooksecurefunc(GameTooltip, "SetSpellBookItem", function(self,...)
 	if not HDH_AT_DB.show_tooltip_id then return end
     local idx, t = ...
-    local id = select(2, GetSpellBookItemInfo(idx, t))
+    local id 
+    if select(4, GetBuildInfo()) >= 110000 then --내부전쟁
+        id = GetSpellBookItemInfo(idx, t).spellID
+    else
+        id = select(2, GetSpellBookItemInfo(idx, t))
+    end
 
     if t == "pet" then
         id = bit.band(0xFFFFFF, id)

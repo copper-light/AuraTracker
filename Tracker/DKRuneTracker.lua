@@ -186,7 +186,7 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 			f:Hide()
 		end
 	end
-	self:Update_Layout()
+	self:UpdateLayout()
 end
 
 if select(4, GetBuildInfo()) < 100000 then
@@ -251,14 +251,14 @@ if select(4, GetBuildInfo()) < 100000 then
 	end
 end
 
-function HDH_DK_RUNE_TRACKER:UpdateIcons()
+function HDH_DK_RUNE_TRACKER:UpdateAllIcons()
 	for k,v in pairs(self.frame.icon) do
 		self:UpdateIcon(v)
 	end
-	-- self:Update_Layout()
+	-- self:UpdateLayout()
 end
 
-function HDH_DK_RUNE_TRACKER:Update_Layout()
+function HDH_DK_RUNE_TRACKER:UpdateLayout()
 	if not self.ui or not self.frame.icon then return end
 	local f, spell
 	local ret = 0 -- 쿨이 도는 스킬의 갯수를 체크하는것
@@ -363,7 +363,7 @@ function HDH_DK_RUNE_TRACKER:Update() -- HDH_TRACKER override
 		self:UpdateRune(i)
 		--self:UpdateRuneType(i)
 	end
-	self:UpdateIcons()
+	self:UpdateAllIcons()
 end
 
 function HDH_DK_RUNE_TRACKER:InitIcons()

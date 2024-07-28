@@ -204,7 +204,7 @@ function HDH_STAGGER_TRACKER:Update() -- HDH_TRACKER override
 		f.spell.v1 = UnitStagger('player') or 0;
 		f.spell.max = UnitHealthMax('player');
 		f.spell.count = (f.spell.v1/f.spell.max * 100);
-		self:UpdateIcons()
+		self:UpdateAllIcons()
 		if f.spell.v1 > 0 then show = true end
 	end
 

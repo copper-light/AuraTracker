@@ -154,7 +154,7 @@ do
 			f.spell.endTime = 0
 			f.spell.v1 = nil
 		end
-		self:UpdateIcons()
+		self:UpdateAllIcons()
 		if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
 				and ((f.spell.count > 0) or UnitAffectingCombat("player") or self.ui.common.always_show) then 
 			self:ShowTracker();

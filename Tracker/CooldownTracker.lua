@@ -59,8 +59,8 @@ local function CT_Timer_Func(self)
 	if self and self.arg then
 		local tracker = self.arg:GetParent() and self.arg:GetParent().parent or nil;
 		if tracker then
-			if( tracker:Update_Icon(self.arg)) or (not tracker.ui.common.always_show and not UnitAffectingCombat("player")) then
-				tracker:Update_Layout()
+			if( tracker:UpdateIcon(self.arg)) or (not tracker.ui.common.always_show and not UnitAffectingCombat("player")) then
+				tracker:UpdateLayout()
 			end
 		end
 		self.arg.timer = nil
@@ -191,8 +191,8 @@ local function CT_UpdateCooldown(f, elapsed)
 			tracker:MoveSpark(f.bar);
 		end
 	elseif tracker.type == HDH_TRACKER.TYPE.COOLDOWN then
-		if( tracker:Update_Icon(f)) or (not tracker.ui.common.always_show and not UnitAffectingCombat("player")) then
-			tracker:Update_Layout()
+		if( tracker:UpdateIcon(f)) or (not tracker.ui.common.always_show and not UnitAffectingCombat("player")) then
+			tracker:UpdateLayout()
 		end
 	end
 
@@ -490,37 +490,13 @@ function HDH_C_TRACKER:UpdateAuras(f)
 				spell.duration = spell.innerCooldown
 				spell.innerSpellEndtime = endTime
 			end
-			-- if not StaggerID[id] then -- 시간차가 아니면
-			-- 	spell.v1 = (v1 ~= 0) and v1 or nil
-			-- else -- 시간차
-			-- 	spell.v1 = v2; 
-			-- end
-			
-			-- spell.count = 0
-			-- spell.overlay = 0
-			-- spell.id = id
-			-- spell.dispelType = dispelType
-
-			-- if spell.isUpdate then
-			-- 	spell.overlay = (spell.overlay or 0) + 1
-			-- else
-			-- 	spell.overlay = 1
-			-- end
-			-- if spell.endTime < curTime then 
-			-- 	spell.startTime = curTime
-			-- 	spell.duration = spell.innerCooldown
-			-- end
-			
-			-- spell.index = i; -- 툴팁을 위해, 순서
-			-- ret = ret + 1;
-			-- spell.isUpdate = true
 			break
 		end
 	end
 	return spell.startTime, spell.duration
 end
 
-function HDH_C_TRACKER:Update_Icon(f) -- f == f
+function HDH_C_TRACKER:UpdateIcon(f) -- f == f
 	--if HDH_TRACKER.ENABLE_MOVE  then return false end
 	if not f or not f.spell or not self or not self.ui then return end
 	local ui = self.ui
@@ -587,11 +563,11 @@ function HDH_C_TRACKER:Update_Icon(f) -- f == f
 		f.iconSatCooldown.spark:Hide()
 	end
 	if self.OrderFunc then self:OrderFunc(self) end 
-	self:Update_Layout();
+	self:UpdateLayout();
 	return isUpdate;
 end
 
-function HDH_C_TRACKER:Update_Layout()
+function HDH_C_TRACKER:UpdateLayout()
 	if not self.ui or not self.frame.icon then return end
 	local f, spell
 	local ret = 0 -- 쿨이 도는 스킬의 갯수를 체크하는것
@@ -734,8 +710,8 @@ function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_SHOW(f, id)
 	if f and f.spell and f.spell.id == id then
 		f.spell.ableGlow = true
 		if not f:IsShown() then
-			if self:Update_Icon(f) then
-				self:Update_Layout(f)
+			if self:UpdateIcon(f) then
+				self:UpdateLayout(f)
 			end
 		else
 			self:ActionButton_ShowOverlayGlow(f)
@@ -746,7 +722,7 @@ end
 function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_HIDE(f, id)
 	if f and f.spell and f.spell.id == id then
 		f.spell.ableGlow = false
-		self:Update_Icon(f)
+		self:UpdateIcon(f)
 	end
 end
 
@@ -932,20 +908,20 @@ function HDH_C_TRACKER:UpdateIconSettings(f) -- HDH_TRACKER override
 	super.UpdateIconSettings(self, f)
 end
 
-function HDH_C_TRACKER:UpdateIcons() -- HDH_TRACKER override
+function HDH_C_TRACKER:UpdateAllIcons() -- HDH_TRACKER override
 	local isUpdateLayout = false
 	if not self.frame or not self.frame.icon then return end
 	for i = 1 , #self.frame.icon do
-		isUpdateLayout = self:Update_Icon(self.frame.icon[i]) -- icon frame
+		isUpdateLayout = self:UpdateIcon(self.frame.icon[i]) -- icon frame
 	end
-	if self.OrderFunc then self:OrderFunc(self); self:Update_Layout(); end 
+	if self.OrderFunc then self:OrderFunc(self); self:UpdateLayout(); end 
 
 	return isUpdateLayout
 end
 
 function HDH_C_TRACKER:Update() -- HDH_TRACKER override
 	if not self.ui then return end
-	self:UpdateIcons();
+	self:UpdateAllIcons();
 end
 
 function HDH_C_TRACKER:IsSwitchByHappenTime(icon1, icon2) 
@@ -1153,7 +1129,7 @@ function CT_OnEvent_Frame(self, event, ...)
 				for i = 1, #self.icon do
 					if self.icon[i].spell.isInnerCDItem then
 						tracker:UpdateCombatSpellInfo(self.icon[i], spellID);
-						tracker:Update_Icon(self.icon[i]);
+						tracker:UpdateIcon(self.icon[i]);
 					end
 				end
 			end
@@ -1171,11 +1147,11 @@ function CT_OnEventIcon(self, event, ...)
 		end
 	elseif event == "ACTIONBAR_UPDATE_USABLE" then
 		if not HDH_TRACKER.ENABLE_MOVE then
-			tracker:Update_Icon(self);
+			tracker:UpdateIcon(self);
 		end
 	elseif event == "ACTIONBAR_UPDATE_COOLDOWN" or event =="BAG_UPDATE_COOLDOWN" then
-		if not HDH_TRACKER.ENABLE_MOVE and (tracker:Update_Icon(self) or (not tracker.ui.common.always_show and not UnitAffectingCombat("player"))) then
-			tracker:Update_Layout(self)
+		if not HDH_TRACKER.ENABLE_MOVE and (tracker:UpdateIcon(self) or (not tracker.ui.common.always_show and not UnitAffectingCombat("player"))) then
+			tracker:UpdateLayout(self)
 		end
 	elseif event == "SPELL_ACTIVATION_OVERLAY_GLOW_SHOW" then
 		tracker:ACTIVATION_OVERLAY_GLOW_SHOW(self, ...)

@@ -159,7 +159,7 @@ do
 		return ret;
 	end
 	
-	function HDH_AURA_TRACKER:UpdateIcons()
+	function HDH_AURA_TRACKER:UpdateAllIcons()
 		local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
 		local column_count = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
 		local margin_h = self.ui.common.margin_h
@@ -338,7 +338,7 @@ do
 		self.GetAurasFunc(self)
 
 		if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
-				and ((self:UpdateIcons() > 0) or UnitAffectingCombat("player") or self.ui.common.always_show) then 
+				and ((self:UpdateAllIcons() > 0) or UnitAffectingCombat("player") or self.ui.common.always_show) then 
 			self:ShowTracker();
 		else
 			self:HideTracker();

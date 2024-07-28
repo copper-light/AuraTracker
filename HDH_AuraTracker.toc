@@ -1,5 +1,5 @@
 ﻿## Interface:  110000
-## Title: HDH_AuraTracker
+## Title: AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
 ## Version: 11.0.0.0
