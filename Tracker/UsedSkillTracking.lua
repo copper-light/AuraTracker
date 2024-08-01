@@ -181,11 +181,11 @@ do -- HDH_USED_SKILL_TRACKER class
 				if i % line == 0 then row = row + size + margin_v; col = 0
 								 else col = col + size + margin_h end
 				f:Show()
-				self:SetGlow(f, true)
+				self:UpdateGlow(f, true)
 				ret = ret + 1
 			else
 				f:Hide()
-				self:SetGlow(f, false)
+				self:UpdateGlow(f, false)
 				f.spell.endTime = nil;
 				f.spell.duration = 0;
 				f.spell.duration = 0;
@@ -341,7 +341,7 @@ do -- HDH_USED_SKILL_TRACKER class
 					-- f.icon:SetAlpha(self.option.icon.off_alpha)
 					-- f.border:SetAlpha(self.option.icon.off_alpha)
 					-- self:ChangeCooldownType(f, self.option.base.cooldown)
-					-- self:SetGlow(f, false)
+					-- self:UpdateGlow(f, false)
 					
 					-- spell.startSound = auraList[i].StartSound
 					-- spell.endSound = auraList[i].EndSound

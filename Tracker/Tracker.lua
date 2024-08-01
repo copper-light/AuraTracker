@@ -100,7 +100,7 @@ local function UpdateCooldown(f, elapsed)
 			end
 		end
 		if f.spell.glow == DB.GLOW_CONDITION_TIME then
-			tracker:SetGlow(f, true)
+			tracker:UpdateGlow(f, true)
 		end
 	end
 	-- tracker:CheckCondition(f, spell.remaining);
@@ -521,7 +521,7 @@ function HDH_TRACKER:UpdateSetting()
 	for k, iconf in pairs(self.frame.icon) do
 		self:UpdateIconSettings(iconf)
 		-- if self:IsGlowing(iconf) then
-		-- 	self:SetGlow(iconf, false)
+		-- 	self:UpdateGlow(iconf, false)
 		-- end
 		self:ActionButton_ResizeOverlayGlow(iconf)
 		if not iconf.icon:IsDesaturated() then
@@ -1007,13 +1007,15 @@ function HDH_TRACKER:IsOk(id, name, isItem) -- 특성 스킬의 변경에 따른
 		else
 			return true
 		end
-	end
-	if IsPlayerSpell(id) then return true end
-	local selected = HDH_AT_UTIL.IsTalentSpell(name); -- true / false / nil: not found talent
-	if selected == nil then
-		return true;
-	else
-		return selected;
+	else 
+		-- return IsPlayerSpell(id)
+		if IsPlayerSpell(id) then return true end
+		local selected = HDH_AT_UTIL.IsTalentSpell(id); -- true / false / nil: not found talent
+		if selected == nil then
+			return true;
+		else
+			return selected;
+		end
 	end
 end
 
@@ -1902,7 +1904,7 @@ function HDH_TRACKER:IsIgnoreSpellByTalentSpell(spell_id)
 	return ret;
 end
 
-function HDH_TRACKER:SetGlow(f, bool)
+function HDH_TRACKER:UpdateGlow(f, bool)
 	if f.spell.ableGlow then -- 블리자드 기본 반짝임 효과면 무조건 적용
 		self:ActionButton_ShowOverlayGlow(f) return
 	end

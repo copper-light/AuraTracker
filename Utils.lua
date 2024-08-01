@@ -162,24 +162,52 @@ do
 	end
 
 	function HDH_AT_UTIL.IsTalentSpell(talent_name, spec, isReload)
-		spec = spec or HDH_AT_UTIL.GetSpecialization();
-		if not spec then return nil end
-		if isReload or cashTalentSpell == nil then cashTalentSpell = {} end
-		if cashTalentSpell[spec] == nil or #(cashTalentSpell[spec]) == 0 then
-			cashTalentSpell[spec] = {};
-			for tier = 1, HDH_AT_UTIL.MAX_TALENT_TIERS do
-				for column = 1, HDH_AT_UTIL.NUM_TALENT_COLUMNS do
-					local id, name,_,_,_,_,_,_,_,selected = HDH_AT_UTIL.GetTalentInfoBySpecialization(spec,tier,column)
-					if name then
-						cashTalentSpell[spec][name] = selected
-					else
-						break
+		if select(4, GetBuildInfo()) <= 49999 then -- 대격변
+			spec = spec or HDH_AT_UTIL.GetSpecialization();
+			if not spec then return nil end
+			if isReload or cashTalentSpell == nil then cashTalentSpell = {} end
+			if cashTalentSpell[spec] == nil or #(cashTalentSpell[spec]) == 0 then
+				cashTalentSpell[spec] = {};
+				for tier = 1, HDH_AT_UTIL.MAX_TALENT_TIERS do
+					for column = 1, HDH_AT_UTIL.NUM_TALENT_COLUMNS do
+						local id, name,_,_,_,_,_,_,_,selected = HDH_AT_UTIL.GetTalentInfoBySpecialization(spec,tier,column)
+						if name then
+							cashTalentSpell[spec][name] = selected
+						else
+							-- break
+						end
+					end
+				end
+			end
+			return cashTalentSpell[spec][talent_name] -- nil: not found talent
+		else
+			return HDH_AT_UTIL.IsSpellTalented(talent_name)
+		end
+	end
+
+	function HDH_AT_UTIL.IsSpellTalented(spellID) -- this could be made to be a lot more efficient, if you already know the relevant nodeID and entryID
+		local configID = C_ClassTalents.GetActiveConfigID()
+		if configID == nil then return end
+	
+		local configInfo = C_Traits.GetConfigInfo(configID)
+		if configInfo == nil then return end
+	
+		for _, treeID in ipairs(configInfo.treeIDs) do -- in the context of talent trees, there is only 1 treeID
+			local nodes = C_Traits.GetTreeNodes(treeID)
+			for i, nodeID in ipairs(nodes) do
+				local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+				for _, entryID in ipairs(nodeInfo.entryIDsWithCommittedRanks) do -- there should be 1 or 0
+					local entryInfo = C_Traits.GetEntryInfo(configID, entryID)
+					if entryInfo and entryInfo.definitionID then
+						local definitionInfo = C_Traits.GetDefinitionInfo(entryInfo.definitionID)
+						if definitionInfo.spellID == spellID then
+							return true
+						end
 					end
 				end
 			end
 		end
-		
-		return cashTalentSpell[spec][talent_name] -- nil: not found talent
+		return false
 	end
 
 	function HDH_AT_UTIL.Deepcopy(orig) -- cpy table

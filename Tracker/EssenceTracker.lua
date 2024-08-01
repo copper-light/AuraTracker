@@ -32,7 +32,7 @@ function OnUpdate(self)
 		self:GetParent().parent:Update();
 	end
 	
-	self:GetParent().parent:SetGlow(self, true);
+	self:GetParent().parent:UpdateGlow(self, true);
 	self:GetParent().parent:UpdateBarValue(self);
 	
 	if self.spell.remaining > 0 then

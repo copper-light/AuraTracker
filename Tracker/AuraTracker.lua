@@ -281,7 +281,7 @@ do
 								         else col = col + size_w + margin_h end
 				ret = ret + 1
 				f:Show()
-				self:SetGlow(f, true)
+				self:UpdateGlow(f, true)
 			else
 				f.timetext:SetText(nil);
 				if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then 
@@ -308,7 +308,7 @@ do
 					end
 					f:Show()
 					
-					self:SetGlow(f, f.spell.glow == DB.GLOW_CONDITION_TIME)
+					self:UpdateGlow(f, f.spell.glow == DB.GLOW_CONDITION_TIME)
 				else
 					if f.spell.display == DB.SPELL_HIDE_AS_SPACE and self.ui.common.order_by == DB.ORDERBY_REG then
 						i = i + 1
@@ -405,7 +405,7 @@ do
 				f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 				f.iconSatCooldown:SetDesaturated(nil)
 				self:ChangeCooldownType(f, self.ui.icon.cooldown)
-				self:SetGlow(f, false)
+				self:UpdateGlow(f, false)
 			end
 			self.GetAurasFunc = HDH_AURA_TRACKER.GetAuras
 			for i = #(self.frame.icon) , iconIdx+1, -1  do

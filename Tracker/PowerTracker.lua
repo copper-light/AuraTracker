@@ -63,7 +63,6 @@ end
 
 HDH_POWER_TRACKER.POWER_INFO = POWER_INFO;
 
-
 local function HDH_POWER_OnUpdate(self)
 	self.spell.curTime = GetTime()
 	
@@ -109,7 +108,7 @@ local function HDH_POWER_OnUpdate(self)
 		end
 	end
 	
-	self:GetParent().parent:SetGlow(self, true);
+	self:GetParent().parent:UpdateGlow(self, true);
 	self:GetParent().parent:UpdateBarValue(self);
 end
 
@@ -344,7 +343,6 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 	local nextIsNill = false;
 	bf.max = barMax or self:GetPowerMax()
 	self.max = bf.max;
-	-- print(self.max)
 	-- 무결성 체크
 	for i = 1, #split do
 		if nextIsNill then 
@@ -523,7 +521,7 @@ function HDH_POWER_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 		f.border:SetAlpha(self.ui.icon.on_alpha)
 		f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
 		ret = 1;
-		self:SetGlow(f, true)
+		self:UpdateGlow(f, true)
 		f:Show();
 		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 			self:UpdateBarValue(f);
@@ -536,7 +534,7 @@ function HDH_POWER_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 			f.icon:SetAlpha(self.ui.icon.off_alpha)
 			f.border:SetAlpha(self.ui.icon.off_alpha)
 			f.border:SetVertexColor(0,0,0)
-			self:SetGlow(f, false)
+			self:UpdateGlow(f, false)
 			f:Show();
 		else
 			f:Hide();
@@ -613,7 +611,7 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 			f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 			f.iconSatCooldown:SetDesaturated(nil)
 			self:ChangeCooldownType(f, self.ui.icon.cooldown)
-			self:SetGlow(f, false)
+			self:UpdateGlow(f, false)
 			
 			f:SetScript("OnUpdate", HDH_POWER_OnUpdate);
 			f:Hide();

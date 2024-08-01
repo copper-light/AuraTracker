@@ -83,7 +83,7 @@ local function STAGGER_TRACKER_OnUpdate(self, elapsed)
 	else
 		self:GetParent().parent:UpdateBarValue(self, false);
 	end
-	self:GetParent().parent:SetGlow(self, true);
+	self:GetParent().parent:UpdateGlow(self, true);
 end
 
 function HDH_STAGGER_TRACKER:UpdateBar(f, barMax)
@@ -289,7 +289,7 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 			f.spell = spell
 			f:SetScript("OnUpdate", STAGGER_TRACKER_OnUpdate)
 			f:Hide();
-			self:SetGlow(f, false)
+			self:UpdateGlow(f, false)
 			self:UpdateArtBar(f)
 		end
 	else

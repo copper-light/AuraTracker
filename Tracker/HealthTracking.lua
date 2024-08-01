@@ -51,7 +51,7 @@ do -- HDH_HEALTH_TRACKER class
 			end
 		end
 		
-		self:GetParent().parent:SetGlow(self, true);
+		self:GetParent().parent:UpdateGlow(self, true);
 		
 		if self.bar then
 			-- self.bar.absorb:Show();
@@ -273,7 +273,7 @@ do -- HDH_HEALTH_TRACKER class
 			f.border:SetAlpha(self.option.icon.on_alpha)
 			f.border:SetVertexColor(unpack(self.option.icon.buff_color)) 
 			ret = 1;
-			self:SetGlow(f, true)
+			self:UpdateGlow(f, true)
 			f:Show();
 			if self.option.bar.enable and f.bar then
 				self:UpdateBarValue(f);
@@ -286,7 +286,7 @@ do -- HDH_HEALTH_TRACKER class
 				f.icon:SetAlpha(self.option.icon.off_alpha)
 				f.border:SetAlpha(self.option.icon.off_alpha)
 				f.border:SetVertexColor(0,0,0)
-				self:SetGlow(f, false)
+				self:UpdateGlow(f, false)
 				f:Show();
 			else
 				f:Hide();
@@ -363,7 +363,7 @@ do -- HDH_HEALTH_TRACKER class
 				f.spell = spell
 				f.icon:SetTexture(auraList[i].Texture or "Interface/ICONS/INV_Misc_QuestionMark")
 				self:ChangeCooldownType(f, self.option.base.cooldown)
-				self:SetGlow(f, false)
+				self:UpdateGlow(f, false)
 				
 				spell.startSound = auraList[i].StartSound
 				spell.endSound = auraList[i].EndSound

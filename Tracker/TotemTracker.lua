@@ -121,7 +121,7 @@ do
 					f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 					f.iconSatCooldown:SetDesaturated(nil)
 					self:ChangeCooldownType(f, self.ui.icon.cooldown)
-					self:SetGlow(f, false)
+					self:UpdateGlow(f, false)
 					self.frame.pointer[spell.name] = f;
 				end
 			end

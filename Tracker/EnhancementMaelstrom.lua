@@ -104,7 +104,7 @@ do
 		-- 	end
 		-- end
 
-		self:GetParent().parent:SetGlow(self, true);
+		self:GetParent().parent:UpdateGlow(self, true);
 		self:GetParent().parent:UpdateBarValue(self);
 	end
 
@@ -235,7 +235,7 @@ do
 			f.border:SetAlpha(self.ui.icon.on_alpha)
 			f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
 			ret = 1;
-			self:SetGlow(f, true)
+			self:UpdateGlow(f, true)
 			f:Show();
 			if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 				self:UpdateBarValue(f);
@@ -266,7 +266,7 @@ do
 				f.icon:SetAlpha(self.ui.icon.off_alpha)
 				f.border:SetAlpha(self.ui.icon.off_alpha)
 				f.border:SetVertexColor(0,0,0)
-				self:SetGlow(f, false)
+				self:UpdateGlow(f, false)
 				f:Show();
 				f.cd:Hide();
 			else
@@ -371,7 +371,7 @@ do
 				f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 				f.iconSatCooldown:SetDesaturated(nil)
 				self:ChangeCooldownType(f, self.ui.icon.cooldown)
-				self:SetGlow(f, false)
+				self:UpdateGlow(f, false)
 				self:UpdateArtBar(f)
 				f:SetScript("OnUpdate", HDH_POWER_OnUpdate);
 				f:Hide();

@@ -155,7 +155,7 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 			f.cd:SetMinMaxValues(f.spell.startTime, f.spell.endTime)
 			f.cd:SetValue(f.spell.endTime - (GetTime() - f.spell.startTime))
 		end
-		self:SetGlow(f, false)
+		self:UpdateGlow(f, false)
 		f:Show()
 		if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then
 			self:UpdateBarValue(f, HDH_TRACKER.ENABLE_MOVE)
@@ -180,7 +180,7 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 			f.iconSatCooldown:Hide()
 			f.iconSatCooldown.spark:Hide()
 			f.cd:Hide() 
-			self:SetGlow(f, true)
+			self:UpdateGlow(f, true)
 			f:Show()
 		else
 			f:Hide()
@@ -440,7 +440,7 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 		f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 		f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 
-		self:SetGlow(f, false)
+		self:UpdateGlow(f, false)
 		f:Hide()
 	end
 

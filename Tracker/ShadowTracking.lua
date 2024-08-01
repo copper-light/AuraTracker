@@ -114,7 +114,7 @@ do
 	-- 			if i % line == 0 then row = row + size + margin_v; col = 0
 	-- 							 else col = col + size + margin_h end
 	-- 			ret = ret + 1
-	-- 			self:SetGlow(f, true)
+	-- 			self:UpdateGlow(f, true)
 	-- 			f:Show()
 	-- 		else
 	-- 			if f.spell.always then 
@@ -123,7 +123,7 @@ do
 	-- 												   f.border:SetAlpha(self.option.icon.off_alpha)
 	-- 												   f.border:SetVertexColor(0,0,0) end
 	-- 				f.counttext:SetText(nil)
-	-- 				f.cd:Hide() self:SetGlow(f, false)
+	-- 				f.cd:Hide() self:UpdateGlow(f, false)
 	-- 				--f:ClearAllPoints()
 	-- 				f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', revers_h and -col or col, revers_v and row or -row)
 	-- 				i = i + 1
@@ -287,7 +287,7 @@ do
 			f.icon:SetTexture(texture)
 			f.spell = spell
 			f:Hide();
-			self:SetGlow(f, false)
+			self:UpdateGlow(f, false)
 			self:UpdateArtBar(f)
 			self.frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 			self.frame:SetScript("OnEvent", self.OnEvent)

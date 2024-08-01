@@ -307,7 +307,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 				if f.spell.count < 1 then f.counttext:SetText(nil)
 				else f.counttext:SetText(f.spell.count) end
 				f.cd:Hide()
-				self:SetGlow(f, true)
+				self:UpdateGlow(f, true)
 			else
 				if f.spell.v1 < 1.0 then
 					if f.spell.showValue and f.spell.v1 < 1 then
@@ -390,7 +390,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 					f.iconSatCooldown.spark:Hide()
 					f.border:SetAlpha(self.ui.icon.on_alpha)
 					f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
-					self:SetGlow(f, true)
+					self:UpdateGlow(f, true)
 
 					if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 						f.bar:SetMinMaxValues(0,1);
@@ -429,7 +429,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 					f.border:SetAlpha(self.ui.icon.off_alpha)
 					f.border:SetVertexColor(0,0,0)
 					f.v1:SetText("")
-					self:SetGlow(f, false)
+					self:UpdateGlow(f, false)
 					f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
 					if f.cd:IsShown() then
 						f.cd:Hide()
@@ -560,7 +560,7 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 		f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 
 		f:SetScript("OnUpdate", OnUpdateBar)
-		self:SetGlow(f, false)
+		self:UpdateGlow(f, false)
 		f.spell = spell;
 		f:Hide();
 	end
