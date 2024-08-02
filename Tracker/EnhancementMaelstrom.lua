@@ -417,8 +417,7 @@ function OnEventTracker(self, event, ...)
 			HDH_UNIT_AURA(self.parent)
 		end
 	elseif event =="PLAYER_TARGET_CHANGED" then
-		local t = self.parent
-		t:RunTimer("PLAYER_TARGET_CHANGED", 0.02, HDH_UNIT_AURA, self.parent) 
+		HDH_AT_UTIL.RunTimer(self.parent, "PLAYER_TARGET_CHANGED", 0.02, HDH_UNIT_AURA, self.parent) 
 	elseif event == 'PLAYER_FOCUS_CHANGED' then
 		HDH_UNIT_AURA(self.parent)
 	elseif event == 'INSTANCE_ENCOUNTER_ENGAGE_UNIT' then
@@ -426,9 +425,9 @@ function OnEventTracker(self, event, ...)
 	elseif event == 'GROUP_ROSTER_UPDATE' then
 		HDH_UNIT_AURA(self.parent)
 	elseif event == 'UNIT_PET' then
-		self.parent:RunTimer("UNIT_PET", 0.5, HDH_UNIT_AURA, self.parent) 
+		HDH_AT_UTIL.RunTimer(self.parent, "UNIT_PET", 0.5, HDH_UNIT_AURA, self.parent) 
 	elseif event == 'ARENA_OPPONENT_UPDATE' then
-		self.parent:RunTimer("ARENA_OPPONENT_UPDATE", 0.5, HDH_UNIT_AURA, self.parent) 
+		HDH_AT_UTIL.RunTimer(self.parent, "ARENA_OPPONENT_UPDATE", 0.5, HDH_UNIT_AURA, self.parent) 
 	elseif event == "ENCOUNTER_START" then
 		self.parent.isRaiding = true;
 	elseif event == "ENCOUNTER_END" then

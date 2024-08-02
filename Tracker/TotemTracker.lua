@@ -1,7 +1,24 @@
 ﻿local DB = HDH_AT_ConfigDB
+local L = HDH_AT_L
 HDH_TT_TRACKER = {}
 
-local AdjustName= {}
+HDH_TT_TRACKER.AdjustSpell = {}
+
+HDH_TT_TRACKER.AdjustSpell[L.GREATER_EARTH_ELEMENTAL] = "198103"
+
+HDH_TT_TRACKER.AdjustSpell[L.GREATER_STORM_ELEMENTAL] = "192249"
+HDH_TT_TRACKER.AdjustSpell[L.LESSER_STORM_ELEMENTAL] = "192249"
+
+HDH_TT_TRACKER.AdjustSpell[L.GREATER_FIRE_ELEMENTAL] = "198067"
+HDH_TT_TRACKER.AdjustSpell[L.LESSER_FIRE_ELEMENTAL] = "198067"
+
+HDH_TT_TRACKER.AdjustSpell[L.XUEN] = "123904"
+HDH_TT_TRACKER.AdjustSpell[L.YU_LON] = "322118"
+HDH_TT_TRACKER.AdjustSpell[L.NIUZAO] = "132578"
+HDH_TT_TRACKER.AdjustSpell[L.JADE_SERPENT_STATUE] = "115313"
+
+HDH_TT_TRACKER.AdjustSpell[L.RAISE_DEAD] = "46585"
+
 ------------------------------------
 -- HDH_T_TRACKER class
 ------------------------------------
@@ -34,8 +51,8 @@ do
 						f.no = i;
 						ret = ret +1;
 					else
-						if AdjustName[name] then
-							name = AdjustName[name]
+						if HDH_TT_TRACKER.AdjustSpell[name] then
+							name = HDH_TT_TRACKER.AdjustSpell[name]
 						end
 						f = self.frame.pointer[name];
 					end

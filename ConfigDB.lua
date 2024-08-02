@@ -591,14 +591,13 @@ function HDH_AT_ConfigDB:ClearTracker(trackerId)
 end
 
 function HDH_AT_ConfigDB:CheckTraitsDB()
-	local idx = 1
+    local idx, transitId
     local ids = self:GetTrackerIds()
     for _, id in ipairs(ids) do
         traits = select(7, self:GetTrackerInfo(id))
-        while traits[idx] do
-            if C_Traits.GetConfigInfo(traits[idx]) then
-                idx = idx + 1
-            else
+        for idx=#traits, 1, -1 do
+            transitId = traits[idx]
+            if not C_Traits.GetConfigInfo(transitId) and not HDH_AT_UTIL.GetSpecializationInfoByID(transitId) then
                 table.remove(traits, idx)
             end
         end

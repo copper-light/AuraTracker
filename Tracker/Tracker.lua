@@ -2007,26 +2007,6 @@ function HDH_TRACKER:StartAni(f, ani_type) -- row 이동 실행
 	end
 end
 
-function HDH_TRACKER:RunTimer(timerName, time, func, ...)
-	if not self.timer then self.timer = {} end
-	if self.timer[timerName] then
-		self.timer[timerName]:Cancel()
-	end
-	self.timer[timerName] = C_Timer.NewTimer(time, function(timer) 
-		if timer.parent then 
-			timer.func(timer.args) 
-			timer.parent[timer.timerName] = nil
-			timer.timerName = nil
-			timer.args = nil
-		end 
-	end)
-	self.timer[timerName].tracker = self
-	self.timer[timerName].parent = self.timer
-	self.timer[timerName].timerName = timerName
-	self.timer[timerName].func = func
-	self.timer[timerName].args = ...
-end
-
 ------------------------------------------
 -- end -- TRACKER interface function
 ------------------------------------------
@@ -2238,6 +2218,15 @@ local function VersionUpdateDB()
 	end
 end
 
+local function ACTIVE_TALENT_GROUP_CHANGED()
+	HDH_AT_UTIL.IsTalentSpell(nil,nil,true)
+	HDH_TRACKER.InitVaribles()
+	HDH_TRACKER.Updates()
+	if HDH_AT_ConfigFrame and HDH_AT_ConfigFrame:IsShown() then 
+		HDH_AT_ConfigFrame:UpdateFrame()
+	end
+end
+
 local function PLAYER_ENTERING_WORLD()
 	if not HDH_TRACKER.IsLoaded then 
 		print('|cffffff00Loaded : AuraTracker |cffffffff(Settings: /at, /auratracker, /ㅁㅅ)')
@@ -2282,14 +2271,7 @@ local function OnEvent(self, event, ...)
 	-- end
 	-- print( event, ...)
 	if event =='ACTIVE_TALENT_GROUP_CHANGED' then
-		HDH_AT_UTIL.IsTalentSpell(nil,nil,true)
-		HDH_TRACKER.InitVaribles()
-		HDH_TRACKER.Updates()
-		if HDH_AT_ConfigFrame and HDH_AT_ConfigFrame:IsShown() then 
-			HDH_AT_ConfigFrame:UpdateFrame()
-		end
-		-- HDH_cashTalentSpell = nil
-	
+		HDH_AT_UTIL.RunTimer(self, "ACTIVE_TALENT_GROUP_CHANGED", 1, ACTIVE_TALENT_GROUP_CHANGED)
 	elseif event == 'PLAYER_REGEN_ENABLED' then	
 		if not HDH_TRACKER.ENABLE_MOVE then
 			HDH_TRACKER.Updates()
@@ -2312,11 +2294,7 @@ local function OnEvent(self, event, ...)
 		C_Timer.After(6, function() PLAY_SOUND = true end)
 	elseif event =="GET_ITEM_INFO_RECEIVED" then
 	elseif event == "TRAIT_CONFIG_UPDATED" then
-		HDH_TRACKER.InitVaribles()
-		HDH_TRACKER.Updates()
-		if HDH_AT_ConfigFrame:IsShown() then
-			HDH_AT_ConfigFrame:UpdateFrame()
-		end
+		HDH_AT_UTIL.RunTimer(self, "ACTIVE_TALENT_GROUP_CHANGED", 1, ACTIVE_TALENT_GROUP_CHANGED)
 	elseif event == "TRAIT_CONFIG_DELETED" then
 		DB:CheckTraitsDB()
 		HDH_TRACKER.InitVaribles()

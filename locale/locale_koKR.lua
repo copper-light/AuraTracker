@@ -296,3 +296,17 @@ L.INNER_COOLDOWN_ITEM = "내부 쿨다운"
 L.INNER_COOLDOWN_ITEM_CONFIG =  "내부 쿨다운 설정" 
 L.PLEASE_INPUT_INNTER_TIME = "내부 쿨다운 시간을 입력해주세요"
 L.COOLDOWN_ITEM_DESC = "※ 발동형 아이템의 |cffff0000내부 쿨다운|r을 설정합니다.\n등록된 주문이 발동되면 쿨다운이 시작됩니다."
+
+-- Set exactly the same as the spell name. If different, the totem function will not work
+L.UNKNOWN_TOTEM = "무엇인가"
+L.GREATER_EARTH_ELEMENTAL = "상급 대지의 정령"
+L.GREATER_FIRE_ELEMENTAL = "상급 불의 정령"
+L.LESSER_FIRE_ELEMENTAL = "하급 불의 정령"
+L.GREATER_STORM_ELEMENTAL = "상급 폭풍의 정령"
+L.LESSER_STORM_ELEMENTAL = "하급 폭풍의 정령"
+L.RAISE_DEAD = "되살아난 구울"
+L.XUEN = "쉬엔"
+L.JADE_SERPENT_STATUE = "옥룡 조각상"
+L.YU_LON = "위론"
+L.NIUZAO = "니우짜오"
+------------------------------------------

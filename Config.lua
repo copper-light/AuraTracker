@@ -116,7 +116,7 @@ local function HDH_AT_AddTrackerList(power_type, name)
 end
 
 if MyClass == "MAGE" then 
-	totemName = L.MAGE_TOTEM
+	-- totemName = L.MAGE_TOTEM
 	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
 	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, L.POWER_ARCANE_CHARGES)
 elseif MyClass == "PALADIN" then 
@@ -126,7 +126,7 @@ elseif MyClass == "PALADIN" then
 elseif MyClass == "WARRIOR" then 
 	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE)
 elseif MyClass == "DRUID" then 
-	totemName = L.DRUID_TOTEM
+	-- totemName = L.DRUID_TOTEM
 	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
 	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
 	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_LUNAR, L.POWER_LUNAR)
@@ -1773,7 +1773,6 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 						end	
 						traitList[#traitList+1] = {traitID, STR_TRANSIT_FORMAT:format(traitName or "", talentName or ""), icon, talentID}
 					else
-						
 						DB:ClearTraits(id)
 						unusedTracker = unusedTracker + 1
 					end
@@ -2719,35 +2718,39 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 	end
 	cacheUesdItem = {}
 
-	local haveTotem, name, startTime, duration, icon, id
+	local haveTotem, name, startTime, duration, icon, id, dbName
 	for i =1, MAX_TOTEMS do
 		haveTotem, name, startTime, duration, icon = GetTotemInfo(i)
 		if not haveTotem then break end
-		_, id, _ = HDH_AT_UTIL.GetInfo(name)
-
-		if not id then 
-			if string.len(UTIL.Trim(name) or "") > 0 then
-				id = name
+		if name ~= L.UNKNOWN_TOTEM then 
+			dbName, id, _ = HDH_AT_UTIL.GetInfo(name)
+			if dbName then 
+				name = dbName
 			end
-		end
+			if not id then 
+				if string.len(UTIL.Trim(name) or "") > 0 then
+					id = name
+				end
+			end
 
-		if id then 
-			if f.totemQueue.activeSpell[id] == nil then
-				if f.totemQueue.cache[id] then
-					local size = f.totemQueue:GetSize()
-					for j = 1, size do
-						if f.totemQueue:Get(j)[3] == id then
-							f.totemQueue:Pop(j)
-							break
+			if id then 
+				if f.totemQueue.activeSpell[id] == nil then
+					if f.totemQueue.cache[id] then
+						local size = f.totemQueue:GetSize()
+						for j = 1, size do
+							if f.totemQueue:Get(j)[3] == id then
+								f.totemQueue:Pop(j)
+								break
+							end
 						end
 					end
+					f.totemQueue:Push({icon, name, id, "|cff5555ff"..L.TOTEM.."|r"})
+					f.totemQueue.cache[id] = true
 				end
-				f.totemQueue:Push({icon, name, id, "|cff5555ff"..L.TOTEM.."|r"})
-				f.totemQueue.cache[id] = true
+				f.totemQueue.activeSpell[id] = true
+			else
+				break
 			end
-			f.totemQueue.activeSpell[id] = true
-		else
-			break
 		end
 	end
 
@@ -3399,7 +3402,8 @@ end
 function HDH_AT_ConfigFrameMixin:OnEvent(event, ...)
 	if event == "UNIT_SPELLCAST_SENT" then
 		table.insert(cacheCastSpell, select(4, ...))
-		self:UpdateLatest()
+		UTIL.RunTimer(self, "UPDATE_LATEST", 0.5, HDH_AT_ConfigFrameMixin.UpdateLatest, self)
+		-- self:UpdateLatest()
 	elseif event == "BAG_UPDATE_COOLDOWN" then
 		local info, startTime, duration, enable, itemId
 		for bag = BACKPACK_CONTAINER, NUM_TOTAL_EQUIPPED_BAG_SLOTS or 0 do
@@ -3422,16 +3426,16 @@ function HDH_AT_ConfigFrameMixin:OnEvent(event, ...)
 				end
 			end
 		end
-		self:UpdateLatest()
+		UTIL.RunTimer(self, "UPDATE_LATEST", 0.5, HDH_AT_ConfigFrameMixin.UpdateLatest, self)
 	elseif event == "UNIT_AURA" then
-		self:UpdateLatest()
+		UTIL.RunTimer(self, "UPDATE_LATEST", 0.5, HDH_AT_ConfigFrameMixin.UpdateLatest, self)
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		local _, event, _, srcGUID, srcName, _, _, _, _, _, _, spellID, spellName =  CombatLogGetCurrentEventInfo()
 		if srcGUID == UnitGUID('player') then
 			if event == "SPELL_DAMAGE" or event == "SPELL_HEAL" or event == "SPELL_CAST_SUCCESS" or event == "SPELL_SUMMON" or event == "SPELL_CREATE" then -- event == "SPELL_AURA_APPLIED" or 
 				name, _, icon = HDH_AT_UTIL.GetInfo(spellID, false)
 				table.insert(cacheCastSpell, spellID)
-				self:UpdateLatest()
+				UTIL.RunTimer(self, "UPDATE_LATEST", 0.5, HDH_AT_ConfigFrameMixin.UpdateLatest, self)
 			end
 		end
 	end

@@ -123,6 +123,9 @@ do
 
 	function HDH_AT_UTIL.GetInfo(value, isItem)
 		if not value then return nil end
+		if HDH_TT_TRACKER.AdjustSpell[value] then
+			value = HDH_TT_TRACKER.AdjustSpell[value]
+		end
 		if not isItem and HDH_AT_UTIL.GetCacheSpellInfo(value) then
 			local name, rank, icon, castingTime, minRange, maxRange, spellID = HDH_AT_UTIL.GetCacheSpellInfo(value) 
 			return name, spellID, icon
@@ -384,6 +387,26 @@ do
 		-- end
 
 		return x, y
+	end
+
+	function HDH_AT_UTIL.RunTimer(obj, timerName, time, func, ...)
+		if not obj.timer then obj.timer = {} end
+		if obj.timer[timerName] then
+			obj.timer[timerName]:Cancel()
+		end
+		obj.timer[timerName] = C_Timer.NewTimer(time, function(timer) 
+			if timer.parent then 
+				timer.func(timer.args) 
+				timer.parent[timer.timerName] = nil
+				timer.timerName = nil
+				timer.args = nil
+			end 
+		end)
+		obj.timer[timerName].tracker = obj
+		obj.timer[timerName].parent = obj.timer
+		obj.timer[timerName].timerName = timerName
+		obj.timer[timerName].func = func
+		obj.timer[timerName].args = ...
 	end
 
 	local Queue = {first = 0, last = -1, size = 0, capacity = 0}

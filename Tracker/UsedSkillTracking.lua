@@ -279,7 +279,7 @@ do -- HDH_USED_SKILL_TRACKER class
 		else
 			if self.option.icon.always_show and self.IsRecentUsedSkill then
 				show = true;
-				self:RunTimer(self.name, HDH_USED_SKILL_TRACKER.TIMER_DELAY, function() self.IsRecentUsedSkill = false; self:Update() end)
+				HDH_AT_UTIL.RunTimer(self, self.name, HDH_USED_SKILL_TRACKER.TIMER_DELAY, function() self.IsRecentUsedSkill = false; self:Update() end)
 			else
 				show = false;
 			end
