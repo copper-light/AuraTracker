@@ -232,100 +232,6 @@ function HDH_AT_OnClickRowFrame(self)
     
 end
 
--- function HDH_OnEnterPressed(self)
--- 	local index = GetTrackerIndex()
--- 	local db = HDH_AT_OP_GetTrackerInfo(index)
--- 	local name = db.name
--- 	local str = HDH_AT_UTIL.Trim(self:GetText()) or ""
--- 	self:SetText(str)
--- 	if tonumber(self:GetText()) and string.len(self:GetText()) > 7 then 
--- 		HDH_OP_AlertDlgShow(self:GetText().." 은(는) 알 수 없는 주문입니다.")
--- 		return
--- 	end
--- 	if string.len(self:GetText()) > 0 then
--- 		local ret = HDH_AddRow(self:GetParent()) -- 성공 하면 no 리턴
--- 		if ret then 
--- 			-- add 에 성공 했을 경우 다음 add 를 위해 가장 아래 공백 row 를 생성해야한다
--- 			local listFrame = self:GetParent():GetParent()
--- 			if ret == #(db.spell_list) then
--- 				local rowFrame = HDH_GetRowFrame(listFrame, ret+1, FLAG_ROW_CREATE)
--- 				HDH_ClearRowData(rowFrame)
--- 				rowFrame:Show() 
--- 			end
--- 			local t = HDH_AT_OP_GetTracker(index)
--- 			if t then t:InitIcons() end
--- 		else
--- 			self:SetText("") 
--- 		end
--- 	else
--- 		HDH_OP_AlertDlgShow("주문 ID/이름을 입력해주세요.")
--- 	end
--- end
-
--- function HDH_OnClickBtnAddAndDel(self, row)
--- 	local edBox= _G[self:GetParent():GetName().."EditBoxID"]
--- 	if self:GetText() == "등록" or self:GetText() == "수정" then
--- 		HDH_OnEnterPressed(edBox)
--- 	else
--- 		local text = _G[self:GetParent():GetName().."TextName"]:GetText()
--- 		if text then
--- 			HDH_DelRow(self:GetParent())
--- 		end
--- 	end
--- end
-
--- function HDH_OnClickBtnUp(self, row)
--- 	local name = HDH_AT_OP_GetTrackerInfo(GetTrackerIndex())
--- 	local aura = DB_AURA.Talent[HDH_GetSpec(name)][name]
--- 	row = tonumber(row)
--- 	if aura[row] and aura[row-1] then
--- 		local tmp_no = aura[row].No
--- 		aura[row].No = aura[row-1].No
--- 		aura[row-1].No = tmp_no
--- 		local tmp = aura[row]
--- 		aura[row] = aura[row-1]
--- 		aura[row-1] = tmp
--- 		--HDH_LoadAuraListFrame(CurUnit, row-1, row)
-		
--- 		local f1 = HDH_GetRowFrame(ListFrame, row)
--- 		local f2 = HDH_GetRowFrame(ListFrame, row-1)
--- 		CrateAni(f1)
--- 		CrateAni(f2)
--- 		f2.ani.func = HDH_LoadAuraListFrame
--- 		f2.ani.args = {GetTrackerIndex(), row-1, row}
--- 		StartAni(f1, ANI_MOVE_UP)
--- 		StartAni(f2 , ANI_MOVE_DOWN)
--- 	end
--- 	local t = HDH_AT_OP_GetTracker(GetTrackerIndex())
--- 	if t then t:InitIcons() end
--- end
-
--- function HDH_OnClickBtnDown(self, row)
--- 	row = tonumber(row)
--- 	local name = HDH_AT_OP_GetTrackerInfo(GetTrackerIndex())
--- 	local aura = DB_AURA.Talent[HDH_GetSpec(name)][name]
--- 	if aura[row] and aura[row+1] then
--- 		local tmp_no = aura[row].No
--- 		aura[row].No = aura[row+1].No
--- 		aura[row+1].No = tmp_no
--- 		local tmp = aura[row]
--- 		aura[row]= aura[row+1]
--- 		aura[row+1] = tmp
-		
--- 		local f1 = HDH_GetRowFrame(ListFrame, row)
--- 		local f2 = HDH_GetRowFrame(ListFrame, row+1)
--- 		CrateAni(f1)
--- 		CrateAni(f2)
--- 		f2.ani.func = HDH_LoadAuraListFrame
--- 		f2.ani.args = {GetTrackerIndex(), row, row+1}
--- 		StartAni(f1, ANI_MOVE_DOWN)
--- 		StartAni(f2 , ANI_MOVE_UP)
--- 		--HDH_LoadAuraListFrame(CurUnit, row, row+1)
--- 	end
--- 	local t = HDH_AT_OP_GetTracker(GetTrackerIndex())
--- 	if t then t:InitIcons() end
--- end
-
 -------------------------------------------------------------
 -- DropDown 
 -------------------------------------------------------------
@@ -551,6 +457,10 @@ function HDH_AT_DropDownMixin:GetItem()
     return self.item
 end
 
+function HDH_AT_DropDownMixin:SetHookOnClick(func)
+    self.hookOnClickFunc = func
+end
+
 function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler, template, multiSelector, always_show_list)
     local multiSelector = multiSelector or false
     local listFrame = _G[frame:GetName().."List"]
@@ -705,6 +615,15 @@ function HDH_AT_DropDown_OnLoad(self)
     -- font:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0,0)
 end
 
+function HDH_AT_DropDown_OnClick(self)
+    if self.hookOnClickFunc then
+        self.hookOnClickFunc(self)
+    end
+    if not self.always_show_list then
+        local list = _G[self:GetName().."List"]
+        list:SetShown(not list:IsShown())
+    end
+end
 
 function HDH_AT_DropDown_OnLeave(self)
     if not self.always_show_list and not _G[self:GetName().."List"]:IsMouseOver() then

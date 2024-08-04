@@ -1428,12 +1428,7 @@
 		<Scripts>
 			<OnLoad function="HDH_AT_DropDown_OnLoad" />
             <OnLeave function="HDH_AT_DropDown_OnLeave" />
-            <OnClick>
-                if not self.always_show_list then
-					local list= _G[self:GetName().."List"]
-                	list:SetShown(not list:IsShown())
-				end
-            </OnClick>
+            <OnClick function="HDH_AT_DropDown_OnClick" />
 		</Scripts>
         <!-- <ButtonText name="$parentText"/> -->
         <NormalFont style="Font_Yellow_S" />

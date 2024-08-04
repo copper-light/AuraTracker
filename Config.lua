@@ -1,5 +1,7 @@
 HDH_AT_ConfigFrameMixin = {}
-HDH_AT_ConfigFrameMixin.FRAME = {}
+HDH_AT_ConfigFrameMixin.F = {}
+HDH_AT_ConfigFrameMixin.cacheCastSpell = {}
+HDH_AT_ConfigFrameMixin.cacheUesdItem = {}
 
 local GetSpellLink = GetSpellLink or C_Spell.GetSpellLink
 
@@ -30,7 +32,7 @@ local FRAME_WIDTH = 404
 local FRAME_MAX_H = 1000
 local FRAME_MIN_H = 260
 
-local STR_TRANSIT_FORMAT = "|cffffc800%s\r\n|cffaaaaaa%s"
+local STR_TRAIT_FORMAT = "|cffffc800%s\r\n|cffaaaaaa%s"
 local STR_TRACKER_FORMAT = "%s%s"
 
 local MAX_TALENT_TABS = 4
@@ -51,7 +53,6 @@ local ANI_MOVE_DOWN = 0
 
 local DDM_TRACKER_ALL = 0
 local DDM_TRACKER_UNUSED = -1
-
 
 local EQUIPMENT_SLOT = {
 	"AMMOSLOT",
@@ -1002,7 +1003,7 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 	local main = GetMainFrame()
 	local F = GetMainFrame().F
 
-	if self == F.DD_TRANSIT then
+	if self == F.DD_TRAIT then
 		main:LoadTrackerList(value)
 		main:ChangeBody(nil, 1)
 
@@ -1058,7 +1059,7 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 			HDH_TRACKER.SetMoveAll(true)
 		end
 
-	elseif self == F.DD_TRACKER_TRANSIT then
+	elseif self == F.DD_TRACKER_TRAIT then
 		main:UpdateTraitsSelector(idx)
 
 	elseif self == F.DD_TRACKER_TYPE then
@@ -1130,7 +1131,7 @@ function HDH_AT_OnClick_Button(self, button)
 		local name = F.ED_TRACKER_NAME:GetText()
 		local type = F.DD_TRACKER_TYPE:GetSelectedValue()
 		local unit = F.DD_TRACKER_UNIT:GetSelectedValue()
-		local traitList = F.DD_TRACKER_TRANSIT:GetSelectedValue()
+		local traitList = F.DD_TRACKER_TRAIT:GetSelectedValue()
 		local caster = F.DD_TRACKER_AURA_CASTER:GetSelectedValue()
 		local filter = F.DD_TRACKER_AURA_FILTER:GetSelectedValue()
 		local trackerObj
@@ -1188,9 +1189,9 @@ function HDH_AT_OnClick_Button(self, button)
 		if not index then
 			main:LoadTrackerList()
 			index = main:GetTrackerIndex(id)
-			F.DD_TRANSIT:SetSelectedIndex(1)
+			F.DD_TRAIT:SetSelectedIndex(1)
 		else
-			F.DD_TRANSIT:SetSelectedValue(curTraits)
+			F.DD_TRAIT:SetSelectedValue(curTraits)
 		end
 		main:ChangeBody(BODY_ELEMENTS, index)
 
@@ -1687,7 +1688,7 @@ function HDH_AT_ConfigFrameMixin:GetTalentList(bigImage)
 end
 
 function HDH_AT_ConfigFrameMixin:GetCurTraits()
-	return self.F.DD_TRANSIT:GetSelectedValue()
+	return self.F.DD_TRAIT:GetSelectedValue()
 end
 
 function HDH_AT_ConfigFrameMixin:GetCurTrackerId()
@@ -1738,7 +1739,7 @@ function HDH_AT_ConfigFrameMixin:AddTrackerElement(elem, trackerId, elemIdx)
 end
 
 function HDH_AT_ConfigFrameMixin:LoadTraits()
-	local ddm = self.F.DD_TRACKER_TRANSIT
+	local ddm = self.F.DD_TRACKER_TRAIT
 	local itemValues = {}
 	local itemTemplates = {}
 	local id, name, icon
@@ -1771,7 +1772,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 						if useAtlas and texture then
 							icon = SPEC_TEXTURE_FORMAT:format(texture)
 						end	
-						traitList[#traitList+1] = {traitID, STR_TRANSIT_FORMAT:format(traitName or "", talentName or ""), icon, talentID}
+						traitList[#traitList+1] = {traitID, STR_TRAIT_FORMAT:format(traitName or "", talentName or ""), icon, talentID}
 					else
 						DB:ClearTraits(id)
 						unusedTracker = unusedTracker + 1
@@ -1788,8 +1789,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 		self.Dialog:AlertShow(L.ALERT_UNUSED_LIST:format(unusedTracker))
 	end
 
-	F.DD_TRANSIT:UseAtlasSize(useAtlas)
-
+	F.DD_TRAIT:UseAtlasSize(useAtlas)
 	table.sort(traitList, function(a, b) 
 		if (a[4] < b[4]) then
 			return true
@@ -1800,7 +1800,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 		end
 	end)
 
-	HDH_AT_DropDown_Init(F.DD_TRANSIT, traitList, HDH_AT_OnSelected_Dropdown , nil, "HDH_AT_DropDownTrackerItemTemplate") --	HDH_AT_DropDownTrackerItemTemplate")
+	HDH_AT_DropDown_Init(F.DD_TRAIT, traitList, HDH_AT_OnSelected_Dropdown , nil, "HDH_AT_DropDownTrackerItemTemplate") --	HDH_AT_DropDownTrackerItemTemplate")
 
 	for _, item in ipairs(self:GetTalentList(useAtlas)) do
 		id, name, icon = unpack(item)
@@ -1818,7 +1818,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 end
 
 function HDH_AT_ConfigFrameMixin:UpdateTraitsSelector(idx)
-	local ddm = self.F.DD_TRACKER_TRANSIT
+	local ddm = self.F.DD_TRACKER_TRAIT
 	local isAlwaysChecked
 	local startIndex = 1
 	local endIndex = #ddm.item
@@ -2247,7 +2247,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerConfig(value)
 			end
 
 			F.DD_TRACKER_TYPE:SetSelectedValue(type)
-			F.DD_TRACKER_TRANSIT:SetSelectedValue(trait)
+			F.DD_TRACKER_TRAIT:SetSelectedValue(trait)
 			F.BODY.CONFIG_TRACKER.BTN_DELETE:Enable()
 			F.BODY.CONFIG_TRACKER.BTN_CANCEL:Enable()
 			F.BODY.CONFIG_TRACKER.BTN_COPY:Enable()
@@ -2269,7 +2269,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerConfig(value)
 		F.DD_TRACKER_UNIT:SelectClear()
 		F.DD_TRACKER_AURA_CASTER:SelectClear()
 		F.DD_TRACKER_AURA_FILTER:SelectClear()
-		F.DD_TRACKER_TRANSIT:SelectClear()
+		F.DD_TRACKER_TRAIT:SelectClear()
 
 		F.DD_TRACKER_AURA_CASTER:Enable()
 		F.DD_TRACKER_AURA_FILTER:Enable()
@@ -2306,48 +2306,6 @@ function HDH_AT_ConfigFrameMixin:GetTrackerData(id)
 
 	return trackerData
 end
-
--- function HDH_AT_ConfigFrameMixin:ChangeTrackerTabByTrackerId(id)
--- 	local parent = self.F.TRACKER
--- 	local selectIdx
--- 	parent.list = parent.list or {}
-
--- 	for idx, tab in pairs(parent.list) do
--- 		if tab.id and (tab.id == id) then
--- 			selectIdx = idx 
--- 			break
--- 		end
--- 	end
-
--- 	-- 현재 트래커 리스트에 있는거면 해당탭으로 이동
--- 	if selectIdx then
--- 		self:SetCurTrackerIdx(selectIdx)
--- 	else
--- 		self.F.DD_TRANSIT:SetSelectedValue(1)
--- 		self:LoadTrackerList()
--- 		self:ChangeTrackerTabByTrackerId(id)
--- 		-- self:LoadTrackerList(traitId)
--- 		-- local traitList = select(7, DB:GetTrackerInfo(id))
--- 		-- local curTalent = select(1, GetSpecializationInfo(GetSpecialization()))
--- 		-- local traitId
--- 		-- if #traitList > 0 then
--- 		-- 	for _, t in ipairs(traitList) do
--- 		-- 		if curTalent == GetTalentIdByTraits(t) then
--- 		-- 			traitId = t
--- 		-- 			break
--- 		-- 		end
--- 		-- 	end
--- 		-- 	if not traitId then
--- 		-- 		traitId = traitList[1]
--- 		-- 	end
--- 		-- 	self.F.DD_TRANSIT:SetSelectedValue(traitId)
--- 		-- 	self:LoadTrackerList(traitId)
--- 		-- 	self:ChangeTrackerTabByTrackerId(id)
--- 		-- else
--- 		-- 	-- self:SetCurTrackerIdx(0)
--- 		-- end
--- 	end
--- end
 
 function HDH_AT_ConfigFrameMixin:GetTrackerIndex(value)
 	local list = self.F.TRACKER.list
@@ -2507,30 +2465,13 @@ function HDH_AT_ConfigFrameMixin:LoadUIConfig(tackerId)
 	end
 end
 
-
-local activeSpell = {}
-local queueCache = {}
-local moveFrame
-
-local function OnUpdate_LatestSpellItem(self)
-	-- if not moveFrame then
-	-- 	moveFrame = CreateFrame("Frame", "nil"..idx, f, "HDH_AT_LatestSpellItemTemplate")
-	-- 	moveFrame:SetSize(self:GetSize())
-	-- end
-
-	-- moveFrame.Icon:SetTexture(self.Icon:GetTexture())
-	-- moveFrame.Name:SetText(self.Name:GetText())
-	-- moveFrame.ID:SetText(self.ID:GetText())
-	-- moveFrame.Type:SetText(self.Type:GetText())
-end
-
 local function OnMouseDown_LatestSpellItem(self)
 	local main = GetMainFrame()
 	main.draggingLatestSpell = true
 	self:SetActive(true)
 	self:SetMovable(true)
 	self:StartMoving()
-	self:SetScript("OnUpdate", OnUpdate_LatestSpellItem)
+	-- self:SetScript("OnUpdate", OnUpdate_LatestSpellItem)
 	self:SetParent(UIParent)
 	self:SetFrameStrata("DIALOG")
 	GameTooltip:Hide()
@@ -2599,8 +2540,6 @@ function HDH_AT_OnHide_LatestSpell(self)
 	end
 end
 
-local cacheCastSpell = {}
-local cacheUesdItem = {}
 function HDH_AT_ConfigFrameMixin:UpdateLatest()
 	if self.draggingLatestSpell then return end
 	local f = self.F.LATEST_SPELL
@@ -2620,14 +2559,13 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 	f.totemQueue = f.totemQueue or UTIL.CreateQueue(50)
 	f.totemQueue.cache = f.totemQueue.cache or {}
 	f.totemQueue.activeSpell = f.totemQueue.activeSpell or {}
+
 	local item
 	local height = 25
 	local list = f.list
 	local trackerId = self:GetCurTrackerId()
 	local tracker = HDH_TRACKER.Get(trackerId)
 	local className = (tracker and tracker:GetClassName()) or nil
-
-
 	local name, icon, count, dispelType, duration, endTime, source, id, canApplyAura, isBossDebuff, castByPlayer 
 	local unitList = {"player", "target", "focus", "pet"}
 	local filterList= {"HELPFUL","HARMFUL"}
@@ -2679,7 +2617,7 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 	end
 
 	local name, id, icon, isItem
-	for _, id in pairs(cacheCastSpell) do
+	for _, id in pairs(self.cacheCastSpell) do
 		name, _, icon = HDH_AT_UTIL.GetInfo(id)
 		if f.skillQueue.activeSpell[id] == nil then
 			if f.skillQueue.cache[id] then
@@ -2696,9 +2634,9 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 		end
 		f.skillQueue.activeSpell[id] = true
 	end
-	cacheCastSpell = {}
+	self.cacheCastSpell = {}
 
-	for _, id in pairs(cacheUesdItem) do
+	for _, id in pairs(self.cacheUesdItem) do
 		isItem = not tracker:IsOk(id)
 		name, _, icon = HDH_AT_UTIL.GetInfo(id, true)
 		if f.skillQueue.activeSpell[id] == nil then
@@ -2716,7 +2654,7 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 		end
 		f.skillQueue.activeSpell[id] = true
 	end
-	cacheUesdItem = {}
+	self.cacheUesdItem = {}
 
 	local haveTotem, name, startTime, duration, icon, id, dbName
 	for i =1, MAX_TOTEMS do
@@ -2898,7 +2836,7 @@ end
 
 function HDH_AT_ConfigFrameMixin:UpdateFrame()
 	local F = self.F
-	local ddm = F.DD_TRANSIT
+	local ddm = F.DD_TRAIT
 	local talentID = select(1, HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))
 	local traitID = talentID and HDH_AT_UTIL.GetLastSelectedSavedConfigID(talentID)
 	local traitName = traitID and UTIL.GetTraitsName(traitID)
@@ -2960,23 +2898,27 @@ local function DBSync(comp, comp_type, key)
 end
 
 function HDH_AT_ConfigFrameMixin:InitFrame()
-    self.F = {}
-	local F = self.F
+	local F = HDH_AT_ConfigFrameMixin.F
 	local UI = UI_COMP_LIST
 	local comp
 
 	self.F.BTN_SHOW_MODIFY_TRACKER = _G[self:GetName().."DropDownTrackerBtnModifyTracker"]
-	
-	-- self.F.DD_TRANSIT = _G[self:GetName().."DropDownTalent"]
-	self.F.DD_TRANSIT = _G[self:GetName().."DropDownTraits"]
-	-- self.F.DROPDOWN_TRACKER = _G[self:GetName().."DropDownTracker"]
+	self.F.DD_TRAIT = _G[self:GetName().."DropDownTraits"]
+
+	self.F.DD_TRAIT:SetHookOnClick(function (self)
+		HDH_AT_ConfigFrameMixin.F.TRACKER:Hide()
+	end)
+
+	local list = _G[self.F.DD_TRAIT:GetName().."List"]
+	list:SetScript("OnHide", function() 
+		HDH_AT_ConfigFrameMixin.F.TRACKER:Show()
+	end)
 
 	self.F.TRACKER = _G[self:GetName().."TrackerSFContents"]
 	self.F.BTN_SHOW_ADD_TRACKER_CONFIG = _G[self.F.TRACKER:GetName().."BtnAddTracker"]
 	self.F.BTN_SHOW_ADD_TRACKER_CONFIG:SetScript("OnClick", HDH_AT_OnClick_TrackerTapButton)
-	
-	self.F.BODY = _G[self:GetName().."Body"]
 
+	self.F.BODY = _G[self:GetName().."Body"]
 	self.F.BODY.CONFIG_DETAIL = _G[self:GetName().."BodyDetailConfig"]
 	self.F.BODY.CONFIG_DETAIL.ICON = _G[self:GetName().."BodyDetailConfigTopIcon"]
 	self.F.BODY.CONFIG_DETAIL.TEXT = _G[self:GetName().."BodyDetailConfigTopText"]
@@ -3135,13 +3077,13 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.F.BODY.CONFIG_TRACKER = _G[self.F.BODY:GetName().."Tracker"]
 	self.F.BODY.CONFIG_TRACKER.TITLE = _G[self.F.BODY:GetName().."TrackerTopText"]
 	self.F.BODY.CONFIG_TRACKER.CONTENTS = _G[self.F.BODY:GetName().."TrackerConfigSFContents"]
-	self.F.BODY.CONFIG_TRACKER.TRANSIT = _G[self.F.BODY:GetName().."TrackerTraitsSFContents"]
+	self.F.BODY.CONFIG_TRACKER.TRAIT = _G[self.F.BODY:GetName().."TrackerTraitsSFContents"]
 	self.F.BODY.CONFIG_TRACKER.BTN_SAVE = _G[self.F.BODY:GetName().."TrackerBottomBtnSaveTracker"]
 	self.F.BODY.CONFIG_TRACKER.BTN_DELETE = _G[self.F.BODY:GetName().."TrackerBottomBtnDelete"]
 	self.F.BODY.CONFIG_TRACKER.BTN_CANCEL = _G[self.F.BODY:GetName().."TrackerBottomBtnCancel"]
 	self.F.BODY.CONFIG_TRACKER.BTN_COPY = _G[self.F.BODY:GetName().."TrackerBottomBtnCopy"]
 
-	self.F.DD_TRACKER_TRANSIT = _G[self.F.BODY.CONFIG_TRACKER.TRANSIT:GetName().."Traits"]
+	self.F.DD_TRACKER_TRAIT = _G[self.F.BODY.CONFIG_TRACKER.TRAIT:GetName().."Traits"]
 
 	self.F.BODY.CONFIG_TRACKER_ELEMENTS = _G[self.F.BODY:GetName().."TrackerElements"]
 	self.F.BODY.CONFIG_TRACKER_ELEMENTS.CONTENTS = _G[self.F.BODY:GetName().."TrackerElementsSFContents"]
@@ -3193,7 +3135,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	F.DD_TRACKER_UNIT = HDH_AT_CreateOptionComponent(F.BODY.CONFIG_TRACKER.CONTENTS, 	  COMP_TYPE.DROPDOWN, 	  L.TRACKER_UNIT)
 	F.DD_TRACKER_AURA_FILTER = HDH_AT_CreateOptionComponent(F.BODY.CONFIG_TRACKER.CONTENTS, COMP_TYPE.DROPDOWN, 	  L.AURA_FILTER_TYPE)
 	F.DD_TRACKER_AURA_CASTER = HDH_AT_CreateOptionComponent(F.BODY.CONFIG_TRACKER.CONTENTS, COMP_TYPE.DROPDOWN, 	  L.AURA_CASTER_TYPE)
-	-- F.DD_TRACKER_TRANSIT = HDH_AT_CreateOptionComponent(F.BODY.CONFIG_TRACKER.CONTENTS,   COMP_TYPE.DROPDOWN, 	  L.USE_TRAIT)
+	-- F.DD_TRACKER_TRAIT = HDH_AT_CreateOptionComponent(F.BODY.CONFIG_TRACKER.CONTENTS,   COMP_TYPE.DROPDOWN, 	  L.USE_TRAIT)
 
 	F.BTN_PREV_NEXT = HDH_AT_CreateOptionComponent(F.BODY.CONFIG_TRACKER.CONTENTS, COMP_TYPE.PREV_NEXT_BUTTON, 	  L.DISPLAY_LEVEL)
 	F.BTN_PREV_NEXT.BtnPrev:SetScript("OnClick", HDH_AT_OnClick_Button)
@@ -3401,7 +3343,7 @@ end
 
 function HDH_AT_ConfigFrameMixin:OnEvent(event, ...)
 	if event == "UNIT_SPELLCAST_SENT" then
-		table.insert(cacheCastSpell, select(4, ...))
+		table.insert(self.cacheCastSpell, select(4, ...))
 		UTIL.RunTimer(self, "UPDATE_LATEST", 0.5, HDH_AT_ConfigFrameMixin.UpdateLatest, self)
 		-- self:UpdateLatest()
 	elseif event == "BAG_UPDATE_COOLDOWN" then
@@ -3412,7 +3354,7 @@ function HDH_AT_ConfigFrameMixin:OnEvent(event, ...)
 				if info then
 					startTime, duration = C_Container.GetItemCooldown(info.itemID)
 					if duration > 1.5 and (GetTime() - startTime) < 1 then
-						table.insert(cacheUesdItem, info.itemID)
+						table.insert(self.cacheUesdItem, info.itemID)
 					end
 				end
 			end
@@ -3422,7 +3364,7 @@ function HDH_AT_ConfigFrameMixin:OnEvent(event, ...)
 			if enable then
 				itemId, _ = GetInventoryItemID("player", index)
 				if duration > 1.5 and (GetTime() - startTime) < 1 then
-					table.insert(cacheUesdItem, itemId)
+					table.insert(self.cacheUesdItem, itemId)
 				end
 			end
 		end
@@ -3434,7 +3376,7 @@ function HDH_AT_ConfigFrameMixin:OnEvent(event, ...)
 		if srcGUID == UnitGUID('player') then
 			if event == "SPELL_DAMAGE" or event == "SPELL_HEAL" or event == "SPELL_CAST_SUCCESS" or event == "SPELL_SUMMON" or event == "SPELL_CREATE" then -- event == "SPELL_AURA_APPLIED" or 
 				name, _, icon = HDH_AT_UTIL.GetInfo(spellID, false)
-				table.insert(cacheCastSpell, spellID)
+				table.insert(self.cacheCastSpell, spellID)
 				UTIL.RunTimer(self, "UPDATE_LATEST", 0.5, HDH_AT_ConfigFrameMixin.UpdateLatest, self)
 			end
 		end
