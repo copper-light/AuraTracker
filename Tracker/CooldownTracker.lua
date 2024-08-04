@@ -370,7 +370,7 @@ function HDH_C_TRACKER:UpdateIcon(f)
 			if HDH_TRACKER.startTime < f.spell.startTime or (spell.duration == 0) then
 				f.cd:SetCooldown(spell.startTime, spell.duration or 0); 
 			else
-				f.cd:SetCooldown(HDH_TRACKER.startTime, f.spell.duration - (f.spell.startTime - HDH_TRACKER.startTime));
+				f.cd:SetCooldown(HDH_TRACKER.startTime, f.spell.duration - (HDH_TRACKER.startTime-f.spell.startTime));
 			end	
 		else 
 			f.cd:SetMinMaxValues(spell.startTime, spell.endTime); f.cd:SetValue(spell.remaining + spell.startTime);
@@ -461,7 +461,7 @@ function HDH_C_TRACKER:UpdateIcon(f)
 			if HDH_TRACKER.startTime < spell.startTime or (spell.duration == 0) then
 				f.cd:SetCooldown(spell.startTime, spell.duration); 
 			else
-				f.cd:SetCooldown(HDH_TRACKER.startTime, spell.duration - (spell.startTime - HDH_TRACKER.startTime));
+				f.cd:SetCooldown(HDH_TRACKER.startTime, spell.duration - (HDH_TRACKER.startTime-spell.startTime));
 			end	
 		else 
 			if  not f.iconSatCooldown:IsShown() then

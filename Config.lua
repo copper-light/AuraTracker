@@ -2659,35 +2659,34 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 	local haveTotem, name, startTime, duration, icon, id, dbName
 	for i =1, MAX_TOTEMS do
 		haveTotem, name, startTime, duration, icon = GetTotemInfo(i)
-		if not haveTotem then break end
-		if name ~= L.UNKNOWN_TOTEM then 
-			dbName, id, _ = HDH_AT_UTIL.GetInfo(name)
-			if dbName then 
-				name = dbName
-			end
-			if not id then 
-				if string.len(UTIL.Trim(name) or "") > 0 then
-					id = name
+		if haveTotem then
+			if name ~= L.UNKNOWN_TOTEM then 
+				dbName, id, _ = HDH_AT_UTIL.GetInfo(name)
+				if dbName then 
+					name = dbName
 				end
-			end
+				if not id then 
+					if string.len(UTIL.Trim(name) or "") > 0 then
+						id = name
+					end
+				end
 
-			if id then 
-				if f.totemQueue.activeSpell[id] == nil then
-					if f.totemQueue.cache[id] then
-						local size = f.totemQueue:GetSize()
-						for j = 1, size do
-							if f.totemQueue:Get(j)[3] == id then
-								f.totemQueue:Pop(j)
-								break
+				if id then 
+					if f.totemQueue.activeSpell[id] == nil then
+						if f.totemQueue.cache[id] then
+							local size = f.totemQueue:GetSize()
+							for j = 1, size do
+								if f.totemQueue:Get(j)[3] == id then
+									f.totemQueue:Pop(j)
+									break
+								end
 							end
 						end
+						f.totemQueue:Push({icon, name, id, "|cff5555ff"..L.TOTEM.."|r"})
+						f.totemQueue.cache[id] = true
 					end
-					f.totemQueue:Push({icon, name, id, "|cff5555ff"..L.TOTEM.."|r"})
-					f.totemQueue.cache[id] = true
+					f.totemQueue.activeSpell[id] = true
 				end
-				f.totemQueue.activeSpell[id] = true
-			else
-				break
 			end
 		end
 	end
