@@ -70,7 +70,7 @@ do -- 애드온 버전 호환성
 			local start, duration, enabled, modRate = GetSpellCooldown(id)
 			if start then
 				local info = { 
-					start = start,
+					startTime = start,
 					duration = duration
 				}
 				return info
@@ -96,8 +96,15 @@ do -- 애드온 버전 호환성
 			end
 		end
 
-		HDH_AT_UTIL.GetSpellCastCount = C_Spell.GetSpellCastCount
-		HDH_AT_UTIL.IsSpellInRange = IsSpellInRange
+		HDH_AT_UTIL.GetSpellCastCount = GetSpellCount
+		HDH_AT_UTIL.IsSpellInRange = function(name) 
+			local inRange = IsSpellInRange(name)
+			if inRange and inRange == 0 then
+				return false
+			else
+				return true
+			end
+		end
 
 		HDH_AT_UTIL.GetSpellInfo = function(spell)
 			local name, rank, icon, castTime, minRange, maxRange, spellID, originalIcon = GetSpellInfo(spell)
@@ -117,6 +124,18 @@ do -- 애드온 버전 호환성
 			end
 		end
 
+		HDH_AT_UTIL.GetSpellBookItemInfo = function(spellName)
+			local spellType, id = GetSpellBookItemInfo(spellName)
+			if spellType then
+				local info = {
+					spellID = id 
+				}
+				return info
+			else
+				return nil
+			end
+		end 
+
 	-------------------------------------------
 	else -- 용군단 이상
     -------------------------------------------
@@ -135,6 +154,7 @@ do -- 애드온 버전 호환성
 		HDH_AT_UTIL.IsSpellInRange = C_Spell.IsSpellInRange
 		HDH_AT_UTIL.IsSpellUsable = C_Spell.IsSpellUsable
 		HDH_AT_UTIL.GetSpellInfo = C_Spell.GetSpellInfo
+		HDH_AT_UTIL.GetSpellBookItemInfo = C_SpellBook.GetSpellBookItemInfo
 	end 
 
 
@@ -185,7 +205,7 @@ do
 		if not value then return nil end
 		if not isItem and HDH_AT_UTIL.GetCacheSpellInfo(value) then
 			local spell = HDH_AT_UTIL.GetCacheSpellInfo(value) 
-			return spell.name, spell.spellID, spell.originalIconID
+			return spell.name, spell.spellID, spell.iconID
 		elseif C_Item.GetItemInfo(value) then
 			local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = C_Item.GetItemInfo(value)
 			if name then
@@ -268,13 +288,15 @@ do
 		end
 
 		local numSpells, petToken = C_SpellBook.HasPetSpells()  -- nil if pet does not have spellbook, 'petToken' will usually be "PET"
-		for i=1, numSpells do
-			local petSpellName, petSubType = C_SpellBook.GetSpellBookItemName(i, Enum.SpellBookSpellBank.Pet)
-			local spellID = select(2,C_SpellBook.GetSpellBookItemType(i, Enum.SpellBookSpellBank.Pet))
-			if searchName == name or searchId == spellID then
-				cashTalentSpell[spec][petSpellName] = true
-				cashTalentSpell[spec][spellID] = true
-			end 
+		if numSpells then
+			for i=1, numSpells do
+				local petSpellName, petSubType = C_SpellBook.GetSpellBookItemName(i, Enum.SpellBookSpellBank.Pet)
+				local spellID = select(2,C_SpellBook.GetSpellBookItemType(i, Enum.SpellBookSpellBank.Pet))
+				if searchName == name or searchId == spellID then
+					cashTalentSpell[spec][petSpellName] = true
+					cashTalentSpell[spec][spellID] = true
+				end 
+			end
 		end
 	end
 

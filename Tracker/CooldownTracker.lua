@@ -223,7 +223,7 @@ function CT_OnUpdateIcon(self) -- 거리 체크는 onUpdate 에서 처리해야�
 			end
 		end
 	else
-		self.spell.newRange = IsSpellInRange(self.spell.name,"target"); -- 1 true, 0 false, nil not target
+		self.spell.newRange = HDH_AT_UTIL.IsSpellInRange(self.spell.name,"target"); -- 1 true, 0 false, nil not target
 	end
 
 	if self.spell.isCharging then --and self.spell.charges.duration > HDH_C_TRACKER.GlobalCooldown
@@ -255,7 +255,7 @@ end
 
 ------- HDH_C_TRACKER member function -----------	
 
-function HDH_C_TRACKER:UpdateSpellInfo(id, isItem)
+function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem)
 	local startTime, duration, count, remaining
 	local chargeCount, chargeCountMax, chargeStartTime, chargeDuration, chargeRemaining
 	local inRange, isAble, isNotEnoughMana
@@ -274,7 +274,7 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, isItem)
 			duration = spellCooldownInfo.duration
 		end
 		count = HDH_AT_UTIL.GetSpellCastCount(id) or 0
-		inRange = HDH_AT_UTIL.IsSpellInRange(id, "target")
+		inRange = HDH_AT_UTIL.IsSpellInRange(name, "target")
 		isAble, isNotEnoughMana = HDH_AT_UTIL.IsSpellUsable(id)
 		
 		isAble = isAble or isNotEnoughMana
@@ -351,7 +351,7 @@ function HDH_C_TRACKER:UpdateIcon(f)
 
 	
 	if not HDH_TRACKER.ENABLE_MOVE and not spell.isInnerCDItem then
-		startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana = self:UpdateSpellInfo(f.spell.id, f.spell.isItem)
+		startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana = self:UpdateSpellInfo(f.spell.id, f.spell.name, f.spell.isItem)
 		spell.startTime = startTime
 		spell.count = count
 		spell.endTime = startTime + duration

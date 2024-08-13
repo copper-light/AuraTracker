@@ -1,4 +1,6 @@
 ﻿-- spell tooltip
+local UTIL = HDH_AT_UTIL
+
 local function addLine(tooltip, id)
     local found = false
 	local idText = "ID: |cffffffff" .. id
@@ -66,13 +68,15 @@ end)
 hooksecurefunc(GameTooltip, "SetSpellBookItem", function(self,...)
 	if not HDH_AT_DB.show_tooltip_id then return end
     local idx, t = ...
-    local id = select(2, C_SpellBook.GetSpellBookItemInfo(idx, t))
-
-    if t == "pet" then
-        id = bit.band(0xFFFFFF, id)
+    local info = UTIL.GetSpellBookItemInfo(idx, t)
+    if info then
+        local id = info.spellID
+        if t == "pet" then
+            id = bit.band(0xFFFFFF, id)
+        end
+        -- local id = select(2, self:GetSpell())
+        if id then addLine(self, id) end
     end
-    -- local id = select(2, self:GetSpell())
-    if id then addLine(self, id) end
 end)
 
 -- hooksecurefunc(GameTooltip, "SetUnitDebuffByAuraInstanceID", function(self,...)

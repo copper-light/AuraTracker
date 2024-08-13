@@ -2242,7 +2242,6 @@ local function PLAYER_ENTERING_WORLD()
 		-- HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_COND_INFO_CHANGED') -- 특성 빌드 설정 변경 완료 됐을때
 		-- HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_CONFIG_CREATED') -- 특성 빌드 설정 변경 완료 됐을때
 		HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_TREE_CURRENCY_INFO_UPDATED') -- 특성 빌드 설정 변경 완료 됐을때
-		
 	end
 
 	VersionUpdateDB()
@@ -2270,7 +2269,7 @@ local function OnEvent(self, event, ...)
 	-- 	HDH_TRACKER.Updates()
 	-- end
 	-- print( event, ...)
-	if event =='ACTIVE_TALENT_GROUP_CHANGED' then
+	if event =='ACTIVE_TALENT_GROUP_CHANGED' or event =='PET_SPECIALIZATION_CHANGED' then
 		HDH_AT_UTIL.RunTimer(self, "ACTIVE_TALENT_GROUP_CHANGED", 1, ACTIVE_TALENT_GROUP_CHANGED)
 	elseif event == 'PLAYER_REGEN_ENABLED' then	
 		if not HDH_TRACKER.ENABLE_MOVE then
