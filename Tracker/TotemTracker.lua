@@ -106,7 +106,7 @@ do
 				elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 				glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
 
-				if self:IsOk(elemId, elemName, false) then 
+				if self:IsLearnedSpellOrEquippedItem(elemId, elemName, false) then 
 					iconIdx = iconIdx + 1
 					f = self.frame.icon[iconIdx]
 					if f:GetParent() == nil then f:SetParent(self.frame) end

@@ -24,42 +24,41 @@ do
 	
 	function HDH_AURA_TRACKER.GetAuras(self)
 		local curTime = GetTime()
-		local name, count, duration, endTime, source, id, v1, v2, v3, dispelType
+		local aura
 		local ret = 0;
 		local f
 		local spell
 
 		for i = 1, 40 do 
-			-- name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod
-			name, _, count, dispelType, duration, endTime, source, _, _, id, _, _, _, _, _, v1, v2, v3 = UnitAura(self.unit, i, self.filter)
-			if not id then break end
+			aura = C_UnitAuras.GetAuraDataByIndex(self.unit, i, self.filter)
+			if not aura then break end
 
 			if self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
-				if source == 'player' then
-					f = self.frame.pointer[tostring(id)] or self.frame.pointer[name]
+				if aura.sourceUnit == 'player' then
+					f = self.frame.pointer[tostring(aura.spellId)] or self.frame.pointer[aura.name]
 				else
 					f = nil
 				end
 			else
-				f = self.frame.pointer[tostring(id)] or self.frame.pointer[name]
+				f = self.frame.pointer[tostring(aura.spellId)] or self.frame.pointer[aura.name]
 			end
 			if f and f.spell then
 
 				spell = f.spell
 				
-				if not StaggerID[id] then -- 시간차가 아니면
-					spell.v1 = (v1 ~= 0) and v1 or nil
+				if not StaggerID[aura.spellId] then -- 시간차가 아니면
+					spell.v1 = (aura.points[1] ~= 0) and aura.points[1] or nil
 				else -- 시간차
-					spell.v1 = v2; 
+					spell.v1 = aura.points[2]; 
 				end
 				
 				if not spell.isUpdate then
-					spell.count = count
+					spell.count = aura.applications
 				else
-					spell.count = (spell.count or 0) + count
+					spell.count = (spell.count or 0) + aura.applications
 				end
-				spell.id = id
-				spell.dispelType = dispelType
+				spell.id = aura.spellId
+				spell.dispelType = aura.dispelName
 
 				if spell.isUpdate then
 					spell.overlay = (spell.overlay or 0) + 1
@@ -67,11 +66,11 @@ do
 					spell.overlay = 1
 				end
 
-				if spell.endTime ~= endTime then spell.endTime = endTime; spell.happenTime = GetTime(); end
-				if endTime > 0 then spell.remaining = spell.endTime - curTime
+				if spell.endTime ~= aura.expirationTime then spell.endTime = aura.expirationTime ; spell.happenTime = GetTime(); end
+				if aura.expirationTime  > 0 then spell.remaining = spell.endTime - curTime
 				else spell.remaining = 0; end
-				spell.duration = duration
-				spell.startTime = endTime - duration
+				spell.duration = aura.duration
+				spell.startTime = aura.expirationTime  - aura.duration
 				spell.index = i; -- 툴팁을 위해, 순서
 				ret = ret + 1;
 				spell.isUpdate = true
@@ -81,21 +80,21 @@ do
 	end
 	
 	function HDH_AURA_TRACKER.GetAurasAll(self)
-		local name, icon, count, dispelType, duration, endTime, source, id, canApplyAura, isBossDebuff, castByPlayer 
+		local aura, spell
 		local curTime = GetTime()
 		local ret = 1;
 		local f
 		for i = 1, 40 do 
-			name, icon, count, dispelType, duration, endTime, source, _, _, id, canApplyAura, isBossDebuff, castByPlayer = UnitAura(self.unit, i, self.filter)
-			if not id then break end
+			aura = C_UnitAuras.GetAuraDataByIndex(self.unit, i, self.filter)
+			if not aura then break end
 			if self.aura_filter == DB.AURA_FILTER_ONLY_BOSS then
-				if not castByPlayer and (self.isRaiding or (isBossDebuff)) then
+				if not aura.isFromPlayerOrPlayerPet and (self.isRaiding or (aura.isBossAura)) then
 					f = self.frame.icon[ret];
 				else
 					f = nil;
 				end
 			elseif self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
-				if source == 'player' then
+				if aura.sourceUnit == 'player' then
 					f = self.frame.icon[ret];
 				else
 					f = nil;
@@ -109,20 +108,20 @@ do
 				spell = f.spell
 				spell.no = i;
 				spell.isUpdate = true
-				spell.count = count
-				spell.id = id
+				spell.count = aura.applications
+				spell.id = aura.spellId
 				spell.overlay = 0
-				spell.endTime = endTime
-				spell.name = name;
-				spell.dispelType = dispelType
+				spell.endTime = aura.expirationTime
+				spell.name = aura.name;
+				spell.dispelType = aura.dispelName
 				spell.remaining = spell.endTime - curTime
-				spell.duration = duration 	
-				spell.startTime = endTime - duration
-				spell.icon = icon
+				spell.duration = aura.duration 	
+				spell.startTime = aura.expirationTime - aura.duration
+				spell.icon = aura.icon
 				spell.index = i; -- 툴팁을 위해, 순서
 				spell.happenTime = GetTime();
-				f.icon:SetTexture(icon)
-				f.iconSatCooldown:SetTexture(icon)
+				f.icon:SetTexture(aura.icon)
+				f.iconSatCooldown:SetTexture(aura.icon)
 				ret = ret + 1;
 			end
 		end

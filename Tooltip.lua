@@ -1,7 +1,4 @@
-﻿
-local GetSpellBookItemInfo = GetSpellBookItemInfo or C_SpellBook.GetSpellBookItemInfo
-
--- spell tooltip
+﻿-- spell tooltip
 local function addLine(tooltip, id)
     local found = false
 	local idText = "ID: |cffffffff" .. id
@@ -24,20 +21,20 @@ end
 
 hooksecurefunc(GameTooltip, "SetUnitBuff", function(self, ...)
 	if not HDH_AT_DB.show_tooltip_id then return end
-    local id = select(10, UnitBuff(...))
-    if id then addLine(self, id) end
+    local aura = C_UnitAuras.GetBuffDataByIndex(...)
+    if aura then addLine(self, aura.spellId) end
 end)
 
 hooksecurefunc(GameTooltip, "SetUnitDebuff", function(self,...)
 	if not HDH_AT_DB.show_tooltip_id then return end
-    local id = select(10, UnitDebuff(...))
-    if id then addLine(self, id) end
+    local aura = C_UnitAuras.GetDebuffDataByIndex(...)
+    if aura then addLine(self, aura.spellId) end
 end)
 
 hooksecurefunc(GameTooltip, "SetUnitAura", function(self,...)
 	if not HDH_AT_DB.show_tooltip_id then return end
-    local id = select(10, UnitAura(...))
-    if id then addLine(self, id) end
+    local aura = C_UnitAuras.GetAuraDataByIndex(...)
+    if aura then addLine(self, aura.spellId) end
 end)
 
 -- GameTooltip:HookScript("OnTooltipSetItem", function(self)
@@ -69,12 +66,7 @@ end)
 hooksecurefunc(GameTooltip, "SetSpellBookItem", function(self,...)
 	if not HDH_AT_DB.show_tooltip_id then return end
     local idx, t = ...
-    local id 
-    if select(4, GetBuildInfo()) >= 110000 then --내부전쟁
-        id = GetSpellBookItemInfo(idx, t).spellID
-    else
-        id = select(2, GetSpellBookItemInfo(idx, t))
-    end
+    local id = select(2, C_SpellBook.GetSpellBookItemInfo(idx, t))
 
     if t == "pet" then
         id = bit.band(0xFFFFFF, id)

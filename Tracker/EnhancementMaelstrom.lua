@@ -56,84 +56,33 @@ do
 				end
 			end
 		end
-
-		-- if tracker.ui.common.display_mode ~= DB.DISPLAY_BAR then
-		-- 	if tracker.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE and tracker.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
-		-- 		self.spell.per = math.max(0, self.spell.remaining / self.spell.duration)
-
-		-- 		-- print(self.spell.per,  self.spell.remaining)
-		-- 		if self.spell.per < 0.99 and self.spell.per > 0.01 then
-		-- 			if not self.iconSatCooldown.spark:IsShown() then
-		-- 				self.iconSatCooldown.spark:Show()
-		-- 			end
-		-- 		else
-		-- 			if self.iconSatCooldown.spark:IsShown() then
-		-- 				self.iconSatCooldown.spark:Hide()
-		-- 			end
-		-- 		end
-		-- 		self.iconSatCooldown.curSize = math.ceil(self.icon:GetHeight() * self.spell.per * 10) / 10
-		-- 		self.iconSatCooldown.curSize = self.iconSatCooldown.curSize - (self.iconSatCooldown.curSize % 0.5)
-		-- 		self.iconSatCooldown.curSize = math.max(self.iconSatCooldown.curSize, 0.1)
-		-- 		if (self.iconSatCooldown.curSize ~= self.iconSatCooldown.preSize) then
-		-- 			self.tex = 0.86 * self.spell.per
-		-- 			if (self.iconSatCooldown.curSize == 0) then self.iconSatCooldown:Hide() end
-		-- 			if tracker.ui.icon.cooldown == DB.COOLDOWN_LEFT then
-		-- 				self.spell.texcoord = 0.07 + (self.tex)
-		-- 				self.iconSatCooldown:SetWidth(self.iconSatCooldown.curSize)
-		-- 				-- spell.texcoord = math.ceil(spell.texcoord * 10) / 10
-		-- 				self.iconSatCooldown:SetTexCoord(0.07, self.spell.texcoord, 0.07, 0.93)
-		-- 			elseif tracker.ui.icon.cooldown == DB.COOLDOWN_RIGHT then
-		-- 				self.spell.texcoord = (0.93 - self.tex)
-		-- 				self.iconSatCooldown:SetWidth(self.iconSatCooldown.curSize)
-		-- 				-- spell.texcoord = math.ceil(spell.texcoord * 10) /10
-		-- 				self.iconSatCooldown:SetTexCoord(self.spell.texcoord, 0.93, 0.07, 0.93)
-		-- 			elseif tracker.ui.icon.cooldown == DB.COOLDOWN_UP then
-		-- 				self.spell.texcoord = (0.07 + self.tex)
-		-- 				self.iconSatCooldown:SetHeight(self.iconSatCooldown.curSize)
-		-- 				-- spell.texcoord = math.ceil(spell.texcoord * 10) /10
-		-- 				self.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, spell.texcoord)
-		-- 			else
-		-- 				self.spell.texcoord = (0.93 - self.tex)
-		-- 				self.iconSatCooldown:SetHeight(self.iconSatCooldown.curSize)
-		-- 				-- spell.texcoord = math.ceil(spell.texcoord * 10) /10
-		-- 				self.iconSatCooldown:SetTexCoord(0.07, 0.93, self.spell.texcoord, 0.93)
-		-- 			end
-		-- 			-- print(spell.per, spell.texcoord, f.iconSatCooldown.curSize)
-		-- 			self.iconSatCooldown.preSize = self.iconSatCooldown.curSize
-		-- 		end
-		-- 	end
-		-- end
-
+		
 		self:GetParent().parent:UpdateGlow(self, true);
 		self:GetParent().parent:UpdateBarValue(self);
 	end
 
     function HDH_ENH_MAELSTROM_TRACKER:GetPower()
 		local curTime = GetTime()
-		local _, count, duration, endTime, id
+		local aura
 		local ret = 0;
 		local f
 		local spell
+		local power = 0
 		for i = 1, 40 do 
-			-- name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod
-			_, _, count, _, duration, endTime, _, _, _, id = UnitAura('player', i, 'HELPFUL')
-			if id == HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID then
-				f = self.frame.pointer[id]
+			aura = C_UnitAuras.GetAuraDataByIndex('player', i, 'HELPFUL')
+			if not aura then break end
+			if aura.spellId == HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID then
+				f = self.frame.pointer[aura.spellId]
 				if f and f.spell then
 					spell = f.spell
-					-- if not StaggerID[id] then -- 시간차가 아니면
-					-- 	spell.v1 = (v1 ~= 0) and v1 or nil
-					-- else -- 시간차
-					-- 	spell.v1 = v2; 
-					-- end
 					
 					if not spell.isUpdate then
-						spell.count = count
+						spell.count = aura.applications
 					else
-						spell.count = (spell.count or 0) + count
+						spell.count = (spell.count or 0) + aura.applications
 					end
-					spell.id = id
-					spell.dispelType = dispelType
+					spell.id = aura.spellId
+					spell.dispelType = aura.dispelName
 
 					if spell.isUpdate then
 						spell.overlay = (spell.overlay or 0) + 1
@@ -141,21 +90,20 @@ do
 						spell.overlay = 1
 					end
 
-					if spell.endTime ~= endTime then spell.endTime = endTime; spell.happenTime = GetTime(); end
-					if endTime > 0 then spell.remaining = spell.endTime - curTime
+					if spell.endTime ~= aura.expirationTime then spell.endTime = aura.expirationTime; spell.happenTime = GetTime(); end
+					if aura.expirationTime > 0 then spell.remaining = spell.endTime - curTime
 					else spell.remaining = 0; end
-					spell.duration = duration
-					spell.startTime = endTime - duration
+					spell.duration = aura.duration
+					spell.startTime = aura.expirationTime - aura.duration
 					spell.index = i; -- 툴팁을 위해, 순서
 					ret = ret + 1;
 					spell.isUpdate = true
 				end
-				-- break
-				count = count * 10
+				power = aura.applications * 10
 				break
 			end
 		end
-		return count or 0
+		return power
     end
     
     function HDH_ENH_MAELSTROM_TRACKER:GetPowerMax()

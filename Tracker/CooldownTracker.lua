@@ -38,10 +38,6 @@ local DefaultCooldownDB = {
 	}
 };
 
-local IsSpellInRange = IsSpellInRange or C_Spell.IsSpellInRange
-local GetSpellCooldown = GetSpellCooldown or C_Spell.GetSpellCooldown
-local GetSpellCount = GetSpellCount or C_Spell.GetSpellCastCount
-
 ------------------------------------
 -- HDH_C_TRACKER class
 ------------------------------------
@@ -227,7 +223,7 @@ function CT_OnUpdateIcon(self) -- 거리 체크는 onUpdate 에서 처리해야�
 			end
 		end
 	else
-		self.spell.newRange = C_Spell.IsSpellInRange(self.spell.name,"target"); -- 1 true, 0 false, nil not target
+		self.spell.newRange = IsSpellInRange(self.spell.name,"target"); -- 1 true, 0 false, nil not target
 	end
 
 	if self.spell.isCharging then --and self.spell.charges.duration > HDH_C_TRACKER.GlobalCooldown
@@ -267,15 +263,20 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, isItem)
 
 	if isItem then
 		startTime, duration = C_Container.GetItemCooldown(id)
-		count = GetItemCount(id) or 0
-		inRange = IsItemInRange(id, "target")
-		isAble = IsUsableItem(id)
+		count = C_Item.GetItemCount(id) or 0
+		inRange = C_Item.IsItemInRange(id, "target")
+		isAble = C_Item.IsUsableItem(id)
 		isNotEnoughMana = false
 	else
-		startTime, duration = GetSpellCooldown(id)
-		count = GetSpellCount(id) or 0
-		inRange = IsSpellInRange(id, "target")
-		isAble, isNotEnoughMana = IsUsableSpell(id)
+		local spellCooldownInfo = HDH_AT_UTIL.GetSpellCooldown(id)
+		if spellCooldownInfo then
+			startTime = spellCooldownInfo.startTime
+			duration = spellCooldownInfo.duration
+		end
+		count = HDH_AT_UTIL.GetSpellCastCount(id) or 0
+		inRange = HDH_AT_UTIL.IsSpellInRange(id, "target")
+		isAble, isNotEnoughMana = HDH_AT_UTIL.IsSpellUsable(id)
+		
 		isAble = isAble or isNotEnoughMana
 	end
 
@@ -288,7 +289,13 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, isItem)
 		inRange = true
 	end
 
-	chargeCount, chargeCountMax, chargeStartTime, chargeDuration = GetSpellCharges(id) -- 스킬의 중첩count과 충전charge은 다른 개념이다. 
+	local charges = HDH_AT_UTIL.GetSpellCharges(id) -- 스킬의 중첩count과 충전charge은 다른 개념이다. 
+	if charges then
+		chargeCount = charges.currentCharges
+		chargeCountMax = charges.maxCharges
+		chargeStartTime = charges.cooldownStartTime
+		chargeDuration = charges.cooldownDuration
+	end
 	if chargeStartTime and chargeDuration then
 		chargeRemaining = chargeStartTime + chargeDuration - curTime
 		chargeRemaining = math.max(chargeRemaining, 0)
@@ -306,25 +313,25 @@ end
 
 function HDH_C_TRACKER:UpdateAuras(f)
 	local curTime = GetTime()
-	local name, count, duration, endTime, source, id, v1, v2, v3, dispelType, startTime
+	local aura
 	local ret = 0;
 	local spell = f.spell
 
 	for i = 1, 40 do 
-		-- name, icon, count, dispelType, duration, expirationTime, source, isStealable, nameplateShowPersonal, spellId, canApplyAura, isBossDebuff, castByPlayer, nameplateShowAll, timeMod
-		name, _, count, dispelType, duration, endTime, source, _, _, id, _, _, _, _, _, v1, v2, v3 = UnitAura('player', i, 'HELPFUL')
-		if not id then break end
-		if f.spell.innerSpellId == id then
-			if spell.innerSpellEndtime ~= endTime or endTime == 0 then
+		aura = C_UnitAuras.GetAuraDataByIndex('player', i, 'HELPFUL')
+		if not aura then break end
+		if f.spell.innerSpellId == aura.spellId then
+			if spell.innerSpellEndtime ~= aura.expirationTime or aura.expirationTime == 0 then
 				spell.startTime = curTime
 				spell.duration = spell.innerCooldown
-				spell.innerSpellEndtime = endTime
+				spell.innerSpellEndtime = aura.expirationTime
 			end
 			break
 		end
 	end
 	return spell.startTime, spell.duration
 end
+
 
 function HDH_C_TRACKER:UpdateIcon(f) 
 	if not f or not f.spell or not self or not self.ui then return end
@@ -966,13 +973,13 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			hasInnerCDItem = true
 		end
 
-		if self:IsOk(elemId, elemName, isItem) then -- and not self:IsIgnoreSpellByTalentSpell(auraList[i])
+		if self:IsLearnedSpellOrEquippedItem(elemId, elemName, isItem) then -- and not self:IsIgnoreSpellByTalentSpell(auraList[i])
 			iconIdx = iconIdx + 1
 			f = self.frame.icon[iconIdx]
 			if f:GetParent() == nil then f:SetParent(self.frame) end
 			
 			id = ADJUST_ID[elemId] or elemId;
-			self.frame.pointer[id] = f
+			self.frame.pointer[elemKey] = f
 			spell = {}
 			if type(elemKey) == "number" then
 				spell.key = tonumber(elemKey)

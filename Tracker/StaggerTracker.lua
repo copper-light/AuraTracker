@@ -42,19 +42,17 @@ local function STAGGER_TRACKER_OnUpdate(self, elapsed)
 	self.spell.curTime = GetTime()
 	if self.spell.curTime - (self.spell.delay or 0) < HDH_TRACKER.BAR_UP_ANI_TERM then return end 
 	self.spell.delay = self.spell.curTime
-	-- local curValue = UnitStagger('player') or 0;
-	
-	curValue = (curValue or 0) + 1000
-	local health_max = UnitHealthMax("player");
-	local per = curValue/health_max;
-	self.spell.v1 = curValue;
-	self.spell.count = (per * 100)
+
+	self.spell.health_max = UnitHealthMax("player");
+	self.spell.v1 =  UnitStagger('player') or 0
+	self.spell.per = self.spell.v1 / UnitHealthMax("player")
+	self.spell.count = (self.spell.per * 100)
 	if self.spell.count == math.huge then self.spell.count = 0; end
 	self.counttext:SetText(format("%d%%", math.ceil(self.spell.count or 0))); 
 	
-	if per > STAGGER_RED_TRANSITION then
+	if self.spell.per > STAGGER_RED_TRANSITION then
 		self.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[3].texture);
-	elseif per > STAGGER_YELLOW_TRANSITION then
+	elseif self.spell.per > STAGGER_YELLOW_TRANSITION then
 		self.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[2].texture);
 	else
 		self.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[1].texture);
@@ -73,9 +71,9 @@ local function STAGGER_TRACKER_OnUpdate(self, elapsed)
 			self.spell.isOn = false;
 		end
 	end
-	if self.bar and self.bar.max ~= health_max then
+	if self.bar and self.bar.max ~= self.spell.health_max then
 		for i = 1, #self.spell.splitValues do
-			self.bar.bar[i].mpMax = self.spell.splitValues[i] or health_max;
+			self.bar.bar[i].mpMax = self.spell.splitValues[i] or self.spell.health_max;
 			self.bar.bar[i].mpMin = self.spell.splitValues[i-1] or 0;
 			self.bar.bar[i]:SetMinMaxValues(self.bar.bar[i].mpMin, self.bar.bar[i].mpMax);
 		end

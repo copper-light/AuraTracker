@@ -2566,29 +2566,29 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 	local trackerId = self:GetCurTrackerId()
 	local tracker = HDH_TRACKER.Get(trackerId)
 	local className = (tracker and tracker:GetClassName()) or nil
-	local name, icon, count, dispelType, duration, endTime, source, id, canApplyAura, isBossDebuff, castByPlayer 
 	local unitList = {"player", "target", "focus", "pet"}
 	local filterList= {"HELPFUL","HARMFUL"}
+	local aura
 
 	for _, unit in pairs(unitList) do
 		if UnitExists(unit) then
 			for i = 1, 40 do 
-				name, icon, count, dispelType, duration, endTime, source, _, _, id, canApplyAura, isBossDebuff, castByPlayer = UnitAura(unit, i, "HELPFUL")
-				if not id then break end
-				if f.buffQueue.activeSpell[id] == nil then
-					if f.buffQueue.cache[id] then
+				aura = C_UnitAuras.GetAuraDataByIndex(unit, i, "HELPFUL")
+				if not aura then break end
+				if f.buffQueue.activeSpell[aura.spellId] == nil then
+					if f.buffQueue.cache[aura.spellId] then
 						local size = f.buffQueue:GetSize()
 						for j = 1, size do
-							if f.buffQueue:Get(j)[3] == id then
+							if f.buffQueue:Get(j)[3] == aura.spellId then
 								f.buffQueue:Pop(j)
 								break
 							end
 						end
 					end
-					f.buffQueue:Push({icon, name, id, "|cff55ff55"..L.BUFF.."|r", false, unit, i, "HELPFUL"})
-					f.buffQueue.cache[id] = true
+					f.buffQueue:Push({aura.icon, aura.name, aura.spellId, "|cff55ff55"..L.BUFF.."|r", false, unit, i, "HELPFUL"})
+					f.buffQueue.cache[aura.spellId] = true
 				end
-				f.buffQueue.activeSpell[id] = true
+				f.buffQueue.activeSpell[aura.spellId] = true
 			end
 		end
 	end
@@ -2596,22 +2596,22 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 	for _, unit in pairs(unitList) do
 		if UnitExists(unit) then
 			for i = 1, 40 do 
-				name, icon, count, dispelType, duration, endTime, source, _, _, id, canApplyAura, isBossDebuff, castByPlayer = UnitAura(unit, i, "HARMFUL")
-				if not id then break end
-				if f.debuffQueue.activeSpell[id] == nil then
-					if f.debuffQueue.cache[id] then
+				aura = C_UnitAuras.GetAuraDataByIndex(unit, i, "HARMFUL")
+				if not aura then break end
+				if f.debuffQueue.activeSpell[aura.spellId] == nil then
+					if f.debuffQueue.cache[aura.spellId] then
 						local size = f.debuffQueue:GetSize()
 						for j = 1, size do
-							if f.debuffQueue:Get(j)[3] == id then
+							if f.debuffQueue:Get(j)[3] == aura.spellId then
 								f.debuffQueue:Pop(j)
 								break
 							end
 						end
 					end
-					f.debuffQueue:Push({icon, name, id, "|cffff5555"..L.DEBUFF.."|r", false, unit, i, "HARMFUL"})
-					f.debuffQueue.cache[id] = true
+					f.debuffQueue:Push({aura.icon, aura.name, aura.spellId, "|cffff5555"..L.DEBUFF.."|r", false, unit, i, "HARMFUL"})
+					f.debuffQueue.cache[aura.spellId] = true
 				end
-				f.debuffQueue.activeSpell[id] = true
+				f.debuffQueue.activeSpell[aura.spellId] = true
 			end
 		end
 	end
@@ -2637,7 +2637,7 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 	self.cacheCastSpell = {}
 
 	for _, id in pairs(self.cacheUesdItem) do
-		isItem = not tracker:IsOk(id)
+		isItem = not tracker:IsLearnedSpellOrEquippedItem(id)
 		name, _, icon = HDH_AT_UTIL.GetInfo(id, true)
 		if f.skillQueue.activeSpell[id] == nil then
 			if f.skillQueue.cache[id] then

@@ -285,7 +285,7 @@ end
 
 function HDH_TRACKER.InitVaribles(trackerId)
 	local id, name, type, unit
-	
+	local tracker
 	if trackerId then
 		id, name, type, unit, _, _, _ = DB:GetTrackerInfo(trackerId)
 		tracker = HDH_TRACKER.Get(trackerId)
@@ -997,7 +997,7 @@ function HDH_TRACKER:LoadOrderFunc()
 	end
 end
 
-function HDH_TRACKER:IsOk(id, name, isItem) -- 특성 스킬의 변경에 따른 스킬 표시 여부를 결정하기 위함
+function HDH_TRACKER:IsLearnedSpellOrEquippedItem(id, name, isItem) -- 특성 스킬의 변경에 따른 스킬 표시 여부를 결정하기 위함
 	if not id or id == 0 then return false end
 	if isItem then 
 		local equipSlot = select(9,GetItemInfo(id)) -- 착용 가능한 장비인가요? (착용 불가능이면, nil, INVTYPE_NON_EQUIP_IGNORE)
@@ -1010,7 +1010,7 @@ function HDH_TRACKER:IsOk(id, name, isItem) -- 특성 스킬의 변경에 따른
 	else 
 		-- return IsPlayerSpell(id)
 		if IsPlayerSpell(id) then return true end
-		local selected = HDH_AT_UTIL.IsTalentSpell(id); -- true / false / nil: not found talent
+		local selected = HDH_AT_UTIL.IsTalentSpell(id, name); -- true / false / nil: not found talent
 		if selected == nil then
 			return true;
 		else
@@ -2219,7 +2219,7 @@ local function VersionUpdateDB()
 end
 
 local function ACTIVE_TALENT_GROUP_CHANGED()
-	HDH_AT_UTIL.IsTalentSpell(nil,nil,true)
+	HDH_AT_UTIL.IsTalentSpell(nil,nil,nil,true)
 	HDH_TRACKER.InitVaribles()
 	HDH_TRACKER.Updates()
 	if HDH_AT_ConfigFrame and HDH_AT_ConfigFrame:IsShown() then 
