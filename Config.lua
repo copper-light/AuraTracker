@@ -2570,6 +2570,8 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 	local filterList= {"HELPFUL","HARMFUL"}
 	local aura
 
+	if tracker == nil then return end
+
 	for _, unit in pairs(unitList) do
 		if UnitExists(unit) then
 			for i = 1, 40 do 

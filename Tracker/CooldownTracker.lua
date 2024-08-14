@@ -223,7 +223,11 @@ function CT_OnUpdateIcon(self) -- 거리 체크는 onUpdate 에서 처리해야�
 			end
 		end
 	else
-		self.spell.newRange = HDH_AT_UTIL.IsSpellInRange(self.spell.name,"target"); -- 1 true, 0 false, nil not target
+		if not self.spell.isItem then
+			self.spell.newRange = HDH_AT_UTIL.IsSpellInRange(self.spell.name,"target"); -- 1 true, 0 false, nil not target
+		else
+			self.spell.newRange = C_Item.IsItemInRange(self.spell.id, "target")
+		end
 	end
 
 	if self.spell.isCharging then --and self.spell.charges.duration > HDH_C_TRACKER.GlobalCooldown
@@ -255,7 +259,7 @@ end
 
 ------- HDH_C_TRACKER member function -----------	
 
-function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem)
+function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 	local startTime, duration, count, remaining
 	local chargeCount, chargeCountMax, chargeStartTime, chargeDuration, chargeRemaining
 	local inRange, isAble, isNotEnoughMana
@@ -265,7 +269,11 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem)
 		startTime, duration = C_Container.GetItemCooldown(id)
 		count = C_Item.GetItemCount(id) or 0
 		inRange = C_Item.IsItemInRange(id, "target")
-		isAble = C_Item.IsUsableItem(id)
+		if not isToy then
+			isAble = C_Item.IsUsableItem(id)
+		else
+			isAble = true
+		end
 		isNotEnoughMana = false
 	else
 		local spellCooldownInfo = HDH_AT_UTIL.GetSpellCooldown(id)
@@ -351,7 +359,7 @@ function HDH_C_TRACKER:UpdateIcon(f)
 
 	
 	if not HDH_TRACKER.ENABLE_MOVE and not spell.isInnerCDItem then
-		startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana = self:UpdateSpellInfo(f.spell.id, f.spell.name, f.spell.isItem)
+		startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana = self:UpdateSpellInfo(f.spell.id, f.spell.name, f.spell.isItem, f.spell.isToy)
 		spell.startTime = startTime
 		spell.count = count
 		spell.endTime = startTime + duration
@@ -538,9 +546,11 @@ function HDH_C_TRACKER:UpdateIcon(f)
 			f.charges:SetCooldown(chargeStartTime, chargeDuration or 0); 
 		end
 	else
-		if spell.isItem and count == 1         then f.counttext:SetText(nil)
-		elseif not spell.isItem and count == 0 then f.counttext:SetText(nil)
-		                                       else f.counttext:SetText(count) end
+		if spell.stackable then
+			f.counttext:SetText(count)
+		else
+			f.counttext:SetText(nil)
+		end
 	end
 
 	if self.OrderFunc then self:OrderFunc(self) end 
@@ -870,10 +880,6 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 		if (ui.icon.cooldown == DB.COOLDOWN_CIRCLE) or (ui.icon.cooldown == DB.COOLDOWN_NONE) then 
 			f.cd:SetCooldown(spell.startTime, spell.duration or 0); 
 			f.cd:SetDrawSwipe(spell.isCharging == false); 
-		else 
-			-- f.cd:SetMinMaxValues(spell.startTime, spell.endTime)
-			-- if spell.isCharging then f.cd:SetStatusBarColor(0,0,0,0)
-			-- else f.cd:SetStatusBarColor(1,1,1,1) end
 		end
 		
 		if self.ui.common.display_mode ~= DB.DISPLAY_ICON then
@@ -997,7 +1003,23 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.showValue = isValue
 			spell.display = display
 			spell.isItem = (isItem or false)
-
+			if isItem then
+				local _, _, _, _, _, _, _, itemStackCount, _, _, _, _, _ = GetItemInfo(spell.key)
+				if itemStackCount > 2 then
+					spell.stackable = true 
+				else
+					spell.stackable = false
+				end
+				if C_ToyBox.GetToyInfo(spell.id) then
+					spell.isToy = true
+				end
+			else
+				if HDH_AT_UTIL.GetSpellCharges(spell.key) then
+					spell.stackable = true 
+				else
+					spell.stackable = false
+				end
+			end
 			spell.duration = 0
 			spell.count = 0
 			spell.remaining = 0

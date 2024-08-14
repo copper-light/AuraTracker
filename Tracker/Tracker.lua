@@ -2256,19 +2256,6 @@ end
 
 -- 이벤트 콜백 함수
 local function OnEvent(self, event, ...)
-	-- local talentID = select(1, GetSpecializationInfo(GetSpecialization()))
-	-- local traitID = C_ClassTalents.GetLastSelectedSavedConfigID(talentID)
-	-- local traitName = UTIL.GetTraitsName(traitID)
-
-	-- if not traitName then
-	-- 	print("|cffffff00AuraTracker|cffffffff ".. L.NONACTIVATE_TRAIT)
-	-- end
-	-- if self.CUR_TRAIT_ID ~= C_ClassTalents.GetLastSelectedSavedConfigID(select(1, GetSpecializationInfo(GetSpecialization()))) then
-	-- 	self.CUR_TRAIT_ID = C_ClassTalents.GetLastSelectedSavedConfigID(select(1, GetSpecializationInfo(GetSpecialization())))
-	-- 	HDH_TRACKER.InitVaribles()
-	-- 	HDH_TRACKER.Updates()
-	-- end
-	-- print( event, ...)
 	if event =='ACTIVE_TALENT_GROUP_CHANGED' or event =='PET_SPECIALIZATION_CHANGED' then
 		HDH_AT_UTIL.RunTimer(self, "ACTIVE_TALENT_GROUP_CHANGED", 1, ACTIVE_TALENT_GROUP_CHANGED)
 	elseif event == 'PLAYER_REGEN_ENABLED' then	

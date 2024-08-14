@@ -124,8 +124,8 @@ do -- 애드온 버전 호환성
 			end
 		end
 
-		HDH_AT_UTIL.GetSpellBookItemInfo = function(spellName)
-			local spellType, id = GetSpellBookItemInfo(spellName)
+		HDH_AT_UTIL.GetSpellBookItemInfo = function(index, bookType)
+			local spellType, id = GetSpellBookItemInfo(index, bookType)
 			if spellType then
 				local info = {
 					spellID = id 

@@ -1072,7 +1072,7 @@
 			</Button>
 
 			<Button name="$parentBtnClose" inherits="UIPanelButtonTemplate" text="X">
-				<Size><AbsDimension x="50" y="25"/></Size>
+				<Size><AbsDimension x="30" y="25"/></Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT" x="-6" y="23" />
 				</Anchors>
@@ -1084,7 +1084,7 @@
 			</Button>
 
 			<Button name="$parentBtnMinMaxFrame" inherits="UIPanelButtonTemplate" text="최소화">
-				<Size><AbsDimension x="50" y="25"/></Size>
+				<Size><AbsDimension x="30" y="25"/></Size>
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnClose" x="0" y="0" />
 				</Anchors>
@@ -1200,7 +1200,7 @@
 					</Frame>
 
 					<Button name="$parentBtnClose" inherits="UIPanelButtonTemplate" text="X">
-						<Size><AbsDimension x="50" y="25"/></Size>
+						<Size><AbsDimension x="30" y="25"/></Size>
 						<Anchors>
 							<Anchor point="TOPRIGHT" x="-6" y="23" />
 						</Anchors>
@@ -1263,7 +1263,7 @@
 		</Layers>
 		<Frames>
 			<Button name="$parentBtnClose" inherits="UIPanelButtonTemplate" text="X">
-				<Size><AbsDimension x="50" y="25"/></Size>
+				<Size><AbsDimension x="30" y="25"/></Size>
 				<Anchors>
 					<Anchor point="TOPRIGHT">
 					<Offset><AbsDimension x="-6" y="23"/></Offset>
@@ -1277,7 +1277,7 @@
 			</Button>
 			
 			<Button name="$parentBtnMinimum" inherits="UIPanelButtonTemplate" text="최대화">
-				<Size><AbsDimension x="50" y="25"/></Size>
+				<Size><AbsDimension x="30" y="25"/></Size>
 				<Anchors>
 					<Anchor point="RIGHT" relativeTo="$parentBtnClose" relativePoint="LEFT">
 					<Offset><AbsDimension x="0" y="0"/></Offset>
@@ -1298,7 +1298,7 @@
 		</Frames>
 		<Scripts>
 			<OnShow>
-				_G[self:GetName().."Text"]:SetText("AuraTracker v"..GetAddOnMetadata("HDH_AuraTracker", "Version"))
+				_G[self:GetName().."Text"]:SetText("AuraTracker v"..C_AddOns.GetAddOnMetadata("HDH_AuraTracker", "Version"))
 			</OnShow>
 			<OnHide>
 				if not HDH_AT_ConfigFrame:IsShown() then
