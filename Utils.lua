@@ -136,9 +136,11 @@ do -- 애드온 버전 호환성
 			end
 		end 
 
+		HDH_AT_UTIL.GetSpellLink = GetSpellLink
 	-------------------------------------------
 	else -- 용군단 이상
     -------------------------------------------
+		HDH_AT_UTIL.GetSpellLink = C_Spell.GetSpellLink
 		HDH_AT_UTIL.GetSpecialization = GetSpecialization
 		HDH_AT_UTIL.GetSpecializationInfo = GetSpecializationInfo
 		HDH_AT_UTIL.GetLastSelectedSavedConfigID = C_ClassTalents.GetLastSelectedSavedConfigID

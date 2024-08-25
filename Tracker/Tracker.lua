@@ -1554,7 +1554,7 @@ function HDH_TRACKER:SetGameTooltip(f, show)
 			if not HDH_TRACKER.ENABLE_MOVE and spell and spell.id then
 				local isItem = spell.isItem
 				local id = spell.id
-				local link = isItem and select(2,GetItemInfo(id)) or GetSpellLink(id)
+				local link = isItem and select(2,GetItemInfo(id)) or UTIL.GetSpellLink(id)
 				if not link then return end
 				GameTooltip:SetOwner(f, "ANCHOR_BOTTOMRIGHT");
 				if self:GetClassName() == "HDH_AURA_TRACKER" and spell.index then

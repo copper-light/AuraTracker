@@ -3,8 +3,6 @@ HDH_AT_ConfigFrameMixin.F = {}
 HDH_AT_ConfigFrameMixin.cacheCastSpell = {}
 HDH_AT_ConfigFrameMixin.cacheUesdItem = {}
 
-local GetSpellLink = GetSpellLink or C_Spell.GetSpellLink
-
 local L = HDH_AT_L
 local DB = HDH_AT_ConfigDB
 local UTIL = HDH_AT_UTIL
@@ -2744,7 +2742,7 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 					local id = self.ID:GetText()
 					if id then
 						local isItem = self.isItem or false
-						local link = isItem and select(2,GetItemInfo(id)) or GetSpellLink(id)
+						local link = isItem and select(2,GetItemInfo(id)) or UTIL.GetSpellLink(id)
 						if not link then return end
 						GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
 						if self.unit then
