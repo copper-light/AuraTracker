@@ -2840,7 +2840,6 @@ function HDH_AT_ConfigFrameMixin:UpdateAbleConfigs(mode)
 	if not self.UI_TAB[idx]:IsEnabled() then
 		idx = 1
 	end
-	-- ChangeTab(self.UI_TAB, idx)
 end
 
 local function DBSync(comp, comp_type, key)
@@ -2999,7 +2998,6 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:SetPoint('TOPLEFT', self.DETAIL_ETC_TAB[2].content, 'TOPLEFT', 20, -70)
 	comp:SetMinMaxValues(0, 1)
 	self.F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR = comp
-	-- INV_Jewelcrafting_DragonsEye03 INV_Jewelcrafting_DragonsEye04 INV_Jewelcrafting_DragonsEye05
 
 	-- inner cooldown item layer
 	HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[3].content, COMP_TYPE.SPLIT_LINE, L.COOLDOWN_ITEM_DESC)
@@ -3376,6 +3374,10 @@ function HDH_AT_ConfigFrame_OnShow(self)
 end
 
 function HDH_AT_ConfigFrame_OnLoad(self)
+	if select(4, GetBuildInfo()) <= 49999 then -- 대격변
+		self.maxTabWidth = 18
+	end
+
     self:SetResizeBounds(FRAME_WIDTH, FRAME_MIN_H, FRAME_WIDTH, FRAME_MAX_H) 
     self:SetupCommend()
     self:InitFrame()

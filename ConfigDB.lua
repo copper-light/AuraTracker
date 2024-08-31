@@ -633,7 +633,7 @@ function HDH_AT_ConfigDB:AppendProfile(supportTrackerList, data)
         match = false
         for _, trait in ipairs(config.tracker.trait) do
             for i = 1, MAX_TALENT_TABS do
-                talentId, _, _, _ = GetSpecializationInfo(i)
+                talentId, _, _, _ = HDH_AT_UTIL.GetSpecializationInfo(i)
                 if talentId == nil then
                     break
                 end
@@ -647,7 +647,7 @@ function HDH_AT_ConfigDB:AppendProfile(supportTrackerList, data)
             end
         end
         if not match then
-            talentID = select(1,GetSpecializationInfo(GetSpecialization()))
+            talentID = select(1,HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))
             config.tracker.trait = {talentID}
         end
         if supportTrackerList[config.tracker.type] then
