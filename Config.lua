@@ -512,10 +512,6 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		end
 	end
 
-	-- if self.bodyType == BODY_TRACKER_EDIT and not bodyType then
-	-- 	self.bodyType = BODY_ELEMENTS
-	-- end
-
 	if (self.bodyType == BODY_DETAIL_GLOW or self.bodyType == BODY_DETAIL_ETC or self.bodyType == BODY_DETAIL_DISPLAY) and trackerIndex then
 		self.bodyType = BODY_ELEMENTS
 	end
@@ -529,9 +525,6 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		self.F.BODY.CONFIG_TRACKER:Show()
 		self.F.BODY.CONFIG_UI:Hide()
 		self.F.BODY.CONFIG_DETAIL:Hide()
-		-- self.F.BODY.CONFIG_DETAIL.ETC:Hide()
-		-- self.F.BODY.CONFIG_UI.DD_CONFIG_MODE:Disable()
-		-- self:LoadTrackerList()
 		self:LoadTrackerConfig()
 		bottom_list[2]:Hide()
 		bottom_list[3]:Hide()
@@ -543,11 +536,9 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		self.F.BODY.CONFIG_TRACKER:Show()
 		self.F.BODY.CONFIG_UI:Hide()
 		self.F.BODY.CONFIG_DETAIL:Hide()
-		-- self.F.BODY.CONFIG_DETAIL.ETC:Hide()
 		bottom_list[2]:Show()
 		bottom_list[3]:Show()
 		self:LoadTrackerConfig(self.trackerId)
-		-- self.F.BODY.CONFIG_UI.DD_CONFIG_MODE:Eanble()
 		ChangeTab(bottom_list, 1)
 		ChangeTab(tracker_list, self.trackerIndex)
 
@@ -556,7 +547,6 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		self.F.BODY.CONFIG_TRACKER:Hide()
 		self.F.BODY.CONFIG_UI:Hide()
 		self.F.BODY.CONFIG_DETAIL:Hide()
-		-- self.F.BODY.CONFIG_DETAIL.ETC:Hide()
 		self:LoadTrackerElementConfig(self.trackerId)
 		bottom_list[2]:Show()
 		bottom_list[3]:Show()
@@ -568,8 +558,6 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		self.F.BODY.CONFIG_TRACKER:Hide()
 		self.F.BODY.CONFIG_UI:Show()
 		self.F.BODY.CONFIG_DETAIL:Hide()
-		-- self.F.BODY.CONFIG_DETAIL.ETC:Hide()
-		-- self.F.BODY.CONFIG_UI.DD_CONFIG_MODE:Enable()
 		self:LoadUIConfig(self.trackerId)
 		self:UpdateAbleConfigs(self.F.BODY.CONFIG_UI.SW_DISPLAY_MODE:GetSelectedValue())
 		ChangeTab(bottom_list, 3)
@@ -926,11 +914,8 @@ local function HDH_AT_OP_OnDragStartRow(self)
 end
 
 local function HDH_AT_OP_OnDragStopRow(self)
-	-- local idx = GetTrackerIndex()
 	self:StopMovingOrSizing();
 	self:SetScript('OnUpdate', nil);
-	-- HDH_LoadAuraListFrame(idx);
-	-- HDH_AT_OP_GetTracker(idx):InitIcons();
 	local main = GetMainFrame()
 	local trackerId = GetMainFrame():GetCurTrackerId()
 	if self:GetParent() == main.F.BODY.CONFIG_TRACKER_ELEMENTS.CONTENTS 
@@ -941,7 +926,6 @@ local function HDH_AT_OP_OnDragStopRow(self)
 	else
 		main:LoadTrackerList(main:GetCurTraits())
 		main:ChangeBody(nil, self.index)
-		-- main:SetCurTrackerIdx(self.idx)
 		HDH_TRACKER.InitVaribles()
 		if main.F.BODY.CONFIG_TRACKER:IsShown() then
 			main:LoadTrackerConfig(main:GetCurTrackerId())
@@ -966,8 +950,6 @@ local function HDH_AT_OnEventTrackerElement(self, elemIdx)
 	elseif string.find(name, "CheckButtonAlways") then
 		local value = self:GetChecked()
 		main:ChangeBody(BODY_DETAIL_DISPLAY, nil, elemIdx, nil, self)
-		-- DB:UpdateTrackerElementAlways(trackerId, elemIdx, value)
-		-- HDH_TRACKER.InitIconFrame(trackerId)
 
 	elseif string.find(name, "CheckButtonGlow") then
 		local value = self:GetChecked()
@@ -1206,10 +1188,6 @@ function HDH_AT_OnClick_Button(self, button)
 				self:GetParent().CheckButton1:SetChecked(false)
 			end)
 		end
-
-		-- if not trackerObj:IsHaveData() then
-		-- 	trackerObj:CreateData()
-		-- end
 		 
 		-- 트래커 고유 설정 변경해야하는 트래커 유형
 		if not perType and (className == "HDH_COMBO_POINT_TRACKER" or className == "HDH_ESSENCE_TRACKER" or className == "HDH_DK_RUNE_TRACKER") then
@@ -1304,11 +1282,7 @@ function HDH_AT_OnClick_Button(self, button)
 			local trait = main:GetCurTraits()
 			main.F.BODY.CONFIG_TRACKER:Hide()
 			DB:DeleteTracker(id)
-			-- HDH_TRACKER.Delete(idx)
-			-- HDH_TRACKER.Reload(idx)
-			-- main:UpdateFrame()
 			main:LoadTrackerList(trait)
-			-- main:LoadTrackerList(trait)
 			main:ChangeBody(BODY_TRACKER_NEW)
 			HDH_TRACKER.InitVaribles()
 
@@ -1333,7 +1307,6 @@ function HDH_AT_OnClick_Button(self, button)
 
 				F.BODY.CONFIG_TRACKER:Hide()
 				GetMainFrame():UpdateFrame()
-				-- GetMainFrame():ChangeTrackerTabByTrackerId(newId)
 				HDH_TRACKER.InitVaribles()
 				main.Dialog:AlertShow(L.ALRET_CONFIRM_COPY:format(copyName))
 
@@ -1391,7 +1364,6 @@ function HDH_AT_OnClick_Button(self, button)
 		local mode = F.BODY.CONFIG_DETAIL.mode
 
 		if mode == BODY_DETAIL_GLOW then
-			-- local checkbutton = F.BODY.CONFIG_DETAIL.GLOW.checkbutton
 			local checkedIdx, condition, glowValue
 			for idx, cd in ipairs(F.BODY.CONFIG_DETAIL.GLOW.CB_LIST) do
 				if cd[1]:GetChecked() then
@@ -1682,7 +1654,6 @@ function HDH_AT_ConfigFrameMixin:GetCurTrackerId()
 end
 
 function HDH_AT_ConfigFrameMixin:DeleteTrackerElement(elem, trackerId, elemIdx)
-	-- rowIdx = select(1, elem:Get())
 	DB:DeleteTrackerElement(trackerId, elemIdx)
 	local t = HDH_TRACKER.Get(trackerId)
 	if t then
@@ -3333,7 +3304,6 @@ function HDH_AT_ConfigFrameMixin:OnEvent(event, ...)
 	if event == "UNIT_SPELLCAST_SENT" then
 		table.insert(self.cacheCastSpell, select(4, ...))
 		UTIL.RunTimer(self, "UPDATE_LATEST", 0.5, HDH_AT_ConfigFrameMixin.UpdateLatest, self)
-		-- self:UpdateLatest()
 	elseif event == "BAG_UPDATE_COOLDOWN" then
 		local info, startTime, duration, enable, itemId
 		for bag = BACKPACK_CONTAINER, NUM_TOTAL_EQUIPPED_BAG_SLOTS or 0 do
@@ -3381,21 +3351,18 @@ end
 function HDH_AT_ConfigFrame_OnShow(self)
 	self.ErrorReset:Show()
 	local IsLoaded = select(1, HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))
-	-- if IsLoaded then
-		if HDH_AT_UTIL.GetSpecialization() == 5 then
-			self.Dialog:AlertShow(L.NOT_FOUND_TALENT)
-		end
-		self:SetClampedToScreen(true)
-		local x = self:GetLeft()
-		local y = self:GetBottom()
-		self:ClearAllPoints()
-		self:SetPoint("BOTTOMLEFT", x, y)
-		self:SetClampedToScreen(false)
-		self:SetWidth(FRAME_WIDTH)
-		self:UpdateFrame()
-	-- else
-	-- 	self:Hide()
-	-- end
+	
+	if HDH_AT_UTIL.GetSpecialization() == 5 then
+		self.Dialog:AlertShow(L.NOT_FOUND_TALENT)
+	end
+	self:SetClampedToScreen(true)
+	local x = self:GetLeft()
+	local y = self:GetBottom()
+	self:ClearAllPoints()
+	self:SetPoint("BOTTOMLEFT", x, y)
+	self:SetClampedToScreen(false)
+	self:SetWidth(FRAME_WIDTH)
+	self:UpdateFrame()
 
 	self.ErrorReset:Hide()
 
