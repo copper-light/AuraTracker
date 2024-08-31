@@ -629,7 +629,6 @@ function HDH_AT_ConfigDB:AppendProfile(supportTrackerList, data)
     local talentID
     for _, config in ipairs(data) do
         id = id + 1
-       
         match = false
         for _, trait in ipairs(config.tracker.trait) do
             for i = 1, MAX_TALENT_TABS do

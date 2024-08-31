@@ -1416,6 +1416,7 @@ function HDH_AT_OnClick_Button(self, button)
 		local tracker
 		for _, item in ipairs(list) do
 			if not item.id then break end
+			
 			if item:GetChecked() then
 				tracker = DB:GetTracker(item.id)
 				tracker = UTIL.Deepcopy(tracker)
@@ -1454,8 +1455,8 @@ function HDH_AT_OnClick_Button(self, button)
 		main.Dialog:AlertShow(L.DO_YOU_WANT_IMPORT_PROFILE, main.Dialog.DLG_TYPE.YES_NO, function() 	
 			local data = F.BODY.CONFIG_UI.ED_IMPORT_STRING:GetText()
 			data = WeakAuraLib_StringToTable(data, true)
-			DB:AppendProfile(DDP_TRACKER_LIST, data)
-			ReloadUI()
+			DB:AppendProfile(GET_TRACKER_TYPE_NAME, data)
+			-- ReloadUI()
 		end)
 
 	elseif self == F.BODY.CONFIG_DETAIL.ETC.CUSTOM_BTN_SEARCH then
