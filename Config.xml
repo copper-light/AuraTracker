@@ -4,6 +4,9 @@
 
     <!-- 설정 프레임 시작 -->
     <Frame name="HDH_AT_ConfigFrame" mixin="HDH_AT_ConfigFrameMixin" movable="true" toplevel="true" parent="UIParent" frameStrata="HIGH" hidden="true" enableMouse="true" resizable="true" inherits="HDH_AT_ConfigFrameTemplate">
+		<KeyValues>
+			<KeyValue key="maxTabWidth" value="18" type="number"/>
+		</KeyValues>
 		<Size><AbsDimension x="410" y="500"/></Size>
 		<Anchors>
             <Anchor point="CENTER" x="0" y="0"/>
@@ -1027,7 +1030,7 @@
 				</Frames>
 			</Frame>
 
-			<Button name="$parentTabElements" inherits="HDH_AT_BottomTapTemplate" id="1" hidden="false">
+			<Button name="$parentTabInfo" inherits="HDH_AT_BottomTapTemplate" id="1" hidden="false">
 				<Size x="32" y="32"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="10" y="-3" />
@@ -1036,12 +1039,26 @@
 				<!-- <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
 				<CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/> -->
 				<Scripts>
-					<OnLoad>self:SetText(HDH_AT_L.CONFIG_TRACKER_ELEMENTS) self:SetActivate(true)</OnLoad>
+					<OnLoad>self:SetText(HDH_AT_L.CONFIG_TRACKER_INFO) self:SetActivate(true)</OnLoad>
 					<OnClick function="HDH_AT_OnClick_ButtomTapButton" />
 				</Scripts>
 			</Button>
 
-			<Button name="$parentTabUI" inherits="HDH_AT_BottomTapTemplate" id="2"  hidden="false">
+			<Button name="$parentTabElements" inherits="HDH_AT_BottomTapTemplate" id="2" hidden="false">
+				<Size x="32" y="32"/>
+				<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentTabInfo" x="3" y="0" />
+				</Anchors>
+				<!-- <NormalTexture/> -->
+				<!-- <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/> -->
+				<Scripts>
+					<OnLoad>self:SetText(HDH_AT_L.CONFIG_TRACKER_ELEMENTS) self:SetActivate(false)</OnLoad>
+					<OnClick function="HDH_AT_OnClick_ButtomTapButton" />
+				</Scripts>
+			</Button>
+
+			<Button name="$parentTabUI" inherits="HDH_AT_BottomTapTemplate" id="3"  hidden="false">
 				<Size x="32" y="32"/>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentTabElements" x="3" y="0" />

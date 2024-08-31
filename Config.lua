@@ -507,15 +507,17 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 
 	if self.bodyType == BODY_TRACKER_NEW and trackerIndex and self:GetTrackerListSize() > 0 then
 		if bottomIndex == 1 then
+			self.bodyType = BODY_TRACKER_EDIT
+		elseif bottomIndex == 2 then
 			self.bodyType = BODY_ELEMENTS
 		else
 			self.bodyType = BODY_UI
 		end
 	end
 
-	if self.bodyType == BODY_TRACKER_EDIT and not bodyType then
-		self.bodyType = BODY_ELEMENTS
-	end
+	-- if self.bodyType == BODY_TRACKER_EDIT and not bodyType then
+	-- 	self.bodyType = BODY_ELEMENTS
+	-- end
 
 	if (self.bodyType == BODY_DETAIL_GLOW or self.bodyType == BODY_DETAIL_ETC or self.bodyType == BODY_DETAIL_DISPLAY) and trackerIndex then
 		self.bodyType = BODY_ELEMENTS
@@ -535,6 +537,7 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		-- self:LoadTrackerList()
 		self:LoadTrackerConfig()
 		bottom_list[2]:Hide()
+		bottom_list[3]:Hide()
 		ChangeTab(bottom_list, 1)
 		ChangeTab(tracker_list, #tracker_list)
 
@@ -545,10 +548,11 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		self.F.BODY.CONFIG_DETAIL:Hide()
 		-- self.F.BODY.CONFIG_DETAIL.ETC:Hide()
 		bottom_list[2]:Show()
+		bottom_list[3]:Show()
 		self:LoadTrackerConfig(self.trackerId)
 		-- self.F.BODY.CONFIG_UI.DD_CONFIG_MODE:Eanble()
-		ChangeTab(tracker_list, self.trackerIndex)
 		ChangeTab(bottom_list, 1)
+		ChangeTab(tracker_list, self.trackerIndex)
 
 	elseif self.bodyType == BODY_ELEMENTS then
 		self.F.BODY.CONFIG_TRACKER_ELEMENTS:Show()
@@ -558,7 +562,8 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		-- self.F.BODY.CONFIG_DETAIL.ETC:Hide()
 		self:LoadTrackerElementConfig(self.trackerId)
 		bottom_list[2]:Show()
-		ChangeTab(bottom_list, 1)
+		bottom_list[3]:Show()
+		ChangeTab(bottom_list, 2)
 		ChangeTab(tracker_list, self.trackerIndex)
 		
 	elseif self.bodyType == BODY_UI then
@@ -570,7 +575,7 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		-- self.F.BODY.CONFIG_UI.DD_CONFIG_MODE:Enable()
 		self:LoadUIConfig(self.trackerId)
 		self:UpdateAbleConfigs(self.F.BODY.CONFIG_UI.SW_DISPLAY_MODE:GetSelectedValue())
-		ChangeTab(bottom_list, 2)
+		ChangeTab(bottom_list, 3)
 		ChangeTab(tracker_list, self.trackerIndex)
 		ChangeTab(ui_list, self.subType)
 
@@ -1453,7 +1458,7 @@ function HDH_AT_OnClick_Button(self, button)
 			end
 		end
 		exportTracker.version = DB:GetVersion()
-		exportTracker.adoon_version = GetAddOnMetadata("HDH_AuraTracker", "Version")
+		exportTracker.adoon_version = C_AddOns.GetAddOnMetadata("HDH_AuraTracker", "Version")
 
 		if #exportTracker > 0 then
 			local data = WeakAuraLib_TableToString(exportTracker, true)
@@ -1616,6 +1621,8 @@ end
 
 function HDH_AT_OnClick_ButtomTapButton(self)
 	if self.index == 1 then
+		GetMainFrame():ChangeBody(BODY_TRACKER_EDIT, nil, nil, nil)
+	elseif self.index == 2 then
 		GetMainFrame():ChangeBody(BODY_ELEMENTS, nil, nil, nil)
 	else
 		GetMainFrame():ChangeBody(BODY_UI, nil, nil, nil)
@@ -3113,13 +3120,16 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.F.BODY.CONFIG_UI.MEMU = _G[self.F.BODY:GetName().."UIMenuSFContents"]
 	self.F.BODY.CONFIG_UI.CONTENTS = _G[self.F.BODY:GetName().."UIConfigSFContents"]
 	
+	self.F.BODY_TAB_INFO = _G[self:GetName().."TabInfo"]
 	self.F.BODY_TAB_ELEMENTS = _G[self:GetName().."TabElements"]
 	self.F.BODY_TAB_UI = _G[self:GetName().."TabUI"]
 
-	self.F.BODY_TAB_ELEMENTS.index = 1
-	self.F.BODY_TAB_UI.index = 2
+	self.F.BODY_TAB_INFO.index = 1
+	self.F.BODY_TAB_ELEMENTS.index = 2
+	self.F.BODY_TAB_UI.index = 3
 
 	self.BODY_TAB = {
+		self.F.BODY_TAB_INFO, 
 		self.F.BODY_TAB_ELEMENTS, 
 		self.F.BODY_TAB_UI
 	}

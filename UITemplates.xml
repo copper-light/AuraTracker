@@ -1399,7 +1399,6 @@
                 <Layers>
                     <Layer level="BACKGROUND">
                         <Texture name="$parentBg" parentKey="BG">
-                            <!-- <Color r="1" g="0.8" b="0" a="0.5"/> -->
                             <Color r="0.35" g="0.35" b="0.35" a="0.8"/>
                             <Anchors>
                                 <Anchor point="TOPLEFT" x="0" y="0" />
@@ -1411,7 +1410,6 @@
 				<Anchors>
 					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT"  x="0" y="0" />
 					<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" />
-					<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 				</Anchors>
 
                 <Frames>
@@ -1421,7 +1419,6 @@
                 <Scripts>
 					<OnLoad></OnLoad>
                     <OnLeave function="HDH_AT_DropDownList_OnLeave" />
-					<!-- <OnClick>self:Hide()</OnClick> -->
                 </Scripts>
 			</Button>
 		</Frames>
@@ -1430,25 +1427,12 @@
             <OnLeave function="HDH_AT_DropDown_OnLeave" />
             <OnClick function="HDH_AT_DropDown_OnClick" />
 		</Scripts>
-        <!-- <ButtonText name="$parentText"/> -->
         <NormalFont style="Font_Yellow_S" />
-			<!-- <Anchors>
-				<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT"  x="0" y="0" />
-				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
-			</Anchors> -->
-		<!-- <NormalFont/> -->
 		<HighlightFont style="Font_Yellow_S"/>
 		<DisabledFont style="Font_Gray_S"/>
         <HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
 			<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
 		</HighlightTexture>
-        <!-- <NormalTexture>
-			<Color r="1" g="0.8" b="0" a="0.8"/>
-			<Anchors>
-				<Anchor point="TOPLEFT" x="2" y="-2"/>
-				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-			</Anchors>					
-		</NormalTexture> -->
 		<DisabledTexture>
 			<Color r="0.3" g="0.3" b="0.3" a="0"/>
 			<Anchors>
@@ -1463,12 +1447,9 @@
 			<OnLoad inherits="append">
 				self.always_show_list = true
 				self.Text:Hide()
-				<!-- self.List:ClearAllPoints() -->
 				self.List:Show()
 				self.List:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
 				self.List.BG:Hide()
-				<!-- self.List:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0) -->
-				<!-- self.List:SetFrameStrata("LOW") -->
 			</OnLoad>
 		</Scripts>
 		<HighlightTexture />
