@@ -1456,7 +1456,7 @@ function HDH_AT_OnClick_Button(self, button)
 			local data = F.BODY.CONFIG_UI.ED_IMPORT_STRING:GetText()
 			data = WeakAuraLib_StringToTable(data, true)
 			DB:AppendProfile(GET_TRACKER_TYPE_NAME, data)
-			-- ReloadUI()
+			ReloadUI()
 		end)
 
 	elseif self == F.BODY.CONFIG_DETAIL.ETC.CUSTOM_BTN_SEARCH then
