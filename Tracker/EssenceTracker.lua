@@ -36,7 +36,6 @@ function OnUpdate(self)
 	self:GetParent().parent:UpdateBarValue(self);
 	
 	if self.spell.remaining > 0 then
-		-- self.timetext:SetText(string.format('%.1f', self.spell.remaining));
 		self:GetParent().parent:UpdateTimeText(self.timetext, self.spell.remaining)
 	else
 		self.timetext:SetText("");
@@ -215,17 +214,11 @@ function HDH_ESSENCE_TRACKER:InitIcons()
 end
 
 function HDH_ESSENCE_TRACKER:PLAYER_ENTERING_WORLD()
+	-- empty
 end
 
 function HDH_ESSENCE_TRACKER:OnEvent(event, unit, powerType)
-	if self == nil or self.parent == nil then return end
-	if ((event == 'UNIT_POWER_UPDATE')) and (self.parent.POWER_INFO[self.parent.type].power_type == powerType) then  -- (event == "UNIT_POWER")
-		if not HDH_TRACKER.ENABLE_MOVE then
-			-- self.parent:Update()
-			-- print("e")
-			-- self.parent:UpdateBar(self.parent.frame.icon[1]);
-		end
-	end
+	-- empty
 end
 ------------------------------------
 -- HDH_ESSENCE_TRACKER class

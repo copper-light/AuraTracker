@@ -1,3 +1,5 @@
+-- ##### 현재 사용하지 않는 트래커
+
 HDH_USED_SKILL_TRACKER = {}
 
 local MyClassKor, MyClass = UnitClass("player");

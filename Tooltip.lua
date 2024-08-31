@@ -28,8 +28,7 @@ end
 do
 
     if select(4, GetBuildInfo()) <= 49999 then -- 대격변
-
-        -- aura tooltip
+        
         hooksecurefunc(GameTooltip, "SetUnitBuff", function(self, ...)
             if not HDH_AT_DB.show_tooltip_id then return end
             local aura = C_UnitAuras.GetBuffDataByIndex(...)

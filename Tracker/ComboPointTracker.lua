@@ -136,7 +136,6 @@ end
 
 function HDH_COMBO_POINT_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
 	local icon = self.frame.icon[idx]
-	--icon:SetScript("OnEvent", nil)
 	icon:Hide()
 	icon:SetParent(nil)
 	icon.spell = nil
@@ -423,7 +422,6 @@ function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 				if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then 
 					if not f.icon:IsDesaturated() then f.icon:SetDesaturated(1) end
 					f.icon:SetAlpha(self.ui.icon.off_alpha)
-					-- f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
 					f.iconSatCooldown:Hide()
 					f.iconSatCooldown.spark:Hide()
 					f.border:SetAlpha(self.ui.icon.off_alpha)
@@ -469,8 +467,6 @@ end
 
 function HDH_COMBO_POINT_TRACKER:Update() -- HDH_TRACKER override
 	if not self.frame or not self.frame.icon or HDH_TRACKER.ENABLE_MOVE then return end
-	-- local auraList = DB_AURA.Talent[self:GetSpec()][self.name]
-	-- if not auraList or #auraList == 0 then return end
 	local iconf;
 	local spell;
 	local ret = 0;
@@ -516,7 +512,6 @@ function HDH_COMBO_POINT_TRACKER:Update() -- HDH_TRACKER override
 end
 
 function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
-	-- if HDH_TRACKER.ENABLE_MOVE then return end
 	local ret = 0
 	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
 	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue

@@ -459,21 +459,8 @@ do
 
 	function HDH_AT_UTIL.AdjustLocation(x, y)
 		local w, h = UIParent:GetSize()
-
 		x = math.floor(x + 0.1 - (w / 2))
 		y = math.floor(y + 0.1 - (h / 2))
-
-		-- if x > 0 then
-		-- 	x = math.floor(x + 0.1)
-		-- else
-		-- 	x = math.ceil(x - 0.1)
-		-- end
-
-		-- if y > 0 then
-		-- 	y = math.floor(y + 0.1)
-		-- else
-		-- 	y = math.ceil(y - 0.1)
-		-- end
 
 		return x, y
 	end

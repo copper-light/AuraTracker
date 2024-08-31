@@ -1,3 +1,5 @@
+-- ##### 현재 사용하지 않는 트래커
+
 CT_VERSION = 0.1
 HDH_HEALTH_TRACKER = {}
 

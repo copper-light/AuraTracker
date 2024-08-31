@@ -30,7 +30,6 @@ end
 HDH_AT_BottomTapMixin = {}
 
 function HDH_AT_BottomTapMixin:SetActivate(bool)
-    -- local name = self:GetName()
     if bool then
         self:Disable()
         self.Left:Hide()
@@ -78,8 +77,6 @@ function HDH_AT_AuraRowMixin:Set(no, key, id, name, texture, display, glow, valu
 	_G[self:GetName().."CheckButtonIsItem"]:SetChecked(isItem)
     self.tmp_id = id
 	self.tmp_chk = isItem
-	-- _G[rowFrame:GetName().."ButtonAdd"]:SetText("삭제")
-	-- _G[rowFrame:GetName().."ButtonAddAndDel"]:SetText("등록")
 	_G[self:GetName().."EditBoxID"]:ClearFocus() -- ButtonAddAndDel 의 값때문에 순서 굉장히 중요함
 	_G[self:GetName().."RowDesc"]:Hide()
     _G[self:GetName().."CheckButtonAlways"]:Show()
@@ -133,10 +130,6 @@ function HDH_AT_AuraRowMixin:Clear()
 	self.tmp_chk = false
     self.readOnly = false
 end
--- function HDH_AT_AuraRowMixin:SetHandler(func_OnEnterPressed, func_OnClick)
---     _G[self:GetName().."ButtonAdd"]:SetScript("OnClick", func_OnClick)
---     _G[self:GetName().."ButtonDel"]:SetScript("OnClick", func_OnClick)
--- end
 
 function HDH_AT_AuraRowMixin:ChangeReadMode()
     if self.timer then
@@ -202,10 +195,8 @@ function HDH_AT_OnEditFocusLost(self)
     -- 버튼 클릭 이벤트보다 포커스 로스트 이벤트가 먼저 일어나서 버튼 이벤트가 발생하지 않는 문제로 인하여
     -- 이벤트를 지연시킴
     self:GetParent().timer = C_Timer.NewTimer(0.5, function(self)
-        -- if not self:IsFocus() then
         self = self.arg
         self:GetParent():ChangeReadMode()
-        -- end
         self.timer = nil
     end)
     self:GetParent().timer.arg = self
@@ -245,7 +236,6 @@ HDH_AT_DropDownMixin = {
 
 function HDH_AT_DropDown_OnEnteredItem(self)
     local dropdownBtn = self:GetParent():GetParent()
-    -- dropdownBtn:SetSelectedIndex(self.idx, true)
     dropdownBtn.onEnterHandler(dropdownBtn, self, self.idx, self.value)
 end
 
@@ -357,8 +347,6 @@ function HDH_AT_DropDownMixin:SelectClear()
             for i, item in ipairs(items) do
                 if item.CheckButton then
                     item.CheckButton:SetChecked(false)
-                    -- item.CheckButton:Enable()
-                    -- item.Text:SetFontObject("Font_White_S")
                 end
             end
             self.selectedValueCount = 0
@@ -441,7 +429,6 @@ function HDH_AT_DropDownMixin:SetSelectedIndex(idx, show)
         end
         self.selectedIdx = idx
         self.value = seletedItemFrame.value
-        -- self.handler(dropdownBtn, self, self.idx, dropdownBtn.value)
     end
 end
 
@@ -544,13 +531,6 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
             totalHeight = totalHeight + itemFrame:GetHeight()
         end
 
-        -- if selectedIdx > 0 and selectedIdx == i then
-        --     if icon then btn.ICON:SetTexture(icon) end
-        --     btn.TEXT:SetText(name)
-        --     _G[list.item[i]:GetName().."On"]:Show()
-        -- else
-        --     _G[list.item[i]:GetName().."On"]:Hide()
-        -- end
         if(not always_show_list) then
             local height = totalHeight + 1
             listFrame:SetHeight(height) 
@@ -608,11 +588,6 @@ end
 function HDH_AT_DropDown_OnLoad(self)
     _G[self:GetName().."Text"]:SetText(L.SELECT)
     _G[self:GetName().."Text"]:SetFontObject("Font_Yellow_S")
-
-    -- local font = self:GetNormalFontObject()
-    -- -- _G[self:GetName().."Text"]:ClearAllPoints()
-    -- font:SetPoint("TOPLEFT", self, "TOPLEFT", 0,0)
-    -- font:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0,0)
 end
 
 function HDH_AT_DropDown_OnClick(self)
@@ -626,9 +601,9 @@ function HDH_AT_DropDown_OnClick(self)
 end
 
 function HDH_AT_DropDown_OnLeave(self)
-    if not self.always_show_list and not _G[self:GetName().."List"]:IsMouseOver() then
-        -- _G[self:GetName().."List"]:Hide()
-    end
+    -- if not self.always_show_list and not _G[self:GetName().."List"]:IsMouseOver() then
+    --     -- _G[self:GetName().."List"]:Hide()
+    -- end
 end
 
 local function CheckMouseOver(frame) 
@@ -708,11 +683,6 @@ end
 
 function HDH_AT_OnValueChanged_Slider(self, value)
     value = SliderValueFormat(self, value)
-    -- local dy = UpdateMinMaxValues(self, value)
-    -- if not dy then
-    --     self.MinValue:SetText(min)
-    --     self.MaxValue:SetText(max)
-    -- end
     self:SetValue(value)
     self.Value:SetText(self.format:format(value))
 end
@@ -790,7 +760,6 @@ local function OnOKColorPicker()
 end
 
 local function OnCancelColorPicker()
-    -- ColorPickerFrame.buttonFrame:SetColorRGBA(ColorPickerFrame:GetPreviousValues())
     self = ColorPickerFrame.buttonFrame
     local r, g, b, a  = ColorPickerFrame:GetPreviousValues()
     self:SetColorRGBA(r, g, b, a)
@@ -813,24 +782,19 @@ function HDH_AT_OnClickColorPicker(self)
 	a = a and a or 1;
 	if self.enableAlpha then
 		ColorPickerFrame.opacity = a
-		-- ColorPickerFrame.Content.ColorPicker:SetColorAlpha(a)
     end
-    -- ColorPickerOkayButton:SetScript("OnClick", OnSelectedColorPicker)
 
     ColorPickerFrame.func = HDH_OnSelectedColor
 
     local info = {};
     ColorPickerFrame.buttonFrame = self
-    -- info.swatchFunc = OnSelectedColorPicker;
     info.swatchFunc = (function () end);
     info.cancelFunc = OnCancelColorPicker;
-    -- info.opacityFunc = OnSelectedColorPicker;
 	info.r = r 
     info.g = g 
     info.b = b
     info.opacity = a 
 	info.hasOpacity = self.enableAlpha;
-	-- ColorPickerFrame:SetColorRGB(r, g, b);
 
     if ColorPickerFrame.Footer then
         ColorPickerFrame.Footer.OkayButton:HookScript("OnClick", OnSelectedColorPicker)
@@ -849,28 +813,12 @@ HDH_AT_TrackerTapBtnTemplateMixin = {}
 
 function HDH_AT_TrackerTapBtnTemplateMixin:SetActivate(bool)
     if bool then
-        -- _G[self:GetName().."Border1"]:Show()
-        -- _G[self:GetName().."Border2"]:Show()
-        -- _G[self:GetName().."Border3"]:Show()
-        -- _G[self:GetName().."Border4"]:Show()
-        -- _G[self:GetName().."Border5"]:Show()
-        -- _G[self:GetName().."Border6"]:Show()
-        -- _G[self:GetName().."Border7"]:Show()
-        -- _G[self:GetName().."BgLine1"]:Show()
         _G[self:GetName().."BgLine2"]:Show()
         _G[self:GetName().."On"]:Show()
         
         self.BG:SetColorTexture(0,0,0,0.5)
         self.Text:SetTextColor(1,0.8,0)
     else
-        -- _G[self:GetName().."Border1"]:Hide()
-        -- _G[self:GetName().."Border2"]:Hide()
-        -- _G[self:GetName().."Border3"]:Hide()
-        -- _G[self:GetName().."Border4"]:Hide()
-        -- _G[self:GetName().."Border5"]:Hide()
-        -- _G[self:GetName().."Border6"]:Hide()
-        -- _G[self:GetName().."Border7"]:Hide()
-        -- _G[self:GetName().."BgLine1"]:Hide()
         _G[self:GetName().."BgLine2"]:Hide()
         _G[self:GetName().."On"]:Hide()
         self.BG:SetColorTexture(0,0,0,0.3)
@@ -1349,18 +1297,13 @@ function HDH_AT_CheckButton2TemplateMixin:SetChecked(bool)
     if bool then
         if not self.isHideBackground then
             self.Active1:Show()
-           
         end
 
         self.ActiveBorderTop:Show()
         self.ActiveBorderLeft:Show()
         self.ActiveBorderRight:Show()
         self.ActiveBorderBottom:Show()
-
         self.CheckMarker:Show()
-        -- self.CheckMarker:SetFontObject("Font_Yellow_M")
-        -- self.Text:SetFontObject("Font_Yellow_S")
-        -- self.Active2:Show()
     else
         self.Text:SetFontObject("Font_White_S")
         self.Active1:Hide()
@@ -1371,14 +1314,6 @@ function HDH_AT_CheckButton2TemplateMixin:SetChecked(bool)
         self.ActiveBorderBottom:Hide()
         self.Active2:Hide()
     end
-
-    -- self.Active1:Hide()
-    -- -- self.CheckMarker:Hide()
-    -- self.ActiveBorderTop:Hide()
-    -- self.ActiveBorderLeft:Hide()
-    -- self.ActiveBorderRight:Hide()
-    -- self.ActiveBorderBottom:Hide()
-    
     self.isChecked = bool
 end
 

@@ -459,9 +459,6 @@ local function GetTalentIdByTraits(searchTraitsId)
 end
 
 local function ChangeTab(list, idx)
-	-- if idx == list.selectedIndex then
-	-- 	return
-	-- end
 	if list.activateButton then
 		list.activateButton:SetActivate(false)
 		if list.activateButton.content then
@@ -1630,25 +1627,9 @@ function HDH_AT_OnClick_ButtomTapButton(self)
 	
 end
 
-function HDH_AT_OnClick_TrackerButton(self)
-    -- local list = self:GetParent().tabList
-    -- local idx = self:GetID() or 0
-    -- HDH_AT_OP_ChangeTapState(list, idx)
-end
-
 function HDH_AT_OnCancelColorPicker()
 	local r,g,b,a = unpack(ColorPickerFrame.previousValues);
 	a = (ColorPickerFrame.hasOpacity and a) or nil;
-	-- UpdateFrameDB_CP(ColorPickerFrame.colorButton, r,g,b,a);
-	-- UpdateFrameDB_CP(ColorPickerFrame.colorButton);
-	-- ColorPickerFrame.colorButton = nil;
-	-- if HDH_AT_OP_IsEachSetting() then
-	-- 	local tracker = HDH_AT_OP_GetTracker(HDH_AT_OP_GetTrackerInfo(GetTrackerIndex()))
-	-- 	if not tracker then return end
-	-- 	tracker:UpdateSetting()
-	-- else
-	-- 	HDH_TRACKER.UpdateSettingAll()
-	-- end
 end
 
 ---------------------------------------------------------
@@ -1901,14 +1882,6 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerElementConfig(trackerId, startRowIdx
 	local F = self.F
 	local listFrame = F.BODY.CONFIG_TRACKER_ELEMENTS.CONTENTS
 	if not listFrame.list then listFrame.list = {} end
-	-- local itemDB = self:GetCurrentTrackerItemListDB()
-	-- local db = HDH_AT_OP_GetTrackerInfo(GetTrackerIndex())
-	-- local tracker_name = db.name
-	-- local type = db.type
-	-- local unit = db.unit
-	-- local spec = HDH_GetSpec(tracker_name);
-	-- if not DB_AURA.Talent[spec] then return end
-	-- aura = db.spell_list
 	if not trackerId then return end
 	local rowFrame
 	local i = startRowIdx or 1
@@ -2863,6 +2836,11 @@ function HDH_AT_ConfigFrameMixin:UpdateFrame()
 			end
 		end
 		self:LoadTrackerList(ddm:GetSelectedValue())
+		
+		if self.bodyType == nil then 
+			self.bodyType = BODY_ELEMENTS
+		end
+
 		self:ChangeBody(nil, nil, nil, nil)
 	else
 		ddm:SelectClear()
@@ -3133,6 +3111,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 		self.F.BODY_TAB_ELEMENTS, 
 		self.F.BODY_TAB_UI
 	}
+	ChangeTab(self.BODY_TAB, 1)
 
 	self.F.LATEST_SPELL_WINDOW = _G[self:GetName().."LatestSpell"]
 	self.F.LATEST_SPELL = _G[self:GetName().."LatestSpellBodySFContents"]

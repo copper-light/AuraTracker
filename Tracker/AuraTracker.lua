@@ -163,7 +163,6 @@ do
 		local column_count = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
 		local margin_h = self.ui.common.margin_h
 		local margin_v = self.ui.common.margin_v
-		-- local size = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
 		local reverse_v = self.ui.common.reverse_v -- 상하반전
 		local reverse_h = self.ui.common.reverse_h -- 좌우반전
 		local icons = self.frame.icon
@@ -266,10 +265,6 @@ do
 						f.spell.remaining = 1;
 						f.spell.endTime = 1;
 						f.spell.startTime = 0;
-					else
-						-- f.bar:SetMinMaxValues(f.spell.startTime, f.spell.endTime);
-						-- f.bar:SetValue(f.spell.startTime+ f.spell.remaining);
-						-- self:UpdateBarValue(f);
 					end
 					f.iconSatCooldown.spark:Hide()
 					self:UpdateBarValue(f);
@@ -345,7 +340,6 @@ do
 	end
 
 	function HDH_AURA_TRACKER:InitIcons()
-		-- if HDH_TRACKER.ENABLE_MOVE then return end
 		local trackerId = self.id
 		local id, name, type, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
 		self.aura_filter = aura_filter
@@ -396,7 +390,6 @@ do
 				spell.remaining = 0
 				spell.overlay = 0
 				spell.endTime = 0
-				-- spell.is_buff = isBuff;
 				spell.isUpdate = false
 				spell.isItem =  isItem
 				f.spell = spell

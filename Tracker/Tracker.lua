@@ -369,12 +369,6 @@ function HDH_TRACKER.SetMoveAll(lock)
 		end
 	end
 end
-
-	-- function HDH_TRACKER.IsEqualClass(type, className)
-	-- 	local ret= false;
-	-- 	if type and HDH_GET_CLASS_NAME[type] == className then ret = true; end
-	-- 	return ret;
-	-- end
 	
 ------------------------------------------
 -- end -- TRACKER Static function 
@@ -477,9 +471,6 @@ function HDH_TRACKER:GetElementSize()
 end
 
 function HDH_TRACKER:Modify(newName, newType, newUnit)
-	-- HDH_DB_Modify(self.name, newName, newType, newUnit)
-	-- HDH_AURA_TRACKER.ModifyList(self.id, newId)
-	
 	if newType ~= self.type then
 		self:Release() -- 프레임 관련 메모리 삭제하고
 		DB:TrancateTrackerElements(self.id)
@@ -514,15 +505,9 @@ end
 function HDH_TRACKER:UpdateSetting()
 	if not self or not self.frame then return end
 	self.frame:SetSize(self.ui.icon.size, self.ui.icon.size)
-	-- if HDH_TRACKER.ENABLE_MOVE then
-	-- 	if self.frame.text then self.frame.text:SetPoint("TOPLEFT", self.frame, "BOTTOMRIGHT", -5, 12) end
-	-- end
 	if not self.frame.icon then return end
 	for k, iconf in pairs(self.frame.icon) do
 		self:UpdateIconSettings(iconf)
-		-- if self:IsGlowing(iconf) then
-		-- 	self:UpdateGlow(iconf, false)
-		-- end
 		self:ActionButton_ResizeOverlayGlow(iconf)
 		if not iconf.icon:IsDesaturated() then
 			iconf.icon:SetAlpha(self.ui.icon.on_alpha)
@@ -859,18 +844,10 @@ function HDH_TRACKER:UpdateBarValue(f, isEnding)
 				f.bar:SetMinMaxValues(0,1); 
 				f.bar:SetValue(0); 
 				f.name:SetTextColor(unpack(self.ui.font.name_color_off));
-				-- if self.ui.common.default_color and f.spell.dispelType then
-				-- 	f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r,
-				-- 							DebuffTypeColor[f.spell.dispelType or ""].g,
-				-- 							DebuffTypeColor[f.spell.dispelType or ""].b)
-				-- else
-				-- 	f.bar:SetStatusBarColor(unpack(self.ui.bar.full_color));
-				-- end
 				f.bar.spark:Hide();
 			else
 				local maxV = f.spell.endTime - f.spell.startTime;
 				f.bar:SetMinMaxValues(0, maxV); 
-				-- f.bar:SetMinMaxValues(f.spell.startTime, f.spell.endTime); 
 				f.bar:SetValue(f.spell.remaining); 
 				if self.ui.common.default_color and f.spell.dispelType then
 					f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r,
@@ -1008,7 +985,6 @@ function HDH_TRACKER:IsLearnedSpellOrEquippedItem(id, name, isItem) -- 특성 �
 			return true
 		end
 	else 
-		-- return IsPlayerSpell(id)
 		if IsPlayerSpell(id) then return true end
 		local selected = HDH_AT_UTIL.IsTalentSpell(id, name); -- true / false / nil: not found talent
 		if selected == nil then
@@ -1066,8 +1042,6 @@ function HDH_TRACKER:CreateDummySpell(count)
 		end
 		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 			f:SetScript("OnUpdate",nil);
-			-- f.bar:SetMinMaxValues(spell.startTime, spell.endTime);
-			-- f.bar:SetValue(spell.startTime+spell.duration);
 			self:UpdateBarValue(f);
 			f.bar:Show();
 			spell.name = spell.name or ("NAME"..i);
@@ -1379,14 +1353,6 @@ local function CreateMoveFrame(self)
 
 	tf:SetPoint("TOPLEFT")
 	tf:SetPoint("BOTTOMRIGHT")
-
-	-- local t = tf:CreateTexture(nil, 'BACKGROUND')
-	-- self.frame.moveFrame = tf
-	-- t:SetPoint("TOPLEFT")
-	-- t:SetPoint("BOTTOMRIGHT")
-	-- t:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/Border2")
-	-- t:SetAlpha(1)
-	-- self.frame.moveFrame.border = t
 
 	local t = tf:CreateTexture(nil, 'BACKGROUND')
 	self.frame.moveFrame = tf
@@ -1710,12 +1676,9 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	ChangeFontLocation(f, timetext, op_font.cd_location, op_font)
 	
 	f.timetext:Show()
-	-- if op_icon.show_cooldown then f.timetext:Show()
-	-- 						 else f.timetext:Hide() end
-	
+
 	self:ChangeCooldownType(f, self.ui.icon.cooldown)
 
-	
 	-- 아이콘 숨기기는 바와 연관되어 있기 때문에 바 설정쪽에 위치함.
 	if op_common.display_mode == DB.DISPLAY_ICON then
 		f.iconframe:Show()
@@ -1741,7 +1704,6 @@ function HDH_TRACKER:UpdateIconSettings(f)
 		if self:GetClassName() == "HDH_AURA_TRACKER" and self.ui.icon.able_buff_cancel then
 			f:SetMouseClickEnabled(true);
 			f:RegisterForClicks("RightButtonUp");
-			-- f:SetScript("OnClick",nil);
 			f:SetScript("OnClick", function(self) 
 				local tracker = self:GetParent().parent;
 				if tracker and tracker.unit and tracker.filter and self.spell.index then
@@ -1814,10 +1776,7 @@ else -- 용군단 코드
 		local frameWidth, frameHeight = f:GetSize();
 		f.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6);
 		f.SpellActivationAlert:SetPoint("CENTER", f, "CENTER", 0, 0);
-		-- f.SpellActivationAlert:SetPoint("TOPLEFT", f, "TOPLEFT", -frameWidth * 0.3, frameWidth * 0.3);
-		-- f.SpellActivationAlert:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", frameWidth * 0.3, -frameWidth * 0.3);
 		f.SpellActivationAlert:Hide()
-		-- button.SpellActivationAlert.animIn:Play();
 	end
 	
 	function HDH_TRACKER:ActionButton_ResizeOverlayGlow(f)
@@ -1847,10 +1806,6 @@ else -- 용군단 코드
 		f = f.iconframe;
 		
 		self:ActionButton_SetupOverlayGlow(f)
-		-- if f.SpellActivationAlert.animOut:IsPlaying() then
-		-- 	f.SpellActivationAlert.animOut:Stop();
-		-- end
-		-- f.SpellActivationAlert.animOut:Stop();
 		if not f.SpellActivationAlert:IsShown() then
 			f.SpellActivationAlert:Show();
 			f.SpellActivationAlert.ProcStartAnim:Play();
@@ -1865,16 +1820,9 @@ else -- 용군단 코드
 			return;
 		end
 	
-		-- 반복적으로 호출되면 왜 인지 모르겠는데 튀는 현상 있어서 그냥 안씀
-		-- if f.SpellActivationAlert.animIn:IsPlaying() then
-		-- 	f.SpellActivationAlert.animIn:Stop();
-		-- end
-	
 		if f:IsVisible() then
 			f.SpellActivationAlert:Hide();
 			border:Show();
-		else
-			-- f.SpellActivationAlert.animOut:OnFinished();	--We aren't shown anyway, so we'll instantly hide it.
 		end
 	end
 	
@@ -1958,7 +1906,6 @@ function HDH_TRACKER:GetAni(f, ani_type) -- row 이동 애니
 			ag:SetScript("OnFinished", function(self) 
 				self:GetParent():Hide(); 
 			end)
-			-- ag:SetScript("OnStop",function() f:SetAlpha(1.0);  end)
 		end	
 		return f.aniHide;
 	elseif ani_type == HDH_TRACKER.ANI_SHOW then
@@ -2292,19 +2239,12 @@ local function OnEvent(self, event, ...)
 		if HDH_AT_ConfigFrame:IsShown() then
 			HDH_AT_ConfigFrame:UpdateFrame()
 		end
-	elseif event == "TRAIT_TREE_CURRENCY_INFO_UPDATED" then
-		-- HDH_TRACKER.warining_count = HDH_TRACKER.warining_count or 0
-		-- if HDH_TRACKER.warining_count % 20 == 0 then
-		-- 	print('|cffffff00AuraTracker:|r '..L.PLASE_RESELECT_TRATIS_2)
-		-- end
-		-- HDH_TRACKER.warining_count = HDH_TRACKER.warining_count + 1
 	end
 end
 
 -- 애드온 로드 시 가장 먼저 실행되는 함수
 local function OnLoad(self)
 	self:RegisterEvent('PLAYER_ENTERING_WORLD')
-	--self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 end
 	
 HDH_AT_ADDON_FRAME = CreateFrame("Frame", "HDH_AT_iconframe", UIParent) -- 애드온 최상위 프레임

@@ -47,28 +47,6 @@ HDH_DK_RUNE_TRACKER.__index = HDH_DK_RUNE_TRACKER
 HDH_DK_RUNE_TRACKER.className = "HDH_DK_RUNE_TRACKER"
 HDH_DK_RUNE_TRACKER.POWER_INFO = POWER_INFO
 	
--- 매 프레임마다 bar frame 그려줌, 콜백 함수
--- local function DK_OnUpdateCooldown(self)
--- 	local spell = self:GetParent():GetParent().spell
--- 	if not spell then self:Hide() return end
-	
--- 	spell.curTime = GetTime()
--- 	if spell.curTime - (spell.delay or 0) < HDH_TRACKER.ONUPDATE_FRAME_TERM then return end -- 10프레임
--- 	spell.delay = spell.curTime
--- 	spell.remaining = spell.endTime - spell.curTime
-
--- 	if spell.remaining > 0 and spell.duration > 0 then
--- 		self:GetParent():GetParent():GetParent().parent:UpdateTimeText(self:GetParent():GetParent().timetext, spell.remaining);
--- 		if self:GetParent():GetParent():GetParent().parent.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE 
--- 		      and self:GetParent():GetParent():GetParent().parent.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
--- 			self:SetValue(spell.endTime - (spell.curTime - spell.startTime))
--- 		end
--- 	end
--- 	-- if self:GetParent():GetParent():GetParent().parent.option.bar.enable and self:GetParent():GetParent().spell.duration > HDH_C_TRACKER.GlobalCooldown then
--- 		-- self:GetParent():GetParent().bar:SetValue(self:GetParent():GetParent():GetParent().parent.option.bar.fill_bar and GetTime() or spell.startTime+spell.remaining);
--- 	-- end
--- end
-
 function HDH_DK_RUNE_TRACKER:CreateData()
 	local trackerId = self.id
 	local key = self.POWER_INFO[self.type].power_type
@@ -135,7 +113,6 @@ function HDH_DK_RUNE_TRACKER:IsHaveData()
 
 	return true
 end
-
 
 function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 	if not f then return end
@@ -350,13 +327,6 @@ function HDH_DK_RUNE_TRACKER:UpdateRune(runeIndex, isEnergize)
 	return ret;
 end
 
--- function HDH_DK_RUNE_TRACKER:UpdateRuneType(runeIndex)
--- 	local runeType = GetRuneType(runeIndex)
--- 	local iconf = self.frame.pointer[runeIndex]
--- 	if not iconf then return end
--- 	iconf.spell.type = runeType
--- end
-
 function HDH_DK_RUNE_TRACKER:Update() -- HDH_TRACKER override
 	if not self.frame or HDH_TRACKER.ENABLE_MOVE then return end
 	for i = 1 , MAX_RUNES do
@@ -405,10 +375,7 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 		spell.glowValue = (glowValue and tonumber(glowValue)) or 0
 
 		spell.showValue = isValue
-		-- spell.glowV1= auraList[i].GlowV1
 		spell.display = display
-		-- spell.showValue = auraList[i].ShowValue -- 수치표시
-		-- spell.v1_hp =  auraList[i].v1_hp -- 수치 체력 단위표시
 		spell.v1 = 0 -- 수치를 저장할 변수
 		spell.aniEnable = true;
 		spell.aniTime = 8;
@@ -417,8 +384,6 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 		spell.name = elemName
 		spell.icon = texture
 		spell.power_index = self.POWER_INFO[self.type].power_index
-		-- if not auraList[i].defaultImg then auraList[i].defaultImg = texture; 
-		-- elseif auraList[i].defaultImg ~= auraList[i].texture then spell.fix_icon = true end
 		spell.id = tonumber(elemId)
 		spell.count = 0
 		spell.duration = 0
@@ -462,15 +427,11 @@ function HDH_DK_RUNE_TRACKER:OnEvent(event, ...)
 	if ( event == "RUNE_POWER_UPDATE" ) then	
 		local runeIndex, isEnergize = ...;
 		if runeIndex and runeIndex >= 1 and runeIndex <= MAX_RUNES then
-			-- self.parent:UpdateRune(runeIndex, isEnergize)
-			-- self.parent:UpdateIcon(runeIndex)
 			self.parent:Update();
 		end
 	elseif ( event == "RUNE_TYPE_UPDATE" ) then
 		local runeIndex = ...;
 		if ( runeIndex and runeIndex >= 1 and runeIndex <= MAX_RUNES ) then
-			-- self.parent:UpdateRuneType(runeIndex)
-			-- self.parent:UpdateIcon(runeIndex)
 			self.parent:Update();
 		end
 	end

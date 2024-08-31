@@ -1,5 +1,3 @@
--- if select(4, GetBuildInfo()) <= 100205 then return end
-
 local DB = HDH_AT_ConfigDB
 HDH_ENH_MAELSTROM_TRACKER = {}
 
@@ -37,7 +35,6 @@ do
 			self.spell.count = math.ceil(self.spell.v1 / maxValue * 100);
 			if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
 			self.counttext:SetText(self.spell.count .. "%"); 
-			-- else self.counttext:SetText(nil) end
 			if self.spell.showValue and self.spell.v1 > 0 then 
 				self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1 / 10, self:GetParent().parent.ui.font.v1_abbreviate)); 
 			else 
@@ -301,8 +298,6 @@ do
 				spell.name = elemName
 				spell.icon = texture
 				spell.power_index = 1
-				-- if not auraList[i].defaultImg then auraList[i].defaultImg = texture; 
-				-- elseif auraList[i].defaultImg ~= auraList[i].texture then spell.fix_icon = true end
 				spell.id = tonumber(elemId)
 				spell.count = 0
 				spell.duration = 0

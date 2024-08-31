@@ -5,7 +5,7 @@
     <!-- 설정 프레임 시작 -->
     <Frame name="HDH_AT_ConfigFrame" mixin="HDH_AT_ConfigFrameMixin" movable="true" toplevel="true" parent="UIParent" frameStrata="HIGH" hidden="true" enableMouse="true" resizable="true" inherits="HDH_AT_ConfigFrameTemplate">
 		<KeyValues>
-			<KeyValue key="maxTabWidth" value="18" type="number"/>
+			<!-- <KeyValue key="maxTabWidth" value="18" type="number"/> -->
 		</KeyValues>
 		<Size><AbsDimension x="410" y="500"/></Size>
 		<Anchors>
