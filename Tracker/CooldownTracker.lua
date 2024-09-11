@@ -1005,7 +1005,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.isItem = (isItem or false)
 			if isItem then
 				local _, _, _, _, _, _, _, itemStackCount, _, _, _, _, _ = GetItemInfo(spell.key)
-				if itemStackCount > 2 then
+				if itemStackCount and itemStackCount > 2 then
 					spell.stackable = true 
 				else
 					spell.stackable = false
@@ -1014,7 +1014,8 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 					spell.isToy = true
 				end
 			else
-				if HDH_AT_UTIL.GetSpellCharges(spell.key) then
+				local chargeInfo = HDH_AT_UTIL.GetSpellCharges(spell.key)
+				if chargeInfo and chargeInfo.maxCharges and chargeInfo.maxCharges  > 2 then
 					spell.stackable = true 
 				else
 					spell.stackable = false
