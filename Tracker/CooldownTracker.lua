@@ -2,7 +2,7 @@
 
 HDH_C_TRACKER = {}
 HDH_C_TRACKER.GlobalCooldown = 2;
-HDH_C_TRACKER.EndCooldown = 0.0;
+HDH_C_TRACKER.EndCooldown = 0.09;
 
 local CombatSpellCache = {}
 
@@ -171,6 +171,7 @@ local function CT_UpdateCooldown(f, elapsed)
 	f.elapsed = 0
 	spell.curTime = GetTime();
 	spell.remaining = spell.endTime - spell.curTime;
+
 	if spell.remaining > HDH_C_TRACKER.EndCooldown and spell.duration > 0 then
 		if not spell.isCharging and spell.duration > HDH_C_TRACKER.GlobalCooldown then
 			tracker:UpdateTimeText(f.timetext, spell.remaining);
@@ -360,11 +361,23 @@ function HDH_C_TRACKER:UpdateIcon(f)
 	
 	if not HDH_TRACKER.ENABLE_MOVE and not spell.isInnerCDItem then
 		startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana = self:UpdateSpellInfo(f.spell.id, f.spell.name, f.spell.isItem, f.spell.isToy)
-		spell.startTime = startTime
+		
+		spell.isGlobalCooldown = (duration < HDH_C_TRACKER.GlobalCooldown)
+		if show_global_cooldown then
+			spell.startTime = startTime
+			spell.endTime = startTime + duration
+			spell.remaining = remaining
+			spell.duration = duration
+		else
+			if not spell.isGlobalCooldown then
+				spell.startTime = startTime
+				spell.endTime = startTime + duration
+				spell.remaining = remaining
+				spell.duration = duration
+			end
+			spell.isGlobalCooldown = false
+		end
 		spell.count = count
-		spell.endTime = startTime + duration
-		spell.remaining = remaining
-		spell.duration = duration
 		spell.charges.count = chargeCount
 		spell.charges.remaining = chargeRemaining
 		spell.charges.endTime = chargeStartTime + chargeDuration
@@ -373,6 +386,7 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		spell.isAble = isAble
 		spell.inRange = inRange
 		spell.isNotEnoughMana = isNotEnoughMana
+		
 	end
 	if spell.remaining <= HDH_C_TRACKER.EndCooldown then 
 		f.cd:Hide()
@@ -397,21 +411,22 @@ function HDH_C_TRACKER:UpdateIcon(f)
 				self:UpdateBarValue(f, true);
 			else 
 				self:UpdateBarValue(f, false);
-			end --spell.startTime+spell.remaining
+			end 
 			
 		else
 			self:UpdateBarValue(f, true);
 		end
 	end
-	if (spell.duration < HDH_C_TRACKER.GlobalCooldown) and not spell.isCharging then f.timetext:SetText(nil) end
-	if (spell.remaining > 0) or (spell.charges.remaining > 0) then -- 글로버 쿨다운 2초 포함
-		if (spell.duration < HDH_C_TRACKER.GlobalCooldown) and (not spell.isCharging) then -- 글로벌 쿨다운
+
+	if (spell.remaining > HDH_C_TRACKER.EndCooldown) or (spell.charges.remaining > 0) then -- 글로버 쿨다운 2초 포함
+		if spell.isGlobalCooldown and (not spell.isCharging) then -- 글로벌 쿨다운
 			if f:IsShown() then
 				CT_StartTimer(f, maxtime); 
 			end
 			
 			if spell.isAble then 
 				self:UpdateGlow(f,  true)
+				f.icon:SetDesaturated(nil)
 				f.iconSatCooldown:SetDesaturated(nil)
 				f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
 				if spell.inRange then
@@ -426,6 +441,7 @@ function HDH_C_TRACKER:UpdateIcon(f)
 					f.icon:SetVertexColor(unpack(out_range_color))
 				end
 			else
+				f.icon:SetDesaturated(1)
 				f.iconSatCooldown:SetAlpha(0)
 			end
 			f.timetext:SetText(nil)
@@ -468,24 +484,29 @@ function HDH_C_TRACKER:UpdateIcon(f)
 				end
 			else
 				f.icon:SetDesaturated(1);
+				f.iconSatCooldown:SetAlpha(0)
 				f.iconSatCooldown:SetDesaturated(1);
 			end
 		end
 
-		if (cooldown_type == DB.COOLDOWN_CIRCLE) or (cooldown_type == DB.COOLDOWN_NONE)  then 
+		if (cooldown_type == DB.COOLDOWN_CIRCLE) or (cooldown_type == DB.COOLDOWN_NONE)  then
+			if f.iconSatCooldown:GetAlpha() ~= 0 then
+				f.iconSatCooldown:SetAlpha(0)
+			end
 			if HDH_TRACKER.startTime < spell.startTime or (spell.duration == 0) then
 				f.cd:SetCooldown(spell.startTime, spell.duration); 
 			else
 				f.cd:SetCooldown(HDH_TRACKER.startTime, spell.duration - (HDH_TRACKER.startTime-spell.startTime));
 			end	
 		else 
-			if  not f.iconSatCooldown:IsShown() then
-				f.iconSatCooldown:Show()
-			end
 			f.cd:SetMinMaxValues(spell.startTime, spell.startTime + spell.duration); 
 			f.cd:SetValue(spell.remaining + spell.startTime);
 		end
+		if not f.iconSatCooldown:IsShown() then
+			f.iconSatCooldown:Show()
+		end
 	else  -- 쿨다운 아닐때
+		f.timetext:SetText(nil)
 		if f.cd:IsShown() then f.cd:Hide() end
 		if spell.display == DB.SPELL_ALWAYS_DISPLAY then 	
 			self:UpdateGlow(f, true);
