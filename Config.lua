@@ -1712,7 +1712,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 	local traits
 	local trackerId
 
-	local useAtlas = select(4, GetBuildInfo()) >= 100000
+	local useAtlas = false --select(4, GetBuildInfo()) >= 100000
 
 	-- Tracker 목록 생성 및 트랜짓이 없는 않는 트래커 확인
 	traitList[#traitList+1] = {DDM_TRACKER_ALL, L.ALL_LIST, nil, 0}
