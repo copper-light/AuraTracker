@@ -836,10 +836,21 @@ function HDH_AT_UI_OnCheck(self)
 		F.BODY.CONFIG_DETAIL.GLOW.CB5:SetChecked(true)
 	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB1 then
 		self:SetChecked(true)
+		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Hide()
 		F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(false)
+		F.BODY.CONFIG_DETAIL.DISPLAY.CB3:SetChecked(false)
 	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB2 then
 		self:SetChecked(true)
+		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Show()
 		F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
+		F.BODY.CONFIG_DETAIL.DISPLAY.CB3:SetChecked(false)
+		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetPoint("LEFT", self,"RIGHT", 2,0)
+	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB3 then
+		self:SetChecked(true)
+		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Show()
+		F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
+		F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(false)
+		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetPoint("LEFT", self,"RIGHT", 2,0)
 	end
 end
 
@@ -1064,9 +1075,9 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 			F.DD_TRACKER_AURA_CASTER:Disable()
 			F.DD_TRACKER_AURA_FILTER:Disable()
 		end
-	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE then
-		F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(true)
-		F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
+	-- elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE then
+	-- 	F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(true)
+	-- 	F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
 	end
 
 	if self.dbKey then
@@ -1391,9 +1402,15 @@ function HDH_AT_OnClick_Button(self, button)
 			local value = DB.SPELL_ALWAYS_DISPLAY
 			if F.BODY.CONFIG_DETAIL.DISPLAY.CB1:GetChecked() then
 				value = DB.SPELL_ALWAYS_DISPLAY
-			else
+			elseif F.BODY.CONFIG_DETAIL.DISPLAY.CB2:GetChecked() then
 				value = F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:GetSelectedValue()
+			else
+				value = F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:GetSelectedValue() + 2
 			end
+
+			-- {DB.SPELL_HIDE_AS_SPACE, HDH_AT_L.USE_SPACE},
+			-- {DB.SPELL_HIDE, HDH_AT_L.DONT_USE_SPACE}
+
 			DB:UpdateTrackerElementDisplay(trackerId, elemIdx, value)
 			HDH_TRACKER.InitIconFrame(trackerId)
 
@@ -2049,15 +2066,37 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			if display == DB.SPELL_ALWAYS_DISPLAY then
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(true)
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(false)
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB3:SetChecked(false)
 				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetSelectedIndex(2)
-			elseif display == DB.SPELL_HIDE then
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Hide()
+			elseif display == DB.SPELL_HIDE_TIME_OFF then
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(true)
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB3:SetChecked(false)
 				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetSelectedIndex(2)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetPoint("LEFT", F.BODY.CONFIG_DETAIL.DISPLAY.CB2,"RIGHT", 2,0)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Show()
+			elseif display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE then
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(true)
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB3:SetChecked(false)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetSelectedIndex(1)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetPoint("LEFT", F.BODY.CONFIG_DETAIL.DISPLAY.CB2,"RIGHT", 2,0)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Show()
+			elseif display == DB.SPELL_HIDE_TIME_ON then
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(false)
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB3:SetChecked(true)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetSelectedIndex(2)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetPoint("LEFT", F.BODY.CONFIG_DETAIL.DISPLAY.CB3,"RIGHT", 2,0)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Show()
 			else -- display == DB.SPELL_HIDE_AS_SPACE
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
-				F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(true)
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(false)
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB3:SetChecked(true)
 				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetSelectedIndex(1)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetPoint("LEFT", F.BODY.CONFIG_DETAIL.DISPLAY.CB3,"RIGHT", 2,0)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Show()
 			end
 			button:SetChecked(F.BODY.CONFIG_DETAIL.DISPLAY.preCheck)
 			F.BODY.CONFIG_DETAIL.BTN_SAVE:Show()
@@ -2912,10 +2951,11 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.Text:SetText(L.DETAIL_DISPLAY)
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB1 = _G[self:GetName().."BodyDetailConfigDisplayCBCondition1"]
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB2 = _G[self:GetName().."BodyDetailConfigDisplayCBCondition2"]
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB3 = _G[self:GetName().."BodyDetailConfigDisplayCBCondition3"]
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE = _G[self:GetName().."BodyDetailConfigDisplaySwitchHideMode"]
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Init({
-		{DB.SPELL_HIDE_AS_SPACE, HDH_AT_L.USE_SPACE},
-		{DB.SPELL_HIDE, HDH_AT_L.DONT_USE_SPACE}
+		{DB.SPELL_HIDE_TIME_OFF_AS_SPACE, HDH_AT_L.USE_SPACE},
+		{DB.SPELL_HIDE_TIME_OFF, HDH_AT_L.DONT_USE_SPACE}
 	}, HDH_AT_OnSelected_Dropdown)
 
 	self.F.BODY.CONFIG_DETAIL.ETC = _G[self:GetName().."BodyDetailConfigETC"]

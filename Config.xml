@@ -910,9 +910,9 @@
 
 								<Frames>
 									<CheckButton name="$parentCBCondition1" inherits="HDH_AT_CheckButton2Template">
-										<Size x="155" y="20" />
+										<Size x="170" y="20" />
 										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-40" />
+											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="15" y="-40" />
 											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 										</Anchors>
 										<Scripts>
@@ -922,12 +922,23 @@
 									</CheckButton>
 
 									<CheckButton name="$parentCBCondition2" inherits="HDH_AT_CheckButton2Template">
-										<Size x="155" y="20" />
+										<Size x="170" y="20" />
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition1" x="0" y="-2" />
 										</Anchors>
 										<Scripts>
-											<OnLoad>self.Text:SetText(HDH_AT_L.HIDE_WHEN_DEACTIVE)</OnLoad>
+											<OnLoad>self.Text:SetText(HDH_AT_L.HIDE_WHEN_TIME_OFF)</OnLoad>
+											<OnClick function="HDH_AT_UI_OnCheck" />
+										</Scripts>
+									</CheckButton>
+
+									<CheckButton name="$parentCBCondition3" inherits="HDH_AT_CheckButton2Template">
+										<Size x="170" y="20" />
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition2" x="0" y="-2" />
+										</Anchors>
+										<Scripts>
+											<OnLoad>self.Text:SetText(HDH_AT_L.HIDE_WHEN_TIME_ON)</OnLoad>
 											<OnClick function="HDH_AT_UI_OnCheck" />
 										</Scripts>
 									</CheckButton>

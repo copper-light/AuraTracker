@@ -485,6 +485,48 @@ do
 		obj.timer[timerName].args = ...
 	end
 
+	function HDH_AT_UTIL.CT_Timer_Func(self)
+		if self and self.arg then
+			local tracker = self.arg:GetParent() and self.arg:GetParent().parent or nil;
+			if tracker then
+				if( tracker:UpdateIcon(self.arg)) or (not tracker.ui.common.always_show and not UnitAffectingCombat("player")) then
+					tracker:UpdateLayout()
+				end
+			end
+			self.arg.timer = nil
+		end
+	end
+	
+	function HDH_AT_UTIL.CT_HasTImer(f)
+		return f.timer and true or false
+	end	
+	
+	function HDH_AT_UTIL.CT_StartTimer(f, maxtime)
+		maxtime = math.max(maxtime or 0, 0)
+		if f and f.spell and f.spell.remaining > 0 then
+			if f.spell.remaining > maxtime then
+				f.timerDuration = f.spell.remaining - maxtime
+			else
+				f.timerDuration = f.spell.remaining
+			end
+
+			if f.timer then
+				HDH_AT_UTIL.CT_StopTimer(f)
+			end
+
+			f.timer = C_Timer.NewTimer(f.timerDuration, HDH_AT_UTIL.CT_Timer_Func)
+			f.timer.arg = f
+		end
+	end
+	
+	function HDH_AT_UTIL.CT_StopTimer(f)
+		if f and f.timer then
+			f.timer:Cancel()
+			f.timer = nil
+		end
+	end
+
+
 	local Queue = {first = 0, last = -1, size = 0, capacity = 0}
 	Queue.__index = Queue
 

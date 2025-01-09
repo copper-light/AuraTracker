@@ -24,10 +24,20 @@ HDH_TRACKER.MAX_ICONS_COUNT = 10
 HDH_TRACKER.BAR_UP_ANI_TERM = 0.1 -- second
 HDH_TRACKER.BAR_DOWN_ANI_TERM = 0.05
 
+HDH_TRACKER.startTime = 0
 
 -------------------------------------------
 -- EVENT SCRIPT
 -------------------------------------------
+
+-- local function MainOnUpdate(f, elapsed)
+-- 	if f.elapsed > 1 then
+-- 		print(GetTime(), elapsed)
+-- 		f.elapsed = 0 
+-- 	else	
+-- 		f.elapsed = (f.elapsed or 0) + elapsed
+-- 	end
+-- end
 
 local function UpdateCooldown(f, elapsed)
 	local spell = f.spell;
@@ -1806,7 +1816,7 @@ else -- 용군단 코드
 		f = f.iconframe;
 		
 		self:ActionButton_SetupOverlayGlow(f)
-		if not f.SpellActivationAlert:IsShown() then
+		if not f.SpellActivationAlert:IsShown() or (not f.SpellActivationAlert.ProcStartAnim:IsPlaying() and not f.SpellActivationAlert.ProcLoop:IsPlaying()) then
 			f.SpellActivationAlert:Show();
 			f.SpellActivationAlert.ProcStartAnim:Play();
 			border:Hide()
@@ -1952,6 +1962,11 @@ function HDH_TRACKER:StartAni(f, ani_type) -- row 이동 실행
 			self:GetAni(f, ani_type):Play();
 		end
 	end
+end
+
+
+function HDH_TRACKER:NoneDisplayIcon(f)
+
 end
 
 ------------------------------------------
@@ -2249,4 +2264,5 @@ end
 	
 HDH_AT_ADDON_FRAME = CreateFrame("Frame", "HDH_AT_iconframe", UIParent) -- 애드온 최상위 프레임
 HDH_AT_ADDON_FRAME:SetScript("OnEvent", OnEvent)
+HDH_AT_ADDON_FRAME:SetScript("OnUpdate", MainOnUpdate)
 OnLoad(HDH_AT_ADDON_FRAME)

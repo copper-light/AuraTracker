@@ -446,7 +446,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 						col = col + size_w + margin_h 
 					end
 				else
-					if f.spell.display == DB.SPELL_HIDE_AS_SPACE and self.ui.common.order_by == DB.ORDERBY_REG then
+					if (f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
 						i = i + 1
 						if i % column_count == 0 then 
 							row = row + size_h + margin_v

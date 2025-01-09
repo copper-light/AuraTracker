@@ -117,7 +117,10 @@ end
 function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 	if not f then return end
 	if not f.spell then return end
-	if f.spell.startTime ~= 0 then
+
+	self:UpdateRune(f.spell.no)
+	if f.spell.remaining > 0.1 then
+		HDH_AT_UTIL.CT_StartTimer(f)
 		if not f.icon:IsDesaturated() then f.icon:SetDesaturated(1) end
 		if f.spell.count == 0 then f.counttext:SetText(nil)
 								else f.counttext:SetText(f.spell.count) end
@@ -137,7 +140,6 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 		if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then
 			self:UpdateBarValue(f, HDH_TRACKER.ENABLE_MOVE)
 		end
-		
 	else
 		if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then self:UpdateBarValue(f, true); end
 		f.icon:SetDesaturated(nil)
@@ -167,8 +169,6 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 end
 
 if select(4, GetBuildInfo()) < 100000 then
-
-	
 
 	function HDH_DK_RUNE_TRACKER:UpdateBarValue(f, isEnding)
 		if f.bar and f.name then
@@ -281,7 +281,7 @@ function HDH_DK_RUNE_TRACKER:UpdateLayout()
 									else col = col + size_w + margin_h end
 				if f.spell.remaining > 0 then ret = ret + 1 end -- 비전투라도 쿨이 돌고 잇는 스킬이 있으면 화면에 출력하기 위해서 체크함
 			else
-				if f.spell.display == DB.SPELL_HIDE_AS_SPACE and self.ui.common.order_by == DB.ORDERBY_REG then
+				if (f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE or f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
 					show_index = show_index + 1
 					f:ClearAllPoints()
 					f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
@@ -305,15 +305,19 @@ function HDH_DK_RUNE_TRACKER:UpdateLayout()
 end
 
 function HDH_DK_RUNE_TRACKER:UpdateRune(runeIndex, isEnergize)
-	local ret = false;
+	local ret = false
 	local start, duration, runeReady = GetRuneCooldown(runeIndex);
 	if select(4, GetBuildInfo()) < 100000 then
 		runeIndex = RUN_INDEX[runeIndex]
 	end
 	if self and self.frame.pointer[runeIndex] then
 		local spell = self.frame.pointer[runeIndex].spell
-		if start and spell then
-			spell.duration = duration
+		if start~= 0 and start and spell then
+			if HDH_TRACKER.startTime < start then
+				spell.duration = duration
+			else
+				spell.duration = duration - (HDH_TRACKER.startTime-start)
+			end
 			spell.startTime = start
 			spell.endTime = start + duration
 			spell.remaining = spell.endTime - GetTime()
@@ -329,10 +333,10 @@ end
 
 function HDH_DK_RUNE_TRACKER:Update() -- HDH_TRACKER override
 	if not self.frame or HDH_TRACKER.ENABLE_MOVE then return end
-	for i = 1 , MAX_RUNES do
-		self:UpdateRune(i)
-		--self:UpdateRuneType(i)
-	end
+	-- for i = 1 , MAX_RUNES do
+	-- 	self:UpdateRune(i)
+	-- 	--self:UpdateRuneType(i)
+	-- end
 	self:UpdateAllIcons()
 end
 

@@ -199,86 +199,97 @@ do
 				if not HDH_TRACKER.ENABLE_MOVE then
 					f.spell.isUpdate = false
 				end
-				if aura_caster == DB.AURA_CASTER_ONLY_MINE then
-					if f.spell.count < 2 then f.counttext:SetText(nil)
-										 else f.counttext:SetText(f.spell.count) end
-				else
-					if f.spell.count < 2 then if f.spell.overlay <= 1 then f.counttext:SetText(nil)
-																      else f.counttext:SetText(f.spell.overlay) end
-										 else f.counttext:SetText(f.spell.count)  end
-				end
-				
-				if f.spell.showValue and f.spell.v1 then 
-					f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate)) 
-				else 
-					f.v1:SetText(nil) 
-				end
-				
-				if f.spell.duration == 0 then 
-					f.cd:Hide() f.timetext:SetText("");
-					f.icon:SetDesaturated(nil)
-			    	f.icon:SetAlpha(self.ui.icon.on_alpha)
-			    	f.border:SetAlpha(self.ui.icon.on_alpha)
-					f.iconSatCooldown:Hide()
-					f.iconSatCooldown.spark:Hide()
-				else 
-					f.cd:Show()
-					
-					self:UpdateTimeText(f.timetext, f.spell.remaining)
-					
-					if cooldown_type ~= DB.COOLDOWN_CIRCLE and  cooldown_type ~= DB.COOLDOWN_NONE then
-						f.icon:SetAlpha(self.ui.icon.off_alpha)
-						f.border:SetAlpha(self.ui.icon.off_alpha)
-						f.icon:SetDesaturated(1)
-						f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
-						f.iconSatCooldown:Show()
+				if f.spell.display == DB.SPELL_ALWAYS_DISPLAY or f.spell.display == DB.SPELL_HIDE_TIME_OFF or f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE or HDH_TRACKER.ENABLE_MOVE then 
+					if aura_caster == DB.AURA_CASTER_ONLY_MINE then
+						if f.spell.count < 2 then f.counttext:SetText(nil)
+											else f.counttext:SetText(f.spell.count) end
 					else
+						if f.spell.count < 2 then if f.spell.overlay <= 1 then f.counttext:SetText(nil)
+																		else f.counttext:SetText(f.spell.overlay) end
+											else f.counttext:SetText(f.spell.count)  end
+					end
+					
+					if f.spell.showValue and f.spell.v1 then 
+						f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate)) 
+					else 
+						f.v1:SetText(nil) 
+					end
+					
+					if f.spell.duration == 0 then 
+						f.cd:Hide() f.timetext:SetText("");
+						f.icon:SetDesaturated(nil)
 						f.icon:SetAlpha(self.ui.icon.on_alpha)
 						f.border:SetAlpha(self.ui.icon.on_alpha)
-						f.icon:SetDesaturated(nil)
+						f.iconSatCooldown:Hide()
+						f.iconSatCooldown.spark:Hide()
+					else 
+						f.cd:Show()
+						
+						self:UpdateTimeText(f.timetext, f.spell.remaining)
+						
+						if cooldown_type ~= DB.COOLDOWN_CIRCLE and  cooldown_type ~= DB.COOLDOWN_NONE then
+							f.icon:SetAlpha(self.ui.icon.off_alpha)
+							f.border:SetAlpha(self.ui.icon.off_alpha)
+							f.icon:SetDesaturated(1)
+							f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
+							f.iconSatCooldown:Show()
+						else
+							f.icon:SetAlpha(self.ui.icon.on_alpha)
+							f.border:SetAlpha(self.ui.icon.on_alpha)
+							f.icon:SetDesaturated(nil)
+						end
 					end
-				end
-				if not self.ui.common.default_color or f.spell.dispelType == nil then 
-					f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
-				else 
-					f.border:SetVertexColor(
-						DebuffTypeColor[f.spell.dispelType or ""].r, 
-						DebuffTypeColor[f.spell.dispelType or ""].g, 
-						DebuffTypeColor[f.spell.dispelType or ""].b,
-						1
-					)
-				end
-				if cooldown_type == DB.COOLDOWN_CIRCLE or cooldown_type == DB.COOLDOWN_NONE then
-					if HDH_TRACKER.startTime < f.spell.startTime or (f.spell.duration == 0) then
-						f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
+					if not self.ui.common.default_color or f.spell.dispelType == nil then 
+						f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
+					else 
+						f.border:SetVertexColor(
+							DebuffTypeColor[f.spell.dispelType or ""].r, 
+							DebuffTypeColor[f.spell.dispelType or ""].g, 
+							DebuffTypeColor[f.spell.dispelType or ""].b,
+							1
+						)
+					end
+					if cooldown_type == DB.COOLDOWN_CIRCLE or cooldown_type == DB.COOLDOWN_NONE then
+						if HDH_TRACKER.startTime < f.spell.startTime or (f.spell.duration == 0) then
+							f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
+						else
+							f.cd:SetCooldown(HDH_TRACKER.startTime, f.spell.duration - (f.spell.startTime - HDH_TRACKER.startTime));
+						end
 					else
-						f.cd:SetCooldown(HDH_TRACKER.startTime, f.spell.duration - (f.spell.startTime - HDH_TRACKER.startTime));
+						f.cd:SetMinMaxValues(f.spell.startTime, f.spell.endTime);
+						f.cd:SetValue(GetTime());
 					end
-				else
-					f.cd:SetMinMaxValues(f.spell.startTime, f.spell.endTime);
-					f.cd:SetValue(GetTime());
-				end
-				if display_mode ~= DB.DISPLAY_ICON and f.bar then
-					if not f.bar:IsShown() then f.bar:Show(); end
-					f.name:SetText(f.spell.name);
-					if f.spell.duration == 0 then
-						f.spell.remaining = 1;
-						f.spell.endTime = 1;
-						f.spell.startTime = 0;
+					if display_mode ~= DB.DISPLAY_ICON and f.bar then
+						if not f.bar:IsShown() then f.bar:Show(); end
+						f.name:SetText(f.spell.name);
+						if f.spell.duration == 0 then
+							f.spell.remaining = 1;
+							f.spell.endTime = 1;
+							f.spell.startTime = 0;
+						end
+						f.iconSatCooldown.spark:Hide()
+						self:UpdateBarValue(f);
 					end
-					f.iconSatCooldown.spark:Hide()
-					self:UpdateBarValue(f);
+					f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
+					i = i + 1
+					if i % column_count == 0 then row = row + size_h + margin_v; col = 0
+											else col = col + size_w + margin_h end
+					ret = ret + 1
+					f:Show()
+					self:UpdateGlow(f, true)
+				elseif (f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
+					i = i + 1
+					if i % column_count == 0 then 
+						row = row + size_h + margin_v
+						col = 0
+					else 
+						col = col + size_w + margin_h 
+					end
+					f:Hide()
 				end
-				f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-				i = i + 1
-				if i % column_count == 0 then row = row + size_h + margin_v; col = 0
-								         else col = col + size_w + margin_h end
-				ret = ret + 1
-				f:Show()
-				self:UpdateGlow(f, true)
 			else
-				f.timetext:SetText(nil);
-				if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then 
+				f.timetext:SetText(nil)
+				if f.spell.display == DB.SPELL_ALWAYS_DISPLAY or f.spell.display == DB.SPELL_HIDE_TIME_ON or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then 
 					f.icon:SetDesaturated(1)
 					f.icon:SetAlpha(self.ui.icon.off_alpha)
 					f.border:SetAlpha(self.ui.icon.off_alpha)
@@ -304,10 +315,14 @@ do
 					
 					self:UpdateGlow(f, f.spell.glow == DB.GLOW_CONDITION_TIME)
 				else
-					if f.spell.display == DB.SPELL_HIDE_AS_SPACE and self.ui.common.order_by == DB.ORDERBY_REG then
+					if (f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
 						i = i + 1
-						if i % column_count == 0 then row = row + size_h + margin_v; col = 0
-										 else col = col + size_w + margin_h end
+						if i % column_count == 0 then 
+							row = row + size_h + margin_v
+							col = 0
+						else 
+							col = col + size_w + margin_h 
+						end
 					end
 					f:Hide()
 				end

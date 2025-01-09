@@ -18,6 +18,8 @@ ADJUST_ID[221771] = 137639;--storm earth fire:targeting -> storm earth fire
 ADJUST_ID[157153] = 157153;--폭우토템
 ADJUST_ID[201764] = 157153;--폭우토템
 
+ADJUST_ID[188499] = 210152
+
 -- HDH_TRACKER.TYPE.PLAYER_COOLDOWN = 3
 -- HDH_TRACKER.TYPE.PET_COOLDOWN = 4
 
@@ -49,43 +51,6 @@ HDH_TRACKER.TYPE.COOLDOWN = 3
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.COOLDOWN, HDH_C_TRACKER)
 
 local super = HDH_AURA_TRACKER
-------------------------------------
--- spell timer
-------------------------------------
-
-local function CT_Timer_Func(self)
-	if self and self.arg then
-		local tracker = self.arg:GetParent() and self.arg:GetParent().parent or nil;
-		if tracker then
-			if( tracker:UpdateIcon(self.arg)) or (not tracker.ui.common.always_show and not UnitAffectingCombat("player")) then
-				tracker:UpdateLayout()
-			end
-		end
-		self.arg.timer = nil
-	end
-end
-
-local function CT_HasTImer(f)
-	return f.timer and true or false
-end	
-
-local function CT_StartTimer(f, maxtime)
-	if f and not f.timer then
-		if (f.spell.remaining > (maxtime or 0)) then
-			f.timer = C_Timer.NewTimer(f.spell.remaining - (maxtime or 0), CT_Timer_Func)
-		else
-			f.timer = C_Timer.NewTimer(f.spell.remaining, CT_Timer_Func)
-		end
-		f.timer.arg = f
-	end
-end
-
-local function CT_StopTimer(f)
-	if f and f.timer then
-		f.timer:Cancel()
-		f.timer = nil
-	end
-end
 
 ------------------------------------
 -- sound
@@ -159,6 +124,10 @@ local function CT_UpdateCooldownSatIcon(tracker, f, spell)
 		end
 		f.iconSatCooldown.preSize = f.iconSatCooldown.curSize
 	end
+
+	-- if f.spell.isAble and (f.iconSatCooldown:IsDesaturated() == false)then
+	-- 	f.iconSatCooldown:SetDesaturated(nil);
+	-- end
 end
 
 local function CT_UpdateCooldown(f, elapsed)
@@ -386,7 +355,6 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		spell.isAble = isAble
 		spell.inRange = inRange
 		spell.isNotEnoughMana = isNotEnoughMana
-		
 	end
 	if spell.remaining <= HDH_C_TRACKER.EndCooldown then 
 		f.cd:Hide()
@@ -412,16 +380,16 @@ function HDH_C_TRACKER:UpdateIcon(f)
 			else 
 				self:UpdateBarValue(f, false);
 			end 
-			
 		else
 			self:UpdateBarValue(f, true);
 		end
 	end
 
 	if (spell.remaining > HDH_C_TRACKER.EndCooldown) or (spell.charges.remaining > 0) then -- 글로버 쿨다운 2초 포함
+		
 		if spell.isGlobalCooldown and (not spell.isCharging) then -- 글로벌 쿨다운
 			if f:IsShown() then
-				CT_StartTimer(f, maxtime); 
+				HDH_AT_UTIL.CT_StartTimer(f, maxtime); 
 			end
 			
 			if spell.isAble then 
@@ -446,47 +414,53 @@ function HDH_C_TRACKER:UpdateIcon(f)
 			end
 			f.timetext:SetText(nil)
 		else
-			if HDH_TRACKER.ENABLE_MOVE or (maxtime == -1) or (maxtime > spell.remaining) then -- 쿨다운 중
-				self:UpdateGlow(f, true)
-				CT_StartTimer(f, -1); 
-				if not f:IsShown() then f:Show() isUpdate = true end
-			else
-				self:UpdateGlow(f, false)
-				CT_StartTimer(f, -1);
-				if f:IsShown() then f:Hide() isUpdate = true end
-			end
+			if spell.display == DB.SPELL_ALWAYS_DISPLAY or spell.display == DB.SPELL_HIDE_TIME_OFF or spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE or spell.isCharging or HDH_TRACKER.ENABLE_MOVE then 	
+				if HDH_TRACKER.ENABLE_MOVE or (maxtime == -1) or (maxtime > spell.remaining) then -- 쿨다운 중
+					HDH_AT_UTIL.CT_StartTimer(f, -1); 
+					if not f:IsShown() then f:Show() isUpdate = true end
+					self:UpdateGlow(f, true)
+				else
+					self:UpdateGlow(f, false)
+					HDH_AT_UTIL.CT_StartTimer(f, -1);
+					if f:IsShown() then f:Hide() isUpdate = true end
+				end
 
-			if spell.isAble then
-				f.iconSatCooldown:SetDesaturated(nil);
-				if spell.inRange then
-					if spell.isNotEnoughMana and use_not_enough_mana_color then
-						f.icon:SetVertexColor(unpack(not_enough_mana_color))
-						f.iconSatCooldown:SetVertexColor(unpack(not_enough_mana_color))
-						f.icon:SetDesaturated(nil)
+				if spell.isAble then
+					f.iconSatCooldown:SetDesaturated(nil);
+					f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
+					if spell.inRange then
+						if spell.isNotEnoughMana and use_not_enough_mana_color then
+							f.icon:SetVertexColor(unpack(not_enough_mana_color))
+							f.iconSatCooldown:SetVertexColor(unpack(not_enough_mana_color))
+							f.icon:SetDesaturated(nil)
+						else
+							if spell.isCharging then 
+								f.icon:SetDesaturated(nil);
+							else
+								f.icon:SetDesaturated(1);
+							end
+							f.iconSatCooldown:SetVertexColor(1,1,1)
+						end
+					elseif use_out_range_color then
+						f.iconSatCooldown:SetVertexColor(unpack(out_range_color))
+						f.icon:SetVertexColor(unpack(out_range_color))
+						f.icon:SetDesaturated(nil);
 					else
 						if spell.isCharging then 
 							f.icon:SetDesaturated(nil);
 						else
 							f.icon:SetDesaturated(1);
 						end
-						f.iconSatCooldown:SetVertexColor(1,1,1)
 					end
-				elseif use_out_range_color then
-					f.iconSatCooldown:SetVertexColor(unpack(out_range_color))
-					f.icon:SetVertexColor(unpack(out_range_color))
-					f.icon:SetDesaturated(nil);
 				else
-					if spell.isCharging then 
-						f.icon:SetDesaturated(nil);
-					else
-						f.icon:SetDesaturated(1);
-					end
+					f.icon:SetDesaturated(1);
+					f.iconSatCooldown:SetAlpha(0)
+					f.iconSatCooldown:SetDesaturated(1);
 				end
 			else
-				f.icon:SetDesaturated(1);
-				f.iconSatCooldown:SetAlpha(0)
-				f.iconSatCooldown:SetDesaturated(1);
-			end
+				if f:IsShown() then f:Hide() self:UpdateGlow(f, false); isUpdate = true end 
+				HDH_AT_UTIL.CT_StartTimer(f, -1);
+			end	
 		end
 
 		if (cooldown_type == DB.COOLDOWN_CIRCLE) or (cooldown_type == DB.COOLDOWN_NONE)  then
@@ -508,9 +482,9 @@ function HDH_C_TRACKER:UpdateIcon(f)
 	else  -- 쿨다운 아닐때
 		f.timetext:SetText(nil)
 		if f.cd:IsShown() then f.cd:Hide() end
-		if spell.display == DB.SPELL_ALWAYS_DISPLAY then 	
+		if spell.display == DB.SPELL_ALWAYS_DISPLAY or f.spell.display == DB.SPELL_HIDE_TIME_ON or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then 	
+			if not f:IsShown() then f:Show() isUpdate = true end
 			self:UpdateGlow(f, true);
-			if not f:IsShown() then f:Show() isUpdate= true end
 		else 
 			if f:IsShown() then f:Hide() self:UpdateGlow(f, false); isUpdate = true end 
 		end
@@ -629,7 +603,7 @@ function HDH_C_TRACKER:UpdateLayout()
 					show_index = show_index + 1
 				end -- 비전투라도 쿨이 돌고 잇는 스킬이 있으면 화면에 출력하기 위해서 체크함
 			else
-				if f.spell.display == DB.SPELL_HIDE_AS_SPACE and self.ui.common.order_by == DB.ORDERBY_REG then
+				if (f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
 					display_index = display_index + 1
 					f:ClearAllPoints()
 					f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
@@ -654,10 +628,11 @@ end
 
 function HDH_C_TRACKER:UpdateAllSlot()
 	self.slot_pointer = {}
+	local t, id, subtype
 	for i=1, 120 do
-		local type, id, subtype = GetActionInfo(i)
+		t, id, subtype = GetActionInfo(i)
 		id = ADJUST_ID[id] or id;
-		if type and self.frame.pointer[id] then
+		if t and self.frame.pointer[id] then
 			self.frame.pointer[id].spell.slot = i;
 			self.slot_pointer[i] = self.frame.pointer[id];
 		end
@@ -755,7 +730,7 @@ function HDH_C_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
 	local icon = self.frame.icon[idx]
 	icon:UnregisterAllEvents()
 	icon:Hide()
-	CT_StopTimer(icon)
+	HDH_AT_UTIL.CT_StopTimer(icon)
 	icon:SetParent(nil)
 	icon.spell = nil
 	self.frame.icon[idx] = nil
@@ -1006,7 +981,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			if f:GetParent() == nil then f:SetParent(self.frame) end
 			
 			id = ADJUST_ID[elemId] or elemId;
-			self.frame.pointer[elemKey] = f
+			self.frame.pointer[id] = f
 			spell = {}
 			if type(elemKey) == "number" then
 				spell.key = tonumber(elemKey)
@@ -1059,7 +1034,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.isAble = true
 			spell.isNotEnoughMana = false
 			
-			spell.slot = nil -- self:GetSlot(spell.id);
+			spell.slot = nil --self:GetSlot(spell.id);
 			-- if not auraList[i].defaultImg then auraList[i].defaultImg = auraList[i].Texture; 
 			-- if auraList[i].defaultImg ~= auraList[i].Texture then spell.fix_icon = true end
 			if innerSpellId then
