@@ -1,7 +1,7 @@
 ﻿local DB = HDH_AT_ConfigDB
 
 HDH_C_TRACKER = {}
-HDH_C_TRACKER.GlobalCooldown = 2;
+HDH_C_TRACKER.GlobalCooldown = 1.9; -- default GC: 1.332
 HDH_C_TRACKER.EndCooldown = 0.09;
 
 local CombatSpellCache = {}
@@ -1107,7 +1107,9 @@ function HDH_C_TRACKER:UpdateGlow(f, bool)
 		local value = 0
 		local active = false
 
-		if f.spell.glow == DB.GLOW_CONDITION_ACTIVE and f.spell.duration < HDH_C_TRACKER.GlobalCooldown and f.spell.isAble then
+		if f.spell.glow == DB.GLOW_CONDITION_ACTIVE 
+			and (f.spell.duration < HDH_C_TRACKER.GlobalCooldown or f.spell.remaining < HDH_C_TRACKER.EndCooldown) 
+			and f.spell.isAble then
 			active = true
 		else
 			if f.spell.glow == DB.GLOW_CONDITION_TIME then

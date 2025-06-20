@@ -137,6 +137,10 @@ do -- 애드온 버전 호환성
 		end 
 
 		HDH_AT_UTIL.GetSpellLink = GetSpellLink
+		HDH_AT_UTIL.GetSpellCastCount = function(spell) 
+			return 0
+		end
+		
 	-------------------------------------------
 	else -- 용군단 이상
     -------------------------------------------
@@ -209,10 +213,11 @@ do
 			local spell = HDH_AT_UTIL.GetCacheSpellInfo(value) 
 			return spell.name, spell.spellID, spell.iconID
 		elseif C_Item.GetItemInfo(value) then
-			local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = C_Item.GetItemInfo(value)
+			local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(value)
+			local itemId = GetItemInfoInstant(value)
 			if name then
 				-- linkType, itemId, enchantId, jewelId1, jewelId2, jewelId3, jewelId4, suffixId, uniqueId
-				local linkType, itemId = strsplit(":", link)
+				-- local linkType, itemId = strsplit(":", link)
 				return name, itemId, texture, true, maxStack -- 마지막 인자 아이템 이냐?
 			end
 		end

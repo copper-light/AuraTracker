@@ -102,7 +102,8 @@ local MyClassKor, MyClass = UnitClass("player");
 local DDP_TRACKER_LIST = {
 	{HDH_TRACKER.TYPE.BUFF, L.BUFF},
 	{HDH_TRACKER.TYPE.DEBUFF, L.DEBUFF},
-	{HDH_TRACKER.TYPE.COOLDOWN, L.SKILL_COOLDOWN}
+	{HDH_TRACKER.TYPE.COOLDOWN, L.SKILL_COOLDOWN},
+	{HDH_TRACKER.TYPE.HEALTH, L.HEALTH}
 }
 
 local powerList = {}
@@ -1056,16 +1057,17 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 		main:UpdateTraitsSelector(idx)
 
 	elseif self == F.DD_TRACKER_TYPE then
-		F.DD_TRACKER_UNIT:SelectClear()
-		F.DD_TRACKER_AURA_CASTER:SelectClear()
-		F.DD_TRACKER_AURA_FILTER:SelectClear()
-
-		F.DD_TRACKER_AURA_CASTER:Enable()
-		F.DD_TRACKER_AURA_FILTER:Enable()
-		F.DD_TRACKER_UNIT:Enable()
-
 		if value == HDH_TRACKER.TYPE.BUFF or value == HDH_TRACKER.TYPE.DEBUFF then
-			
+			F.DD_TRACKER_UNIT:SelectClear()
+			F.DD_TRACKER_UNIT:Enable()
+			F.DD_TRACKER_AURA_FILTER:SelectClear()
+			F.DD_TRACKER_AURA_FILTER:Enable()
+			F.DD_TRACKER_AURA_CASTER:Enable()
+			F.DD_TRACKER_AURA_CASTER:SelectClear()
+		elseif value == HDH_TRACKER.TYPE.HEALTH then
+			F.DD_TRACKER_UNIT:Disable()
+			F.DD_TRACKER_AURA_CASTER:Disable()
+			F.DD_TRACKER_AURA_FILTER:Disable()
 		elseif value == HDH_TRACKER.TYPE.TOTEM then
 			F.DD_TRACKER_UNIT:Disable()
 			F.DD_TRACKER_AURA_CASTER:Disable()
@@ -1243,7 +1245,7 @@ function HDH_AT_OnClick_Button(self, button)
 			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2:SetChecked(false)
 			main.DIALOG_SELECT_DISPLAY_TYPE:Show()
 		else
-			if F.BODY.CONFIG_TRACKER.is_creation and className ~= "HDH_POWER_TRACKER" and className ~= "HDH_STAGGER_TRACKER" and className ~= "HDH_ENH_MAELSTROM_TRACKER" then
+			if F.BODY.CONFIG_TRACKER.is_creation and className ~= "HDH_HEALTH_TRACKER" and className ~= "HDH_POWER_TRACKER" and className ~= "HDH_STAGGER_TRACKER" and className ~= "HDH_ENH_MAELSTROM_TRACKER" then
 				main.DIALOG_SELECT_DISPLAY_TYPE.HeaderText:SetText(L.PLEASE_SELECT_CONFIG_TYPE)
 				main.DIALOG_SELECT_DISPLAY_TYPE.DescIconText:SetText(L.DESC_USE_GLOBAL_CONFIG)
 				main.DIALOG_SELECT_DISPLAY_TYPE.DescBarText:SetText(L.DESC_USE_SEVERAL_CONFIG)
@@ -2201,6 +2203,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerConfig(value)
 		local id, name, type, unit, aura_filter, aura_caster, trait = DB:GetTrackerInfo(value)
 		F.BODY.CONFIG_TRACKER.is_creation = false
 		F.BODY.CONFIG_TRACKER.TITLE:SetText(L.EDIT_TRACKER)
+		
 		if id then
 			F.ED_TRACKER_NAME:SetText(name)
 
@@ -2216,6 +2219,16 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerConfig(value)
 				F.DD_TRACKER_AURA_FILTER:Enable()
 				F.DD_TRACKER_UNIT:Enable()
 				-- HDH_AT_DropDown_Init(F.DD_TRACKER_UNIT, DDP_AURA_UNIT_LIST, HDH_AT_OnSelected_Dropdown)
+
+			elseif type == HDH_TRACKER.TYPE.HEALTH then
+				-- F.DD_TRACKER_UNIT:SetSelectedValue(unit)
+				-- F.DD_TRACKER_UNIT:Enable()
+				F.DD_TRACKER_UNIT:SelectClear()
+				F.DD_TRACKER_UNIT:Disable()
+				F.DD_TRACKER_AURA_CASTER:SelectClear()
+				F.DD_TRACKER_AURA_FILTER:SelectClear()
+				F.DD_TRACKER_AURA_CASTER:Disable()
+				F.DD_TRACKER_AURA_FILTER:Disable()
 
 			elseif type == HDH_TRACKER.TYPE.TOTEM then
 				F.DD_TRACKER_UNIT:SelectClear()

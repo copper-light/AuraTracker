@@ -1777,19 +1777,13 @@ if select(4, GetBuildInfo()) <= 49999 then -- 대격변 코드
 else -- 용군단 코드
 
 	function HDH_TRACKER:ActionButton_SetupOverlayGlow(f)
-		-- If we already have a SpellActivationAlert then just early return. We should already be setup
 		if f.SpellActivationAlert then
 			return;
 		end
 		local name = f:GetParent():GetName()..'g'..time()
-		
-		if select(4, GetBuildInfo()) <= 49999 then -- 대격변
-			f.SpellActivationAlert = CreateFrame("Frame", name, f, "ActionBarButtonSpellActivationAlert")
-		else
-			f.SpellActivationAlert = CreateFrame("Frame", name, f, "ActionButtonSpellAlertTemplate")
-		end
-
 		local frameWidth, frameHeight = f:GetSize();
+
+		f.SpellActivationAlert = CreateFrame("Frame", name, f, "ActionButtonSpellAlertTemplate")
 		f.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6);
 		f.SpellActivationAlert:SetPoint("CENTER", f, "CENTER", 0, 0);
 		f.SpellActivationAlert:Hide()
@@ -1968,7 +1962,6 @@ function HDH_TRACKER:StartAni(f, ani_type) -- row 이동 실행
 		end
 	end
 end
-
 
 function HDH_TRACKER:NoneDisplayIcon(f)
 

@@ -7,11 +7,7 @@ local POWRE_BAR_SPLIT_MARGIN = 4;
 
 local MyClassKor, MyClass = UnitClass("player");
 
-local POWER_INFO = {}
-local IS_REGEN_POWER = {} -- 자동으로 리젠되는 자원인가? 비전투중일때 자원바를 보이게 할것인가 판단하는 기준이됨
-IS_REGEN_POWER[0] = true; -- 마나
-IS_REGEN_POWER[2] = true; -- 집중
-IS_REGEN_POWER[3] = true; -- 기력
+
 
 ------------------------------------
 -- HDH_POWER_TRACKER class
@@ -38,81 +34,89 @@ HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_RUNIC, 	   HDH_POWER_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_FURY,      HDH_POWER_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_PAIN,	   HDH_POWER_TRACKER)
 
-POWER_INFO[HDH_TRACKER.TYPE.POWER_MANA]		 	= {power_type="MANA",		 	power_index =0,		color={0.25, 0.78, 0.92, 1}, 	texture = "Interface/Icons/INV_Misc_Rune_03"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_RAGE]			= {power_type="RAGE", 			power_index =1,		color={0.77, 0.12, 0.23, 1}, 	texture = "Interface/Icons/Ability_Warrior_Rampage"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_FOCUS] 		= {power_type="FOCUS", 			power_index =2,		color={1.00, 0.50, 0.25, 1}, 	texture = "Interface/Icons/Ability_Fixated_State_Orange"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_ENERGY]		= {power_type="ENERGY",			power_index =3, 	color={1, 0.96, 0.41, 1}, 	  	texture = "Interface/Icons/Spell_Holy_PowerInfusion"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_RUNIC]    	= {power_type="RUNIC_POWER", 	power_index =6,		color={0, 0.82, 1, 1}, 			texture = "Interface/Icons/Spell_DeathKnight_FrozenRuneWeapon"};
+local POWER_INFO = {}
+POWER_INFO[HDH_TRACKER.TYPE.POWER_MANA]		 	= {power_type="MANA",		 	power_index =0,		color={0.25, 0.78, 0.92, 1}, 	regen=true,  texture = "Interface/Icons/INV_Misc_Rune_03"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_RAGE]			= {power_type="RAGE", 			power_index =1,		color={0.77, 0.12, 0.23, 1}, 	regen=false, texture = "Interface/Icons/Ability_Warrior_Rampage"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_FOCUS] 		= {power_type="FOCUS", 			power_index =2,		color={1.00, 0.50, 0.25, 1}, 	regen=true,  texture = "Interface/Icons/Ability_Fixated_State_Orange"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_ENERGY]		= {power_type="ENERGY",			power_index =3, 	color={1, 0.96, 0.41, 1}, 	  	regen=true,  texture = "Interface/Icons/Spell_Holy_PowerInfusion"};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_RUNIC]    	= {power_type="RUNIC_POWER", 	power_index =6,		color={0, 0.82, 1, 1}, 			regen=false,  texture = "Interface/Icons/Spell_DeathKnight_FrozenRuneWeapon"};
 
-POWER_INFO[HDH_TRACKER.TYPE.POWER_FURY] 		= {power_type="FURY",			power_index =17, 	color={0.788, 0.259, 0.992, 1},	texture = "Interface/Icons/Spell_Shadow_SummonVoidWalker"};-- 17
-POWER_INFO[HDH_TRACKER.TYPE.POWER_PAIN] 		= {power_type="PAIN",			power_index =18,	color={1, 156/255, 0, 1}, 		texture = "Interface/Icons/Ability_Warlock_FireandBrimstone"}; -- 18
+POWER_INFO[HDH_TRACKER.TYPE.POWER_FURY] 		= {power_type="FURY",			power_index =17, 	color={0.788, 0.259, 0.992, 1},	regen=false,  texture = "Interface/Icons/Spell_Shadow_SummonVoidWalker"};-- 17
+POWER_INFO[HDH_TRACKER.TYPE.POWER_PAIN] 		= {power_type="PAIN",			power_index =18,	color={1, 156/255, 0, 1}, 		regen=false,  texture = "Interface/Icons/Ability_Warlock_FireandBrimstone"}; -- 18
 
 if select(4, GetBuildInfo()) >= 100000 then -- 용군단
 	HDH_TRACKER.TYPE.POWER_LUNAR = 10
 	HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_LUNAR,	   HDH_POWER_TRACKER)
-	POWER_INFO[HDH_TRACKER.TYPE.POWER_LUNAR] 	    = {power_type="LUNAR_POWER",	power_index =8, 	color={0.30, 0.52, 0.90, 1},	texture = "Interface/Icons/Ability_Druid_Eclipse"};
+	POWER_INFO[HDH_TRACKER.TYPE.POWER_LUNAR] 	    = {power_type="LUNAR_POWER",	power_index =8, 	color={0.30, 0.52, 0.90, 1},	regen=false,  texture = "Interface/Icons/Ability_Druid_Eclipse"};
 
 	HDH_TRACKER.TYPE.POWER_MAELSTROM = 11
 	HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_MAELSTROM, HDH_POWER_TRACKER)
-	POWER_INFO[HDH_TRACKER.TYPE.POWER_MAELSTROM]	= {power_type="MAELSTROM", 		power_index =11,	color={0.25, 0.5, 1, 1},		texture = "Interface/Icons/Spell_Shaman_StaticShock"};
+	POWER_INFO[HDH_TRACKER.TYPE.POWER_MAELSTROM]	= {power_type="MAELSTROM", 		power_index =11,	color={0.25, 0.5, 1, 1},		regen=false,  texture = "Interface/Icons/Spell_Shaman_StaticShock"};
 
 	HDH_TRACKER.TYPE.POWER_INSANITY = 12
 	HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_INSANITY,  HDH_POWER_TRACKER)
-	POWER_INFO[HDH_TRACKER.TYPE.POWER_INSANITY] 	= {power_type="INSANITY", 		power_index =13,	color={0.70, 0.4, 0.90, 1},	  	texture = "Interface/Icons/SPELL_SHADOW_TWISTEDFAITH"};
+	POWER_INFO[HDH_TRACKER.TYPE.POWER_INSANITY] 	= {power_type="INSANITY", 		power_index =13,	color={0.70, 0.4, 0.90, 1},	  	regen=false,  texture = "Interface/Icons/SPELL_SHADOW_TWISTEDFAITH"};
 end
 
 HDH_POWER_TRACKER.POWER_INFO = POWER_INFO;
 
-local function HDH_POWER_OnUpdate(self)
-	self.spell.curTime = GetTime()
+local function HDH_POWER_OnUpdate(f, elapsed)
+	self = f:GetParent().parent
+	f.spell.curTime = GetTime()
 	
-	if self.spell.curTime - (self.spell.delay or 0) < 0.02  then return end 
-	self.spell.delay = self.spell.curTime
-	local curValue = self:GetParent().parent:GetPower()
-	local maxValue = self:GetParent().parent:GetPowerMax()
-	self.spell.v1 = curValue;
-	self.spell.count = math.ceil(self.spell.v1 / maxValue * 100);
-	if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
-	self.counttext:SetText(self.spell.count .. "%"); 
+	if f.spell.curTime - (f.spell.delay or 0) < 0.02  then return end 
+	f.spell.delay = f.spell.curTime
+	local curValue = self:GetPower()
+	local maxValue = self:GetPowerMax()
+	f.spell.v1 = curValue;
+	f.spell.count = math.ceil(f.spell.v1 / maxValue * 100);
+	if f.spell.count == 100 and f.spell.v1 ~= maxValue then f.spell.count = 99 end
+	f.counttext:SetText(f.spell.count .. "%"); 
 	-- else self.counttext:SetText(nil) end
-	if self.spell.showValue then 
-		self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1, self:GetParent().parent.ui.font.v1_abbreviate)); 
+	if f.spell.showValue then 
+		f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate)); 
 	else 
-		self.v1:SetText(nil) 
+		f.v1:SetText(nil) 
 	end
 
-	if IS_REGEN_POWER[self.spell.power_index] then
-		if self.spell.v1 < maxValue then
-			if self.spell.isOn ~= true then
-				self:GetParent().parent:Update();
-				self.spell.isOn = true;
+	if self.power_info.regen then
+		if f.spell.v1 < maxValue then
+			if f.spell.isOn ~= true then
+				self:Update();
+				f.spell.isOn = true;
 			end
 		else 
-			if self.spell.isOn ~= false then
-				self:GetParent().parent:Update();
-				self.spell.isOn = false;
+			if f.spell.isOn ~= false then
+				self:Update();
+				f.spell.isOn = false;
 			end
-			self:GetParent().parent:Update();
+			self:Update();
 		end
 	else
-		if self.spell.v1 > 0 then
-			if self.spell.isOn ~= true then
-				self:GetParent().parent:Update();
-				self.spell.isOn = true;
+		if f.spell.v1 > 0 then
+			if f.spell.isOn ~= true then
+				self:Update();
+				f.spell.isOn = true;
 			end
 		else
-			if self.spell.isOn ~= false then
-				self:GetParent().parent:Update();
-				self.spell.isOn = false;
+			if f.spell.isOn ~= false then
+				self:Update();
+				f.spell.isOn = false;
 			end
 		end
 	end
-	
-	self:GetParent().parent:UpdateGlow(self, true);
-	self:GetParent().parent:UpdateBarValue(self);
+
+	if self.max == maxValue then -- UpdateBar 함수안에 UpdateAbsorb 를 포함한다.
+		self:UpdateGlow(f, true);
+		self:UpdateBarValue(f, elapsed);
+	else
+		self:UpdateBar(f, maxValue);
+		self:UpdateGlow(f, true);
+		self:UpdateBarValue(f, elapsed, true);
+	end
 end
 
-function HDH_POWER_TRACKER:UpdateBarValue(f, non_animate)
+function HDH_POWER_TRACKER:UpdateBarValue(f, elapsed, non_animate)
 	if f.bar and f.bar.bar and #f.bar.bar > 0 then
 		local bar;
 		for i = 1, #f.bar.bar do 
@@ -144,19 +148,19 @@ function HDH_POWER_TRACKER:UpdateBarValue(f, non_animate)
 end
 
 function HDH_POWER_TRACKER:GetPower()
-	return UnitPower('player', POWER_INFO[self.type].power_index);
+	return UnitPower('player', self.power_info.power_index);
 end
 
 function HDH_POWER_TRACKER:GetPowerMax()
-	return UnitPowerMax('player', POWER_INFO[self.type].power_index)
+	return UnitPowerMax('player', self.power_info.power_index)
 end
 
 function HDH_POWER_TRACKER:CreateData()
 	local trackerId = self.id
-	local key = POWER_INFO[self.type].power_type .. '1'
+	local key = self.power_info.power_type .. '1'
 	local id = 0
-	local name = POWER_INFO[self.type].power_type
-	local texture = POWER_INFO[self.type].texture;
+	local name = self.power_info.power_type
+	local texture = self.power_info.texture;
 	local display = DB.SPELL_ALWAYS_DISPLAY
 	local isValue = true
 	local isItem = false
@@ -173,7 +177,7 @@ function HDH_POWER_TRACKER:CreateData()
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON_AND_BAR)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.reverse_h', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.column_count', 6)
-	DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', POWER_INFO[self.type].color)
+	DB:SetTrackerValue(trackerId, 'ui.%s.bar.color', self.power_info.color)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.use_full_color', false)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.location', DB.BAR_LOCATION_R)
 	DB:SetTrackerValue(trackerId, 'ui.%s.bar.width', 200)
@@ -193,13 +197,13 @@ function HDH_POWER_TRACKER:CreateData()
 	DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_abbreviate', false)
 
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 20)
-	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', POWER_INFO[self.type].color)
+	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', self.power_info.color)
 	self:UpdateSetting();
 end
 
 function HDH_POWER_TRACKER:IsHaveData()
 	local key = DB:GetTrackerElement(self.id, 1)
-	if (POWER_INFO[self.type].power_type .. '1') == key then
+	if (self.power_info.power_type .. '1') == key then
 		return true
 	else
 		return false
@@ -219,7 +223,7 @@ function HDH_POWER_TRACKER:CreateDummySpell(count)
 	f:SetMouseClickEnabled(false);
 	if not f:GetParent() then f:SetParent(self.frame) end
 	if f.icon:GetTexture() == nil then
-		f.icon:SetTexture(POWER_INFO[self.type].texture);
+		f.icon:SetTexture(self.power_info.texture);
 	end
 	f:ClearAllPoints()
 	spell = {}
@@ -297,8 +301,8 @@ function HDH_POWER_TRACKER:Update() -- HDH_TRACKER override
 		f.spell.max = self:GetPowerMax()
 		f.spell.count = (f.spell.v1/f.spell.max * 100);
 		self:UpdateAllIcons()
-		if IS_REGEN_POWER[f.spell.power_index] then
-			if f.spell.max ~= f.spell.v1 then show = true end
+		if self.power_info.regen then
+			if f.spell.max ~= f.spell.v1 and not UnitIsDead("player") then show = true end
 		elseif f.spell.v1 > 0 then show = true end
 	end
 
@@ -554,6 +558,8 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 		return 
 	end
 	
+ 	self.power_info = self.POWER_INFO[self.type]
+
 	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitValues
 	local elemSize = DB:GetTrackerElementSize(trackerId)
 	local spell 
@@ -592,7 +598,7 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.no = i
 			spell.name = elemName
 			spell.icon = texture
-			spell.power_index = POWER_INFO[self.type].power_index
+			spell.power_index = self.power_info.power_index
 			-- if not auraList[i].defaultImg then auraList[i].defaultImg = texture; 
 			-- elseif auraList[i].defaultImg ~= auraList[i].texture then spell.fix_icon = true end
 			spell.id = tonumber(elemId)
@@ -642,7 +648,7 @@ end
 
 function HDH_POWER_TRACKER:OnEvent(event, unit, powerType)
 	if self == nil or self.parent == nil then return end
-	if ((event == 'UNIT_POWER_UPDATE')) and (POWER_INFO[self.parent.type].power_type == powerType) then  -- (event == "UNIT_POWER")
+	if ((event == 'UNIT_POWER_UPDATE')) and (self.parent.power_info.power_type == powerType) then  -- (event == "UNIT_POWER")
 		if not HDH_TRACKER.ENABLE_MOVE then
 			self.parent:Update(powerType)
 		end

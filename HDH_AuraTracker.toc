@@ -2,7 +2,7 @@
 ## Title: AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
-## Version: 11.1.7.1
+## Version: 11.1.7.2
 ## SavedVariablesPerCharacter: HDH_AT_DB
 ## IconTexture: Interface\AddOns\HDH_AuraTracker\Texture\logo.blp
 
@@ -24,7 +24,7 @@ Tracker\DKRuneTracker.lua
 Tracker\EssenceTracker.lua
 Tracker\StaggerTracker.lua
 Tracker\EnhancementMaelstrom.lua
-# Tracker\ShadowTracking.lua
+Tracker\HealthTracker.lua
 
 # https://www.wowace.com/projects/libcompress
 Lib\LibCompress\LibStub.lua

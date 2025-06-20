@@ -317,3 +317,5 @@ L.JADE_SERPENT_STATUE = "Jade Serpent Statue"
 L.YU_LON = "Yu'lon"
 L.NIUZAO = "Niuzao"
 -------------------------------------------
+
+L.HEALTH = "Health"

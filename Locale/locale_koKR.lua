@@ -313,3 +313,5 @@ L.XUEN = "쉬엔"
 L.JADE_SERPENT_STATUE = "옥룡 조각상"
 L.YU_LON = "위론"
 L.NIUZAO = "니우짜오"
+
+L.HEALTH = "체력"
