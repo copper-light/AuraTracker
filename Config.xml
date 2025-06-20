@@ -905,6 +905,13 @@
 												<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-10"/>
 											</Anchors>
 										</FontString>
+
+										<FontString parentKey="Text2" name="$parentText2" inherits="Font_Yellow_M" text="특성 습득 시에만 아이콘 표시" justifyH="LEFT">
+											<Size x="400" y="25" />
+											<Anchors>
+												<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-125"/>
+											</Anchors>
+										</FontString>
 									</Layer>
 								</Layers>
 
@@ -947,6 +954,103 @@
 										<Size x="210" y="20"/>
 										<Anchors>
 											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="2" y="0" />
+										</Anchors>
+										<Scripts>
+											<OnShow>
+											</OnShow>
+										</Scripts>
+									</Frame>
+
+									<CheckButton name="$parentCBConditionTransit1" inherits="HDH_AT_CheckButton2Template">
+										<Size x="170" y="20" />
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="15" y="-155" />
+											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+										</Anchors>
+										<Scripts>
+											<OnLoad>self.Text:SetText(HDH_AT_L.OFF)</OnLoad>
+											<OnClick function="HDH_AT_UI_OnCheck" />
+										</Scripts>
+									</CheckButton>
+
+									<CheckButton name="$parentCBConditionTransit2" inherits="HDH_AT_CheckButton2Template">
+										<Size x="170" y="20" />
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBConditionTransit1" x="0" y="-2" />
+										</Anchors>
+										<Scripts>
+											<OnLoad>self.Text:SetText(HDH_AT_L.LEARNED_TRANSIT_INPUT)</OnLoad>
+											<OnClick function="HDH_AT_UI_OnCheck" />
+										</Scripts>
+									</CheckButton>
+
+									<EditBox name="$parentEBCondition" inherits="InputBoxTemplate" enableMouse="true" numeric="true" autoFocus="false">
+										<Size>
+											<AbsDimension x="182" y="26"/>
+										</Size>
+										<Layers>
+											<Layer level="BACKGROUND">
+												<Texture parentKey="BG" hidden="false">
+													<Size x="20" y="20"/>
+													<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+													<Anchors>
+														<Anchor point="RIGHT" relativePoint="LEFT" x="-7" y="0"/>
+													</Anchors>
+													<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+												</Texture>
+											</Layer>
+											<Layer level="OVERLAY">
+												<Texture parentKey="Icon" hidden="false" file="Interface\ICONS\INV_Misc_QuestionMark" >
+													<Size x="18" y="18"/>
+													<Anchors>
+														<Anchor point="RIGHT" relativePoint="LEFT" x="-8" y="0"/>
+													</Anchors>
+													<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+												</Texture>
+											</Layer>
+										</Layers>
+										<Anchors>
+											<Anchor point="LEFT" relativeTo="$parentCBConditionTransit2" relativePoint="RIGHT" x="29" y="0" />
+										</Anchors>
+										<Scripts>
+										</Scripts>
+									</EditBox>
+
+									<Frame name="$parentSwitchHideMode" inherits="HDH_AT_SwitchFrameTemplate">
+										<Size x="210" y="20"/>
+										<Anchors>
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBConditionTransit2" x="2" y="-22" />
+										</Anchors>
+										<Scripts>
+											<OnShow>
+											</OnShow>
+										</Scripts>
+									</Frame>
+
+									<Frame name="$parentSwitchHideMode">
+										<Size x="150" y="20"/>
+										<Layers>
+											<!-- <Layer level="BACKGROUND">
+												<Texture parentKey="BG" hidden="false">
+													<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+													<Anchors>
+														<Anchor point="TOPLEFT" x="0" y="0"/>
+														<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+													</Anchors>
+												</Texture>
+											</Layer> -->
+											<Layer level="OVERLAY">
+												<FontString parentKey="Text" inherits="Font_White_S" text="미습득 시 아이콘 숨김 방식" justifyH="RIGHT"  justifyV="CENTER">
+													<Size  y="20" />
+													<Anchors>
+														<Anchor point="LEFT" relativePoint="LEFT" x="4" y="0"/>
+														<Anchor point="RIGHT" relativePoint="RIGHT" x="-4" y="0"/>
+													</Anchors>
+												</FontString>
+											</Layer>
+										</Layers>
+										<Anchors>
+											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBConditionTransit2" x="20" y="-2" />
 										</Anchors>
 										<Scripts>
 											<OnShow>

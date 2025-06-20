@@ -2971,6 +2971,8 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 		{DB.SPELL_HIDE_TIME_OFF, HDH_AT_L.DONT_USE_SPACE}
 	}, HDH_AT_OnSelected_Dropdown)
 
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.Text2:SetText(L.DETAIL_DISPLAY_LEARND_TRANSIT)
+
 	self.F.BODY.CONFIG_DETAIL.ETC = _G[self:GetName().."BodyDetailConfigETC"]
 	self.F.BODY.CONFIG_DETAIL.ETC.MENU = _G[self:GetName().."BodyDetailConfigETCMenuSFContents"]
 	self.F.BODY.CONFIG_DETAIL.ETC.CONTENTS = _G[self:GetName().."BodyDetailConfigETCSFContents"]
