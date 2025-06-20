@@ -1782,7 +1782,13 @@ else -- 용군단 코드
 			return;
 		end
 		local name = f:GetParent():GetName()..'g'..time()
-		f.SpellActivationAlert = CreateFrame("Frame", name, f, "ActionBarButtonSpellActivationAlert")
+		
+		if select(4, GetBuildInfo()) <= 49999 then -- 대격변
+			f.SpellActivationAlert = CreateFrame("Frame", name, f, "ActionBarButtonSpellActivationAlert")
+		else
+			f.SpellActivationAlert = CreateFrame("Frame", name, f, "ActionButtonSpellAlertTemplate")
+		end
+
 		local frameWidth, frameHeight = f:GetSize();
 		f.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6);
 		f.SpellActivationAlert:SetPoint("CENTER", f, "CENTER", 0, 0);
@@ -1814,7 +1820,6 @@ else -- 용군단 코드
 	function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
 		border = f.border
 		f = f.iconframe;
-		
 		self:ActionButton_SetupOverlayGlow(f)
 		if not f.SpellActivationAlert:IsShown() or (not f.SpellActivationAlert.ProcStartAnim:IsPlaying() and not f.SpellActivationAlert.ProcLoop:IsPlaying()) then
 			f.SpellActivationAlert:Show();

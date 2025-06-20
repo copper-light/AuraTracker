@@ -231,7 +231,7 @@ end
 
 function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 	local startTime, duration, count, remaining
-	local chargeCount, chargeCountMax, chargeStartTime, chargeDuration, chargeRemaining
+	local chargeCount, chargeCountMax, chargeStartTime, chargeDuration, chargeRemaining, castCount
 	local inRange, isAble, isNotEnoughMana
 	local curTime = GetTime()
 
@@ -247,6 +247,7 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 		isNotEnoughMana = false
 	else
 		local spellCooldownInfo = HDH_AT_UTIL.GetSpellCooldown(id)
+		castCount = HDH_AT_UTIL.GetSpellCastCount(id)
 		if spellCooldownInfo then
 			startTime = spellCooldownInfo.startTime
 			duration = spellCooldownInfo.duration
@@ -254,7 +255,6 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 		count = HDH_AT_UTIL.GetSpellCastCount(id) or 0
 		inRange = HDH_AT_UTIL.IsSpellInRange(name, "target")
 		isAble, isNotEnoughMana = HDH_AT_UTIL.IsSpellUsable(id)
-		
 		isAble = isAble or isNotEnoughMana
 	end
 
@@ -279,7 +279,7 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 		chargeRemaining = math.max(chargeRemaining, 0)
 	end
 
-	return startTime or 0, duration or 0, remaining or 0, count or 0, chargeStartTime or 0, chargeDuration or 0, chargeRemaining or 0, chargeCount or 0, chargeCountMax or 0, inRange or false, isAble or false, isNotEnoughMana or false
+	return startTime or 0, duration or 0, remaining or 0, count or 0, chargeStartTime or 0, chargeDuration or 0, chargeRemaining or 0, chargeCount or 0, chargeCountMax or 0, castCount or 0, inRange or false, isAble or false, isNotEnoughMana or false
 end
 
 function HDH_C_TRACKER:UpdateCombatSpellInfo(f, id)
@@ -329,7 +329,7 @@ function HDH_C_TRACKER:UpdateIcon(f)
 
 	
 	if not HDH_TRACKER.ENABLE_MOVE and not spell.isInnerCDItem then
-		startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana = self:UpdateSpellInfo(f.spell.id, f.spell.name, f.spell.isItem, f.spell.isToy)
+		startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, castCount, inRange, isAble, isNotEnoughMana = self:UpdateSpellInfo(f.spell.id, f.spell.name, f.spell.isItem, f.spell.isToy)
 		
 		spell.isGlobalCooldown = (duration < HDH_C_TRACKER.GlobalCooldown)
 		if show_global_cooldown then
@@ -351,6 +351,7 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		spell.charges.remaining = chargeRemaining
 		spell.charges.endTime = chargeStartTime + chargeDuration
 		spell.charges.duration = chargeDuration
+		spell.castCount = castCount
 		spell.isCharging = (chargeRemaining > 0 and chargeCount >= 1) and true or false
 		spell.isAble = isAble
 		spell.inRange = inRange
@@ -540,12 +541,12 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		if (cooldown_type == DB.COOLDOWN_CIRCLE) or (cooldown_type == DB.COOLDOWN_NONE) then
 			f.charges:SetCooldown(chargeStartTime, chargeDuration or 0); 
 		end
+	elseif spell.stackable then
+		f.counttext:SetText(count)
+	elseif castCount > 0 then
+		f.counttext:SetText(castCount)
 	else
-		if spell.stackable then
-			f.counttext:SetText(count)
-		else
-			f.counttext:SetText(nil)
-		end
+		f.counttext:SetText(nil)
 	end
 
 	if self.OrderFunc then self:OrderFunc(self) end 
