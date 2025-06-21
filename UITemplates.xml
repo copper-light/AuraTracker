@@ -2571,7 +2571,15 @@
 				</Texture>
 			</Layer>
 			<Layer level="OVERLAY">
-				<Texture name="$parentIcon" parentKey="Icon" hidden="false" file="Interface\ICONS\INV_Misc_QuestionMark" >
+				<Texture name="$parentDefaultIcon" parentKey="DefaultIcon" file="Interface\ICONS\INV_Misc_QuestionMark"  hidden="false">
+					<Size x="16" y="16"/>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="LEFT" x="2" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+
+				<Texture name="$parentIcon" parentKey="Icon" file="Interface\ICONS\INV_Misc_QuestionMark" hidden="true">
 					<Size x="16" y="16"/>
 					<Anchors>
 						<Anchor point="LEFT" relativePoint="LEFT" x="2" y="0"/>

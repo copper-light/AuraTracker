@@ -1343,3 +1343,14 @@ end
 function HDH_AT_SpellSearchEditBoxTemplateMixin:SetText(text)
     self.EditBox:SetText(text)
 end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetIcon(texture)
+    self.Icon:SetTexture(texture)
+    self.Icon:Show()
+    self.DefaultIcon:Hide()
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetDefaultIcon()
+    self.DefaultIcon:Show()
+    self.Icon:Hide()
+end

@@ -856,13 +856,13 @@ function HDH_AT_UI_OnCheck(self)
 		self:SetChecked(true)
 		F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2:SetChecked(false)
 		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:Hide()
-		F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_LEARNED_TRAIT:Hide()
+		F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_SW_HIDE_MODE_UNLEARNED_TRAIT:Hide()
 		F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT:Hide()
 	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2 then
 		self:SetChecked(true)
 		F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT1:SetChecked(false)
 		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:Show()
-		F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_LEARNED_TRAIT:Show()
+		F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_SW_HIDE_MODE_UNLEARNED_TRAIT:Show()
 		F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT:Show()
 	end
 end
@@ -1428,7 +1428,7 @@ function HDH_AT_OnClick_Button(self, button)
 
 			if F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2:GetChecked() then
 				traitId = F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT:GetText()
-				traitIconHideMode = F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:GetSelectedValue()
+				traitIconHideMode = F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:GetSelectedValue()
 			end
 
 			DB:UpdateTrackerElementDisplay(trackerId, elemIdx, value, traitId, traitIconHideMode)
@@ -1954,6 +1954,10 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerElementConfig(trackerId, startRowIdx
 	end
 end
 
+-- function HDH_AT_ConfigFrameMixin:GetSpell()
+-- 	HDH_AT_UTIL.GetCacheSpellInfo(spellName)
+-- end
+
 function HDH_AT_ConfigFrameMixin:LoadTrackerListForExport()
 	local content = self.UI_TAB[9].content
 	local ids = DB:GetTrackerIds()
@@ -2082,7 +2086,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 		if button ~= nil then
 			F.BODY.CONFIG_DETAIL.DISPLAY.checkbutton = button
 			F.BODY.CONFIG_DETAIL.DISPLAY.preCheck = not button:GetChecked()
-			local display = DB:GetTrackerElementDisplay(trackerId, elemIdx)
+			local display, connectTraitId, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, elemIdx)
 			if display == DB.SPELL_ALWAYS_DISPLAY then
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(true)
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(false)
@@ -2100,7 +2104,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(true)
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB3:SetChecked(false)
-				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetSelectedIndex(1)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetSelectedIndex(2)
 				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetPoint("LEFT", F.BODY.CONFIG_DETAIL.DISPLAY.CB2,"RIGHT", 2,0)
 				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Show()
 			elseif display == DB.SPELL_HIDE_TIME_ON then
@@ -2114,10 +2118,31 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(false)
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB3:SetChecked(true)
-				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetSelectedIndex(1)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetSelectedIndex(2)
 				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetPoint("LEFT", F.BODY.CONFIG_DETAIL.DISPLAY.CB3,"RIGHT", 2,0)
 				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Show()
 			end
+
+			if connectTraitId then
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT1:SetChecked(false)
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2:SetChecked(true)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:Show()
+				F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_SW_HIDE_MODE_UNLEARNED_TRAIT:Show()
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:SetSelectedIndex(unlearnedHideMode)
+				F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT:Show()
+				F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT:SetText(connectTraitId)
+				F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT.EditBox.tmp_text = connectTraitId
+				-- F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT:SetIcon()
+			else
+				F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT:SetText("")
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT1:SetChecked(true)
+				F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2:SetChecked(false)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:Hide()
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:SetSelectedIndex(2)
+				F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_SW_HIDE_MODE_UNLEARNED_TRAIT:Hide()
+				F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT:Hide()
+			end
+
 			button:SetChecked(F.BODY.CONFIG_DETAIL.DISPLAY.preCheck)
 			F.BODY.CONFIG_DETAIL.BTN_SAVE:Show()
 			F.BODY.CONFIG_DETAIL.BTN_CLOSE:ClearAllPoints()
@@ -2994,8 +3019,8 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2 = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents".."CBConditionTrait2"]
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents".."SwitchHideModeUnlearnedTrait"]
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:Init({
-		{DB.SPELL_HIDE_TIME_OFF_AS_SPACE, HDH_AT_L.USE_SPACE},
-		{DB.SPELL_HIDE_TIME_OFF, HDH_AT_L.DONT_USE_SPACE}
+		{DB.SPELL_HIDE_AS_SPACE, HDH_AT_L.USE_SPACE},
+		{DB.SPELL_HIDE, HDH_AT_L.DONT_USE_SPACE}
 	}, HDH_AT_OnSelected_Dropdown)
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents".."SpellSearchEditBox"]
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT.EditBox:SetScript("OnEscapePressed", 
@@ -3006,11 +3031,24 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	)
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT.EditBox:SetScript("OnEnterPressed", 
 		function(self)
-			print("asdf")
+			local id = HDH_AT_UTIL.Trim(self:GetText()) or ""
+			local ret = false
+			if string.len(id) > 0 then
+				local spell = HDH_AT_UTIL.GetCacheSpellInfo(id)
+				if spell then 
+					self:GetParent():SetIcon(spell.iconID)
+					ret = true
+				end
+			end
+
+			if ret == false then
+				self:GetParent():Reset()
+				GetMainFrame().Dialog:AlertShow(L.PLEASE_INPUT_ID) return 
+			end
 		end
 	)
 
-	self.F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_LEARNED_TRAIT = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents".."LabelSwitchHideModeLearnedTrait"]
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_SW_HIDE_MODE_UNLEARNED_TRAIT = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents".."LabelSwitchHideModeLearnedTrait"]
 
 	self.F.BODY.CONFIG_DETAIL.ETC = _G[self:GetName().."BodyDetailConfigETC"]
 	self.F.BODY.CONFIG_DETAIL.ETC.MENU = _G[self:GetName().."BodyDetailConfigETCMenuSFContents"]

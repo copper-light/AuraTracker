@@ -294,7 +294,13 @@ do
 		if cashTalentSpell[spec][spellName] or cashTalentSpell[spec][spellId] then
 			return true
 		else
-			return false
+			if spellName ~= nil then
+				local spell = HDH_AT_UTIL.GetCacheSpellInfo(spellName)
+				if spell then
+					spellId = spell.spellID
+				end
+			end
+			return HDH_AT_UTIL.IsTraitSpellTalented(spellId)
 		end
 	end
 
@@ -306,10 +312,10 @@ do
 			local offset, numSlots = skillLineInfo.itemIndexOffset, skillLineInfo.numSpellBookItems
 			for j = offset+1, offset+numSlots do
 				local name, subName = C_SpellBook.GetSpellBookItemName(j, Enum.SpellBookSpellBank.Player)
-				local spellID = select(2,C_SpellBook.GetSpellBookItemType(j, Enum.SpellBookSpellBank.Player))
-				if searchName == name or searchId == spellID then
+				local spellType, spellID = C_SpellBook.GetSpellBookItemType(j, Enum.SpellBookSpellBank.Player)
+				if spellType ~= 2 and name and spellID then
 					cashTalentSpell[spec][name] = true
-					cashTalentSpell[spec][searchId] = true
+					cashTalentSpell[spec][spellID] = true
 				end 
 			end
 		end
@@ -318,13 +324,38 @@ do
 		if numSpells then
 			for i=1, numSpells do
 				local petSpellName, petSubType = C_SpellBook.GetSpellBookItemName(i, Enum.SpellBookSpellBank.Pet)
-				local spellID = select(2,C_SpellBook.GetSpellBookItemType(i, Enum.SpellBookSpellBank.Pet))
-				if searchName == name or searchId == spellID then
+				local spellType, spellID = C_SpellBook.GetSpellBookItemType(i, Enum.SpellBookSpellBank.Pet)
+				if spellType ~= 2 and name and spellID then
 					cashTalentSpell[spec][petSpellName] = true
 					cashTalentSpell[spec][spellID] = true
 				end 
 			end
 		end
+	end
+
+	function HDH_AT_UTIL.IsTraitSpellTalented(spellID) -- this could be made to be a lot more efficient, if you already know the relevant nodeID and entryID
+		local configID = C_ClassTalents.GetActiveConfigID()
+		if configID == nil then return end
+
+		local configInfo = C_Traits.GetConfigInfo(configID)
+		if configInfo == nil then return end
+
+		for _, treeID in ipairs(configInfo.treeIDs) do -- in the context of talent trees, there is only 1 treeID
+			local nodes = C_Traits.GetTreeNodes(treeID)
+			for i, nodeID in ipairs(nodes) do
+				local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+				for _, entryID in ipairs(nodeInfo.entryIDsWithCommittedRanks) do -- there should be 1 or 0
+					local entryInfo = C_Traits.GetEntryInfo(configID, entryID)
+					if entryInfo and entryInfo.definitionID then
+						local definitionInfo = C_Traits.GetDefinitionInfo(entryInfo.definitionID)
+						if definitionInfo.spellID == spellID then
+							return true
+						end
+					end
+				end
+			end
+		end
+		return false
 	end
 
 	function HDH_AT_UTIL.Deepcopy(orig) -- cpy table
