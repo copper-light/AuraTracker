@@ -188,7 +188,14 @@ function HDH_AT_OnEditFocusGained(self)
     end
     _G[self:GetParent():GetName().."RowDesc"]:Hide()
     _G[self:GetParent():GetName().."ButtonAdd"]:Show() 
-    
+end
+
+function HDH_AT_OnTextChanged(self)
+    if string.len(self:GetText()) == 0 then
+        self.Desc:Show()
+    else
+        self.Desc:Hide()
+    end
 end
 
 function HDH_AT_OnEditFocusLost(self)
@@ -231,7 +238,6 @@ local TEXT_DD_MULTI_SELETED = "%d 개 선택됨"
 
 HDH_AT_DropDownMixin = {
     globals= {"HDH_AT_DropDownMixin"}
-
 }
 
 function HDH_AT_DropDown_OnEnteredItem(self)
@@ -1325,4 +1331,15 @@ function HDH_AT_CheckButton2TemplateMixin:SetScript(scriptTypeName, func)
     if scriptTypeName == "OnClick" then
         self.OnClickfunc = func
     end
+end
+
+---
+HDH_AT_SpellSearchEditBoxTemplateMixin = {}
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:GetText()
+    return self.EditBox:GetText()
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetText(text)
+    self.EditBox:SetText(text)
 end

@@ -852,6 +852,18 @@ function HDH_AT_UI_OnCheck(self)
 		F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
 		F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(false)
 		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetPoint("LEFT", self,"RIGHT", 2,0)
+	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT1 then
+		self:SetChecked(true)
+		F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2:SetChecked(false)
+		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:Hide()
+		F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_LEARNED_TRAIT:Hide()
+		F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT:Hide()
+	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2 then
+		self:SetChecked(true)
+		F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT1:SetChecked(false)
+		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:Show()
+		F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_LEARNED_TRAIT:Show()
+		F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT:Show()
 	end
 end
 
@@ -1402,6 +1414,7 @@ function HDH_AT_OnClick_Button(self, button)
 		elseif mode == BODY_DETAIL_DISPLAY then
 			local checkbutton = F.BODY.CONFIG_DETAIL.DISPLAY.checkbutton
 			local value = DB.SPELL_ALWAYS_DISPLAY
+			local traitId, traitIconHideMode
 			if F.BODY.CONFIG_DETAIL.DISPLAY.CB1:GetChecked() then
 				value = DB.SPELL_ALWAYS_DISPLAY
 			elseif F.BODY.CONFIG_DETAIL.DISPLAY.CB2:GetChecked() then
@@ -1413,7 +1426,12 @@ function HDH_AT_OnClick_Button(self, button)
 			-- {DB.SPELL_HIDE_AS_SPACE, HDH_AT_L.USE_SPACE},
 			-- {DB.SPELL_HIDE, HDH_AT_L.DONT_USE_SPACE}
 
-			DB:UpdateTrackerElementDisplay(trackerId, elemIdx, value)
+			if F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2:GetChecked() then
+				traitId = F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT:GetText()
+				traitIconHideMode = F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:GetSelectedValue()
+			end
+
+			DB:UpdateTrackerElementDisplay(trackerId, elemIdx, value, traitId, traitIconHideMode)
 			HDH_TRACKER.InitIconFrame(trackerId)
 
 			local ui = DB:GetTrackerUI((DB:hasTrackerUI(trackerId) and trackerId) or nil)
@@ -2960,23 +2978,43 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 		{ self.F.BODY.CONFIG_DETAIL.GLOW.CB4, self.F.BODY.CONFIG_DETAIL.GLOW.CB_DD4, self.F.BODY.CONFIG_DETAIL.GLOW.CB_EB4 }
 	}
 
-	self.F.BODY.CONFIG_DETAIL.DISPLAY = _G[self:GetName().."BodyDetailConfigDisplay"]
-	self.F.BODY.CONFIG_DETAIL.DISPLAY.Text:SetText(L.DETAIL_DISPLAY)
-	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB1 = _G[self:GetName().."BodyDetailConfigDisplayCBCondition1"]
-	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB2 = _G[self:GetName().."BodyDetailConfigDisplayCBCondition2"]
-	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB3 = _G[self:GetName().."BodyDetailConfigDisplayCBCondition3"]
-	self.F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE = _G[self:GetName().."BodyDetailConfigDisplaySwitchHideMode"]
+	self.F.BODY.CONFIG_DETAIL.DISPLAY = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents"]
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.Title1:SetText(L.DETAIL_DISPLAY)
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB1 = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContentsCBCondition1"]
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB2 = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContentsCBCondition2"]
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB3 = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContentsCBCondition3"]
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContentsSwitchHideMode"]
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Init({
 		{DB.SPELL_HIDE_TIME_OFF_AS_SPACE, HDH_AT_L.USE_SPACE},
 		{DB.SPELL_HIDE_TIME_OFF, HDH_AT_L.DONT_USE_SPACE}
 	}, HDH_AT_OnSelected_Dropdown)
 
-	self.F.BODY.CONFIG_DETAIL.DISPLAY.Text2:SetText(L.DETAIL_DISPLAY_LEARND_TRANSIT)
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.Title2:SetText(L.DETAIL_DISPLAY_LEARNED_TRAIT)
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT1 = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents".."CBConditionTrait1"]
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2 = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents".."CBConditionTrait2"]
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents".."SwitchHideModeUnlearnedTrait"]
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:Init({
+		{DB.SPELL_HIDE_TIME_OFF_AS_SPACE, HDH_AT_L.USE_SPACE},
+		{DB.SPELL_HIDE_TIME_OFF, HDH_AT_L.DONT_USE_SPACE}
+	}, HDH_AT_OnSelected_Dropdown)
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents".."SpellSearchEditBox"]
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT.EditBox:SetScript("OnEscapePressed", 
+		function(self)
+			self:SetText(self.tmp_text or "")
+			self:ClearFocus()
+		end
+	)
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.EB_LEARNED_TRAIT.EditBox:SetScript("OnEnterPressed", 
+		function(self)
+			print("asdf")
+		end
+	)
+
+	self.F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_LEARNED_TRAIT = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents".."LabelSwitchHideModeLearnedTrait"]
 
 	self.F.BODY.CONFIG_DETAIL.ETC = _G[self:GetName().."BodyDetailConfigETC"]
 	self.F.BODY.CONFIG_DETAIL.ETC.MENU = _G[self:GetName().."BodyDetailConfigETCMenuSFContents"]
 	self.F.BODY.CONFIG_DETAIL.ETC.CONTENTS = _G[self:GetName().."BodyDetailConfigETCSFContents"]
-
 
 	--------------------------------------------------------------------------------------------------------------------------------------------------
 	-- START: DETAIL_ETC_TAB
@@ -2995,9 +3033,9 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp.Icon:SetTexture("Interface/Icons/INV_Misc_QuestionMark")
 	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON = comp
 	table.insert(CHANGE_ICON_CB_LIST, comp)
-	local component1 = CreateFrame("EditBox", (comp:GetName()..'EditBox'), comp, "InputBoxTemplate")
-	component1:SetSize(130, 26)
-	component1:SetPoint('TOPLEFT', comp, 'BOTTOMLEFT', 5, -3)
+	local component1 = CreateFrame("EditBox", (comp:GetName()..'EditBox'), comp, "HDH_AT_EditBoxTemplate")
+	component1:SetSize(132, 20)
+	component1:SetPoint('TOPLEFT', comp, 'BOTTOMLEFT', 2, -7)
 	component1:SetText(value or "")
 	component1:SetAutoFocus(false)
 	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_EB_SPELL = component1
@@ -3006,7 +3044,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	end)
 
 	local component2 = CreateFrame("CheckButton", (comp:GetName()..'CheckButtonIsItem'), comp, "HDH_AT_CheckButton2Template")
-	component2:SetPoint('TOPLEFT', component1, 'BOTTOMLEFT', -5, 0)
+	component2:SetPoint('TOPLEFT', component1, 'BOTTOMLEFT', -2, -3)
 	component2.Text:SetText(L.ITEM_TOOLTIP)
 	component2:SetSize(82,20)
 	component2:HiddenBackground(true)
@@ -3317,7 +3355,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:SetText(L.APPLY_SHARE_STRING)
 	self.F.BODY.CONFIG_UI.BTN_IMPORT_STRING = comp
 	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.EDIT_BOX)
-	comp:SetSize(220,26)
+	comp:SetSize(250,26)
 	comp:SetFontObject("Font_White_XS")
 	comp:SetMaxLetters(0)
 	self.F.BODY.CONFIG_UI.ED_IMPORT_STRING = comp
@@ -3328,7 +3366,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:SetText(L.CREATE_SHARE_STRING)
 	self.F.BODY.CONFIG_UI.BTN_EXPORT_STRING = comp
 	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX)
-	comp:SetSize(220,26)
+	comp:SetSize(250,26)
 	comp:SetMaxLetters(0)
 	comp:SetFontObject("Font_White_XS")
 	self.F.BODY.CONFIG_UI.ED_EXPORT_STRING = comp
@@ -3491,20 +3529,20 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 
 	if component_type == COMP_TYPE.CHECK_BOX then
 		component = CreateFrame("Button", (parent:GetName()..'Button'..parent.row.."_"..parent.col), parent, "HDH_AT_CheckButton2Template")
-		component:SetPoint('LEFT', frame, 'RIGHT', 18, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 18 or 0, 0)
 		component:SetScript("OnClick", HDH_AT_UI_OnCheck)
 
 	elseif component_type == COMP_TYPE.BUTTON then
 		component = CreateFrame("Button", (parent:GetName()..'Button'..parent.row.."_"..parent.col), parent, "HDH_AT_ButtonTemplate")
 		component:SetSize(115, 22)
-		component:SetPoint('LEFT', frame, 'RIGHT', 20, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 20 or 0, 0)
 		component:SetText(value or 'None')
 		component:SetScript("OnClick", HDH_AT_OnClick_Button)
 	
 	elseif component_type == COMP_TYPE.EDIT_BOX then
-		component = CreateFrame("EditBox", (parent:GetName()..'EditBox'..parent.row.."_"..parent.col), parent, "InputBoxTemplate")
-		component:SetSize(110, 26)
-		component:SetPoint('LEFT', frame, 'RIGHT', 25, 0)
+		component = CreateFrame("EditBox", (parent:GetName()..'EditBox'..parent.row.."_"..parent.col), parent, "HDH_AT_EditBoxTemplate")
+		component:SetSize(115, 20)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 20 or 5, 0)
 		component:SetText(value or "")
 		component:SetAutoFocus(false) 
 		component:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
@@ -3514,33 +3552,33 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	elseif component_type == COMP_TYPE.DROPDOWN then
 		component = CreateFrame("Button", (parent:GetName()..'DropDown'..parent.row.."_"..parent.col), parent, "HDH_AT_DropDownOptionTemplate")
 		component:SetSize(115, 20)
-		component:SetPoint('LEFT', frame, 'RIGHT', 20, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 20 or 0, 0)
 
 	elseif component_type == COMP_TYPE.SLIDER then
 		component = CreateFrame("Slider", (parent:GetName()..'Slider'..parent.row.."_"..parent.col), parent, "HDH_AT_SliderTemplate")
 		component:SetSize(115, 20)
-		component:SetPoint('LEFT', frame, 'RIGHT', 20, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 20 or 0, 0)
 		component:SetHandler(HDH_AT_OnChangedSlider)
 		component:Init(10, 0, 100, true, true, 10)
 
 	elseif component_type == COMP_TYPE.COLOR_PICKER then
 		component = CreateFrame("Button", (parent:GetName()..'ColorPicker'..parent.row.."_"..parent.col), parent, "HDH_AT_ColorPickerTemplate")
-		component:SetSize(26, 26)
-		component:SetPoint('LEFT', frame, 'RIGHT', 22, 0)
+		component:SetSize(115, 20)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 20 or 0, 0)
 		component:SetHandler(HDH_AT_OnSeletedColor, function(self, text)
-			GetMainFrame().Dialog:AlertShow(L.ERROR_COLOR_CODE:format(UTIL.Trim(text)))
+			GetMainFrame().Dialog:AlertShow(L.ERROR_COLOR_CODE:format(UTIL.Trim(text) or " "))
 		end)
 
 	elseif component_type == COMP_TYPE.PREV_NEXT_BUTTON then
 		component = CreateFrame("Button", (parent:GetName()..'PrevNextButton'..parent.row.."_"..parent.col), parent, "HDH_AT_PrevNextButtonTemplate")
 		component:SetSize(115, 26)
-		component:SetPoint('LEFT', frame, 'RIGHT', 20, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 20 or 0, 0)
 		-- component:SetHandler(HDH_AT_OnSeletedColor)
 	
 	elseif component_type == COMP_TYPE.IMAGE_CHECKBUTTON then
 		component = CreateFrame("Button", (parent:GetName()..'ImageCheckButton'..parent.row.."_"..parent.col), parent, "HDH_AT_CheckButtonImageTemplate")
 		component:SetSize(20, 20)
-		component:SetPoint('LEFT', frame, 'RIGHT', 10	, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', 10, 0)
 		component:SetScript("OnClick", HDH_AT_UI_OnCheck)
 		-- component:SetHandler(HDH_AT_OnSeletedColor)
 

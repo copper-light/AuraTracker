@@ -360,7 +360,7 @@ do
 		self.aura_filter = aura_filter
 		self.aura_caster = aura_caster
 		if not id then return end
-		local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, hideMode
+		local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, connectTraitId, unlearnedHideMode
 		local elemSize = DB:GetTrackerElementSize(trackerId)
 		local spell 
 		local f
@@ -379,7 +379,7 @@ do
 		else
 			for i = 1, elemSize do
 				elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-				display, hideMode = DB:GetTrackerElementDisplay(trackerId, i)
+				display, connectTraitId, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, i)
 				glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
 				iconIdx = iconIdx + 1
 				f = self.frame.icon[iconIdx]
@@ -391,7 +391,8 @@ do
 				spell.glowValue = (glowValue and tonumber(glowValue)) or 0
 				spell.showValue = isValue
 				spell.display = display
-				spell.hideMode = hideMode
+				spell.connectTraitId = connectTraitId
+				spell.unlearnedHideMode = unlearnedHideMode
 				spell.v1 = 0 -- 수치를 저장할 변수
 				spell.aniEnable = true;
 				spell.aniTime = 8;

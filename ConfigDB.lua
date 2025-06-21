@@ -450,12 +450,14 @@ end
 
 function HDH_AT_ConfigDB:GetTrackerElementDisplay(trackerId, elementIndex)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
-    return element.display or CONFIG.SPELL_ALWAYS_DISPLAY
+    return element.display or CONFIG.SPELL_ALWAYS_DISPLAY, element.connectTraitId, element.unlearnedHideMode 
 end
 
-function HDH_AT_ConfigDB:UpdateTrackerElementDisplay(trackerId, elementIndex, value)
+function HDH_AT_ConfigDB:UpdateTrackerElementDisplay(trackerId, elementIndex, value, connectTraitId, unlearnedHideMode)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
     element.display = value
+    element.connectTraitId = connectTraitId
+    element.unlearnedHideMode = unlearnedHideMode
 end
 
 function HDH_AT_ConfigDB:UpdateTrackerElementGlow(trackerId, elementIndex, glowType, condition, value)

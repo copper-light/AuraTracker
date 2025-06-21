@@ -963,6 +963,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	local iconIdx = 0
 	local hasEquipItem = false
 	local hasInnerCDItem = false
+	local need_equipment_event = false;
 
 	self.frame.pointer = {};
 	self.frame:UnregisterAllEvents()
@@ -976,7 +977,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			hasInnerCDItem = true
 		end
 
-		if self:IsLearnedSpellOrEquippedItem(elemId, elemName, isItem) then -- and not self:IsIgnoreSpellByTalentSpell(auraList[i])
+		if HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(elemId, elemName, isItem) then -- and not self:IsIgnoreSpellByTalentSpell(auraList[i])
 			iconIdx = iconIdx + 1
 			f = self.frame.icon[iconIdx]
 			if f:GetParent() == nil then f:SetParent(self.frame) end
@@ -1010,6 +1011,8 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 				if C_ToyBox.GetToyInfo(spell.id) then
 					spell.isToy = true
 				end
+
+				need_equipment_event = need_equipment_event or isItem
 			else
 				local chargeInfo = HDH_AT_UTIL.GetSpellCharges(spell.key)
 				if chargeInfo and chargeInfo.maxCharges and chargeInfo.maxCharges  > 2 then
@@ -1043,7 +1046,6 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 				spell.innerSpellId = tonumber(innerSpellId)
 				spell.innerCooldown = tonumber(innerCooldown)
 				spell.innerTrackingType = innerTrackingType
-
 			end
 
 			f.spell = spell
@@ -1084,6 +1086,11 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	self.frame:SetScript("OnEvent", CT_OnEvent_Frame)
 	self.frame:RegisterEvent('PLAYER_TALENT_UPDATE')
 	self.frame:RegisterEvent('ACTIONBAR_SLOT_CHANGED')
+
+	if need_equipment_event then
+		self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
+	end
+
 	if #(self.frame.icon) > 0 then
 		self.frame:RegisterEvent('UNIT_PET');
 	end
