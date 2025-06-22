@@ -3059,7 +3059,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.EB_CONNECT_TRAIT = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents".."SpellSearchEditBox"]
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.EB_CONNECT_TRAIT:SetOnClickHandler(
 		function(element)
-			self:SetSearchEdit(element, element:GetValue())
+			return self:SetSearchEdit(element, element:GetValue())
 		end
 	)
 

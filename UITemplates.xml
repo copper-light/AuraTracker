@@ -2578,7 +2578,8 @@
 						<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" />
 					</Anchors>
 				</Texture>
-
+			</Layer>
+			<Layer level="BORDER">
 				<Texture parentKey="BackgroundActive" alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight" hidden="true">
 					<Size x="20" y="16"/>
 					<!-- <Color r="1" g="0.8" b="0.1" a="0.65"/> -->
@@ -2645,17 +2646,25 @@
 					<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT" x="0" y="0" />
 				</Anchors>
 				<Scripts>
+					<OnEditFocusGained>
+						self.initText = self:GetText()
+					</OnEditFocusGained>
 					<OnEditFocusLost>
-						self:GetParent().OnClickSearchHandler(self:GetParent())
 						self:Hide()
 						self:GetParent().Name:Show()
 						self:GetParent().Background:Show()
-						<!-- self:GetParent():LoadBackup() -->
+						local curValue = self:GetParent():GetValue()
+						if self.initText ~= self:GetText() and not self.searchedValue then
+							self:GetParent():SetName(self:GetParent():GetValue())
+							self:GetParent():SetDefaultIcon()
+						end
+						self.searchedValue = nil
+						self.initText = nil
 					</OnEditFocusLost>
 					<OnEnterPressed>
-						<!-- if self:GetParent().OnClickSearchHandler then
-							self:GetParent().OnClickSearchHandler(self:GetParent())
-						end -->
+						if self:GetParent().OnClickSearchHandler then
+							self.searchedValue = self:GetParent().OnClickSearchHandler(self:GetParent())
+						end
 						self:ClearFocus()
 					</OnEnterPressed>
 					<OnEscapePressed>
