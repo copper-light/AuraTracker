@@ -1336,12 +1336,26 @@ end
 ---
 HDH_AT_SpellSearchEditBoxTemplateMixin = {}
 
-function HDH_AT_SpellSearchEditBoxTemplateMixin:GetText()
+function HDH_AT_SpellSearchEditBoxTemplateMixin:GetValue()
     return self.EditBox:GetText()
 end
 
-function HDH_AT_SpellSearchEditBoxTemplateMixin:SetText(text)
-    self.EditBox:SetText(text)
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetValue(value)
+    self.EditBox:SetText(value)
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetName(name)
+    if name== nil or string.len(name) == 0 then
+        self.Name:SetText("")
+        self.Desc:Show()
+    else
+        self.Name:SetText(name)
+        self.Desc:Hide()
+    end
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:GetName()
+    return self.Name:GetText()
 end
 
 function HDH_AT_SpellSearchEditBoxTemplateMixin:SetIcon(texture)
@@ -1353,4 +1367,40 @@ end
 function HDH_AT_SpellSearchEditBoxTemplateMixin:SetDefaultIcon()
     self.DefaultIcon:Show()
     self.Icon:Hide()
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:Reset()
+    self.DefaultIcon:Show()
+    self.Icon:Hide()
+    self.Name:SetText("")
+    self.EditBox:SetText("")
+    self.Desc:SetText(L.PLEASE_INPUT_TRAIT_SPELL)
+    self.Desc:Show()
+    self.tmp_name = nil
+    self.tmp_value = nil
+    self.tmp_icon = nil
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetBackup(value, name, icon)
+    self.tmp_value = value
+    self.tmp_name = name
+    self.tmp_icon = icon
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:LoadBackup()
+    if self.tmp_value then
+        self:SetName(self.tmp_name or "")
+        self:SetValue(self.tmp_value or "")
+        if self.tmp_icon then
+            self:SetIcon(self.tmp_icon)
+        else
+            self:SetDefaultIcon()
+        end
+    else
+        self:Reset()
+    end
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetOnClickHandler(handler)
+    self.OnClickSearchHandler = handler
 end

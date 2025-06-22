@@ -2562,15 +2562,35 @@
 		<Size x="110" y="20" />
 		<Layers>
 			<Layer level="BACKGROUND">
-				<Texture parentKey="Background" hidden="false">
+				<Texture name="$parentIconBackground" parentKey="Background" hidden="false">
 					<Size x="20" y="20"/>
 					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
 					<Anchors>
 						<Anchor point="LEFT" relativePoint="LEFT" x="0" y="0"/>
 					</Anchors>
 				</Texture>
+
+				<Texture parentKey="Background" hidden="false">
+					<Size x="20" y="20"/>
+					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIconBackground" relativePoint="RIGHT" x="2" y="0" />
+						<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" />
+					</Anchors>
+				</Texture>
+
+				<Texture parentKey="BackgroundActive" alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight" hidden="true">
+					<Size x="20" y="16"/>
+					<!-- <Color r="1" g="0.8" b="0.1" a="0.65"/> -->
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIconBackground" relativePoint="RIGHT" x="4" y="0" />
+						<Anchor point="RIGHT" relativePoint="RIGHT" x="-2" y="0" />
+					</Anchors>
+					<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
+				</Texture>
 			</Layer>
 			<Layer level="OVERLAY">
+				
 				<Texture name="$parentDefaultIcon" parentKey="DefaultIcon" file="Interface\ICONS\INV_Misc_QuestionMark"  hidden="false">
 					<Size x="16" y="16"/>
 					<Anchors>
@@ -2586,17 +2606,80 @@
 					</Anchors>
 					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
 				</Texture>
+
+				<FontString parentKey="Name" inherits="Font_White_S" text="" justifyH="LEFT" justifyV="CENTER">
+					<Size x="100" y="20" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIconBackground" relativePoint="RIGHT" x="6" y="0" />
+						<Anchor point="RIGHT" relativePoint="RIGHT" x="-50" y="0" />
+					</Anchors>
+				</FontString>
+
+				<FontString parentKey="Desc" inherits="Font_Gray_S" text="" justifyH="LEFT" justifyV="CENTER">
+					<Size x="100" y="20" />
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIconBackground" relativePoint="RIGHT" x="6" y="0" />
+						<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" />
+					</Anchors>
+				</FontString>
+				
 			</Layer>
 		</Layers>
 		<Frames>
-			<EditBox name="$parentEditBox" parentKey="EditBox" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" numeric="true" autoFocus="false">
-				<Size x="120" y="20" />
+			<Button name="$parentCancel" parentKey="BtnCancel" inherits="HDH_AT_ButtonTemplate" text="원래대로">
+				<Size x="50" y="20" />
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentIcon" relativePoint="RIGHT" x="4" y="0" />
 					<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" />
 				</Anchors>
+				<Scripts>
+					<OnClick>
+						self:GetParent():LoadBackup()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<EditBox name="$parentEditBox" parentKey="EditBox" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false" hidden="true">
+				<Size x="120" y="20" />
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentIconBackground" relativePoint="RIGHT" x="2" y="0" />
+					<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT" x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnEditFocusLost>
+						self:GetParent().OnClickSearchHandler(self:GetParent())
+						self:Hide()
+						self:GetParent().Name:Show()
+						self:GetParent().Background:Show()
+						<!-- self:GetParent():LoadBackup() -->
+					</OnEditFocusLost>
+					<OnEnterPressed>
+						<!-- if self:GetParent().OnClickSearchHandler then
+							self:GetParent().OnClickSearchHandler(self:GetParent())
+						end -->
+						self:ClearFocus()
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:GetParent():LoadBackup()
+						self:ClearFocus()
+					</OnEscapePressed>
+				</Scripts>
 			</EditBox>
 		</Frames>
+
+		<Scripts>
+			<OnEnter>
+				self.BackgroundActive:Show()
+			</OnEnter>
+			<OnLeave>
+				self.BackgroundActive:Hide()
+			</OnLeave>
+			<OnMouseUp>
+				self.Name:Hide()
+				self.Background:Hide()
+				self.EditBox:Show()
+				self.EditBox:SetFocus()
+			</OnMouseUp>
+		</Scripts>
 	</Frame>
 
 </Ui> 

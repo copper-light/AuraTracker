@@ -976,7 +976,7 @@
 													</CheckButton>
 
 													<Frame name="$parentSwitchHideMode" inherits="HDH_AT_SwitchFrameTemplate">
-														<Size x="210" y="20"/>
+														<Size x="195" y="20"/>
 														<Anchors>
 															<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="2" y="0" />
 														</Anchors>
@@ -1010,7 +1010,7 @@
 													</CheckButton>
 
 													<Frame name="$parentSpellSearchEditBox" inherits="HDH_AT_SpellSearchEditBoxTemplate">
-														<Size  x="210" y="20" /> 
+														<Size  x="195" y="20" /> 
 														<Anchors>
 															<Anchor point="LEFT" relativeTo="$parentCBConditionTrait2" relativePoint="RIGHT" x="2" y="0" />
 														</Anchors>
@@ -1022,7 +1022,7 @@
 													</Frame>
 
 													<Frame name="$parentLabelSwitchHideModeLearnedTrait">
-														<Size x="210" y="20"/>
+														<Size x="195" y="20"/>
 														<Layers>
 															<Layer level="BACKGROUND">
 																<Texture parentKey="BG" hidden="false">
@@ -1052,7 +1052,7 @@
 													</Frame>
 
 													<Frame name="$parentSwitchHideModeUnlearnedTrait" inherits="HDH_AT_SwitchFrameTemplate">
-														<Size x="210" y="20"/>
+														<Size x="195" y="20"/>
 														<Anchors>
 															<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentLabelSwitchHideModeLearnedTrait" x="0" y="-2" />
 														</Anchors>

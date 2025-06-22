@@ -246,6 +246,9 @@ do
 
 	function HDH_AT_UTIL.Trim(str)
 		if not str then return nil end
+		if type(str) ~= "string" then
+			str = tostring(str)
+		end 
 		str = str:gsub('|[r|R]', '')
 		str = str:gsub('|[c|C][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9]', '')
 		local front, near
