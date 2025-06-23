@@ -420,7 +420,7 @@ function HDH_AT_ConfigDB:SetTrackerElement(trackerId, elementIndex, key, id, nam
 	element.isItem = isItem
     element.isValue = isValue
 
-    glowType = HDH_AT_ConfigDB:GetTrackerElementGlow(trackerId, elementIndex)
+    local glowType = HDH_AT_ConfigDB:GetTrackerElementGlow(trackerId, elementIndex)
     if not glowType then
         element.glowType = CONFIG.GLOW_CONDITION_NONE
     end
@@ -451,14 +451,15 @@ end
 
 function HDH_AT_ConfigDB:GetTrackerElementDisplay(trackerId, elementIndex)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
-    return element.display or CONFIG.SPELL_ALWAYS_DISPLAY, element.connectTraitId, element.unlearnedHideMode 
+    return element.display or CONFIG.SPELL_ALWAYS_DISPLAY, element.connectedSpellId, element.connectedSpellIsItem, element.unlearnedHideMode
 end
 
-function HDH_AT_ConfigDB:UpdateTrackerElementDisplay(trackerId, elementIndex, value, connectTraitId, unlearnedHideMode)
+function HDH_AT_ConfigDB:UpdateTrackerElementDisplay(trackerId, elementIndex, value, connectedSpellId, connectedSpellIsItem, unlearnedHideMode)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
     element.display = value
-    element.connectTraitId = connectTraitId
+    element.connectedSpellId = connectedSpellId
     element.unlearnedHideMode = unlearnedHideMode
+    element.connectedSpellIsItem = connectedSpellIsItem
 end
 
 function HDH_AT_ConfigDB:UpdateTrackerElementGlow(trackerId, elementIndex, glowType, condition, value)
@@ -511,8 +512,6 @@ function HDH_AT_ConfigDB:GetTrackerElementInnerCooldown(trackerId, elementIndex)
         return nil
     end
 end
-
-
 
 function HDH_AT_ConfigDB:hasTrackerUI(id)
     return HDH_AT_DB.ui[id] and true or false

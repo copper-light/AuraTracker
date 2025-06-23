@@ -1354,6 +1354,14 @@ function HDH_AT_SpellSearchEditBoxTemplateMixin:SetName(name)
     end
 end
 
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetIsItem(bool)
+    self.CBIsItem:SetChecked(bool or false)
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:GetIsItem()
+    return self.CBIsItem:GetChecked()
+end
+
 function HDH_AT_SpellSearchEditBoxTemplateMixin:GetName()
     return self.Name:GetText()
 end
@@ -1379,18 +1387,24 @@ function HDH_AT_SpellSearchEditBoxTemplateMixin:Reset()
     self.tmp_name = nil
     self.tmp_value = nil
     self.tmp_icon = nil
+    self.tmp_isItem = false
+    self.BtnCancel:Hide()
+    self:SetIsItem(false)
+    self.CBIsItem:Hide()
 end
 
-function HDH_AT_SpellSearchEditBoxTemplateMixin:SetBackup(value, name, icon)
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetBackup(value, name, icon, isItem)
     self.tmp_value = value
     self.tmp_name = name
     self.tmp_icon = icon
+    self.tmp_isItem = isItem
 end
 
 function HDH_AT_SpellSearchEditBoxTemplateMixin:LoadBackup()
     if self.tmp_value then
         self:SetName(self.tmp_name or "")
         self:SetValue(self.tmp_value or "")
+        self:SetIsItem(self.tmp_isItem or false)
         if self.tmp_icon then
             self:SetIcon(self.tmp_icon)
         else

@@ -227,18 +227,18 @@ do
 		return traitName
 	end
 
-	function HDH_AT_UTIL.GetInfo(value, isItem)
+	function HDH_AT_UTIL.GetInfo(value, isItem) -- name, id, texture, isItem
 		if not value then return nil end
 		if not isItem and HDH_AT_UTIL.GetCacheSpellInfo(value) then
 			local spell = HDH_AT_UTIL.GetCacheSpellInfo(value) 
-			return spell.name, spell.spellID, spell.iconID
+			return spell.name, spell.spellID, spell.iconID, false
 		elseif C_Item.GetItemInfo(value) then
 			local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(value)
 			local itemId = GetItemInfoInstant(value)
 			if name then
 				-- linkType, itemId, enchantId, jewelId1, jewelId2, jewelId3, jewelId4, suffixId, uniqueId
 				-- local linkType, itemId = strsplit(":", link)
-				return name, itemId, texture, true, maxStack -- 마지막 인자 아이템 이냐?
+				return name, itemId, texture, true, maxStack
 			end
 		end
 		return nil
@@ -248,7 +248,8 @@ do
 		if not str then return nil end
 		if type(str) ~= "string" then
 			str = tostring(str)
-		end 
+		end
+		if string.len(str) == 0 then return "" end
 		str = str:gsub('|[r|R]', '')
 		str = str:gsub('|[c|C][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9]', '')
 		local front, near

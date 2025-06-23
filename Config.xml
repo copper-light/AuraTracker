@@ -898,7 +898,7 @@
 								</Anchors>
 
 								<Frames>
-									<ScrollFrame name="$parentConfigSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+									<ScrollFrame name="$parentConfigSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate">
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent"  x="0" y="0" />
@@ -1015,9 +1015,9 @@
 															<Anchor point="LEFT" relativeTo="$parentCBConditionTrait2" relativePoint="RIGHT" x="2" y="0" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>
-																self.EditBox.Desc:SetText(HDH_AT_L.PLEASE_INPUT_TRAIT_SPELL)
-															</OnLoad>
+															<!-- <OnLoad> -->
+																<!-- self.EditBox.Desc:SetText(HDH_AT_L.PLEASE_INPUT_TRAIT_SPELL) -->
+															<!-- </OnLoad> -->
 														</Scripts>
 													</Frame>
 

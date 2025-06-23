@@ -327,6 +327,7 @@ function HDH_C_TRACKER:UpdateIcon(f)
 	local use_not_enough_mana_color = self.ui.cooldown.use_not_enough_mana_color
 	local use_out_range_color = self.ui.cooldown.use_out_range_color
 
+	if spell.blankDisplay then return end
 	
 	if not HDH_TRACKER.ENABLE_MOVE and not spell.isInnerCDItem then
 		startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, castCount, inRange, isAble, isNotEnoughMana = self:UpdateSpellInfo(f.spell.id, f.spell.name, f.spell.isItem, f.spell.isToy)
@@ -580,45 +581,60 @@ function HDH_C_TRACKER:UpdateLayout()
 			size_h = self.ui.bar.height + self.ui.icon.size
 			size_w = max(self.ui.bar.width, self.ui.icon.size)
 		end
-		
+
 	else
 		size_w = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
 		size_h = self.ui.icon.size
 	end
-	
+
 	for i = 1 , #self.frame.icon do
 		f = self.frame.icon[i]
 		if f and f.spell then
-			if HDH_TRACKER.ENABLE_MOVE or f:IsShown() then
-				f:ClearAllPoints()
-				f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-				display_index = display_index + 1
-				if display_index % line == 0 then 
-					row = row + size_h + margin_v
-					col = 0			
-				else 
-					col = col + size_w + margin_h 
-				end
-				if (f.spell.duration > HDH_C_TRACKER.GlobalCooldown and f.spell.remaining > 0.5) 
-						or (f.spell.charges and f.spell.charges.remaining and f.spell.charges.remaining > 0) then 
-					show_index = show_index + 1
-				end -- 비전투라도 쿨이 돌고 잇는 스킬이 있으면 화면에 출력하기 위해서 체크함
-			else
-				if (f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
-					display_index = display_index + 1
+			if not f.spell.blankDisplay then
+				if HDH_TRACKER.ENABLE_MOVE or f:IsShown() then
 					f:ClearAllPoints()
 					f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
+					display_index = display_index + 1
 					if display_index % line == 0 then 
+						row = row + size_h + margin_v
+						col = 0			
+					else 
+						col = col + size_w + margin_h 
+					end
+					if (f.spell.duration > HDH_C_TRACKER.GlobalCooldown and f.spell.remaining > 0.5) 
+							or (f.spell.charges and f.spell.charges.remaining and f.spell.charges.remaining > 0) then 
+						show_index = show_index + 1
+					end -- 비전투라도 쿨이 돌고 잇는 스킬이 있으면 화면에 출력하기 위해서 체크함
+				else
+					if (f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
+						display_index = display_index + 1
+						f:ClearAllPoints()
+						f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
+						if display_index % line == 0 then
+							row = row + size_h + margin_v
+							col = 0
+						else 
+							col = col + size_w + margin_h
+						end
+					end
+				end
+			else
+				if self.ui.common.order_by == DB.ORDERBY_REG then
+					display_index = display_index + 1
+					if display_index % line == 0 then
 						row = row + size_h + margin_v
 						col = 0
 					else 
 						col = col + size_w + margin_h
 					end
+					if f:IsShown() then
+						f:Hide()
+					end
 				end
 			end
 		end
 	end
-	
+
 	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
 			and (HDH_TRACKER.ENABLE_MOVE or show_index > 0 or always_show or UnitAffectingCombat("player")) then
 		self:ShowTracker();
@@ -956,20 +972,24 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 		return 
 	end
 
-	local elemKey, elemId, elemName, texture, defaultImg, display, glowType, isValue, isItem, glowCondition, glowValue
+	local elemKey, elemId, elemName, texture, defaultImg, glowType, isValue, isItem, glowCondition, glowValue
+	local display, connectedId, connectedIsItem, unlearnedHideMode
+	local innerTrackingType, innerSpellId, innerCooldown
 	local elemSize = DB:GetTrackerElementSize(trackerId)
-	local spell 
+	local spell
 	local f
 	local iconIdx = 0
 	local hasEquipItem = false
 	local hasInnerCDItem = false
-	local need_equipment_event = false;
+	local needEquipmentEvent = false;
+	local isLearned = false
 
 	self.frame.pointer = {};
 	self.frame:UnregisterAllEvents()
 	
 	for i = 1 , elemSize do
 		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
+		display, connectedId, connectedIsItem, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, i)
 		glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
 		defaultImg = DB:GetTrackerElementDefaultImage(trackerId, i)
 		innerTrackingType, innerSpellId, innerCooldown =  DB:GetTrackerElementInnerCooldown(trackerId, i)
@@ -977,14 +997,29 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			hasInnerCDItem = true
 		end
 
-		if HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(elemId, elemName, isItem) then -- and not self:IsIgnoreSpellByTalentSpell(auraList[i])
+		if connectedId then
+			isLearned = HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(connectedId, nil, connectedIsItem)
+			if connectedIsItem then
+				needEquipmentEvent = true
+			end
+		else
+			isLearned = true
+		end
+
+		if unlearnedHideMode ~= DB.SPELL_HIDE or isLearned then
 			iconIdx = iconIdx + 1
 			f = self.frame.icon[iconIdx]
 			if f:GetParent() == nil then f:SetParent(self.frame) end
-			
 			id = ADJUST_ID[elemId] or elemId;
-			self.frame.pointer[id] = f
+			
 			spell = {}
+			if isLearned then
+				self.frame.pointer[id] = f
+			else
+				spell.blankDisplay = true
+				f:Hide()
+			end
+			
 			if type(elemKey) == "number" then
 				spell.key = tonumber(elemKey)
 			else
@@ -1012,7 +1047,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 					spell.isToy = true
 				end
 
-				need_equipment_event = need_equipment_event or isItem
+				needEquipmentEvent = needEquipmentEvent or isItem
 			else
 				local chargeInfo = HDH_AT_UTIL.GetSpellCharges(spell.key)
 				if chargeInfo and chargeInfo.maxCharges and chargeInfo.maxCharges  > 2 then
@@ -1037,7 +1072,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.inRange = true
 			spell.isAble = true
 			spell.isNotEnoughMana = false
-			
+
 			spell.slot = nil --self:GetSlot(spell.id);
 			-- if not auraList[i].defaultImg then auraList[i].defaultImg = auraList[i].Texture; 
 			-- if auraList[i].defaultImg ~= auraList[i].Texture then spell.fix_icon = true end
@@ -1059,21 +1094,26 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
 			self:ChangeCooldownType(f, self.ui.icon.cooldown)
 			self:UpdateGlow(f, false)
-			f:SetScript("OnUpdate", CT_OnUpdateIcon);
-			if f:GetScript("OnEvent") ~= CT_OnEventIcon then
-				f:SetScript("OnEvent", CT_OnEventIcon)
-			end
 			
-			if not spell.isInnerCDItem then
-				if spell.isItem then
-					f:RegisterEvent("BAG_UPDATE");
-					f:RegisterEvent("BAG_UPDATE_COOLDOWN");
-				else
-					f:RegisterEvent("ACTIONBAR_UPDATE_USABLE");
-					f:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
-					f:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW");
-					f:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE");
+			if not spell.blankDisplay then
+				f:SetScript("OnUpdate", CT_OnUpdateIcon);
+				if f:GetScript("OnEvent") ~= CT_OnEventIcon then
+					f:SetScript("OnEvent", CT_OnEventIcon)
 				end
+
+				if not spell.isInnerCDItem then
+					if spell.isItem then
+						f:RegisterEvent("BAG_UPDATE");
+						f:RegisterEvent("BAG_UPDATE_COOLDOWN");
+					else
+						f:RegisterEvent("ACTIONBAR_UPDATE_USABLE");
+						f:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
+						f:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW");
+						f:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE");
+					end
+				end
+			else
+				f:UnregisterAllEvents()
 			end
 		end
 	end
@@ -1087,7 +1127,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	self.frame:RegisterEvent('PLAYER_TALENT_UPDATE')
 	self.frame:RegisterEvent('ACTIONBAR_SLOT_CHANGED')
 
-	if need_equipment_event then
+	if needEquipmentEvent then
 		self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
 	end
 
@@ -1098,11 +1138,11 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	if hasInnerCDItem then
 		self.frame:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
 	end
-	
+
 	for i = #self.frame.icon, iconIdx+1 , -1 do
 		self:ReleaseIcon(i)
 	end
-	
+
 	self:Update()
 end
 

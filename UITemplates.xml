@@ -1243,7 +1243,7 @@
 		<FontString inherits="Font_White_S" justifyH="LEFT"/>
 		<TextInsets left="5" right="5" bottom="0" top="0"/>
 		<Scripts>
-			<OnLoad inherits="prepend">
+			<OnLoad>
 				self.Desc:SetText(HDH_AT_L.PLEASE_INPUT)
 			</OnLoad>
 			<OnTextSet>
@@ -2612,7 +2612,7 @@
 					<Size x="100" y="20" />
 					<Anchors>
 						<Anchor point="LEFT" relativeTo="$parentIconBackground" relativePoint="RIGHT" x="6" y="0" />
-						<Anchor point="RIGHT" relativePoint="RIGHT" x="-50" y="0" />
+						<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" />
 					</Anchors>
 				</FontString>
 
@@ -2627,47 +2627,112 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Button name="$parentCancel" parentKey="BtnCancel" inherits="HDH_AT_ButtonTemplate" text="원래대로">
-				<Size x="50" y="20" />
+			<Button name="$parentCancel" parentKey="BtnCancel" inherits="HDH_AT_ButtonTemplate" text="원래대로" hidden="true">
+				<Size x="47" y="20" />
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentIconBackground" parentKey="Background" hidden="false">
+							<Size x="20" y="20"/>
+							<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="LEFT" x="0" y="0"/>
+								<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" />
 				</Anchors>
 				<Scripts>
-					<OnClick>
+					<OnLoad>self:SetText(HDH_AT_L.REVERT)</OnLoad>
+					<OnEnter>
+						self.overMouse = true
+					</OnEnter>
+					<OnLeave>
+						self.overMouse = false
+					</OnLeave>
+					<OnMouseUp>
+						if not self:GetParent().EditBox:HasFocus() then
+							self:GetParent().BtnCancel:Hide()
+							self:GetParent().CBIsItem:Hide()
+							self:GetParent().EditBox:Hide()
+							self:GetParent().Name:Show()
+							self:GetParent().Background:Show()
+						end
 						self:GetParent():LoadBackup()
-					</OnClick>
+					</OnMouseUp>
 				</Scripts>
 			</Button>
+
+			<CheckButton name="$parentCheckButtonIsItem" parentKey="CBIsItem" inherits="HDH_AT_CheckButton2Template" hidden="true">
+				<Size x="57" y="20" />
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT" x="-2" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self.Text:SetText(HDH_AT_L.ITEM)
+						self:HiddenBackground(true)
+					</OnLoad>
+					<OnEnter>
+						self.overMouse = true
+					</OnEnter>
+					<OnLeave>
+						self.overMouse = false
+					</OnLeave>
+					<OnMouseUp>
+						self.overMouse = false
+						self:GetParent().EditBox:SetFocus()
+					</OnMouseUp>
+				</Scripts>
+			</CheckButton>
 
 			<EditBox name="$parentEditBox" parentKey="EditBox" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false" hidden="true">
 				<Size x="120" y="20" />
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentIconBackground" relativePoint="RIGHT" x="2" y="0" />
-					<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT" x="0" y="0" />
+					<Anchor point="RIGHT" relativeTo="$parentCheckButtonIsItem" relativePoint="LEFT" x="-2" y="0" />
 				</Anchors>
 				<Scripts>
+					<OnLoad>self.Desc:SetText("")</OnLoad>
 					<OnEditFocusGained>
 						self.initText = self:GetText()
+						self:GetParent().Desc:Hide()
 					</OnEditFocusGained>
 					<OnEditFocusLost>
-						self:Hide()
-						self:GetParent().Name:Show()
-						self:GetParent().Background:Show()
-						local curValue = self:GetParent():GetValue()
-						if self.initText ~= self:GetText() and not self.searchedValue then
+						local curValue = HDH_AT_UTIL.Trim(self:GetText()) or ""
+						if HDH_AT_UTIL.Trim(self.initText) ~= curValue and not self.searchedValue then
 							self:GetParent():SetName(self:GetParent():GetValue())
 							self:GetParent():SetDefaultIcon()
 						end
+
+						if self.cmdPressed or (not self:GetParent().BtnCancel.overMouse and not self:GetParent().CBIsItem.overMouse) then
+							self:GetParent().CBIsItem:Hide()
+							self:GetParent().BtnCancel:Hide()
+							self:Hide()
+							self:GetParent().Name:Show()
+							self:GetParent().Background:Show()
+							if string.len(curValue) == 0 then
+								self:GetParent().Desc:Show()
+							else
+								self:GetParent().Desc:Hide()
+							end
+						end
+
 						self.searchedValue = nil
 						self.initText = nil
+						self.cmdPressed = false
 					</OnEditFocusLost>
 					<OnEnterPressed>
 						if self:GetParent().OnClickSearchHandler then
 							self.searchedValue = self:GetParent().OnClickSearchHandler(self:GetParent())
 						end
+						self.cmdPressed = true
 						self:ClearFocus()
 					</OnEnterPressed>
 					<OnEscapePressed>
+						self.cmdPressed = true
 						self:GetParent():LoadBackup()
 						self:ClearFocus()
 					</OnEscapePressed>
@@ -2687,6 +2752,8 @@
 				self.Background:Hide()
 				self.EditBox:Show()
 				self.EditBox:SetFocus()
+				self.CBIsItem:Show()
+				self.BtnCancel:Show()
 			</OnMouseUp>
 		</Scripts>
 	</Frame>

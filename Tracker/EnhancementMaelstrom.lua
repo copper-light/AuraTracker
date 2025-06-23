@@ -21,7 +21,7 @@ HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM, HDH_ENH_MAELSTROM_TRA
 
 do
 
-	local function HDH_POWER_OnUpdate(self)
+	local function HDH_ENH_MAELSTROM_OnUpdate(self)
 		self.spell.curTime = GetTime()
 		
 		if self.spell.curTime - (self.spell.delay or 0) < 0.02  then return end 
@@ -316,11 +316,11 @@ do
 				self:ChangeCooldownType(f, self.ui.icon.cooldown)
 				self:UpdateGlow(f, false)
 				self:UpdateArtBar(f)
-				f:SetScript("OnUpdate", HDH_POWER_OnUpdate);
+				f:SetScript("OnUpdate", HDH_ENH_MAELSTROM_OnUpdate);
 				f:Hide();
 				self:ActionButton_HideOverlayGlow(f)
 			end
-			self.frame:SetScript("OnEvent", self.OnEvent)
+			self.frame:SetScript("OnEvent", HDH_ENH_MAELSTROM_OnEventTracker)
 			self.frame:RegisterUnitEvent('UNIT_AURA')
 			self:Update()
 		else
@@ -345,32 +345,32 @@ end -- TRACKER class
 -------------------------------------------
 -- 이벤트 메세지 function
 -------------------------------------------
-function HDH_UNIT_AURA(self)
+function HDH_ENH_MAELSTROM_UNIT_AURA(self)
 	if self then
 		self:Update()
 	end
 end
 
 
-function OnEventTracker(self, event, ...)
+function HDH_ENH_MAELSTROM_OnEventTracker(self, event, ...)
 	if not self.parent then return end
 	if event == 'UNIT_AURA' then
 		local unit = select(1,...)
 		if self.parent and unit == self.parent.unit then
-			HDH_UNIT_AURA(self.parent)
+			HDH_ENH_MAELSTROM_UNIT_AURA(self.parent)
 		end
 	elseif event =="PLAYER_TARGET_CHANGED" then
-		HDH_AT_UTIL.RunTimer(self.parent, "PLAYER_TARGET_CHANGED", 0.02, HDH_UNIT_AURA, self.parent) 
+		HDH_AT_UTIL.RunTimer(self.parent, "PLAYER_TARGET_CHANGED", 0.02, HDH_ENH_MAELSTROM_UNIT_AURA, self.parent) 
 	elseif event == 'PLAYER_FOCUS_CHANGED' then
-		HDH_UNIT_AURA(self.parent)
+		HDH_ENH_MAELSTROM_UNIT_AURA(self.parent)
 	elseif event == 'INSTANCE_ENCOUNTER_ENGAGE_UNIT' then
-		HDH_UNIT_AURA(self.parent)
+		HDH_ENH_MAELSTROM_UNIT_AURA(self.parent)
 	elseif event == 'GROUP_ROSTER_UPDATE' then
-		HDH_UNIT_AURA(self.parent)
+		HDH_ENH_MAELSTROM_UNIT_AURA(self.parent)
 	elseif event == 'UNIT_PET' then
-		HDH_AT_UTIL.RunTimer(self.parent, "UNIT_PET", 0.5, HDH_UNIT_AURA, self.parent) 
+		HDH_AT_UTIL.RunTimer(self.parent, "UNIT_PET", 0.5, HDH_ENH_MAELSTROM_UNIT_AURA, self.parent) 
 	elseif event == 'ARENA_OPPONENT_UPDATE' then
-		HDH_AT_UTIL.RunTimer(self.parent, "ARENA_OPPONENT_UPDATE", 0.5, HDH_UNIT_AURA, self.parent) 
+		HDH_AT_UTIL.RunTimer(self.parent, "ARENA_OPPONENT_UPDATE", 0.5, HDH_ENH_MAELSTROM_UNIT_AURA, self.parent) 
 	elseif event == "ENCOUNTER_START" then
 		self.parent.isRaiding = true;
 	elseif event == "ENCOUNTER_END" then

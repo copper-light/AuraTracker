@@ -102,36 +102,3 @@ do
     end
     
 end
-
-function PrintLearnedTalents()
-    local configID = C_ClassTalents.GetActiveConfigID()
-    if not configID then return end
-
-    local configInfo = C_Traits.GetConfigInfo(configID)
-    if not configInfo then return end
-
-    -- 트리 ID 가져오기
-    local treeID = configInfo.treeIDs[1] -- 보통 첫 번째 트리가 클래스/특성 트리입니다.
-    if not treeID then return end
-
-    -- 트리 정보 가져오기
-    -- local treeInfo = C_Traits.GetTreeInfo(treeID)
-    -- if not treeInfo then return end
-
-    -- 트리의 모든 노드 정보 가져오기
-    
-    for _, treeID in ipairs(configInfo.treeIDs) do
-        local nodes = C_Traits.GetTreeNodes(treeID)
-        for _, nodeID in ipairs(nodes) do
-            local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
-            if nodeInfo and nodeInfo.ranksPurchased and nodeInfo.ranksPurchased > 0 then
-                for _, e in ipairs(nodeInfo.entryIDs) do
-                    local entryInfo = C_Traits.GetEntryInfo(configID, e)
-                    if entryInfo then
-                        print("특성 ID:", nodeInfo.ID, "| 이름:", entryInfo.name, "| 단계:", nodeInfo.ranksPurchased)
-                    end
-                end
-            end
-        end
-    end
-end

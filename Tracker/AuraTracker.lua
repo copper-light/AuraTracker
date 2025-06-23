@@ -187,12 +187,12 @@ do
 				size_h = self.ui.bar.height + self.ui.icon.size
 				size_w = max(self.ui.bar.width, self.ui.icon.size)
 			end
-			
+
 		else
 			size_w = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
 			size_h = self.ui.icon.size
 		end
-		
+
 		for k,f in ipairs(icons) do
 			if not f.spell then break end
 			if f.spell.isUpdate then
@@ -289,42 +289,54 @@ do
 				end
 			else
 				f.timetext:SetText(nil)
-				if f.spell.display == DB.SPELL_ALWAYS_DISPLAY or f.spell.display == DB.SPELL_HIDE_TIME_ON or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then 
-					f.icon:SetDesaturated(1)
-					f.icon:SetAlpha(self.ui.icon.off_alpha)
-					f.border:SetAlpha(self.ui.icon.off_alpha)
-					f.border:SetVertexColor(0,0,0) 
-					f.v1:SetText(nil)
-					f.counttext:SetText(nil)
-					f.cd:Hide()
-					f.iconSatCooldown.spark:Hide() 
-					f.iconSatCooldown:Hide() 
-					if display_mode ~= DB.DISPLAY_ICON and f.bar then 
-						if not f.bar:IsShown() then f.bar:Show(); end
-						f.name:SetText(f.spell.name);
-						self:UpdateBarValue(f, true);
-					end--f.bar:Hide();
-					f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-					i = i + 1
-					if i % column_count == 0 then 
-						row = row + size_h + margin_v; col = 0
-					else 
-						col = col + size_w + margin_h 
+				if not f.spell.blankDisplay then
+					if f.spell.display == DB.SPELL_ALWAYS_DISPLAY or f.spell.display == DB.SPELL_HIDE_TIME_ON or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then
+						f.icon:SetDesaturated(1)
+						f.icon:SetAlpha(self.ui.icon.off_alpha)
+						f.border:SetAlpha(self.ui.icon.off_alpha)
+						f.border:SetVertexColor(0,0,0) 
+						f.v1:SetText(nil)
+						f.counttext:SetText(nil)
+						f.cd:Hide()
+						f.iconSatCooldown.spark:Hide() 
+						f.iconSatCooldown:Hide() 
+						if display_mode ~= DB.DISPLAY_ICON and f.bar then 
+							if not f.bar:IsShown() then f.bar:Show(); end
+							f.name:SetText(f.spell.name);
+							self:UpdateBarValue(f, true);
+						end--f.bar:Hide();
+						f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
+						i = i + 1
+						if i % column_count == 0 then 
+							row = row + size_h + margin_v; col = 0
+						else 
+							col = col + size_w + margin_h
+						end
+						f:Show()
+
+						self:UpdateGlow(f, f.spell.glow == DB.GLOW_CONDITION_TIME)
+					else
+						if (f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
+							i = i + 1
+							if i % column_count == 0 then 
+								row = row + size_h + margin_v
+								col = 0
+							else 
+								col = col + size_w + margin_h
+							end
+						end
+						f:Hide()
 					end
-					f:Show()
-					
-					self:UpdateGlow(f, f.spell.glow == DB.GLOW_CONDITION_TIME)
 				else
-					if (f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
+					if self.ui.common.order_by == DB.ORDERBY_REG then
 						i = i + 1
 						if i % column_count == 0 then 
 							row = row + size_h + margin_v
 							col = 0
 						else 
-							col = col + size_w + margin_h 
+							col = col + size_w + margin_h
 						end
 					end
-					f:Hide()
 				end
 				f.spell.endTime = nil;
 				f.spell.duration = 0;
@@ -360,14 +372,17 @@ do
 		self.aura_filter = aura_filter
 		self.aura_caster = aura_caster
 		if not id then return end
-		local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, connectTraitId, unlearnedHideMode
+		local elemKey, elemId, elemName, texture, glowType, isValue, isItem, glowCondition, glowValue
+		local display, connectedId, connectedIsItem, unlearnedHideMode
 		local elemSize = DB:GetTrackerElementSize(trackerId)
 		local spell 
 		local f
+		local isLearned = true
 		local iconIdx = 0;
+		local needEquipmentEvent = false
 		self.frame.pointer = {}
 
-		if self.type == HDH_TRACKER.TYPE.BUFF then 
+		if self.type == HDH_TRACKER.TYPE.BUFF then
 			self.filter = "HELPFUL"
 		else 
 			self.filter = "HARMFUL"
@@ -379,41 +394,57 @@ do
 		else
 			for i = 1, elemSize do
 				elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-				display, connectTraitId, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, i)
+				display, connectedId, connectedIsItem, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, i)
 				glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
-				iconIdx = iconIdx + 1
-				f = self.frame.icon[iconIdx]
-				if f:GetParent() == nil then f:SetParent(self.frame) end
-				self.frame.pointer[elemKey] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
-				spell = {}
-				spell.glow = glowType
-				spell.glowCondtion = glowCondition
-				spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-				spell.showValue = isValue
-				spell.display = display
-				spell.connectTraitId = connectTraitId
-				spell.unlearnedHideMode = unlearnedHideMode
-				spell.v1 = 0 -- 수치를 저장할 변수
-				spell.aniEnable = true;
-				spell.aniTime = 8;
-				spell.aniOverSec = false;
-				spell.no = i
-				spell.name = elemName
-				spell.icon = texture
-				spell.id = tonumber(elemId)
-				spell.count = 0
-				spell.duration = 0
-				spell.remaining = 0
-				spell.overlay = 0
-				spell.endTime = 0
-				spell.isUpdate = false
-				spell.isItem =  isItem
-				f.spell = spell
-				f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-				f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-				f.iconSatCooldown:SetDesaturated(nil)
-				self:ChangeCooldownType(f, self.ui.icon.cooldown)
-				self:UpdateGlow(f, false)
+
+				if connectedId then
+					isLearned = HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(connectedId, nil, connectedIsItem)
+					if connectedIsItem then
+						needEquipmentEvent = true
+					end
+				else
+					isLearned = true
+				end
+				if unlearnedHideMode ~= DB.SPELL_HIDE or isLearned then
+					iconIdx = iconIdx + 1
+					f = self.frame.icon[iconIdx]
+					if f:GetParent() == nil then f:SetParent(self.frame) end
+
+					spell = {}
+
+					if isLearned then
+						self.frame.pointer[elemKey] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
+					else
+						spell.blankDisplay = true
+						f:Hide()
+					end
+					spell.glow = glowType
+					spell.glowCondtion = glowCondition
+					spell.glowValue = (glowValue and tonumber(glowValue)) or 0
+					spell.showValue = isValue
+					spell.display = display
+					spell.v1 = 0 -- 수치를 저장할 변수
+					spell.aniEnable = true;
+					spell.aniTime = 8;
+					spell.aniOverSec = false;
+					spell.no = iconIdx
+					spell.name = elemName
+					spell.icon = texture
+					spell.id = tonumber(elemId)
+					spell.count = 0
+					spell.duration = 0
+					spell.remaining = 0
+					spell.overlay = 0
+					spell.endTime = 0
+					spell.isUpdate = false
+					spell.isItem =  isItem
+					f.spell = spell
+					f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+					f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+					f.iconSatCooldown:SetDesaturated(nil)
+					self:ChangeCooldownType(f, self.ui.icon.cooldown)
+					self:UpdateGlow(f, false)
+				end
 			end
 			self.GetAurasFunc = HDH_AURA_TRACKER.GetAuras
 			for i = #(self.frame.icon) , iconIdx+1, -1  do
@@ -421,8 +452,8 @@ do
 			end
 		end
 		self:LoadOrderFunc();
-		
-		self.frame:SetScript("OnEvent", OnEventTracker)
+
+		self.frame:SetScript("OnEvent", HDH_AURA_OnEvent)
 		self.frame:UnregisterAllEvents()
 
 		if aura_filter == DB.AURA_FILTER_ONLY_BOSS then
@@ -445,10 +476,14 @@ do
 			elseif string.find(self.unit, 'arena') then
 				self.frame:RegisterEvent('ARENA_OPPONENT_UPDATE')
 			end
+
+			if needEquipmentEvent then
+				self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
+			end
 		else
-			return 
+			return
 		end
-		
+
 		self:Update()
 		return iconIdx;
 	end
@@ -456,7 +491,7 @@ do
 	function HDH_AURA_TRACKER:PLAYER_ENTERING_WORLD()
 		self.isRaiding = self:IsRaiding()
 	end
-	
+
 ------------------------------------------
 end -- TRACKER class
 ------------------------------------------
@@ -465,37 +500,42 @@ end -- TRACKER class
 -------------------------------------------
 -- 이벤트 메세지 function
 -------------------------------------------
-function HDH_UNIT_AURA(self)
+function HDH_AURA_UNIT_AURA(self)
 	if self then
 		self:Update()
 	end
 end
 
+function HDH_AURA_PLAYER_EQUIPMENT_CHANGED(self)
+	self:InitIcons()
+end
 
-function OnEventTracker(self, event, ...)
+function HDH_AURA_OnEvent(self, event, ...)
 	if not self.parent then return end
 	if event == 'UNIT_AURA' then
 		local unit = select(1,...)
 		if self.parent and unit == self.parent.unit then
-			HDH_UNIT_AURA(self.parent)
+			HDH_AURA_UNIT_AURA(self.parent)
 		end
 	elseif event =="PLAYER_TARGET_CHANGED" then
 		local t = self.parent
-		HDH_AT_UTIL.RunTimer(t, "PLAYER_TARGET_CHANGED", 0.02, HDH_UNIT_AURA, self.parent) 
+		HDH_AT_UTIL.RunTimer(t, "PLAYER_TARGET_CHANGED", 0.02, HDH_AURA_UNIT_AURA, self.parent) 
 	elseif event == 'PLAYER_FOCUS_CHANGED' then
-		HDH_UNIT_AURA(self.parent)
+		HDH_AURA_UNIT_AURA(self.parent)
 	elseif event == 'INSTANCE_ENCOUNTER_ENGAGE_UNIT' then
-		HDH_UNIT_AURA(self.parent)
+		HDH_AURA_UNIT_AURA(self.parent)
 	elseif event == 'GROUP_ROSTER_UPDATE' then
-		HDH_UNIT_AURA(self.parent)
+		HDH_AURA_UNIT_AURA(self.parent)
 	elseif event == 'UNIT_PET' then
-		HDH_AT_UTIL.RunTimer(self.parent, "UNIT_PET", 0.5, HDH_UNIT_AURA, self.parent) 
+		HDH_AT_UTIL.RunTimer(self.parent, "UNIT_PET", 0.5, HDH_AURA_UNIT_AURA, self.parent) 
 	elseif event == 'ARENA_OPPONENT_UPDATE' then
-		HDH_AT_UTIL.RunTimer(self.parent, "ARENA_OPPONENT_UPDATE", 0.5, HDH_UNIT_AURA, self.parent) 
+		HDH_AT_UTIL.RunTimer(self.parent, "ARENA_OPPONENT_UPDATE", 0.5, HDH_AURA_UNIT_AURA, self.parent) 
 	elseif event == "ENCOUNTER_START" then
 		self.parent.isRaiding = true;
 	elseif event == "ENCOUNTER_END" then
 		self.parent.isRaiding = false;
+	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
+		HDH_AURA_PLAYER_EQUIPMENT_CHANGED(self.parent)
 	end
 end
 
