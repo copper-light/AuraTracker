@@ -199,7 +199,13 @@ do
 				if not HDH_TRACKER.ENABLE_MOVE then
 					f.spell.isUpdate = false
 				end
-				if f.spell.display == DB.SPELL_ALWAYS_DISPLAY or f.spell.display == DB.SPELL_HIDE_TIME_OFF or f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE or HDH_TRACKER.ENABLE_MOVE then 
+				
+				if aura_filter == DB.AURA_FILTER_ALL 
+						or aura_filter == DB.AURA_FILTER_ONLY_BOSS 
+						or f.spell.display == DB.SPELL_ALWAYS_DISPLAY 
+						or f.spell.display == DB.SPELL_HIDE_TIME_OFF 
+						or f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE 
+						or HDH_TRACKER.ENABLE_MOVE then
 					if aura_caster == DB.AURA_CASTER_ONLY_MINE then
 						if f.spell.count < 2 then f.counttext:SetText(nil)
 											else f.counttext:SetText(f.spell.count) end

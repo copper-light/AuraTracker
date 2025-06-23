@@ -75,7 +75,6 @@ do
 				end
 			end
 		end
-
 		if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
 				and ((self:UpdateAllIcons() > 0) or self.ui.common.always_show or UnitAffectingCombat("player")) then
 			self:ShowTracker();
@@ -106,7 +105,7 @@ do
 				elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 				glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
 
-				if self:IsLearnedSpellOrEquippedItem(elemId, elemName, false) then 
+				if HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(elemId, elemName, false) then 
 					iconIdx = iconIdx + 1
 					f = self.frame.icon[iconIdx]
 					if f:GetParent() == nil then f:SetParent(self.frame) end
