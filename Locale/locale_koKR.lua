@@ -103,6 +103,7 @@ L.DOWNWARD = "아래로"
 L.TO_THE_LEFT = "왼쪽으로"
 L.TO_THE_RIGHT = "오른쪽으로"
 L.CIRCLE = "원형"
+L.SHARE = "공유 설정"
 L.COOLDOWN_ANIMATION_DIDRECTION = "쿨다운 방향/표시 여부"
 L.ANIMATION_DIDRECTION = "애니메이션 방향"
 L.CANCEL_BUFF = "오른쪽 클릭으로 버프 삭제\n(전투 중에는 불가능)"
@@ -300,8 +301,6 @@ L.TRACKING_BUFF = "발동 버프 주문\n(ID 또는 이름)"
 L.INNER_COOLDOWN = "발동 아이템의\n내부 쿨다운 시간\n(초 단위)"
 L.PLEASE_INPUT_INNTER_TIME = "내부 쿨다운 시간을 입력해주세요"
 L.COOLDOWN_ITEM_DESC = "※ 발동형 아이템의 |cffff0000내부 쿨다운|r을 설정합니다.\n등록된 주문이 발동되면 쿨다운이 시작됩니다."
-
--- Set exactly the same as the spell name. If different, the totem function will not work
 L.UNKNOWN_TOTEM = "무엇인가"
 L.GREATER_EARTH_ELEMENTAL = "상급 대지의 정령"
 L.GREATER_FIRE_ELEMENTAL = "상급 불의 정령"
@@ -314,7 +313,7 @@ L.JADE_SERPENT_STATUE = "옥룡 조각상"
 L.YU_LON = "위론"
 L.NIUZAO = "니우짜오"
 
---
+-- 11.1.7.3
 L.HEALTH = "체력"
 L.DETAIL_DISPLAY_LEARNED_TRAIT = "지정된 특성 습득 또는 아이템 장착 시에만 아이콘 표시"
 L.LEARNED_TRAIT_SPELL_INPUT = "사용: 연동할 특성/아이템 등록"

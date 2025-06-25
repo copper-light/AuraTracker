@@ -24,7 +24,7 @@ L.COPY = "Copy"
 L.ITEM = "Item"
 L.ITEM_TOOLTIP = "Is item"
 L.INPUT_ID_TOOLTIP = "Please enter a NAME or ID.\nIf it is not working,\nConfirm the |cffff0000SPELL ID|r in the tooltip on the buff/debuff frame."
-L.CLICK_TO_ADD = "               (Add a spell)"
+L.CLICK_TO_ADD = "(Add a spell)"
 L.CONFIG_UI = "UI"
 L.CONFIG_TRACKER_INFO = "Tracker"
 L.CONFIG_TRACKER_ELEMENTS = "Spell"
@@ -278,14 +278,12 @@ L.PLEASE_SELECT_CONFIG_TYPE = "Please select the config type.\n('UI Settings > C
 L.DESC_USE_GLOBAL_CONFIG = "※ Use global settings that share the same settings as other tracker."
 L.DESC_USE_SEVERAL_CONFIG = "※ Use unique settings that only apply to the current tracker."
 L.DISPLAY_WHEN_IN_RAID = "Tracker is hidden\nduring raid"
-
 L.HIDE_WHEN_TIME_OFF = "Hide: Not during Aura/CD"
 L.HIDE_WHEN_TIME_ON  = "Hide: During Aura/CD"
-
 L.DETAIL_DISPLAY = "Display settings for spell (Choose one)"
 L.DETAIL_GLOW = "Glow setting for spell (Choose one)"
-L.USE_SPACE = "Leave empty space"
-L.DONT_USE_SPACE = "Don't use space"
+L.USE_SPACE = "Blank space"
+L.DONT_USE_SPACE = "Don't use Blank"
 L.SAVED_CONFIG_WARN_DONT_REG_ORDER = "Saved configuration.\n\n('|cffff0000Leave empty space|r' function is activated\nwhen display sort is '|cffff0000Sort by Registered|r')"
 L.LATEST_SPELL_LIST_DESC = "The used spells while the settings window is open are displayed,\n\nAnd you can add them\nby dragging to the list\non the left!"
 L.SHOW_LATEST_SPELL = "Latest spells ▶"
@@ -303,8 +301,6 @@ L.PLEASE_INPUT_INNER_TIME = "Please enter the time of internal cooldown."
 L.INNER_COOLDOWN_ITEM_CONFIG =  "Config of internal cooldown" 
 L.ENABLE_INNER_COOLDOWN_ITEM = "Enable internal cooldown"
 L.COOLDOWN_ITEM_DESC = "※ Setting |cffff0000 the internal cooldown|r of a proc item. When a registered spell is triggered, the cooldown begins."
-
--- Set exactly the same as the spell name. If different, the totem function will not work
 L.UNKNOWN_TOTEM = "Unknown"
 L.GREATER_EARTH_ELEMENTAL = "Greater Earth Elemental"
 L.GREATER_FIRE_ELEMENTAL = "Greater Fire Elemental"
@@ -316,6 +312,14 @@ L.XUEN = "Xuen"
 L.JADE_SERPENT_STATUE = "Jade Serpent Statue"
 L.YU_LON = "Yu'lon"
 L.NIUZAO = "Niuzao"
--------------------------------------------
 
-L.HEALTH = "Health"
+-- 11.1.7.3
+L.HEALTH = "Здоровье" -- (Health)
+L.DETAIL_DISPLAY_LEARNED_TRAIT = "Показывать иконку при наличии таланта/предмета" -- (Show icon if talent/item equipped)
+L.LEARNED_TRAIT_SPELL_INPUT = "ВКЛ: зарегистрировать талант" -- (ON: Register talent)
+L.PLEASE_INPUT_TRAIT_SPELL = "(Введите имя или ID)" -- (Enter name or ID)
+L.PLEASE_INPUT_SPELL = "Введите имя или ID" -- (Enter name or ID)
+L.PLEASE_INPUT = "Ввод" -- (Input)
+L.HIDE_MODE_UNLEARNED_ICON = "Скрывать иконку, если не изучено" -- (Hide icon when not learned)
+L.REVERT = "Восстановить" -- (Revert)
+L.ONLY_FOR_AURA_CD_TOTEM = "Эта функция доступна только для |cffff0000баффов/дебаффов|r, |cffff0000перезарядок|r и |cffff0000тотемов|r." -- (This feature is only available for Buffs/Debuffs, Cooldowns, and Totems.)

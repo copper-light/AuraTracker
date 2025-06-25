@@ -1966,7 +1966,10 @@
 					<Anchor point="LEFT"  relativePoint="RIGHT" relativeTo="$parentText" x="0" y="0"/>
 				</Anchors>
 				<Scripts>
-					<OnLoad>self:SetNumeric(true)</OnLoad>
+					<OnLoad>
+						self:SetNumeric(true)
+						self.Desc:SetText(HDH_AT_L.PLEASE_INPUT)
+					</OnLoad>
 				</Scripts>
 			</EditBox>
 

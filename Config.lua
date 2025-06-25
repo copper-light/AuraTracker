@@ -2592,7 +2592,7 @@ local function OnMouseUp_LatestSpellItem(self) -- here
 	self:StopMovingOrSizing()
 	self:SetScript("OnUpdate", nil)
 
-	if (className == "HDH_AURA_TRACKER" or className == "HDH_C_TRACKER" or className == "HDH_TT_TRACKER") then	
+	if (className == "HDH_AURA_TRACKER" or className == "HDH_C_TRACKER" or className == "HDH_TT_TRACKER") then
 		local left, bottom, w, h = main.F.BODY.CONFIG_TRACKER_ELEMENTS:GetBoundsRect()
 		local curX, curY = self:GetCenter()
 
@@ -2771,6 +2771,9 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 				dbName, id, _ = HDH_AT_UTIL.GetInfo(name)
 				if dbName then 
 					name = dbName
+				else
+					id = HDH_TT_TRACKER.AdjustSpell[name]
+					name, id, _ = HDH_AT_UTIL.GetInfo(id)
 				end
 				if not id then 
 					if string.len(UTIL.Trim(name) or "") > 0 then
