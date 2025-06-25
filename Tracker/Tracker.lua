@@ -975,27 +975,6 @@ function HDH_TRACKER:LoadOrderFunc()
 	end
 end
 
-function HDH_TRACKER:IsLearnedSpellOrEquippedItem(id, name, isItem) -- 특성 스킬의 변경에 따른 스킬 표시 여부를 결정하기 위함
-	if not id or id == 0 then return false end
-	if isItem then 
-		local equipSlot = select(9,GetItemInfo(id)) -- 착용 가능한 장비인가요? (착용 불가능이면, nil, INVTYPE_NON_EQUIP_IGNORE)
-		if equipSlot and equipSlot ~= "" and equipSlot ~= "INVTYPE_NON_EQUIP_IGNORE" then 
-			self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
-			return IsEquippedItem(id) -- 착용중인가요?
-		else
-			return true
-		end
-	else 
-		if IsPlayerSpell(id) then return true end
-		local selected = HDH_AT_UTIL.IsTalentSpell(id, name); -- true / false / nil: not found talent
-		if selected == nil then
-			return true;
-		else
-			return selected;
-		end
-	end
-end
-
 function HDH_TRACKER:CreateDummySpell(count)
 	local icons =  self.frame.icon
 	local ui = self.ui
@@ -2166,6 +2145,38 @@ local function VersionUpdateDB()
 			end
 		end
 		DB:SetVersion(2.9)
+	end
+
+	if DB:GetVersion() == 2.9 then
+		local element
+		local reg = false
+		local equipSlot
+		for _, trackerId in ipairs(DB:GetTrackerIds()) do
+			for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
+				if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
+					element = HDH_AT_DB.tracker[trackerId].element[elemIdx]
+					if HDH_AT_DB.tracker[trackerId].type == HDH_TRACKER.TYPE.COOLDOWN or HDH_AT_DB.tracker[trackerId].type == HDH_TRACKER.TYPE.TOTEM then
+						if element.isItem then
+							equipSlot = select(9, GetItemInfo(element.id))
+							if equipSlot and equipSlot ~= "" and equipSlot ~= "INVTYPE_NON_EQUIP_IGNORE" then 
+								reg = true
+							else
+								reg = false
+							end
+						else
+							reg = true
+						end
+						if reg then
+							element.connectedSpellId = element.id
+							element.unlearnedHideMode = DB.SPELL_HIDE
+							element.connectedSpellIsItem = element.isItem
+						end
+					end
+					
+				end
+			end
+		end
+		DB:SetVersion(3.0)
 	end
 end
 

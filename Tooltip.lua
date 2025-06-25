@@ -98,6 +98,7 @@ do
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, OnTooltipSetId)
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetId)
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Toy, OnTooltipSetId)
+        TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Talent, OnTooltipSetId)
     end
     
 end

@@ -28,7 +28,6 @@ do
 	HDH_TT_TRACKER.className = "HDH_TT_TRACKER"
 	HDH_TRACKER.TYPE.TOTEM = 4
 	HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.TOTEM, HDH_TT_TRACKER)
-	local super = HDH_AURA_TRACKER
 	
 	function HDH_TT_TRACKER:Update(...) -- HDH_TRACKER override
 		if not self.frame or HDH_TRACKER.ENABLE_MOVE then return end
@@ -75,7 +74,6 @@ do
 				end
 			end
 		end
-
 		if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
 				and ((self:UpdateAllIcons() > 0) or self.ui.common.always_show or UnitAffectingCombat("player")) then
 			self:ShowTracker();
@@ -93,10 +91,13 @@ do
 		self.aura_caster = aura_caster
 		if not id then return end
 		local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue
+		local connectedId, connectedIsItem, unlearnedHideMode
 		local elemSize = DB:GetTrackerElementSize(trackerId)
 		local spell 
 		local f
 		local iconIdx = 0;
+		local isLearned = false
+		local needEquipmentEvent = false
 		self.frame.pointer = {}
 
 		if aura_filter == DB.AURA_FILTER_ALL then
@@ -104,14 +105,29 @@ do
 		else
 			for i = 1, elemSize do
 				elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
+				display, connectedId, connectedIsItem, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, i)
 				glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
-
-				if self:IsLearnedSpellOrEquippedItem(elemId, elemName, false) then 
+				if connectedId then
+					isLearned = HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(connectedId, nil, connectedIsItem)
+					if connectedIsItem then
+						needEquipmentEvent = true
+					end
+				else
+					isLearned = true
+				end
+				if unlearnedHideMode ~= DB.SPELL_HIDE or isLearned then
 					iconIdx = iconIdx + 1
 					f = self.frame.icon[iconIdx]
 					if f:GetParent() == nil then f:SetParent(self.frame) end
-					self.frame.pointer[elemKey or tostring(elemId)] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
 					spell = {}
+
+					if isLearned then
+						self.frame.pointer[elemKey or tostring(elemId)] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
+					else
+						spell.blankDisplay = true
+						f:Hide()
+					end
+
 					spell.glow = glowType
 					spell.glowCondtion = glowCondition
 					spell.glowValue = (glowValue and tonumber(glowValue)) or 0
@@ -147,13 +163,14 @@ do
 			end
 		end
 		self:LoadOrderFunc();
-		
+		self.frame:UnregisterAllEvents()
 		if #(self.frame.icon) > 0 or aura_filter == DB.AURA_FILTER_ALL then
 			self.frame:SetScript("OnEvent", HDH_TT_OnEvent)
 			self.frame:RegisterEvent("PLAYER_TOTEM_UPDATE");
 			--self.frame:RegisterEvent("UPDATE_SHAPESHIFT_FORM");
-		else
-			self.frame:UnregisterAllEvents()
+			if needEquipmentEvent then
+				self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
+			end
 		end
 		self:Update()
 	end
@@ -173,8 +190,8 @@ function HDH_TT_OnEvent(self, event, ...)
 		if not HDH_TRACKER.ENABLE_MOVE then
 			tracker:Update(...)
 		end
-	elseif event == "UPDATE_SHAPESHIFT_FORM" then
-	
+	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
+		tracker:InitIcons()
 	end
 end
 

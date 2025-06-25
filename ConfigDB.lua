@@ -82,12 +82,13 @@ CONFIG.GLOW_CONDITION_COUNT = 3
 CONFIG.GLOW_CONDITION_VALUE = 4
 
 CONFIG.SPELL_ALWAYS_DISPLAY = 1
--- CONFIG.SPELL_HIDE = 2
--- CONFIG.SPELL_HIDE_AS_SPACE = 3
 CONFIG.SPELL_HIDE_TIME_OFF = 2
 CONFIG.SPELL_HIDE_TIME_OFF_AS_SPACE = 3
 CONFIG.SPELL_HIDE_TIME_ON = 4
 CONFIG.SPELL_HIDE_TIME_ON_AS_SPACE = 5
+
+CONFIG.SPELL_HIDE_AS_SPACE = 1
+CONFIG.SPELL_HIDE = 2
 
 CONFIG.CONDITION_GT_OR_EQ = 1
 CONFIG.CONDITION_LT_OR_EQ = 2
@@ -419,7 +420,7 @@ function HDH_AT_ConfigDB:SetTrackerElement(trackerId, elementIndex, key, id, nam
 	element.isItem = isItem
     element.isValue = isValue
 
-    glowType = HDH_AT_ConfigDB:GetTrackerElementGlow(trackerId, elementIndex)
+    local glowType = HDH_AT_ConfigDB:GetTrackerElementGlow(trackerId, elementIndex)
     if not glowType then
         element.glowType = CONFIG.GLOW_CONDITION_NONE
     end
@@ -450,12 +451,15 @@ end
 
 function HDH_AT_ConfigDB:GetTrackerElementDisplay(trackerId, elementIndex)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
-    return element.display or CONFIG.SPELL_ALWAYS_DISPLAY
+    return element.display or CONFIG.SPELL_ALWAYS_DISPLAY, element.connectedSpellId, element.connectedSpellIsItem, element.unlearnedHideMode
 end
 
-function HDH_AT_ConfigDB:UpdateTrackerElementDisplay(trackerId, elementIndex, value)
+function HDH_AT_ConfigDB:UpdateTrackerElementDisplay(trackerId, elementIndex, value, connectedSpellId, connectedSpellIsItem, unlearnedHideMode)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
     element.display = value
+    element.connectedSpellId = connectedSpellId
+    element.unlearnedHideMode = unlearnedHideMode
+    element.connectedSpellIsItem = connectedSpellIsItem
 end
 
 function HDH_AT_ConfigDB:UpdateTrackerElementGlow(trackerId, elementIndex, glowType, condition, value)
@@ -508,8 +512,6 @@ function HDH_AT_ConfigDB:GetTrackerElementInnerCooldown(trackerId, elementIndex)
         return nil
     end
 end
-
-
 
 function HDH_AT_ConfigDB:hasTrackerUI(id)
     return HDH_AT_DB.ui[id] and true or false

@@ -188,7 +188,14 @@ function HDH_AT_OnEditFocusGained(self)
     end
     _G[self:GetParent():GetName().."RowDesc"]:Hide()
     _G[self:GetParent():GetName().."ButtonAdd"]:Show() 
-    
+end
+
+function HDH_AT_OnTextChanged(self)
+    if string.len(self:GetText()) == 0 then
+        self.Desc:Show()
+    else
+        self.Desc:Hide()
+    end
 end
 
 function HDH_AT_OnEditFocusLost(self)
@@ -231,7 +238,6 @@ local TEXT_DD_MULTI_SELETED = "%d 개 선택됨"
 
 HDH_AT_DropDownMixin = {
     globals= {"HDH_AT_DropDownMixin"}
-
 }
 
 function HDH_AT_DropDown_OnEnteredItem(self)
@@ -1325,4 +1331,90 @@ function HDH_AT_CheckButton2TemplateMixin:SetScript(scriptTypeName, func)
     if scriptTypeName == "OnClick" then
         self.OnClickfunc = func
     end
+end
+
+---
+HDH_AT_SpellSearchEditBoxTemplateMixin = {}
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:GetValue()
+    return self.EditBox:GetText()
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetValue(value)
+    self.EditBox:SetText(value)
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetName(name)
+    if name== nil or string.len(name) == 0 then
+        self.Name:SetText("")
+        self.Desc:Show()
+    else
+        self.Name:SetText(name)
+        self.Desc:Hide()
+    end
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetIsItem(bool)
+    self.CBIsItem:SetChecked(bool or false)
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:GetIsItem()
+    return self.CBIsItem:GetChecked()
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:GetName()
+    return self.Name:GetText()
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetIcon(texture)
+    self.Icon:SetTexture(texture)
+    self.Icon:Show()
+    self.DefaultIcon:Hide()
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetDefaultIcon()
+    self.DefaultIcon:Show()
+    self.Icon:Hide()
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:Reset()
+    self.DefaultIcon:Show()
+    self.Icon:Hide()
+    self.Name:SetText("")
+    self.EditBox:SetText("")
+    self.Desc:SetText(L.PLEASE_INPUT_TRAIT_SPELL)
+    self.Desc:Show()
+    self.tmp_name = nil
+    self.tmp_value = nil
+    self.tmp_icon = nil
+    self.tmp_isItem = false
+    self.BtnCancel:Hide()
+    self:SetIsItem(false)
+    self.CBIsItem:Hide()
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetBackup(value, name, icon, isItem)
+    self.tmp_value = value
+    self.tmp_name = name
+    self.tmp_icon = icon
+    self.tmp_isItem = isItem
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:LoadBackup()
+    if self.tmp_value then
+        self:SetName(self.tmp_name or "")
+        self:SetValue(self.tmp_value or "")
+        self:SetIsItem(self.tmp_isItem or false)
+        if self.tmp_icon then
+            self:SetIcon(self.tmp_icon)
+        else
+            self:SetDefaultIcon()
+        end
+    else
+        self:Reset()
+    end
+end
+
+function HDH_AT_SpellSearchEditBoxTemplateMixin:SetOnClickHandler(handler)
+    self.OnClickSearchHandler = handler
 end

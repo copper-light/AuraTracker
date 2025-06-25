@@ -192,6 +192,26 @@ do
 		return false
 	end
 
+	function HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(id, name, isItem) -- 특성 스킬의 변경에 따른 스킬 표시 여부를 결정하기 위함
+		if not id or id == 0 then return false end
+		if isItem then 
+			local equipSlot = select(9,GetItemInfo(id)) -- 착용 가능한 장비인가요? (착용 불가능이면, nil, INVTYPE_NON_EQUIP_IGNORE)
+			if equipSlot and equipSlot ~= "" and equipSlot ~= "INVTYPE_NON_EQUIP_IGNORE" then 
+				return IsEquippedItem(id) -- 착용중인가요?
+			else
+				return true
+			end
+		else 
+			if IsPlayerSpell(id) then return true end
+			local selected = HDH_AT_UTIL.IsTalentSpell(id, name); -- true / false / nil: not found talent
+			if selected == nil then
+				return true;
+			else
+				return selected;
+			end
+		end
+	end
+
 	function HDH_AT_UTIL.GetTraitsName(id)
 		local traitName = nil
 		if id then
@@ -207,18 +227,18 @@ do
 		return traitName
 	end
 
-	function HDH_AT_UTIL.GetInfo(value, isItem)
+	function HDH_AT_UTIL.GetInfo(value, isItem) -- name, id, texture, isItem
 		if not value then return nil end
 		if not isItem and HDH_AT_UTIL.GetCacheSpellInfo(value) then
 			local spell = HDH_AT_UTIL.GetCacheSpellInfo(value) 
-			return spell.name, spell.spellID, spell.iconID
+			return spell.name, spell.spellID, spell.iconID, false
 		elseif C_Item.GetItemInfo(value) then
 			local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(value)
 			local itemId = GetItemInfoInstant(value)
 			if name then
 				-- linkType, itemId, enchantId, jewelId1, jewelId2, jewelId3, jewelId4, suffixId, uniqueId
 				-- local linkType, itemId = strsplit(":", link)
-				return name, itemId, texture, true, maxStack -- 마지막 인자 아이템 이냐?
+				return name, itemId, texture, true, maxStack
 			end
 		end
 		return nil
@@ -226,6 +246,10 @@ do
 
 	function HDH_AT_UTIL.Trim(str)
 		if not str then return nil end
+		if type(str) ~= "string" then
+			str = tostring(str)
+		end
+		if string.len(str) == 0 then return "" end
 		str = str:gsub('|[r|R]', '')
 		str = str:gsub('|[c|C][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9][a-zA-Z0-9]', '')
 		local front, near
@@ -274,7 +298,13 @@ do
 		if cashTalentSpell[spec][spellName] or cashTalentSpell[spec][spellId] then
 			return true
 		else
-			return false
+			if spellName ~= nil then
+				local spell = HDH_AT_UTIL.GetCacheSpellInfo(spellName)
+				if spell then
+					spellId = spell.spellID
+				end
+			end
+			return HDH_AT_UTIL.IsTraitSpellTalented(spellId)
 		end
 	end
 
@@ -286,10 +316,10 @@ do
 			local offset, numSlots = skillLineInfo.itemIndexOffset, skillLineInfo.numSpellBookItems
 			for j = offset+1, offset+numSlots do
 				local name, subName = C_SpellBook.GetSpellBookItemName(j, Enum.SpellBookSpellBank.Player)
-				local spellID = select(2,C_SpellBook.GetSpellBookItemType(j, Enum.SpellBookSpellBank.Player))
-				if searchName == name or searchId == spellID then
+				local spellType, spellID = C_SpellBook.GetSpellBookItemType(j, Enum.SpellBookSpellBank.Player)
+				if spellType ~= 2 and name and spellID then
 					cashTalentSpell[spec][name] = true
-					cashTalentSpell[spec][searchId] = true
+					cashTalentSpell[spec][spellID] = true
 				end 
 			end
 		end
@@ -298,13 +328,38 @@ do
 		if numSpells then
 			for i=1, numSpells do
 				local petSpellName, petSubType = C_SpellBook.GetSpellBookItemName(i, Enum.SpellBookSpellBank.Pet)
-				local spellID = select(2,C_SpellBook.GetSpellBookItemType(i, Enum.SpellBookSpellBank.Pet))
-				if searchName == name or searchId == spellID then
+				local spellType, spellID = C_SpellBook.GetSpellBookItemType(i, Enum.SpellBookSpellBank.Pet)
+				if spellType ~= 2 and name and spellID then
 					cashTalentSpell[spec][petSpellName] = true
 					cashTalentSpell[spec][spellID] = true
 				end 
 			end
 		end
+	end
+
+	function HDH_AT_UTIL.IsTraitSpellTalented(spellID) -- this could be made to be a lot more efficient, if you already know the relevant nodeID and entryID
+		local configID = C_ClassTalents.GetActiveConfigID()
+		if configID == nil then return end
+
+		local configInfo = C_Traits.GetConfigInfo(configID)
+		if configInfo == nil then return end
+
+		for _, treeID in ipairs(configInfo.treeIDs) do -- in the context of talent trees, there is only 1 treeID
+			local nodes = C_Traits.GetTreeNodes(treeID)
+			for i, nodeID in ipairs(nodes) do
+				local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
+				for _, entryID in ipairs(nodeInfo.entryIDsWithCommittedRanks) do -- there should be 1 or 0
+					local entryInfo = C_Traits.GetEntryInfo(configID, entryID)
+					if entryInfo and entryInfo.definitionID then
+						local definitionInfo = C_Traits.GetDefinitionInfo(entryInfo.definitionID)
+						if definitionInfo.spellID == spellID then
+							return true
+						end
+					end
+				end
+			end
+		end
+		return false
 	end
 
 	function HDH_AT_UTIL.Deepcopy(orig) -- cpy table
@@ -441,7 +496,7 @@ do
 
 	function HDH_AT_UTIL.StringToColor(text)
 		if text == nil then return nil end
-		text = HDH_AT_UTIL.Trim(text)
+		text = HDH_AT_UTIL.Trim(text) or ""
 		if string.len(text) == 0 then return nil end
 		if string.sub(text, 1, 1) == "#" then
 			text = string.sub(text, 2)
