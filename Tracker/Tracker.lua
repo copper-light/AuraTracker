@@ -30,15 +30,6 @@ HDH_TRACKER.startTime = 0
 -- EVENT SCRIPT
 -------------------------------------------
 
--- local function MainOnUpdate(f, elapsed)
--- 	if f.elapsed > 1 then
--- 		print(GetTime(), elapsed)
--- 		f.elapsed = 0 
--- 	else	
--- 		f.elapsed = (f.elapsed or 0) + elapsed
--- 	end
--- end
-
 local function UpdateCooldown(f, elapsed)
 	local spell = f.spell;
 	local tracker = f:GetParent().parent;
