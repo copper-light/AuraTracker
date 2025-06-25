@@ -314,12 +314,12 @@ L.YU_LON = "Yu'lon"
 L.NIUZAO = "Niuzao"
 
 -- 11.1.7.3
-L.HEALTH = "Здоровье" -- (Health)
-L.DETAIL_DISPLAY_LEARNED_TRAIT = "Показывать иконку при наличии таланта/предмета" -- (Show icon if talent/item equipped)
-L.LEARNED_TRAIT_SPELL_INPUT = "ВКЛ: зарегистрировать талант" -- (ON: Register talent)
-L.PLEASE_INPUT_TRAIT_SPELL = "(Введите имя или ID)" -- (Enter name or ID)
-L.PLEASE_INPUT_SPELL = "Введите имя или ID" -- (Enter name or ID)
-L.PLEASE_INPUT = "Ввод" -- (Input)
-L.HIDE_MODE_UNLEARNED_ICON = "Скрывать иконку, если не изучено" -- (Hide icon when not learned)
-L.REVERT = "Восстановить" -- (Revert)
-L.ONLY_FOR_AURA_CD_TOTEM = "Эта функция доступна только для |cffff0000баффов/дебаффов|r, |cffff0000перезарядок|r и |cffff0000тотемов|r." -- (This feature is only available for Buffs/Debuffs, Cooldowns, and Totems.)
+L.HEALTH = "Health"
+L.DETAIL_DISPLAY_LEARNED_TRAIT = "Show icon if talent/item equipped"
+L.LEARNED_TRAIT_SPELL_INPUT = "ON: Register talent"
+L.PLEASE_INPUT_TRAIT_SPELL = "(Enter name or ID)"
+L.PLEASE_INPUT_SPELL = "Enter name or ID"
+L.PLEASE_INPUT = "Input"
+L.HIDE_MODE_UNLEARNED_ICON = "Hide icon when not learned"
+L.REVERT = "Revert"
+L.ONLY_FOR_AURA_CD_TOTEM = "This feature is only available for |cffff0000Buffs/Debuffs|r, |cffff0000Cooldowns|r, and |cffff0000Totems|r."
