@@ -32,3 +32,4 @@ Lib\LibCompress\LibCompress.lua
 Lib\AceSerializer-3.0\AceSerializer-3.0.lua
 Lib\WeakAuraLib\Transmission.lua
 Config.xml
+
