@@ -1815,21 +1815,21 @@ else -- 용군단 코드
 end
 
 HDH_TRACKER.DB_Spell = {}
-function HDH_TRACKER:IsIgnoreSpellByTalentSpell(spell_id)
-	local ret = false;
-	if not spell_id then return true end
-	if DB_Spell.Ignore and DB_Spell.Ignore[1] then
-		local name = DB_Spell.Ignore[1].Spell;
-		local show = DB_Spell.Ignore[1].Show;
-		local selected = HDH_AT_UTIL.IsTalentSpell(spell_id); -- true / false / nil: not found talent
-		if selected == true then
-			ret = (not show);
-		elseif selected == false then
-			ret = show;
-		end
-	end
-	return ret;
-end
+-- function HDH_TRACKER:IsIgnoreSpellByTalentSpell(spell_id)
+-- 	local ret = false;
+-- 	if not spell_id then return true end
+-- 	if DB_Spell.Ignore and DB_Spell.Ignore[1] then
+-- 		local name = DB_Spell.Ignore[1].Spell;
+-- 		local show = DB_Spell.Ignore[1].Show;
+-- 		local selected = IsPlayerSpell(spell_id); -- true / false / nil: not found talent
+-- 		if selected == true then
+-- 			ret = (not show);
+-- 		elseif selected == false then
+-- 			ret = show;
+-- 		end
+-- 	end
+-- 	return ret;
+-- end
 
 function HDH_TRACKER:UpdateGlow(f, bool)
 	if f.spell.ableGlow then -- 블리자드 기본 반짝임 효과면 무조건 적용
@@ -2181,7 +2181,7 @@ local function VersionUpdateDB()
 end
 
 local function ACTIVE_TALENT_GROUP_CHANGED()
-	HDH_AT_UTIL.IsTalentSpell(nil,nil,nil,true)
+	-- HDH_AT_UTIL.IsTalentSpell(nil,nil,nil,true)
 	HDH_TRACKER.InitVaribles()
 	HDH_TRACKER.Updates()
 	if HDH_AT_ConfigFrame and HDH_AT_ConfigFrame:IsShown() then 

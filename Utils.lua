@@ -201,14 +201,18 @@ do
 			else
 				return true
 			end
-		else 
-			if IsPlayerSpell(id) then return true end
-			local selected = HDH_AT_UTIL.IsTalentSpell(id, name); -- true / false / nil: not found talent
-			if selected == nil then
-				return true;
-			else
-				return selected;
+		else
+			if not id and name then
+				id = HDH_AT_UTIL.GetInfo(name)
 			end
+			-- if IsPlayerSpell(id) then return true end
+			-- local selected = HDH_AT_UTIL.IsTalentSpell(id, name); -- true / false / nil: not found talent
+			-- if selected == nil then
+			-- 	return true;
+			-- else
+			-- 	return selected;
+			-- end
+			return IsPlayerSpell(id)
 		end
 	end
 
@@ -272,95 +276,72 @@ do
 		end
 	end
 
-	local cashTalentSpell
-	function HDH_AT_UTIL.IsTalentSpell(spellId, spellName, spec, isReload)
-		spec = spec or HDH_AT_UTIL.GetSpecialization();
-		if not spec then return nil end
-		if isReload or cashTalentSpell == nil then cashTalentSpell = {} end
-		if cashTalentSpell[spec] == nil or #(cashTalentSpell[spec]) == 0 then
-			cashTalentSpell[spec] = {};
-			if select(4, GetBuildInfo()) <= 49999 then -- 대격변
-				for tier = 1, HDH_AT_UTIL.MAX_TALENT_TIERS do
-					for column = 1, HDH_AT_UTIL.NUM_TALENT_COLUMNS do
-						local id, name,_,selected = HDH_AT_UTIL.GetTalentInfoBySpecialization(spec,tier,column)
-						if name then
-							cashTalentSpell[spec][name] = selected
-							cashTalentSpell[spec][spellId] = selected
-						else
-							-- break
-						end
-					end
-				end
-			else
-				HDH_AT_UTIL.UpdateLearnedSpells(spellId, spellName)
-			end
-		end
-		if cashTalentSpell[spec][spellName] or cashTalentSpell[spec][spellId] then
-			return true
-		else
-			if spellName ~= nil then
-				local spell = HDH_AT_UTIL.GetCacheSpellInfo(spellName)
-				if spell then
-					spellId = spell.spellID
-				end
-			end
-			return HDH_AT_UTIL.IsTraitSpellTalented(spellId)
-		end
-	end
+	-- local cashTalentSpell
+	-- function HDH_AT_UTIL.IsTalentSpell(spellId, spellName, spec, isReload)
+	-- 	spec = spec or HDH_AT_UTIL.GetSpecialization();
+	-- 	if not spec then return nil end
+	-- 	if isReload or cashTalentSpell == nil then cashTalentSpell = {} end
+	-- 	if cashTalentSpell[spec] == nil or #(cashTalentSpell[spec]) == 0 then
+	-- 		cashTalentSpell[spec] = {};
+	-- 		if select(4, GetBuildInfo()) <= 49999 then -- 대격변
+	-- 			for tier = 1, HDH_AT_UTIL.MAX_TALENT_TIERS do
+	-- 				for column = 1, HDH_AT_UTIL.NUM_TALENT_COLUMNS do
+	-- 					local id, name,_,selected = HDH_AT_UTIL.GetTalentInfoBySpecialization(spec,tier,column)
+	-- 					if name then
+	-- 						cashTalentSpell[spec][name] = selected
+	-- 						cashTalentSpell[spec][spellId] = selected
+	-- 					else
+	-- 						-- break
+	-- 					end
+	-- 				end
+	-- 			end
+	-- 		else
+	-- 			HDH_AT_UTIL.UpdateLearnedSpells(spellId, spellName)
+	-- 		end
+	-- 	end
+	-- 	if cashTalentSpell[spec][spellName] or cashTalentSpell[spec][spellId] then
+	-- 		return true
+	-- 	else
+	-- 		if spellName ~= nil then
+	-- 			local spell = HDH_AT_UTIL.GetCacheSpellInfo(spellName)
+	-- 			if spell then
+	-- 				spellId = spell.spellID
+	-- 			end
+	-- 		end
+	-- 		return HDH_AT_UTIL.IsTraitSpellTalented(spellId)
+	-- 	end
+	-- end
 
-	function HDH_AT_UTIL.UpdateLearnedSpells(searchId, searchName) -- this could be made to be a lot more efficient, if you already know the relevant nodeID and entryID
-		local spec = HDH_AT_UTIL.GetSpecialization();
-		if not spec then return nil end
-		for i = 1, C_SpellBook.GetNumSpellBookSkillLines() do
-			local skillLineInfo = C_SpellBook.GetSpellBookSkillLineInfo(i)
-			local offset, numSlots = skillLineInfo.itemIndexOffset, skillLineInfo.numSpellBookItems
-			for j = offset+1, offset+numSlots do
-				local name, subName = C_SpellBook.GetSpellBookItemName(j, Enum.SpellBookSpellBank.Player)
-				local spellType, spellID = C_SpellBook.GetSpellBookItemType(j, Enum.SpellBookSpellBank.Player)
-				if spellType ~= 2 and name and spellID then
-					cashTalentSpell[spec][name] = true
-					cashTalentSpell[spec][spellID] = true
-				end 
-			end
-		end
+	-- function HDH_AT_UTIL.UpdateLearnedSpells(searchId, searchName) -- this could be made to be a lot more efficient, if you already know the relevant nodeID and entryID
+	-- 	local spec = HDH_AT_UTIL.GetSpecialization();
+	-- 	if not spec then return nil end
+	-- 	for i = 1, C_SpellBook.GetNumSpellBookSkillLines() do
+	-- 		local skillLineInfo = C_SpellBook.GetSpellBookSkillLineInfo(i)
+	-- 		local offset, numSlots = skillLineInfo.itemIndexOffset, skillLineInfo.numSpellBookItems
+	-- 		for j = offset+1, offset+numSlots do
+	-- 			local name, subName = C_SpellBook.GetSpellBookItemName(j, Enum.SpellBookSpellBank.Player)
+	-- 			local spellType, spellID = C_SpellBook.GetSpellBookItemType(j, Enum.SpellBookSpellBank.Player)
+	-- 			if spellType ~= 2 and name and spellID then
+	-- 				cashTalentSpell[spec][name] = true
+	-- 				cashTalentSpell[spec][spellID] = true
+	-- 			end 
+	-- 		end
+	-- 	end
 
-		local numSpells, petToken = C_SpellBook.HasPetSpells()  -- nil if pet does not have spellbook, 'petToken' will usually be "PET"
-		if numSpells then
-			for i=1, numSpells do
-				local petSpellName, petSubType = C_SpellBook.GetSpellBookItemName(i, Enum.SpellBookSpellBank.Pet)
-				local spellType, spellID = C_SpellBook.GetSpellBookItemType(i, Enum.SpellBookSpellBank.Pet)
-				if spellType ~= 2 and name and spellID then
-					cashTalentSpell[spec][petSpellName] = true
-					cashTalentSpell[spec][spellID] = true
-				end 
-			end
-		end
-	end
+	-- 	local numSpells, petToken = C_SpellBook.HasPetSpells()  -- nil if pet does not have spellbook, 'petToken' will usually be "PET"
+	-- 	if numSpells then
+	-- 		for i=1, numSpells do
+	-- 			local petSpellName, petSubType = C_SpellBook.GetSpellBookItemName(i, Enum.SpellBookSpellBank.Pet)
+	-- 			local spellType, spellID = C_SpellBook.GetSpellBookItemType(i, Enum.SpellBookSpellBank.Pet)
+	-- 			if spellType ~= 2 and name and spellID then
+	-- 				cashTalentSpell[spec][petSpellName] = true
+	-- 				cashTalentSpell[spec][spellID] = true
+	-- 			end 
+	-- 		end
+	-- 	end
+	-- end
 
-	function HDH_AT_UTIL.IsTraitSpellTalented(spellID) -- this could be made to be a lot more efficient, if you already know the relevant nodeID and entryID
-		local configID = C_ClassTalents.GetActiveConfigID()
-		if configID == nil then return end
 
-		local configInfo = C_Traits.GetConfigInfo(configID)
-		if configInfo == nil then return end
-
-		for _, treeID in ipairs(configInfo.treeIDs) do -- in the context of talent trees, there is only 1 treeID
-			local nodes = C_Traits.GetTreeNodes(treeID)
-			for i, nodeID in ipairs(nodes) do
-				local nodeInfo = C_Traits.GetNodeInfo(configID, nodeID)
-				for _, entryID in ipairs(nodeInfo.entryIDsWithCommittedRanks) do -- there should be 1 or 0
-					local entryInfo = C_Traits.GetEntryInfo(configID, entryID)
-					if entryInfo and entryInfo.definitionID then
-						local definitionInfo = C_Traits.GetDefinitionInfo(entryInfo.definitionID)
-						if definitionInfo.spellID == spellID then
-							return true
-						end
-					end
-				end
-			end
-		end
-		return false
-	end
 
 	function HDH_AT_UTIL.Deepcopy(orig) -- cpy table
 		local orig_type = type(orig)
