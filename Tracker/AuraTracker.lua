@@ -292,11 +292,13 @@ do
 						col = col + size_w + margin_h 
 					end
 					f:Hide()
+				elseif f.spell.display == DB.SPELL_HIDE_TIME_ON and f.spell.remaining > 0 then
+					f:Hide()
 				end
 			else
 				f.timetext:SetText(nil)
 				if not f.spell.blankDisplay then
-					if f.spell.display == DB.SPELL_ALWAYS_DISPLAY or f.spell.display == DB.SPELL_HIDE_TIME_ON or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then
+					if f.spell.display == DB.SPELL_HIDE_TIME_ON or f.spell.display == DB.SPELL_ALWAYS_DISPLAY or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then
 						f.icon:SetDesaturated(1)
 						f.icon:SetAlpha(self.ui.icon.off_alpha)
 						f.border:SetAlpha(self.ui.icon.off_alpha)

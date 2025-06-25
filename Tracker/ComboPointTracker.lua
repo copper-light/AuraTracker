@@ -512,17 +512,17 @@ function HDH_COMBO_POINT_TRACKER:Update() -- HDH_TRACKER override
 end
 
 function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
-	local ret = 0
 	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue
+	local elemKey, elemId, elemName, texture, glowType, display, isValue, isItem, glowCondition, glowValue
 	local trackerId = self.id
+	local spell, f
 	
 	if not self:IsHaveData() then
 		self:CreateData()
 	end
 	for i = 1, power_max do
 		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-		display, connectedId, connectedIsItem, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, i)
+		display, _, _, _ = DB:GetTrackerElementDisplay(trackerId, i)
 		glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
 
 		f = self.frame.icon[i]

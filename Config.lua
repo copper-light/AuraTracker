@@ -779,10 +779,11 @@ local function HDH_AT_OnSeletedColor(self, r, g, b, a)
 	end
 end
 
-function HDH_AT_UI_OnCheck(self)
-	local F = GetMainFrame().F
+function HDH_AT_OnCheck(self)
+	local main = GetMainFrame()
+	local F = main.F
 	local value = self:GetChecked()
-	local trackerId = GetMainFrame():GetCurTrackerId()
+	local trackerId = main:GetCurTrackerId()
 
 	if value ~= nil and self.dbKey ~= nil then
 		DB:SetTrackerValue(trackerId, self.dbKey, value)
@@ -792,7 +793,7 @@ function HDH_AT_UI_OnCheck(self)
 	if self == F.BODY.CONFIG_UI.CB_MOVE then
 		HDH_TRACKER.ENABLE_MOVE = value
 		HDH_TRACKER.SetMoveAll(value)
-		ShowGrid(GetMainFrame(), value)
+		ShowGrid(main, value)
 	
 	elseif self == F.BODY.CONFIG_UI.CB_DISPLAY_WHEN_NONCOMBAT then
 		HDH_TRACKER.InitVaribles(DB:HasUI(trackerId) and trackerId)
@@ -816,7 +817,7 @@ function HDH_AT_UI_OnCheck(self)
 			isItem = F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon.isItem
 		end
 		if (searchChecked and not key) then
-			GetMainFrame().Dialog:AlertShow(L.PLEASE_SEARCH_ICON) return 
+			main.Dialog:AlertShow(L.PLEASE_SEARCH_ICON) return 
 		end
 
 		DB:SetTrackerElementImage(trackerId, elemIdx, texture, key, isItem)
@@ -859,11 +860,17 @@ function HDH_AT_UI_OnCheck(self)
 		F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_SW_HIDE_MODE_UNLEARNED_TRAIT:Hide()
 		F.BODY.CONFIG_DETAIL.DISPLAY.EB_CONNECT_TRAIT:Hide()
 	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2 then
-		self:SetChecked(true)
-		F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT1:SetChecked(false)
-		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:Show()
-		F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_SW_HIDE_MODE_UNLEARNED_TRAIT:Show()
-		F.BODY.CONFIG_DETAIL.DISPLAY.EB_CONNECT_TRAIT:Show()
+		local tracker = HDH_TRACKER.Get(trackerId)
+		local className = (tracker and tracker:GetClassName()) or nil
+		if className == "HDH_AURA_TRACKER" or className == "HDH_C_TRACKER" or className == "HDH_TT_TRACKER" then
+			self:SetChecked(true)
+			F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT1:SetChecked(false)
+			F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:Show()
+			F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_SW_HIDE_MODE_UNLEARNED_TRAIT:Show()
+			F.BODY.CONFIG_DETAIL.DISPLAY.EB_CONNECT_TRAIT:Show()
+		else
+			main.Dialog:AlertShow(L.ONLY_FOR_AURA_CD_TOTEM);
+		end
 	end
 end
 
@@ -1089,9 +1096,6 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 			F.DD_TRACKER_AURA_CASTER:Disable()
 			F.DD_TRACKER_AURA_FILTER:Disable()
 		end
-	-- elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE then
-	-- 	F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(true)
-	-- 	F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
 	end
 
 	if self.dbKey then
@@ -1110,7 +1114,6 @@ local function HDH_AT_OnChangeTabUI(self)
 	elseif self:GetParent() == GetMainFrame().F.BODY.CONFIG_DETAIL.ETC.MENU then
 		GetMainFrame():ChangeBody(nil, nil, nil, self.index)
 	end
-	
 end
 
 local function HDH_AT_OnClick_TrackerConfigButton(self)
@@ -1213,7 +1216,7 @@ function HDH_AT_OnClick_Button(self, button)
 				self:GetParent().CheckButton1:SetChecked(false)
 			end)
 		end
-		 
+
 		-- 트래커 고유 설정 변경해야하는 트래커 유형
 		if not perType and (className == "HDH_COMBO_POINT_TRACKER" or className == "HDH_ESSENCE_TRACKER" or className == "HDH_DK_RUNE_TRACKER") then
 			main.DIALOG_SELECT_DISPLAY_TYPE.HeaderText:SetText(L.PLEASE_SELECT_DISPLAY_TYPE)
@@ -1221,7 +1224,7 @@ function HDH_AT_OnClick_Button(self, button)
 			main.DIALOG_SELECT_DISPLAY_TYPE.DescBarText:SetText(L.DESC_CONFIG_BAR)
 			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1.Text:SetText(L.USE_DISPLAY_ICON) 
 			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2.Text:SetText(L.USE_DISPLAY_BAR) 
-			
+
 			main.DIALOG_SELECT_DISPLAY_TYPE.Button:SetScript("OnClick", function(self)
 				local trackerId = self:GetParent().trackerId
 				if self:GetParent().CheckButton1:GetChecked() then
@@ -1229,7 +1232,7 @@ function HDH_AT_OnClick_Button(self, button)
 				else
 					DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_BAR)
 				end
-				
+
 				HDH_TRACKER.InitVaribles()
 				self:GetParent():Hide()
 
@@ -1276,7 +1279,7 @@ function HDH_AT_OnClick_Button(self, button)
 					if self:GetParent().CheckButton2:GetChecked() then
 						DB:CopyGlobelToTracker(trackerId)
 					end
-					
+
 					HDH_TRACKER.InitVaribles()
 					self:GetParent():Hide()
 
@@ -1297,7 +1300,7 @@ function HDH_AT_OnClick_Button(self, button)
 				end
 			end
 		end
-		
+
 	elseif self == F.BODY.CONFIG_TRACKER.BTN_DELETE then
 		local id = main:GetCurTrackerId()
 		local name = select(2, DB:GetTrackerInfo(id))
@@ -1458,7 +1461,7 @@ function HDH_AT_OnClick_Button(self, button)
 		local tracker
 		for _, item in ipairs(list) do
 			if not item.id then break end
-			
+
 			if item:GetChecked() then
 				tracker = DB:GetTracker(item.id)
 				tracker = UTIL.Deepcopy(tracker)
@@ -1657,6 +1660,7 @@ end
 
 function HDH_AT_ConfigFrameMixin:GetTraits(talentId)
 	local ret = {}
+	local id, name
 	talentId = talentId or HDH_AT_UTIL.GetSpecialization() --ClassTalentFrame.TalentsTab.LoadoutDropDown:GetSelectionID()
 	local ids = HDH_AT_UTIL.GetConfigIDsBySpecID(talentId)
 	for i, v in pairs(ids) do
@@ -1669,11 +1673,12 @@ end
 
 function HDH_AT_ConfigFrameMixin:GetTalentList(bigImage)
 	local ret = {}
+	local id, name, icon, texture
 	if bigImage == nil then
 		bigImage = false
 	end
 	for i = 1, MAX_TALENT_TABS do
-        id, name, desc, icon = HDH_AT_UTIL.GetSpecializationInfo(i)
+        id, name, _, icon = HDH_AT_UTIL.GetSpecializationInfo(i)
 		if id == nil then
 			break
 		end
@@ -1706,6 +1711,7 @@ function HDH_AT_ConfigFrameMixin:DeleteTrackerElement(elem, trackerId, elemIdx)
 end
 
 function HDH_AT_ConfigFrameMixin:AddTrackerElement(elem, trackerId, elemIdx)
+	local trackerObj
 	local rowIdx, key, id, name, texture, display, isGlow, isValue, isItem = elem:Get()
 	display = (DB:GetTrackerElement(trackerId, elemIdx) and DB:GetTrackerElementDisplay(trackerId, elemIdx)) or nil
 	if not display then
@@ -1732,6 +1738,22 @@ function HDH_AT_ConfigFrameMixin:AddTrackerElement(elem, trackerId, elemIdx)
 	DB:SetTrackerElement(trackerId, elemIdx, key, id, name, texture, display, isValue, isItem)
 	self:LoadTrackerElementConfig(trackerId, elemIdx)
 
+	if HDH_TRACKER.Get(trackerId).type == HDH_TRACKER.TYPE.COOLDOWN or HDH_TRACKER.Get(trackerId).type == HDH_TRACKER.TYPE.TOTEM then
+		local equipSlot
+		local reg = false
+		if isItem then
+			equipSlot = select(9, GetItemInfo(id))
+			if equipSlot and equipSlot ~= "" and equipSlot ~= "INVTYPE_NON_EQUIP_IGNORE" then 
+				reg = true
+			end
+		else
+			reg = true
+		end
+		if reg then
+			DB:UpdateTrackerElementDisplay(trackerId, elemIdx, display, id, isItem,  DB.SPELL_HIDE)
+		end
+	end
+
 	trackerObj = HDH_TRACKER.Get(trackerId)
 	if trackerObj then
 		trackerObj:InitIcons()
@@ -1742,9 +1764,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 	local ddm = self.F.DD_TRACKER_TRAIT
 	local itemValues = {}
 	local itemTemplates = {}
-	local id, name, icon
-	local itemFrame, isTalent, check
-
+	local id, name, texture
 	local F = self.F
 	local ids = DB:GetTrackerIds()
 	local traitList = {}
@@ -1752,8 +1772,6 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 	local cacheTraits = {}
 	local unusedTracker = 0
 	local traits
-	local trackerId
-
 	local useAtlas = false --select(4, GetBuildInfo()) >= 100000
 
 	-- Tracker 목록 생성 및 트랜짓이 없는 않는 트래커 확인
@@ -1804,6 +1822,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 
 	for _, item in ipairs(self:GetTalentList(useAtlas)) do
 		id, name, icon = unpack(item)
+		if name == nil then break end
 		itemValues[#itemValues+1] = {-1, name, icon}
 		itemTemplates[#itemTemplates+1] = "HDH_AT_SplitItemTemplate"
 		itemValues[#itemValues+1] = {id, L.ALWAYS_USE, nil}
@@ -1819,7 +1838,7 @@ end
 
 function HDH_AT_ConfigFrameMixin:UpdateTraitsSelector(idx)
 	local ddm = self.F.DD_TRACKER_TRAIT
-	local isAlwaysChecked
+	local itemFrame
 	local startIndex = 1
 	local endIndex = #ddm.item
 	local isAlwaysChecked = false
@@ -1845,14 +1864,19 @@ function HDH_AT_ConfigFrameMixin:UpdateTraitsSelector(idx)
 	
 	for i = startIndex, endIndex do
 		itemFrame = ddm.item[i]
-		if (HDH_AT_UTIL.GetSpecializationInfoByID(itemFrame.value)) then
-			isAlwaysChecked = itemFrame.CheckButton:GetChecked()
-		else
-			if itemFrame.value ~= -1 then
-				if isAlwaysChecked then
-					itemFrame.CheckButton:SetChecked(false)
+		if itemFrame.value then
+			if (HDH_AT_UTIL.GetSpecializationInfoByID(itemFrame.value)) then
+				isAlwaysChecked = itemFrame.CheckButton:GetChecked()
+			else
+				if itemFrame.value ~= -1 then
+					if isAlwaysChecked then
+						itemFrame.CheckButton:SetChecked(false)
+					end
 				end
 			end
+			itemFrame:Show()
+		else
+			itemFrame:Hide()
 		end
 	end
 end
@@ -2375,7 +2399,6 @@ function HDH_AT_ConfigFrameMixin:GetTrackerData(id)
 	for _, tracker in ipairs(HDH_AT_DB.tracker) do
 		if tracker.trait then
 			if UTIL.HasValue(tracker.trait, id) then
-				-- values[#values+1] = { tracker.id, tracker.name }
 				trackerData[#trackerData+1] = {
 					id = tracker.id,
 					name = tracker.name,
@@ -3588,7 +3611,7 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	if component_type == COMP_TYPE.CHECK_BOX then
 		component = CreateFrame("Button", (parent:GetName()..'Button'..parent.row.."_"..parent.col), parent, "HDH_AT_CheckButton2Template")
 		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 18 or 0, 0)
-		component:SetScript("OnClick", HDH_AT_UI_OnCheck)
+		component:SetScript("OnClick", HDH_AT_OnCheck)
 
 	elseif component_type == COMP_TYPE.BUTTON then
 		component = CreateFrame("Button", (parent:GetName()..'Button'..parent.row.."_"..parent.col), parent, "HDH_AT_ButtonTemplate")
@@ -3637,7 +3660,7 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		component = CreateFrame("Button", (parent:GetName()..'ImageCheckButton'..parent.row.."_"..parent.col), parent, "HDH_AT_CheckButtonImageTemplate")
 		component:SetSize(20, 20)
 		component:SetPoint('LEFT', frame, 'RIGHT', 10, 0)
-		component:SetScript("OnClick", HDH_AT_UI_OnCheck)
+		component:SetScript("OnClick", HDH_AT_OnCheck)
 		-- component:SetHandler(HDH_AT_OnSeletedColor)
 
 	elseif component_type == COMP_TYPE.EDITBOX_ADD_DEL then

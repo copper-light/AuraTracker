@@ -2155,6 +2155,38 @@ local function VersionUpdateDB()
 		end
 		DB:SetVersion(2.9)
 	end
+
+	if DB:GetVersion() == 2.9 then
+		local element
+		local reg = false
+		local equipSlot
+		for _, trackerId in ipairs(DB:GetTrackerIds()) do
+			for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
+				if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
+					element = HDH_AT_DB.tracker[trackerId].element[elemIdx]
+					if HDH_AT_DB.tracker[trackerId].type == HDH_TRACKER.TYPE.COOLDOWN or HDH_AT_DB.tracker[trackerId].type == HDH_TRACKER.TYPE.TOTEM then
+						if element.isItem then
+							equipSlot = select(9, GetItemInfo(element.id))
+							if equipSlot and equipSlot ~= "" and equipSlot ~= "INVTYPE_NON_EQUIP_IGNORE" then 
+								reg = true
+							else
+								reg = false
+							end
+						else
+							reg = true
+						end
+						if reg then
+							element.connectedSpellId = element.id
+							element.unlearnedHideMode = DB.SPELL_HIDE
+							element.connectedSpellIsItem = element.isItem
+						end
+					end
+					
+				end
+			end
+		end
+		DB:SetVersion(3.0)
+	end
 end
 
 local function ACTIVE_TALENT_GROUP_CHANGED()

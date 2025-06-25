@@ -24,6 +24,7 @@ Tracker\DKRuneTracker.lua
 Tracker\EssenceTracker.lua
 Tracker\StaggerTracker.lua
 Tracker\EnhancementMaelstrom.lua
+Tracker\HealthTracker.lua
 # Tracker\ShadowTracking.lua
 
 # https://www.wowace.com/projects/libcompress
