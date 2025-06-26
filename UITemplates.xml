@@ -1087,6 +1087,10 @@
 		</NormalTexture>
 		<HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
 			<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
+			<Anchors>
+				<Anchor point="TOPLEFT" x="2" y="-2"/>
+				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+			</Anchors>
 		</HighlightTexture>
 		<DisabledTexture>
 			<Color r="0.5" g="0.5" b="0.5" a="0.8"/>
@@ -1135,56 +1139,123 @@
 		</DisabledTexture>
 	</Button>
 
-    <Frame name="HDH_AT_ConfigFrameTemplate" virtual="true">
-        <Layers>
-            <Layer level="BORDER">
-                <Texture parentKey="TopLeftCorner" inherits="Talent-Inner-TopLeft">
+	<Frame name="HDH_AT_ConfigFrameTemplate" virtual="true">
+		<Layers>
+            <Layer level="BORDER" textureSubLevel="1">
+                <Texture parentKey="Top" >
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Size x="1" y="2" />
                     <Anchors>
-                        <Anchor point="TOPLEFT" x="-4" y="4"/>
+						<Anchor point="TOPLEFT" x="-1" y="1"/>
+						<Anchor point="TOPRIGHT" x="1" y="1"/>
                     </Anchors>
                 </Texture>
-				<Texture parentKey="TopRightCorner" inherits="Talent-Inner-TopRight">
+				<Texture parentKey="Left">
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Size x="2" y="1" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="-1" y="0"/>
+						<Anchor point="BOTTOMLEFT" x="-1" y="0"/>
+                    </Anchors>
+                </Texture>
+				<Texture parentKey="Right">
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Size x="2" y="1" />
+                    <Anchors>
+                        <Anchor point="TOPRIGHT" x="1" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="1" y="0"/>
+                    </Anchors>
+                </Texture>
+				<Texture parentKey="Bottom" >
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Size x="1" y="2" />
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" x="-1" y="-1"/>
+						<Anchor point="BOTTOMRIGHT" x="1" y="-1"/>
+                    </Anchors>
+                </Texture>
+			</Layer>
+
+			<Layer level="BORDER" textureSubLevel="0">
+				<Texture parentKey="Top" >
+					<Color r="0" g="0" b="0" a="0.3" />
+					<Size x="1" y="2" />
+                    <Anchors>
+						<Anchor point="TOPLEFT" x="-2" y="2"/>
+						<Anchor point="TOPRIGHT" x="2" y="2"/>
+                    </Anchors>
+                </Texture>
+
+				<Texture parentKey="Left">
+					<Color r="0" g="0" b="0" a="0.3" />
+					<Size x="2" y="1" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="-2" y="0"/>
+						<Anchor point="BOTTOMLEFT" x="-2" y="0"/>
+                    </Anchors>
+                </Texture>
+
+				<Texture parentKey="Right">
+					<Color r="0" g="0" b="0" a="0.3" />
+					<Size x="2" y="1" />
+                    <Anchors>
+                        <Anchor point="TOPRIGHT" x="2" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="2" y="0"/>
+                    </Anchors>
+                </Texture>
+
+				<Texture parentKey="Bottom">
+					<Color r="0" g="0" b="0" a="0.3" />
+					<Size x="1" y="2" />
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" x="-2" y="-2"/>
+						<Anchor point="BOTTOMRIGHT" x="2" y="-2"/>
+                    </Anchors>
+                </Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<CheckButton name="HDH_AT_TalentCheckButtonTemplate" inherits="HDH_AT_ConfigFrameTemplate" mixin="HDH_AT_TalentCheckButtonMixin"  virtual="true">
+		<Size x="70" y="70" />
+		<Layers>
+
+			<Layer level="ARTWORK" textureSubLevel="1">
+				<Texture name="$parentIcon" parentKey="Icon" hidden="false">
 					<Anchors>
-						<Anchor point="TOPRIGHT" x="4" y="4"/>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="2" y="-2"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-2" y="2" />
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.22" bottom="0.78" /> 
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK" textureSubLevel="5">
+				<Texture name="$parentActive" parentKey="Active">
+					<Size x="1" y="12" />
+					<Color r="0" g="0" b="0" a="0.5"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIcon" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parentIcon" x="0" y="0" />
 					</Anchors>
 				</Texture>
-				<Texture parentKey="BotLeftCorner" inherits="Talent-Inner-BotLeft">
+			</Layer>
+
+			<Layer level="ARTWORK" textureSubLevel="3">
+				<FontString name="$parentName" parentKey="Name" inherits="Font_Yellow_S" text="텍스트 입력" justifyH="CENTER" justifyV="MIDDLE" hidden="false">
+					<Size x="1" y="15" />
 					<Anchors>
-						<Anchor point="BOTTOMLEFT" x="-4" y="-4"/>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="0" y="0" />
 					</Anchors>
-				</Texture>
-				<Texture parentKey="BotRightCorner" inherits="Talent-Inner-BotRight">
-					<Anchors>
-						<Anchor point="BOTTOMRIGHT" x="4" y="-4"/>
-					</Anchors>
-				</Texture>
-				<Texture parentKey="TopBorder" inherits="_Talent-Inner-TopTile">
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeKey="$parent.TopLeftCorner" relativePoint="TOPRIGHT" x="0" y="0"/>
-						<Anchor point="TOPRIGHT" relativeKey="$parent.TopRightCorner" relativePoint="TOPLEFT" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-				<Texture parentKey="BottomBorder" inherits="_Talent-Inner-BotTile">
-					<Anchors>
-						<Anchor point="BOTTOMLEFT" relativeKey="$parent.BotLeftCorner" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.BotRightCorner" relativePoint="BOTTOMLEFT" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-				<Texture parentKey="LeftBorder" inherits="!Talent-Inner-LeftTile">
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeKey="$parent.TopLeftCorner" relativePoint="BOTTOMLEFT" x="0" y="0"/>
-						<Anchor point="BOTTOMLEFT" relativeKey="$parent.BotLeftCorner" relativePoint="TOPLEFT" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-				<Texture parentKey="RightBorder" inherits="!Talent-Inner-RightTile">
-					<Anchors>
-						<Anchor point="TOPRIGHT" relativeKey="$parent.TopRightCorner" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.BotRightCorner" relativePoint="TOPRIGHT" x="0" y="0"/>
-					</Anchors>
-				</Texture>	
-            </Layer>
-        </Layers>
-    </Frame>
+				</FontString>
+			</Layer>
+		</Layers>
+
+		<Scripts>
+			<OnClick inherits="prepend">HDH_AT_TalentCheckButton_OnClick(self)</OnClick>
+		</Scripts>
+	</CheckButton>
 
 	<EditBox name="HDH_AT_EditBoxTemplate" inherits="InputBoxScriptTemplate" virtual="true">
 		<Size x="120" y="20" />
@@ -1265,7 +1336,6 @@
 		</Scripts>
 	</EditBox>
 
-
     <Button name="HDH_AT_DropDownItemTemplate" virtual="true">
         <Size x="100" y="22" />
         <Anchors>
@@ -1284,9 +1354,10 @@
 				</Texture>
 			</Layer>
 
-			<Layer level="BORDER">
-				<Texture name="$parentOn" parentKey="Active" alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight"  hidden="true">
-					<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
+			<Layer level="ARTWORK" textureSubLevel="0">
+				<Texture name="$parentOn" parentKey="Active" hidden="true">
+					<!-- <TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" /> -->
+					<Color r="1" g="0.8" b="0" a="0.5"/>
 					<Anchors>
 						<Anchor point="TOPLEFT" x="0" y="0"/>
 						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
@@ -1294,7 +1365,7 @@
 				</Texture>
 			</Layer>
 
-			<Layer level="ARTWORK">
+			<Layer level="ARTWORK" textureSubLevel="1">
 				<FontString name ="$parentText" parentKey="Text" inherits="Font_White_S" text="특성" justifyH="CENTER">
 					<Size><AbsDimension x="100" y="36" /></Size>
 					<Anchors>
@@ -1364,7 +1435,7 @@
 						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2"/>
 						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2"/>
 					</Anchors>
-					<TexCoords left="0.08" right="0.92" top="0.27" bottom="0.58" /> 
+					<TexCoords left="0.08" right="0.92" top="0.17" bottom="0.48" /> 
 				</Texture>
 			</Layer>
 
@@ -1534,12 +1605,12 @@
 						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2"/>
 						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2"/>
 					</Anchors>
-					<TexCoords left="0.08" right="0.92" top="0.17" bottom="0.59" /> 
+					<TexCoords left="0.08" right="0.92" top="0.22" bottom="0.61" /> 
 				</Texture>
 
                 <Texture name="$parentBg"  parentKey="BG" >
                     <!-- <Color r="1" g="0.8" b="0" a="0.5"/> -->
-                    <Color r="0" g="0" b="0" a="0.1"/>
+                    <Color r="0" g="0" b="0" a="0.2"/>
                     <Anchors>
                         <Anchor point="TOPLEFT" x="0" y="0" />
                         <Anchor point="BOTTOMRIGHT" x="0" y="0" />
@@ -2085,6 +2156,14 @@
 				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
 			</Anchors>
 		</NormalTexture>
+		<HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
+			<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
+				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+			</Anchors>
+		</HighlightTexture>
+		
 		<DisabledFont style="Font_White_S"/>
 		<DisabledTexture>
 			<Color r="1" g="0.8" b="0.1" a="0.65"/>

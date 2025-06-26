@@ -22,6 +22,36 @@
 
         <Frames>
 
+			<CheckButton name="$parentTalent1" parentKey="Talent1" inherits="HDH_AT_TalentCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" x="0" y="4" />
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton name="$parentTalent2"  parentKey="Talent2"  inherits="HDH_AT_TalentCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentTalent1" relativePoint="BOTTOMRIGHT" x="4" y="0" />
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton name="$parentTalent3"  parentKey="Talent3"  inherits="HDH_AT_TalentCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentTalent2" relativePoint="BOTTOMRIGHT" x="4" y="0" />
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton name="$parentTalent4"  parentKey="Talent4"  inherits="HDH_AT_TalentCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentTalent3" relativePoint="BOTTOMRIGHT" x="4" y="0" />
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton name="$parentTalent5"  parentKey="Talent5"  inherits="HDH_AT_TalentCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentTalent4" relativePoint="BOTTOMRIGHT" x="4" y="0" />
+				</Anchors>
+			</CheckButton>
+
 			<Frame name="$parentReset" parentKey="ErrorReset" inherits="HDH_AT_BackgroundTemplate">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
@@ -50,9 +80,9 @@
 			</Frame>
 
             <Button name="$parentDropDownTraits" inherits="HDH_AT_DropDownTrackerTemplate">
-				<Size><AbsDimension x="112" y="40" /></Size>
+				<Size x="114" y="40"/>
                 <Anchors>
-                    <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" x="-4" y="1" />
+                    <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" x="-2" y="1" />
                     <!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
                 </Anchors>
             </Button>
@@ -60,9 +90,9 @@
 			<ScrollFrame name="$parentTrackerSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate">
 				<Size x="120" />
 				<Anchors>
-					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentDropDownTraits" x="0" y="0" />
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentDropDownTraits" x="0" y="-1" />
 					<!-- <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDropDownTalent" x="6" y="0" /> -->
-					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parentDropDownTraits" x="5" y="0" />
+					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parentDropDownTraits" x="3" y="0" />
 					<Anchor point="BOTTOM" relativePoint="BOTTOM" x="0" y="0" />
 				</Anchors>
 				<Frames>
@@ -1136,7 +1166,7 @@
 			<Button name="$parentTabInfo" inherits="HDH_AT_BottomTapTemplate" id="1" hidden="false">
 				<Size x="32" y="32"/>
 				<Anchors>
-					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="10" y="-3" />
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="10" y="-2" />
 				</Anchors>
 				<!-- <NormalTexture/> -->
 				<!-- <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
@@ -1191,67 +1221,37 @@
 				<HighlightTexture file="Interface\CHATFRAME\UI-ChatIM-SizeGrabber-Highlight" alphaMode="ADD"/>
 			</Button>
 
-			<Button name="$parentBtnClose" >
-				<Size><AbsDimension x="35" y="35"/></Size>
+			<Button name="$parentBtnClose" text="X" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
+				<Size><AbsDimension x="25" y="20"/></Size>
 				<Anchors>
-					<Anchor point="TOPRIGHT" x="0" y="28" />
+					<Anchor point="TOPRIGHT" x="0" y="24" />
 				</Anchors>
-				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture name="$parentBG" file="Interface\Buttons\UI-SquareButton-Disabled">
-							<Anchors>
-								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2" relativeTo="$parent" />
-								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2" relativeTo="$parent"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-				
 				<Scripts>
 					<OnClick>
 						self:GetParent():Hide(); 
 					</OnClick>
 				</Scripts>
-				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
-				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
-				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
 			</Button>
 
-			<Button name="$parentBtnMinMaxFrame">
-				<Size><AbsDimension x="35" y="35"/></Size>
+			<Button name="$parentBtnMinMaxFrame" text="▲" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
+				<Size><AbsDimension x="25" y="20"/></Size>
 				<Anchors>
-					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnClose" x="5" y="0" />
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnClose" x="-4" y="0" />
 				</Anchors>
-
-				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture name="$parentBG" file="Interface\Buttons\UI-SquareButton-Disabled">
-							<Anchors>
-								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2" relativeTo="$parent" />
-								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2" relativeTo="$parent"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-
 				<Scripts>
-					<OnLoad>self:SetText(HDH_AT_L.MINIMUM_WINDOW)</OnLoad>
 					<OnClick>
 						HDH_AT_MinimumFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
 						HDH_AT_MinimumFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
 						HDH_AT_MinimumFrame:Show(); self:GetParent():Hide();
 					</OnClick>
 				</Scripts>
-				<NormalTexture file="Interface\Buttons\UI-Panel-CollapseButton-Up"/>
-				<PushedTexture file="Interface\Buttons\UI-Panel-CollapseButton-Down"/>
-				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
 			</Button>
 
 			<Frame name="$parentLatestSpell" parentKey="LatestSpell" inherits="HDH_AT_ConfigFrameTemplate"  movable="true" enableMouse="true" hidden="true">
 				<Size x="150"/>
 				<Anchors>
-					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="10" y="0" />
-					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="10" y="0" />
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="6" y="0" />
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="6" y="0" />
 				</Anchors>
 
 				<Frames>
@@ -1328,7 +1328,6 @@
 									</Frame>
 								</ScrollChild>
 							</ScrollFrame>
-
 							<CheckButton name="$parentCBAutoPopup" inherits="HDH_AT_CheckButton2Template">
 								<Size x="150" y="20" />
 								<Anchors>
@@ -1348,30 +1347,16 @@
 						</Scripts>
 					</Frame>
 
-					<Button name="$parentBtnClose" >
-						<Size><AbsDimension x="35" y="35"/></Size>
+					<Button name="$parentBtnClose" text="X" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
+						<Size><AbsDimension x="25" y="20"/></Size>
 						<Anchors>
-							<Anchor point="TOPRIGHT" x="0" y="28" />
+							<Anchor point="TOPRIGHT" x="0" y="24" />
 						</Anchors>
-						<Layers>
-							<Layer level="BACKGROUND">
-								<Texture name="$parentBG" file="Interface\Buttons\UI-SquareButton-Disabled">
-									<Anchors>
-										<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2" relativeTo="$parent" />
-										<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2" relativeTo="$parent"/>
-									</Anchors>
-								</Texture>
-							</Layer>
-						</Layers>
-						
 						<Scripts>
 							<OnClick>
 								self:GetParent():Hide(); 
 							</OnClick>
 						</Scripts>
-						<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
-						<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
-						<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
 					</Button>
 				</Frames>
 				<Scripts>
@@ -1434,22 +1419,11 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Button name="$parentBtnClose" >
-				<Size><AbsDimension x="35" y="35"/></Size>
+			<Button name="$parentBtnClose" text="X" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
+				<Size><AbsDimension x="25" y="20"/></Size>
 				<Anchors>
-					<Anchor point="TOPRIGHT" x="0" y="28" />
+					<Anchor point="TOPRIGHT" x="0" y="24" />
 				</Anchors>
-				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture name="$parentBG" file="Interface\Buttons\UI-SquareButton-Disabled">
-							<Anchors>
-								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2" relativeTo="$parent" />
-								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2" relativeTo="$parent"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-				
 				<Scripts>
 					<OnClick>
 						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
@@ -1457,39 +1431,20 @@
 						self:GetParent():Hide(); 
 					</OnClick>
 				</Scripts>
-				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
-				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
-				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
 			</Button>
 
-			<Button name="$parentBtnMinMaxFrame">
-				<Size><AbsDimension x="35" y="35"/></Size>
+			<Button name="$parentBtnMinMaxFrame" text="▼" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
+				<Size><AbsDimension x="25" y="20"/></Size>
 				<Anchors>
-					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnClose" x="5" y="0" />
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnClose" x="-4" y="0" />
 				</Anchors>
-
-				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture name="$parentBG" file="Interface\Buttons\UI-SquareButton-Disabled">
-							<Anchors>
-								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2" relativeTo="$parent" />
-								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2" relativeTo="$parent"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-
 				<Scripts>
-					<OnLoad>self:SetText(HDH_AT_L.MINIMUM_WINDOW)</OnLoad>
 					<OnClick>
 						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
 						HDH_AT_ConfigFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
 						HDH_AT_ConfigFrame:Show(); self:GetParent():Hide();
 					</OnClick>
 				</Scripts>
-				<NormalTexture file="Interface\Buttons\UI-Panel-ExpandButton-Up"/>
-				<PushedTexture file="Interface\Buttons\UI-Panel-ExpandButton-Down"/>
-				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
 			</Button>
 
 		</Frames>

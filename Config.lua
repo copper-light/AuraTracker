@@ -871,6 +871,11 @@ function HDH_AT_OnCheck(self)
 		else
 			main.Dialog:AlertShow(L.ONLY_FOR_AURA_CD_TOTEM);
 		end
+	elseif self == main.TalentButtonList[1] or self == main.TalentButtonList[2] or self == main.TalentButtonList[3] or self == main.TalentButtonList[4] or self == main.TalentButtonList[5] then
+		for _, cb in ipairs(main.TalentButtonList) do
+			cb:SetChecked(cb == self)
+		end
+
 	end
 end
 
@@ -1772,7 +1777,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 	local cacheTraits = {}
 	local unusedTracker = 0
 	local traits
-	local useAtlas = false --select(4, GetBuildInfo()) >= 100000
+	local useAtlas = select(4, GetBuildInfo()) >= 100000
 
 	-- Tracker 목록 생성 및 트랜짓이 없는 않는 트래커 확인
 	traitList[#traitList+1] = {DDM_TRACKER_ALL, L.ALL_LIST, nil, 0}
@@ -2946,6 +2951,7 @@ end
 function HDH_AT_ConfigFrameMixin:UpdateFrame()
 	local F = self.F
 	local ddm = F.DD_TRAIT
+	local currentSpec = HDH_AT_UTIL.GetSpecialization()
 	local talentID = select(1, HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))
 	local traitID = talentID and HDH_AT_UTIL.GetLastSelectedSavedConfigID(talentID)
 	local traitName = traitID and UTIL.GetTraitsName(traitID)
@@ -2977,6 +2983,27 @@ function HDH_AT_ConfigFrameMixin:UpdateFrame()
 		self:ChangeBody(BODY_TRACKER_NEW)
 	end
 	LoadDB(nil, self.F.LATEST_SPELL.CB_AUTO_POPUP)
+
+	local id, name, _, icon, lastIdx
+	for i=1, #self.TalentButtonList do
+		id, name, _, icon = HDH_AT_UTIL.GetSpecializationInfo(i)
+		if string.len(name or "") > 0 then
+			self.TalentButtonList[i].Name:SetText(name)
+			self.TalentButtonList[i].Icon:SetTexture(icon)
+			self.TalentButtonList[i]:Show()
+			self.TalentButtonList[i]:SetValue(id)
+			lastIdx = i
+		else
+			if lastIdx then
+				self.TalentButtonList[i]:SetUnassigned()
+				lastIdx = nil
+				self.TalentButtonList[i]:Show()
+			else
+				self.TalentButtonList[i]:Hide()
+			end
+		end
+		self.TalentButtonList[i]:SetChecked(i == currentSpec)
+	end
 end
 
 function HDH_AT_ConfigFrameMixin:UpdateAbleConfigs(mode)
@@ -3201,7 +3228,6 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	--------------------------------------------------------------------------------------------------------------------------------------------------
 	-- END : DETAIL_ETC_TAB
 	--------------------------------------------------------------------------------------------------------------------------------------------------
-
 	self.F.BODY.CONFIG_DETAIL.BTN_SAVE = _G[self:GetName().."BodyDetailConfigBottomButtonApply"]
 	self.F.BODY.CONFIG_DETAIL.BTN_CLOSE = _G[self:GetName().."BodyDetailConfigBottomButtonClose"]
 
@@ -3276,7 +3302,6 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	F.BTN_PREV_NEXT.BtnPrev:SetScript("OnClick", HDH_AT_OnClick_Button)
 	F.BTN_PREV_NEXT.BtnNext:SetScript("OnClick", HDH_AT_OnClick_Button)
 	
-
 	HDH_AT_DropDown_Init(F.DD_TRACKER_TYPE, DDP_TRACKER_LIST, HDH_AT_OnSelected_Dropdown)
 	HDH_AT_DropDown_Init(F.DD_TRACKER_UNIT, DDP_AURA_UNIT_LIST, HDH_AT_OnSelected_Dropdown)
 	HDH_AT_DropDown_Init(F.DD_TRACKER_AURA_FILTER, DDP_AURA_FILTER_LIST, HDH_AT_OnSelected_Dropdown)
@@ -3315,7 +3340,6 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 
 	-- FONT NAME
-	
 	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.DROPDOWN,       L.FONT_LOCATION,         "ui.%s.font.name_location")
 	HDH_AT_DropDown_Init(comp, DDP_FONT_NAME_LOC_LIST, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[4].content, COMP_TYPE.COLOR_PICKER, L.FONT_ON_COLOR,          "ui.%s.font.name_color")
@@ -3375,14 +3399,11 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:Init(0, 0, 1)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SLIDER,     L.INACTIVED_ICON_ALPHA,       "ui.%s.icon.off_alpha")
 	comp:Init(0, 0, 1)
-	-- comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SLIDER,     L.ACTIVED_ICON_BORDER_COLOR,       "ui.%s.icon.border_size")
-	-- comp:Init(0, 0, 10)
+
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,     L.ACTIVED_ICON_BORDER_COLOR,       "ui.%s.icon.active_border_color")
-	
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,       L.ICON_SPARK_COLOR,         "ui.%s.icon.spark_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER, L.COOLDOWN_COLOR,      "ui.%s.icon.cooldown_bg_color")
 
-	
 	HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.BLANK_LINE, ' ')
 	HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SPLIT_LINE, L.ONLY_FOR_CONFIG_OF_AURA_TRACKER)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.USE_DEFAULT_BORDER_COLOR,           "ui.%s.common.default_color")
@@ -3461,6 +3482,13 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp = HDH_AT_CreateOptionComponent(tabUIList[10].content, COMP_TYPE.BUTTON,       L.RESET_ADDON)
 	comp:SetText(L.RESET)
 	self.F.BODY.CONFIG_UI.BTN_RESET = comp
+
+	--- load talent button 
+	self.TalentButtonList = {}
+	-- self.TalentButtonList = {self.Talent1, self.Talent2, self.Talent3, self.Talent4, self.Talent5}
+	for _, btn in ipairs(self.TalentButtonList) do
+		btn:SetScript("OnClick", HDH_AT_OnCheck)
+	end
 end
 
 function HDH_AT_ConfigFrameMixin:SetupCommend()
