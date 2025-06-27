@@ -340,10 +340,6 @@
 							<Offset><AbsDimension x="0" y="0"/></Offset>
 							</Anchor>
 						</Anchors>
-						<Layers>
-							<Layer level="BACKGROUND">
-							</Layer>
-						</Layers>
 						<Frames>
 							<Button name="$parentBtnShowSpellList" inherits="HDH_AT_ButtonTemplate" hidden="false">
 								<Size x="95" y="20" />

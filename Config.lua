@@ -1777,7 +1777,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 	local cacheTraits = {}
 	local unusedTracker = 0
 	local traits
-	local useAtlas = select(4, GetBuildInfo()) >= 100000
+	local useAtlas = false --select(4, GetBuildInfo()) >= 100000
 
 	-- Tracker 목록 생성 및 트랜짓이 없는 않는 트래커 확인
 	traitList[#traitList+1] = {DDM_TRACKER_ALL, L.ALL_LIST, nil, 0}
@@ -1813,6 +1813,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 	end
 
 	F.DD_TRAIT:UseAtlasSize(useAtlas)
+	
 	table.sort(traitList, function(a, b) 
 		if (a[4] < b[4]) then
 			return true
@@ -2984,6 +2985,9 @@ function HDH_AT_ConfigFrameMixin:UpdateFrame()
 	end
 	LoadDB(nil, self.F.LATEST_SPELL.CB_AUTO_POPUP)
 
+
+	
+
 	local id, name, _, icon, lastIdx
 	for i=1, #self.TalentButtonList do
 		id, name, _, icon = HDH_AT_UTIL.GetSpecializationInfo(i)
@@ -3729,7 +3733,7 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 
 	-- if component and option_name then
 	-- 	local bgTexutre = frame:CreateTexture(nil, 'BACKGROUND')
-	-- 	bgTexutre:SetColorTexture(0.15,0.15,0.15,0.5)
+	-- 	bgTexutre:SetColorTexture(1,1,1,0.5)
 	-- 	bgTexutre:SetPoint('TOPLEFT', frame, 'TOPLEFT', 0, 1)
 	-- 	bgTexutre:SetPoint('RIGHT', component, 'RIGHT', 4, 0)
 	-- 	bgTexutre:SetPoint('BOTTOM', frame, 'BOTTOM', 0, -1)

@@ -1423,19 +1423,19 @@
 	</Button>
 
     <Button name="HDH_AT_DropDownTrackerItemTemplate" inherits="HDH_AT_DropDownItemTemplate" virtual="true">
-		<Size x="100" y="30" />
+		<Size x="100" y="40" />
         <Anchors>
             <Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parent" x="0" y="0"/>
             <Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parent" x="0" y="0"/>
         </Anchors>
 		<Layers>
 			<Layer level="BACKGROUND" textureSubLevel="-2">
-				<Texture name="$parentTexture" parentKey="Texture">
+				<Texture name="$parentTexture" parentKey="Texture" alphaMode="ADD" >
                     <Anchors>
-						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2"/>
-						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2"/>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="1" y="-1"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-1" y="1"/>
 					</Anchors>
-					<TexCoords left="0.08" right="0.92" top="0.17" bottom="0.48" /> 
+					<TexCoords left="0.08" right="0.92" top="0.15" bottom="0.60" /> 
 				</Texture>
 			</Layer>
 
@@ -1597,15 +1597,15 @@
         <Size x="134" y="40" />
         <Layers>
             <Layer level="BACKGROUND">
-				<Texture name="$parentTexture" useAtlasSize="true" parentKey="Texture">
+				<Texture name="$parentTexture" useAtlasSize="true" alphaMode="ADD" parentKey="Texture">
                     <!-- <Size><AbsDimension x="111" y="36" /></Size>
 					
                     <TexCoords left="0.1" right=".9" top="0.36" bottom="0.64" /> -->
 					<Anchors>
-						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2"/>
-						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2"/>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="1" y="-1"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-1" y="1"/>
 					</Anchors>
-					<TexCoords left="0.08" right="0.92" top="0.22" bottom="0.61" /> 
+					<TexCoords left="0.08" right="0.92" top="0.35" bottom="0.65" /> 
 				</Texture>
 
                 <Texture name="$parentBg"  parentKey="BG" >
@@ -1631,8 +1631,8 @@
                 <Texture>
                     <Color r="0.1" g="0.1" b="0.1" a="0.3"/>
                     <Anchors>
-                        <Anchor point="TOPLEFT" x="2" y="-2" />
-                        <Anchor point="BOTTOMRIGHT" x="-2" y="2" />
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="1" y="-1"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-1" y="1"/>
                     </Anchors>
                 </Texture>
             </Layer>
