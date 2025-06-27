@@ -3198,6 +3198,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 
 	-- Split power bar layer
 	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[2].content, COMP_TYPE.SPLIT_LINE, L.THIS_IS_ONLY_SPLIT_POWER_BAR)
+	comp.Line:Hide()
 	comp = CreateFrame("Frame", (self.DETAIL_ETC_TAB[2].content:GetName()..'SplitBar'), self.DETAIL_ETC_TAB[2].content, "HDH_AT_SplitBarTemplate")
 	comp:SetSize(230, 30)
 	comp:SetPoint('TOPLEFT', self.DETAIL_ETC_TAB[2].content, 'TOPLEFT', 20, -70)
@@ -3205,7 +3206,8 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR = comp
 
 	-- inner cooldown item layer
-	HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[3].content, COMP_TYPE.SPLIT_LINE, L.COOLDOWN_ITEM_DESC)
+	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[3].content, COMP_TYPE.SPLIT_LINE, L.COOLDOWN_ITEM_DESC)
+	comp.Line:Hide()
 	self.F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_SWITCH = comp
 	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[3].content, COMP_TYPE.EDIT_BOX, L.INNER_COOLDOWN)
 	comp:SetNumeric(true)
@@ -3404,14 +3406,14 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,       L.ICON_SPARK_COLOR,         "ui.%s.icon.spark_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER, L.COOLDOWN_COLOR,      "ui.%s.icon.cooldown_bg_color")
 
-	HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.BLANK_LINE, ' ')
+	-- HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.BLANK_LINE, ' ')
 	HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SPLIT_LINE, L.ONLY_FOR_CONFIG_OF_AURA_TRACKER)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.USE_DEFAULT_BORDER_COLOR,           "ui.%s.common.default_color")
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.CANCEL_BUFF,         "ui.%s.icon.able_buff_cancel")
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
  
-	HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.BLANK_LINE, ' ')
+	-- HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.BLANK_LINE, ' ')
 	HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SPLIT_LINE, L.ONLY_FOR_CONFIG_OF_COOLDOWN_TRACKER)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SWITCH,       L.DISPLAY_GLOBAL_COOLDOWN,         "ui.%s.cooldown.show_global_cooldown")
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
@@ -3628,7 +3630,6 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		frame:SetPoint('TOPLEFT', parent, 'TOPLEFT', MARGIN_X + x, MARGIN_Y + y)
 		frame.text:SetPoint('LEFT', frame, 'LEFT', COMP_MARGIN, 0)
 		frame.text:SetNonSpaceWrap(false)
-		-- frame.text:SetJustifyV('CENTER')
 		frame.text:SetJustifyV('MIDDLE')
 		frame.text:SetText(option_name)
 		frame:SetSize(COMP_WIDTH, COMP_HEIGHT)
@@ -3641,20 +3642,20 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 
 	if component_type == COMP_TYPE.CHECK_BOX then
 		component = CreateFrame("Button", (parent:GetName()..'Button'..parent.row.."_"..parent.col), parent, "HDH_AT_CheckButton2Template")
-		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 18 or 0, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 23 or 0, 0)
 		component:SetScript("OnClick", HDH_AT_OnCheck)
 
 	elseif component_type == COMP_TYPE.BUTTON then
 		component = CreateFrame("Button", (parent:GetName()..'Button'..parent.row.."_"..parent.col), parent, "HDH_AT_ButtonTemplate")
 		component:SetSize(115, 22)
-		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 20 or 0, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 25 or 0, 0)
 		component:SetText(value or 'None')
 		component:SetScript("OnClick", HDH_AT_OnClick_Button)
 	
 	elseif component_type == COMP_TYPE.EDIT_BOX then
 		component = CreateFrame("EditBox", (parent:GetName()..'EditBox'..parent.row.."_"..parent.col), parent, "HDH_AT_EditBoxTemplate")
 		component:SetSize(115, 20)
-		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 20 or 5, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 25 or 5, 0)
 		component:SetText(value or "")
 		component:SetAutoFocus(false) 
 		component:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
@@ -3664,19 +3665,19 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	elseif component_type == COMP_TYPE.DROPDOWN then
 		component = CreateFrame("Button", (parent:GetName()..'DropDown'..parent.row.."_"..parent.col), parent, "HDH_AT_DropDownOptionTemplate")
 		component:SetSize(115, 20)
-		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 20 or 0, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 25 or 0, 0)
 
 	elseif component_type == COMP_TYPE.SLIDER then
 		component = CreateFrame("Slider", (parent:GetName()..'Slider'..parent.row.."_"..parent.col), parent, "HDH_AT_SliderTemplate")
 		component:SetSize(115, 20)
-		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 20 or 0, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 25 or 0, 0)
 		component:SetHandler(HDH_AT_OnChangedSlider)
 		component:Init(10, 0, 100, true, true, 10)
 
 	elseif component_type == COMP_TYPE.COLOR_PICKER then
 		component = CreateFrame("Button", (parent:GetName()..'ColorPicker'..parent.row.."_"..parent.col), parent, "HDH_AT_ColorPickerTemplate")
 		component:SetSize(115, 20)
-		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 20 or 0, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 25 or 0, 0)
 		component:SetHandler(HDH_AT_OnSeletedColor, function(self, text)
 			GetMainFrame().Dialog:AlertShow(L.ERROR_COLOR_CODE:format(UTIL.Trim(text) or " "))
 		end)
@@ -3684,15 +3685,13 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	elseif component_type == COMP_TYPE.PREV_NEXT_BUTTON then
 		component = CreateFrame("Button", (parent:GetName()..'PrevNextButton'..parent.row.."_"..parent.col), parent, "HDH_AT_PrevNextButtonTemplate")
 		component:SetSize(115, 26)
-		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 20 or 0, 0)
-		-- component:SetHandler(HDH_AT_OnSeletedColor)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 25 or 0, 0)
 	
 	elseif component_type == COMP_TYPE.IMAGE_CHECKBUTTON then
 		component = CreateFrame("Button", (parent:GetName()..'ImageCheckButton'..parent.row.."_"..parent.col), parent, "HDH_AT_CheckButtonImageTemplate")
 		component:SetSize(20, 20)
 		component:SetPoint('LEFT', frame, 'RIGHT', 10, 0)
 		component:SetScript("OnClick", HDH_AT_OnCheck)
-		-- component:SetHandler(HDH_AT_OnSeletedColor)
 
 	elseif component_type == COMP_TYPE.EDITBOX_ADD_DEL then
 		component = CreateFrame("Frame", (parent:GetName()..'AddDelEdtibox'..parent.row.."_"..parent.col), parent, "HDH_AT_AddDelEdtiboxTemplate")
@@ -3702,40 +3701,44 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		component.EditBox:SetAutoFocus(false) 
 		component.EditBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
 		component.EditBox:SetScript("OnEnterPressed", function(self) self:ClearFocus() end)
-		-- component:SetHandler(HDH_AT_OnSeletedColor)
 
 	elseif component_type == COMP_TYPE.BLANK_LINE then
 		component = CreateFrame("Frame", (parent:GetName()..'Line'..parent.row.."_"..parent.col), parent, "HDH_AT_BlankLineFrameTemplate")
 		component:SetSize(255, 26)
 		component:SetPoint('LEFT', frame, 'LEFT', 5, 0)
-		-- component:SetPoint('RIGHT', parent, 'RIGHT', -10, 0)
-		-- component:SetHandler(HDH_AT_OnSeletedColor)
 	
 	elseif component_type == COMP_TYPE.SPLIT_LINE then
 		component = CreateFrame("Frame", (parent:GetName()..'Line'..parent.row.."_"..parent.col), parent, "HDH_AT_LineFrameTemplate")
 		component:SetSize(255, 26)
 		component:SetPoint('LEFT', frame, 'LEFT', 5, 0)
-		-- component:SetPoint('RIGHT', parent, 'RIGHT', -10, 0)
-		-- component:SetHandler(HDH_AT_OnSeletedColor)
-		
 		frame.text:ClearAllPoints()
-		frame.text:SetPoint('LEFT', component, 'LEFT', 5, 0)
+		frame.text:SetPoint('LEFT', component, 'LEFT', 0, 0)
 		frame.text:SetPoint('RIGHT', component, 'RIGHT', -5, 0)
-		frame.text:SetJustifyH('CENTER')
+		frame.text:SetJustifyH('LEFT')
+		frame.text:SetFontObject('Font_White_S')
 		
 	elseif component_type == COMP_TYPE.SWITCH then
 		component = CreateFrame("Frame", (parent:GetName()..'Line'..parent.row.."_"..parent.col), parent, "HDH_AT_SwitchFrameTemplate")
 		component:SetSize(115, 20)
-		component:SetPoint('LEFT', frame, 'RIGHT', 20, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', 25, 0)
 	end
 
 	if component_type then
 		DBSync(component, component_type, db_key)
 	end
+
+	-- if component and option_name then
+	-- 	local bgTexutre = frame:CreateTexture(nil, 'BACKGROUND')
+	-- 	bgTexutre:SetColorTexture(0.15,0.15,0.15,0.5)
+	-- 	bgTexutre:SetPoint('TOPLEFT', frame, 'TOPLEFT', 0, 1)
+	-- 	bgTexutre:SetPoint('RIGHT', component, 'RIGHT', 4, 0)
+	-- 	bgTexutre:SetPoint('BOTTOM', frame, 'BOTTOM', 0, -1)
+	-- end
+
 	local w, h = parent:GetParent():GetSize()
 	parent:ClearAllPoints()
-	parent:SetSize(w, -(y - COMP_HEIGHT -20) )
+	parent:SetSize(w, -(y - COMP_HEIGHT -20))
 	parent:SetPoint('TOPLEFT', parent:GetParent(), 'TOPLEFT', 0, 0)
-	-- parent:SetPoint('BOTTOMRIGHT', parent:GetParent(), 'BOTTOMRIGHT', 0, 30)
+
 	return component, label
 end

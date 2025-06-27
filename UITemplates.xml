@@ -2192,13 +2192,13 @@
 	<Frame name="HDH_AT_LineFrameTemplate" virtual="true">
 		<Layers>
 			<Layer level="ARTWORK">
-				<Texture name="$parentLine">
-					<Size y="24" />
+				<Texture name="$parentLine" parentKey="Line">
+					<Size y="1" />
 					<!-- <Color r="0.3" g="0.3" b="0.3" a="0.5"/> -->
-					<Color r="0.3" g="0.3" b="0.3" a="0.3"/>
+					<Color r="1" g="1" b="1" a="0.5"/>
 					<Anchors>
-						<Anchor point="LEFT" x="0" y="0"/>
-						<Anchor point="RIGHT" x="0" y="0"/>
+						<Anchor point="BOTTOMLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
 					</Anchors>
 				</Texture>
 			</Layer>
