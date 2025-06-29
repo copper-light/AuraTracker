@@ -70,7 +70,7 @@
 	</Font>
 
 	<Font name="Font_Gray_XXS" font="Fonts\2002.TTF" virtual="true">
-		<Color r="0.4" g="0.4" b="0.4"/>
+		<Color r="0.3" g="0.3" b="0.3"/>
 		<FontHeight>
 		  <AbsValue val="7"/>
 		</FontHeight>
@@ -2917,7 +2917,7 @@
 				</Scripts>
 				<ThumbTexture name="$parentThumbTexture" parentKey="ThumbTexture">
 					<Size x="5" y="25"/>
-					<Color r="0.4" g="0.4" b="0.4" />
+					<Color r="0.3" g="0.3" b="0.3" />
 				</ThumbTexture>
 			</Slider>
 		</Frames>
