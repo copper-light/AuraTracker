@@ -47,10 +47,32 @@
 		</Shadow>
 	</Font>
 
+	<Font name="Font_Yellow_XXS" font="Fonts\2002.TTF" virtual="true">
+		<Color r="1" g="0.8" b="0"/>
+		<FontHeight>
+		  <AbsValue val="7"/>
+		</FontHeight>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+
 	<Font name="Font_Gray_S" font="Fonts\2002.TTF" virtual="true">
 		<Color r="0.4" g="0.4" b="0.4"/>
 		<FontHeight>
 		  <AbsValue val="11"/>
+		</FontHeight>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+
+	<Font name="Font_Gray_XXS" font="Fonts\2002.TTF" virtual="true">
+		<Color r="0.4" g="0.4" b="0.4"/>
+		<FontHeight>
+		  <AbsValue val="7"/>
 		</FontHeight>
 		<Shadow>
 			<Offset x="1" y="-1"/>
@@ -90,7 +112,7 @@
 		</Shadow>
 	</Font>
 
-	<Font name="Font_White_SS" font="Fonts\2002.TTF" virtual="true">
+	<Font name="Font_White_XS" font="Fonts\2002.TTF" virtual="true">
 		<Color r="0.7" g="0.7" b="0.7"/>
 		<FontHeight>
 		  <AbsValue val="9"/>
@@ -100,7 +122,7 @@
 		</Shadow>
 	</Font>
 
-	<Font name="Font_White_XS" font="Fonts\2002.TTF" virtual="true">
+	<Font name="Font_White_XXS" font="Fonts\2002.TTF" virtual="true">
 		<Color r="0.9" g="0.9" b="0.9"/>
 		<FontHeight>
 		  <AbsValue val="7"/>
@@ -510,7 +532,7 @@
 					</Anchors>
 				</Texture>
 
-				<FontString parentKey="Tracker" inherits="Font_White_SS" maxLines="1" justifyH="RIGHT" text="">
+				<FontString parentKey="Tracker" inherits="Font_White_XS" maxLines="1" justifyH="RIGHT" text="">
 					<Anchors>
 						<Anchor point="TOPLEFT" x="5" y="-12"/>
 						<Anchor point="BOTTOMRIGHT" x="-10" y="0"/>
@@ -1597,15 +1619,19 @@
         <Size x="134" y="40" />
         <Layers>
             <Layer level="BACKGROUND">
-				<Texture name="$parentTexture" useAtlasSize="true" alphaMode="ADD" parentKey="Texture">
+				<Texture name="$parentTexture" useAtlasSize="true" parentKey="Texture">
                     <!-- <Size><AbsDimension x="111" y="36" /></Size>
 					
                     <TexCoords left="0.1" right=".9" top="0.36" bottom="0.64" /> -->
+					<!-- <Size x="60" y="40"/> -->
 					<Anchors>
 						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="1" y="-1"/>
 						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-1" y="1"/>
+						<!-- <Anchor point="LEFT" relativePoint="LEFT" x="1" y="0"/> -->
 					</Anchors>
+					<!-- <TexCoords left="0.08" right="0.92" top="0.25" bottom="0.75" />  -->
 					<TexCoords left="0.08" right="0.92" top="0.35" bottom="0.65" /> 
+					<!-- <TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" />  -->
 				</Texture>
 
                 <Texture name="$parentBg"  parentKey="BG" >
@@ -1654,6 +1680,7 @@
 				_G[self:GetName().."Text"]:SetPoint("LEFT", _G[self:GetName().."Icon"], "RIGHT", 0, 0)
 				_G[self:GetName().."Text"]:SetJustifyH("CENTER") -->
 				<!-- _G[self:GetName().."Text"]:SetFontObject("Font_Yellow_M") -->
+				self.Texture:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 0))
 			</OnLoad>
 			<OnShow>
 				<!-- if self.Icon:GetTexture() then
@@ -1744,8 +1771,8 @@
                 <Texture name="$parentBg">
 					<Color r="0.1" g="0.1" b="0.1" a="0.5" />
                     <Anchors>
-                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="0"/>
-						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="0"/>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="1" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-1" y="0"/>
                     </Anchors>
                 </Texture>
             </Layer>
@@ -2391,14 +2418,14 @@
 					</Anchors>
 				</FontString>
 
-				<FontString parentKey="ID" inherits="Font_White_SS" text="주문아이디" justifyH="LEFT">
+				<FontString parentKey="ID" inherits="Font_White_XS" text="주문아이디" justifyH="LEFT">
 					<Size x="50" y="10" />
 					<Anchors>
 						<Anchor point="TOPLEFT" relativePoint="RIGHT" relativeTo="$parentIcon" x="5" y="0"/>
 					</Anchors>
 				</FontString>
 
-				<FontString parentKey="Type" inherits="Font_White_SS" text="주문유형" justifyH="RIGHT">
+				<FontString parentKey="Type" inherits="Font_White_XS" text="주문유형" justifyH="RIGHT">
 					<Size x="20" y="10" />
 					<Anchors>
 						<Anchor point="TOPLEFT" relativePoint="RIGHT" relativeTo="$parentIcon" x="0" y="0"/>
@@ -2834,4 +2861,70 @@
 		</Scripts>
 	</Frame>
 
+	<ScrollFrame name="HDH_AT_ScrollFrameTemplate" inherits="UIPanelScrollFrameCodeTemplate" virtual="true" hidden="false">
+		<Size x="120" />
+		<Frames>
+			<Slider parentKey="ScrollBar"  hidden="false">
+				<Size x="16" y="0"/>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="3" y="-12"/>
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="3" y="14"/>
+				</Anchors>
+				<Layers>
+					<Layer>
+						<Texture parentKey="Background" hidden="true">
+							<Size x="2"/>
+							<Color r="0.4" g="0.4" b="0.4" a="0.4"/>
+							<Anchors>
+								<Anchor point="TOP" relativePoint="TOP" x="0" y="0"/>
+								<Anchor point="BOTTOM" relativePoint="BOTTOM" x="0" y="0" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentScrollUpButton" text="▲" parentKey="ScrollUpButton">
+						<Size x="10" y="12"/>
+						<Anchors>
+							<Anchor point="BOTTOM" relativePoint="TOP"/>
+						</Anchors>
+						<Scripts>
+							<OnClick function="UIPanelScrollBarScrollUpButton_OnClick"/>
+						</Scripts>
+						<NormalFont style="Font_Gray_XXS"/>
+						<HighlightFont style="Font_Yellow_XXS"/>
+						<DisabledFont style="Font_Gray_XXS"/>
+					</Button>
+					<Button name="$parentScrollDownButton" text="▼" parentKey="ScrollDownButton">
+						<Size x="10" y="12"/>
+						<Anchors>
+							<Anchor point="TOP" relativePoint="BOTTOM" />
+						</Anchors>
+						<Scripts>
+							<OnClick function="UIPanelScrollBarScrollDownButton_OnClick"/>
+						</Scripts>
+						<NormalFont style="Font_Gray_XXS"/>
+						<HighlightFont style="Font_Yellow_XXS"/>
+						<DisabledFont style="Font_Gray_XXS"/>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnValueChanged function="UIPanelScrollBar_OnValueChanged"/>
+					<OnEnter>self.on_cursor = true self.Background:Show()</OnEnter>
+					<OnLeave>self.on_cursor = false if not self.Dragging then self.Background:Hide() end</OnLeave>
+					<OnMouseDown>self.Dragging = true </OnMouseDown>
+					<OnMouseUp>self.Dragging = false if not self.on_cursor then self.Background:Hide() end</OnMouseUp>
+				</Scripts>
+				<ThumbTexture name="$parentThumbTexture" parentKey="ThumbTexture">
+					<Size x="5" y="25"/>
+					<Color r="0.4" g="0.4" b="0.4" />
+				</ThumbTexture>
+			</Slider>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self.scrollBarHideable = true
+			</OnLoad>
+		</Scripts>
+	</ScrollFrame>
 </Ui> 

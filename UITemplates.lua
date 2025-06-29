@@ -506,12 +506,16 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
                 local t = _G[itemFrame:GetName().."Texture"]
                 if frame.useAtlasSize then
                     t:SetAtlas(texture)
+                    t:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 1))
+                elseif frame.useFullSizeTexture then
+                    t:SetTexture(texture) 
                 else
                     t:SetTexture(texture) 
                     t:ClearAllPoints()
-                    t:SetPoint("LEFT", itemFrame,"LEFT", 4, 0)
-                    t:SetSize(itemFrame:GetHeight()-8, itemFrame:GetHeight()-8)
+                    t:SetPoint("LEFT", itemFrame,"LEFT", 1, 0)
+                    t:SetSize(itemFrame:GetHeight()-2, itemFrame:GetHeight()-2)
                     t:SetTexCoord(0.1,0.9,0.1,0.9)
+	                t:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 0))
                 end
             end
             

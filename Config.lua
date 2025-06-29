@@ -1900,7 +1900,7 @@ function HDH_AT_ConfigFrameMixin:GetElementFrame(listFrame, trackerId, index)
 		end)
 		if index == 1 then row:SetPoint("TOPLEFT",listFrame,"TOPLEFT") row:SetPoint("TOPLEFT",listFrame,"TOPLEFT")
 					  else row:SetPoint("TOPLEFT",listFrame,"TOPLEFT",0,(-row:GetHeight()*(index-1))) end
-		row:SetWidth(listFrame:GetParent():GetWidth())
+		row:SetWidth(listFrame:GetParent():GetWidth()-10)
 		row:Hide() -- 기본이 hide 중요!
 		row:SetScript('OnDragStart', HDH_AT_OP_OnDragStartRow)
 		row:SetScript('OnDragStop', HDH_AT_OP_OnDragStopRow)
@@ -2556,7 +2556,7 @@ function HDH_AT_ConfigFrameMixin:AppendUITab(tabData, tabFrame, bodyFrame)
 			ret[tabButtonIdx] = component
 		end
 		component:SetPoint('TOPLEFT', tabFrame, 'TOPLEFT', 1, -(component:GetHeight() * (idx -1)))
-		component:SetPoint('RIGHT', tabFrame, 'RIGHT', -20, 0)
+		component:SetPoint('RIGHT', tabFrame, 'RIGHT', -12, 0)
 		component:SetText(data.name)
 	end
 	
@@ -3437,7 +3437,9 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SLIDER,       L.HEIGHT_SIZE,           "ui.%s.bar.height")
 	comp:Init(0, 10, 300, true, true, 20)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.DROPDOWN,       L.BAR_TEXTURE,         "ui.%s.bar.texture")
+	comp.useFullSizeTexture = true
 	HDH_AT_DropDown_Init(comp, DDP_BAR_TEXTURE_LIST, HDH_AT_OnSelected_Dropdown, nil, "HDH_AT_DropDownOptionTextureItemTemplate")
+
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.DROPDOWN,       L.LOCATION_BAR,         "ui.%s.bar.location")
 	HDH_AT_DropDown_Init(comp, DDP_BAR_LOC_LIST, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.DROPDOWN,       L.ANIMATION_DIDRECTION,         "ui.%s.bar.cooldown_progress")
@@ -3603,7 +3605,7 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	local MARGIN_X = 5
 	local MARGIN_Y = -10
 	local COMP_HEIGHT = 25
-	local COMP_WIDTH = parent:GetParent():GetWidth() - 180
+	local COMP_WIDTH = parent:GetParent():GetWidth() - 170
 	local COMP_MARGIN = 10
 	local start_x = 0
 

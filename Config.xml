@@ -87,7 +87,7 @@
                 </Anchors>
             </Button>
 
-			<ScrollFrame name="$parentTrackerSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate">
+			<ScrollFrame name="$parentTrackerSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate">
 				<Size x="120" />
 				<Anchors>
 					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentDropDownTraits" x="0" y="-1" />
@@ -95,25 +95,6 @@
 					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parentDropDownTraits" x="3" y="0" />
 					<Anchor point="BOTTOM" relativePoint="BOTTOM" x="0" y="0" />
 				</Anchors>
-				<Frames>
-					<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="true">
-						<Layers>
-							<Layer level="BACKGROUND">
-								<Texture>
-									<Color r="0" g="0" b="0" a="0.3"/>
-									<Anchors>
-										<Anchor point="TOPLEFT" x="-1" y="17" />
-										<Anchor point="BOTTOMRIGHT" x="1" y="-16" />
-									</Anchors>
-								</Texture>
-							</Layer>
-						</Layers>
-						<Anchors>
-							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="-16" y="-18"/>
-							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="-16" y="16"/>
-						</Anchors>
-					</Slider>
-				</Frames>
 
 				<ScrollChild>
 					<Frame name="$parentContents" hidden="false">
@@ -149,10 +130,14 @@
 						</Frames>
 					</Frame>
 				</ScrollChild>
+				
 				<Scripts>
-					<OnShow>
+					<OnLoad>
+						self.ScrollBar:ClearAllPoints()
+						self.ScrollBar:SetPoint("TOPLEFT", -10, -2)
+						self.ScrollBar:SetPoint("BOTTOMLEFT", -10, 4)
 						self.scrollBarHideable = true
-					</OnShow>
+					</OnLoad>
 				</Scripts>
 			</ScrollFrame>
 
@@ -264,25 +249,16 @@
 								</Frames>
 							</Frame>
 
-							<ScrollFrame name="$parentTraitsSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+							<ScrollFrame name="$parentTraitsSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate, HDH_AT_BackgroundTemplate">
 								<Size><AbsDimension x="135" y="200"/></Size>
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLabel" x="0" y="0" />
 									<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$parentBottom" x="0" y="0" />
 								</Anchors>
 
-								<Frames>
-									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-19" y="-20"/>
-											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-19" y="20"/>
-										</Anchors>
-									</Slider>
-								</Frames>
-
 								<ScrollChild>
 									<Frame name="$parentContents" hidden="false">
-										<Size><AbsDimension x="135" y="1"/></Size>
+										<Size><AbsDimension x="148" y="1"/></Size>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="" x="0" y="0" />
@@ -301,21 +277,12 @@
 								</ScrollChild>
 							</ScrollFrame>
 
-							<ScrollFrame name="$parentConfigSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+							<ScrollFrame name="$parentConfigSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate, HDH_AT_BackgroundTemplate">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentTop" x="0" y="0" />
 									<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parentTop" x="0" y="0" />
 									<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$parentBottom" x="0" y="0" />
 								</Anchors>
-
-								<Frames>
-									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
-											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
-										</Anchors>
-									</Slider>
-								</Frames>
 
 								<ScrollChild>
 									<Frame name="$parentContents" hidden="false">
@@ -362,32 +329,17 @@
 								</Scripts>
 							</Button>
 
-							<ScrollFrame name="$parentSF" inherits="UIPanelScrollFrameTemplate">
+							<ScrollFrame name="$parentSF" inherits="HDH_AT_ScrollFrameTemplate">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
 										<Offset><AbsDimension x="10" y="-30"/></Offset>
 									</Anchor>
 									<Anchor point="BOTTOMRIGHT"  relativePoint="BOTTOMRIGHT">
-										<Offset><AbsDimension x="-25" y="30"/></Offset>
+										<Offset><AbsDimension x="0" y="30"/></Offset>
 									</Anchor>
 								</Anchors>
 								
 								<Layers>
-									<Layer level="BACKGROUND">
-										<Texture>
-											<Size><AbsDimension x="0" y="0"/></Size>
-											<Color r="0" g="0" b="0" a="0.2"/>
-											<Anchors>
-												<Anchor point="TOPLEFT" relativeTo="$parentScrollBar" relativePoint="TOPLEFT">
-													<Offset><AbsDimension x="0" y="0"/></Offset>
-												</Anchor>
-												<Anchor point="BOTTOMRIGHT"  relativeTo="$parentScrollBar" relativePoint="BOTTOMRIGHT">
-													<Offset><AbsDimension x="0" y="0"/></Offset>
-												</Anchor>
-											</Anchors>
-										</Texture>
-									</Layer>
-									
 									<Layer level="ARTWORK">
 										<FontString name="$parentText1" inherits="Font_Yellow_S" justifyH ="LEFT" text="No">
 											<Size><AbsDimension x="20" y="25"/></Size>
@@ -401,7 +353,7 @@
 											<Size><AbsDimension x="100" y="25"/></Size>
 											<Anchors>
 												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText1">
-													<Offset><AbsDimension x="40" y="0"/></Offset>
+													<Offset><AbsDimension x="35" y="0"/></Offset>
 												</Anchor>
 											</Anchors>
 										</FontString>
@@ -417,7 +369,7 @@
 										<FontString name="$parentText4" parentKey="LabelAlways" inherits="Font_Yellow_S" justifyH ="CENTER" text="항상표시" hidden="false">
 											<Size><AbsDimension x="50" y="25"/></Size>
 											<Anchors>
-												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText3" x="-40" y="0" />
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText3" x="-18" y="0" />
 											</Anchors>	
 										</FontString>
 
@@ -442,7 +394,7 @@
 											</Size>
 											<Anchors>
 												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent" x="0" y="-1"/>
-												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-85" y="-1"/>
+												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-100" y="-1"/>
 											</Anchors>
 										</FontString>
 
@@ -496,6 +448,7 @@
 											HDH_AT_L.ADDON_TIP3
 										}
 										self.tipIdx = math.floor(random() * 100)
+										self.scrollBarHideable = true
 									</OnLoad>
 
 									<OnShow>
@@ -646,25 +599,16 @@
 								</Frames>
 							</Frame>
 
-							<ScrollFrame name="$parentMenuSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+							<ScrollFrame name="$parentMenuSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate, HDH_AT_BackgroundTemplate">
 								<Size><AbsDimension x="110" y="35"/></Size>
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentTop" x="0" y="0" />
 									<Anchor point="BOTTOM" relativePoint="TOP"  relativeTo="$parentBottom" x="0" y="0" />
 								</Anchors>
 
-								<Frames>
-									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-19" y="-18"/>
-											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-19" y="18"/>
-										</Anchors>
-									</Slider>
-								</Frames>
-
 								<ScrollChild>
 									<Frame name="$parentContents" hidden="false">
-										<Size><AbsDimension x="110" y="200"/></Size>
+										<Size><AbsDimension x="113" y="200"/></Size>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
@@ -675,20 +619,11 @@
 								</ScrollChild>
 							</ScrollFrame>
 
-							<ScrollFrame name="$parentConfigSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+							<ScrollFrame name="$parentConfigSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate, HDH_AT_BackgroundTemplate">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentMenuSF" x="0" y="0" />
 									<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" relativeTo="$parentBottom"  x="0" y="0" />
 								</Anchors>
-
-								<Frames>
-									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
-											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
-										</Anchors>
-									</Slider>
-								</Frames>
 
 								<ScrollChild>
 									<Frame name="$parentContents" hidden="false">
@@ -924,20 +859,11 @@
 								</Anchors>
 
 								<Frames>
-									<ScrollFrame name="$parentConfigSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate">
+									<ScrollFrame name="$parentConfigSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate">
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent"  x="0" y="0" />
 										</Anchors>
-
-										<Frames>
-											<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-												<Anchors>
-													<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
-													<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
-												</Anchors>
-											</Slider>
-										</Frames>
 
 										<ScrollChild>
 											<Frame name="$parentContents" hidden="false">
@@ -1097,20 +1023,12 @@
 									<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT"  relativeTo="$parentBottom" x="0" y="0" />
 								</Anchors>
 								<Frames>
-									<ScrollFrame name="$parentMenuSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+									<ScrollFrame name="$parentMenuSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate, HDH_AT_BackgroundTemplate">
 										<Size><AbsDimension x="110" y="35"/></Size>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="0" />
 											<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parent" x="0" y="0" />
 										</Anchors>
-										<Frames>
-											<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-												<Anchors>
-													<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
-													<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
-												</Anchors>
-											</Slider>
-										</Frames>
 
 										<ScrollChild>
 											<Frame name="$parentContents" hidden="false">
@@ -1126,19 +1044,11 @@
 
 									</ScrollFrame>
 
-									<ScrollFrame name="$parentSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+									<ScrollFrame name="$parentSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate, HDH_AT_BackgroundTemplate">
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentMenuSF" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="0" y="0" />
 										</Anchors>
-										<Frames>
-											<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-												<Anchors>
-													<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
-													<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
-												</Anchors>
-											</Slider>
-										</Frames>
 
 										<ScrollChild>
 											<Frame name="$parentContents" hidden="false">
@@ -1294,25 +1204,16 @@
 							</Layer>
 						</Layers>
 						<Frames>
-							<ScrollFrame name="$parentSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate">
+							<ScrollFrame name="$parentSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate">
 								<Size><AbsDimension x="150" y="200"/></Size>
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="-1" />
 									<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parent" x="0" y="25" />
 								</Anchors>
-
-								<Frames>
-									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-19" y="-20"/>
-											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-19" y="20"/>
-										</Anchors>
-									</Slider>
-								</Frames>
-
+								
 								<ScrollChild>
 									<Frame name="$parentContents" hidden="false">
-										<Size><AbsDimension x="150" y="1"/></Size>
+										<Size><AbsDimension x="160" y="1"/></Size>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="5" />
