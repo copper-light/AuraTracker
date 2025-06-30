@@ -3468,7 +3468,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:SetText(L.APPLY_SHARE_STRING)
 	self.F.BODY.CONFIG_UI.BTN_IMPORT_STRING = comp
 	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.EDIT_BOX)
-	comp:SetSize(250,26)
+	comp:SetSize(263,26)
 	comp:SetFontObject("Font_White_XS")
 	comp:SetMaxLetters(0)
 	self.F.BODY.CONFIG_UI.ED_IMPORT_STRING = comp
@@ -3479,7 +3479,8 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:SetText(L.CREATE_SHARE_STRING)
 	self.F.BODY.CONFIG_UI.BTN_EXPORT_STRING = comp
 	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX)
-	comp:SetSize(250,26)
+	comp:SetSize(263,26)
+	comp.Desc:SetText("")
 	comp:SetMaxLetters(0)
 	comp:SetFontObject("Font_White_XS")
 	self.F.BODY.CONFIG_UI.ED_EXPORT_STRING = comp
