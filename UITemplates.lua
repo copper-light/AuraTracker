@@ -15,7 +15,6 @@ end
 ---------------------------
 ---------------------------
 
-
 HDH_AT_UITabBtnMixin = {}
 function HDH_AT_UITabBtnMixin:SetActivate(bool)
     if bool then
@@ -1408,6 +1407,18 @@ function HDH_AT_TalentCheckButtonMixin:SetChecked(bool)
         self.Name:Hide()
         self.Active:Hide()
     end
+end
+
+function HDH_AT_TalentCheckButtonMixin:SetActivate(bool)
+    self:SetChecked(bool)
+end
+
+function HDH_AT_TalentCheckButtonMixin:SetText(text)
+    self.Name:SetText(text)
+end
+
+function HDH_AT_TalentCheckButtonMixin:GetText()
+    return self.Name:GetText()
 end
 
 function HDH_AT_TalentCheckButtonMixin:SetValue(id)

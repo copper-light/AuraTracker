@@ -394,7 +394,7 @@
 											</Size>
 											<Anchors>
 												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent" x="0" y="-1"/>
-												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-105" y="-1"/>
+												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-110" y="-1"/>
 											</Anchors>
 										</FontString>
 
@@ -1147,11 +1147,46 @@
 				<Scripts>
 					<OnClick>
 						HDH_AT_MinimumFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
-						HDH_AT_MinimumFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
+						HDH_AT_MinimumFrame:SetPoint("RIGHT", self, "LEFT", -4, 0);
 						HDH_AT_MinimumFrame:Show(); self:GetParent():Hide();
 					</OnClick>
 				</Scripts>
 			</Button>
+
+			<Frame name="parentLogo" inherits="HDH_AT_ConfigFrameTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnMinMaxFrame" x="-4" y="0" />
+					<!-- <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="4" /> -->
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBG">
+							<Color r="0" g="0" b="0" a="0.5" />
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" />
+								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY">
+						<Texture name="$parentIcon" file="Interface\Addons\HDH_AuraTracker\Texture\logo">
+							<Size><AbsDimension x="18" y="18"/></Size>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+							<TexCoords left="0.05" right="0.95" top="0.05" bottom="0.95"/> 
+						</Texture>
+
+						<!-- <FontString name="$parentText" inherits="GAMEFONTNORMAL" justifyH ="LEFT" justifyV="MIDDLE" text="Auratracker">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT" x="4" y="0" relativeTo="$parentIcon"/>
+								<Anchor point="RIGHT" relativePoint="RIGHT" x="-2" y="0" relativeTo="$parent"/>
+							</Anchors>
+						</FontString> -->
+					</Layer>
+				</Layers>
+			</Frame>
 
 			<Frame name="$parentLatestSpell" parentKey="LatestSpell" inherits="HDH_AT_ConfigFrameTemplate"  movable="true" enableMouse="true" hidden="true">
 				<Size x="150"/>
@@ -1284,7 +1319,7 @@
     </Frame>
 
 	<Frame name="HDH_AT_MinimumFrame" movable="true" toplevel="true" parent="UIParent" frameStrata="HIGH" hidden="true" enableMouse="true" inherits="HDH_AT_ConfigFrameTemplate">
-		<Size><AbsDimension x="175" y="30"/></Size>
+		<Size><AbsDimension x="165" y="20"/></Size>
 		<Anchors>
 			<Anchor point="CENTER" x="0" y="0"/>
 		</Anchors>
@@ -1301,45 +1336,47 @@
 			<Layer level="OVERLAY">
 
 				<Texture name="$parentIcon" file="Interface\Addons\HDH_AuraTracker\Texture\logo">
-					<Size><AbsDimension x="24" y="24"/></Size>
+					<Size><AbsDimension x="18" y="18"/></Size>
 					<Anchors>
-						<Anchor point="LEFT" relativePoint="LEFT" x="2" relativeTo="$parent" />
+						<Anchor point="LEFT" relativePoint="LEFT" x="0" relativeTo="$parent" />
 					</Anchors>
+					<TexCoords left="0.05" right="0.95" top="0.05" bottom="0.95"/> 
 				</Texture>
 
-				<FontString name="$parentText" inherits="GAMEFONTNORMAL" justifyH ="CENTER" justifyV="CENTER" text="Auratracking :D">
+				<FontString name="$parentText" inherits="GAMEFONTNORMAL" justifyH ="LEFT" justifyV="MIDDLE" text="Auratracking :D">
 					<Anchors>
-						<Anchor point="LEFT" relativePoint="RIGHT" x="2" y="0" relativeTo="$parentIcon"/>
+						<Anchor point="LEFT" relativePoint="RIGHT" x="4" y="0" relativeTo="$parentIcon"/>
 						<Anchor point="RIGHT" relativePoint="RIGHT" x="-2" y="0" relativeTo="$parent"/>
 					</Anchors>
 				</FontString>
 			</Layer>
 		</Layers>
 		<Frames>
-			<Button name="$parentBtnClose" text="X" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
+		
+			<Button name="$parentBtnMinMaxFrame" text="▼" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
 				<Size><AbsDimension x="25" y="20"/></Size>
 				<Anchors>
-					<Anchor point="TOPRIGHT" x="0" y="24" />
+					<Anchor point="LEFT" relativePoint="RIGHT" x="4" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
+						HDH_AT_ConfigFrame:SetPoint("TOPRIGHT", self:GetParent().Close,"BOTTOMRIGHT", 0, -4);
+						HDH_AT_ConfigFrame:Show(); self:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentBtnClose" parentKey="Close" text="X" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
+				<Size><AbsDimension x="25" y="20"/></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentBtnMinMaxFrame" relativePoint="RIGHT" x="4" y="0" />
 				</Anchors>
 				<Scripts>
 					<OnClick>
 						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
 						HDH_AT_ConfigFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
 						self:GetParent():Hide(); 
-					</OnClick>
-				</Scripts>
-			</Button>
-
-			<Button name="$parentBtnMinMaxFrame" text="▼" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
-				<Size><AbsDimension x="25" y="20"/></Size>
-				<Anchors>
-					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnClose" x="-4" y="0" />
-				</Anchors>
-				<Scripts>
-					<OnClick>
-						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
-						HDH_AT_ConfigFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
-						HDH_AT_ConfigFrame:Show(); self:GetParent():Hide();
 					</OnClick>
 				</Scripts>
 			</Button>
