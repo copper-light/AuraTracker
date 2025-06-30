@@ -47,8 +47,9 @@ do -- 애드온 버전 호환성
 		end
 
 		HDH_AT_UTIL.GetConfigIDsBySpecID = function(search_specID)
-			ret = {}
-			search_index = nil
+			local ret = {}
+			local search_index = nil
+			local specIndex, id, name 
 			for i = 1, HDH_AT_UTIL.MAX_TALENT_TIERS do
 				id, name = HDH_AT_UTIL.GetSpecializationInfo(i)
 				if id and id == search_specID then
