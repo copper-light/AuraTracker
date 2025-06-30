@@ -27,7 +27,7 @@ end
 
 do
 
-    if select(4, GetBuildInfo()) <= 49999 then -- 대격변
+    if select(4, GetBuildInfo()) <= 59999 then -- 대격변
         
         hooksecurefunc(GameTooltip, "SetUnitBuff", function(self, ...)
             if not HDH_AT_DB.show_tooltip_id then return end
@@ -93,6 +93,15 @@ do
             if id then addLine(self, id) end
         end)
 
+        GameTooltip:HookScript('OnTooltipSetSpell', function(self, ...)
+            if not HDH_AT_DB.show_tooltip_id then return end
+            local id = select(2, self:GetSpell())
+            if not id then
+                id = select(3, self:GetItem())
+            end
+
+            if id then addLine(self, id) end
+        end)
     else
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.UnitAura, OnTooltipSetId)
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, OnTooltipSetId)

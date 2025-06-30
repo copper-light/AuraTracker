@@ -1,7 +1,7 @@
 local DB = HDH_AT_ConfigDB
 HDH_ENH_MAELSTROM_TRACKER = {}
 
-if select(4, GetBuildInfo()) <= 49999 then -- 대격변
+if select(4, GetBuildInfo()) <= 59999 then -- 대격변
 	HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID = 53817
 else
 	HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID = 344179

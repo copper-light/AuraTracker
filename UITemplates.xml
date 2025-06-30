@@ -640,6 +640,43 @@
 		<Anchors>
 			<Anchor point="TOP" relativePoint="BOTTOM" x="0" y="0" />
 		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture>
+					<Size x="1" y="1" />
+					<Color r="0" g="0" b="0" a="0.5"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="1" y="0" />
+						<Anchor point="TOPRIGHT" x="1" y="0" />
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<!-- <NormalTexture/> -->
+		<!-- <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
+		<CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/> -->
+		<Scripts>
+			<!-- <OnClick function="HDH_AT_OnClickBottomTap" /> -->
+		</Scripts>
+	</Button>
+
+	<Button name="HDH_AT_TapTemplate" inherits="PanelTabButtonTemplate" mixin="HDH_AT_BottomTapMixin" virtual="true">
+		<Size x="32" y="32"/>
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" x="0" y="0" />
+		</Anchors>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture>
+					<Size x="1" y="1" />
+					<Color r="0" g="0" b="0" a="0.5"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="1" y="0" />
+						<Anchor point="TOPRIGHT" x="1" y="0" />
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
 		<!-- <NormalTexture/> -->
 		<!-- <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
 		<CheckedTexture file="Interface\Buttons\CheckButtonHilight" alphaMode="ADD"/> -->
@@ -1049,6 +1086,127 @@
 		<HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
 			<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
 		</HighlightTexture>
+	</Button>
+
+	<Button name="HDH_AT_UITabBtnTemplate2" mixin="HDH_AT_BottomTapMixin" virtual="true">
+		<Size><AbsDimension x="90" y="30" /></Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="BG" >
+					<Color r="0" g="0" b="0" a="0.8"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0" />
+						<Anchor point="BOTTOMRIGHT" x="0" y="0" />
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="BORDER">
+				<Texture parentKey="Left" >
+					<Size x="4"/>
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0" />
+						<Anchor point="BOTTOMLEFT" x="0" y="0" />
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Right" >
+					<Size x="4"/>
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="0" y="0" />
+						<Anchor point="BOTTOMRIGHT" x="0" y="0" />
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Middle" >
+					<Size y="4"/>
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" x="0" y="0" />
+						<Anchor point="BOTTOMRIGHT" x="0" y="0" />
+					</Anchors>
+				</Texture>
+
+				<Texture parentKey="LeftActive" >
+					<Size x="4"/>
+					<Color r="1" g="0.8" b="0" a="0.8"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0" />
+						<Anchor point="BOTTOMLEFT" x="0" y="-4" />
+					</Anchors>
+				</Texture>
+				<Texture parentKey="RightActive" >
+					<Size x="4"/>
+					<Color r="1" g="0.8" b="0" a="0.8"/>
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="0" y="0" />
+						<Anchor point="BOTTOMRIGHT" x="0" y="-4" />
+					</Anchors>
+				</Texture>
+				<Texture parentKey="MiddleActive" >
+					<Size y="4"/>
+					<Color r="1" g="0.8" b="0" a="0.8"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" x="0" y="-4" />
+						<Anchor point="BOTTOMRIGHT" x="0" y="-4" />
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="OVERLAY">
+				<Texture name="$parentBgLine1" hidden="true">
+					<Color r="0" g="0" b="0" a="0.5"/>
+					<Size><AbsDimension x="3" y="35" /></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="-2" y="0"/>
+						<Anchor point="BOTTOMLEFT" x="-2" y="0"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentLine2" parentKey="Active1" hidden="true">
+					<Color r="1" g="0.8" b="0" a="0.8"/>
+					<Size><AbsDimension x="5" y="5" /></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="TOPRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+				<Texture alphaMode="ADD" parentKey="Active2"  hidden="true" file="Interface\HELPFRAME\HelpFrameButton-Highlight" >
+					<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="-1" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<ButtonText name="$parentText" parentKey="Text" justifyH="CENTER">
+			<Anchors>
+				<Anchor point="TOPLEFT" x="8" y="0"/>
+				<Anchor point="BOTTOMRIGHT" x="-8" y="0"/>
+			</Anchors>
+		</ButtonText>
+
+		<NormalFont style="Font_Yellow_S"/>
+		<HighlightFont style="Font_Yellow_S"/>
+		<DisabledFont style="Font_White_S"/>
+
+		<NormalTexture>
+			<Color r="0" g="0" b="0" a="0.5"/>
+			<Anchors>
+				<Anchor point="TOPLEFT" x="4" y="0"/>
+				<Anchor point="BOTTOMRIGHT" x="-4" y="0"/>
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
+			<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
+		</HighlightTexture>
+		<DisabledTexture>
+			<Color r="1" g="0.8" b="0" a="0.3"/>
+			<Anchors>
+				<Anchor point="TOPLEFT" x="0" y="-2"/>
+				<Anchor point="BOTTOMRIGHT" x="-1" y="2"/>
+			</Anchors>
+		</DisabledTexture>
 	</Button>
 
 	<Button name="HDH_AT_UITabBtnLabelTemplate" inherits="HDH_AT_UITabBtnTemplate" virtual="true">
@@ -2873,8 +3031,8 @@
 				<Layers>
 					<Layer>
 						<Texture parentKey="Background" hidden="true">
-							<Size x="2"/>
-							<Color r="0.4" g="0.4" b="0.4" a="0.4"/>
+							<Size x="5"/>
+							<Color r="0.4" g="0.4" b="0.4" a="0.2"/>
 							<Anchors>
 								<Anchor point="TOP" relativePoint="TOP" x="0" y="0"/>
 								<Anchor point="BOTTOM" relativePoint="BOTTOM" x="0" y="0" />
@@ -2910,10 +3068,28 @@
 				</Frames>
 				<Scripts>
 					<OnValueChanged function="UIPanelScrollBar_OnValueChanged"/>
-					<OnEnter>self.on_cursor = true self.Background:Show()</OnEnter>
-					<OnLeave>self.on_cursor = false if not self.Dragging then self.Background:Hide() end</OnLeave>
-					<OnMouseDown>self.Dragging = true </OnMouseDown>
-					<OnMouseUp>self.Dragging = false if not self.on_cursor then self.Background:Hide() end</OnMouseUp>
+					<OnEnter>
+						self.on_cursor = true
+						self.Background:Show()
+						self.ThumbTexture:SetColorTexture(1, 0.8, 0.1, 0.65)
+					</OnEnter>
+					<OnLeave>
+						self.on_cursor = false 
+						if not self.Dragging then 
+							self.Background:Hide()
+							self.ThumbTexture:SetColorTexture(0.3, 0.3, 0.3)
+						end
+					</OnLeave>
+					<OnMouseDown>
+						self.Dragging = true
+					</OnMouseDown>
+					<OnMouseUp>
+						self.Dragging = false 
+						if not self.on_cursor then 
+							self.Background:Hide()
+							self.ThumbTexture:SetColorTexture(0.3, 0.3, 0.3)
+						end
+					</OnMouseUp>
 				</Scripts>
 				<ThumbTexture name="$parentThumbTexture" parentKey="ThumbTexture">
 					<Size x="5" y="25"/>
