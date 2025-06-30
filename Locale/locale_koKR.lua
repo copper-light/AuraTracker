@@ -326,3 +326,6 @@ L.ONLY_FOR_AURA_CD_TOTEM = "해당 기능은 |cffff0000버프/디버프|r, |cfff
 
 -- 11.1.7.4
 L.UNASSIGNED = "미할당"
+L.PRIMARY_SPEC = "주 전문화"
+L.SECONDARY_SPEC = "보조 전문화"
+L.COMMON_SPEC = "전문화 공통"

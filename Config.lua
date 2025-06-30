@@ -1831,7 +1831,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 		if name == nil then break end
 		itemValues[#itemValues+1] = {-1, name, icon}
 		itemTemplates[#itemTemplates+1] = "HDH_AT_SplitItemTemplate"
-		itemValues[#itemValues+1] = {id, L.ALWAYS_USE, nil}
+		itemValues[#itemValues+1] = {id, L.COMMON_SPEC , nil}
 		itemTemplates[#itemTemplates+1] = "HDH_AT_CheckButtonItemTemplate"
 		for _, trait in ipairs(self:GetTraits(id)) do
 			itemValues[#itemValues+1] = trait
@@ -3715,7 +3715,7 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	
 	elseif component_type == COMP_TYPE.SPLIT_LINE then
 		component = CreateFrame("Frame", (parent:GetName()..'Line'..parent.row.."_"..parent.col), parent, "HDH_AT_LineFrameTemplate")
-		component:SetSize(255, 26)
+		component:SetSize(270, 26)
 		component:SetPoint('LEFT', frame, 'LEFT', 5, 0)
 		frame.text:ClearAllPoints()
 		frame.text:SetPoint('LEFT', component, 'LEFT', 0, 0)
