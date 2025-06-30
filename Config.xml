@@ -1319,7 +1319,7 @@
     </Frame>
 
 	<Frame name="HDH_AT_MinimumFrame" movable="true" toplevel="true" parent="UIParent" frameStrata="HIGH" hidden="true" enableMouse="true" inherits="HDH_AT_ConfigFrameTemplate">
-		<Size><AbsDimension x="165" y="20"/></Size>
+		<Size><AbsDimension x="155" y="20"/></Size>
 		<Anchors>
 			<Anchor point="CENTER" x="0" y="0"/>
 		</Anchors>
@@ -1343,7 +1343,7 @@
 					<TexCoords left="0.05" right="0.95" top="0.05" bottom="0.95"/> 
 				</Texture>
 
-				<FontString name="$parentText" inherits="GAMEFONTNORMAL" justifyH ="LEFT" justifyV="MIDDLE" text="Auratracking :D">
+				<FontString name="$parentText" inherits="GAMEFONTNORMAL" justifyH ="CENTER" justifyV="MIDDLE" text="Auratracking :D">
 					<Anchors>
 						<Anchor point="LEFT" relativePoint="RIGHT" x="4" y="0" relativeTo="$parentIcon"/>
 						<Anchor point="RIGHT" relativePoint="RIGHT" x="-2" y="0" relativeTo="$parent"/>
