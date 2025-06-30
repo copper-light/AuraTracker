@@ -1,10 +1,10 @@
-﻿## Interface: 40402
+﻿## Interface: 110107, 110200
 ## Title: AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
 ## Version: 11.1.7.5
 ## SavedVariablesPerCharacter: HDH_AT_DB
-## AllowLoadGameType: cata
+## IconTexture: Interface\AddOns\HDH_AuraTracker\Texture\logo.blp
 
 Locale\locale.lua
 Locale\locale_koKR.lua
@@ -25,7 +25,6 @@ Tracker\EssenceTracker.lua
 Tracker\StaggerTracker.lua
 Tracker\EnhancementMaelstrom.lua
 Tracker\HealthTracker.lua
-# Tracker\ShadowTracking.lua
 
 # https://www.wowace.com/projects/libcompress
 Lib\LibCompress\LibStub.lua
@@ -33,3 +32,4 @@ Lib\LibCompress\LibCompress.lua
 Lib\AceSerializer-3.0\AceSerializer-3.0.lua
 Lib\WeakAuraLib\Transmission.lua
 Config.xml
+
