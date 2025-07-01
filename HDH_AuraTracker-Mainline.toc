@@ -1,4 +1,4 @@
-﻿## Interface: 110107, 110200
+## Interface: 110107, 110200
 ## Title: AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
@@ -8,6 +8,7 @@
 
 Locale\locale.lua
 Locale\locale_koKR.lua
+Locale\locale_ruRU.lua
 
 Utils.lua
 UITemplates.xml
@@ -32,4 +33,3 @@ Lib\LibCompress\LibCompress.lua
 Lib\AceSerializer-3.0\AceSerializer-3.0.lua
 Lib\WeakAuraLib\Transmission.lua
 Config.xml
-
