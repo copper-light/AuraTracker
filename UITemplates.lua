@@ -15,7 +15,6 @@ end
 ---------------------------
 ---------------------------
 
-
 HDH_AT_UITabBtnMixin = {}
 function HDH_AT_UITabBtnMixin:SetActivate(bool)
     if bool then
@@ -289,9 +288,7 @@ function HDH_AT_DropDownMixin:GetIndex(value)
     return nil
 end
 
-
 function HDH_AT_DropDownMixin:GetSelectedValue()
-
     if self.multiSelector then
         local listFrame = _G[self:GetName().."List"]
         local items = self.item
@@ -356,7 +353,7 @@ function HDH_AT_DropDownMixin:SelectClear()
                 end
             end
             self.selectedValueCount = 0
-            _G[self:GetName().."Text"]:SetText(string.format(TEXT_DD_MULTI_SELETED, selectedValueCount))
+            _G[self:GetName().."Text"]:SetText(string.format(TEXT_DD_MULTI_SELETED))
         else
             for i, child in ipairs(items) do
                 _G[child:GetName().."On"]:Hide()
@@ -407,7 +404,7 @@ function HDH_AT_DropDownMixin:SetSelectedIndex(idx, show)
     local items = self.item
     show = show or false
 
-    if not multiSelector then
+    if not self.multiSelector then
         if idx <= 0 or idx > #items then return end
         local seletedItemFrame = items[idx]
         for i, child in ipairs(items) do
@@ -461,7 +458,7 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
     template = template or "HDH_AT_DropDownOptionItemTemplate"
     itemValues = itemValues or {}
     frame.always_show_list = always_show_list or false
-    local id, name, texture
+    local id, name, texture, handler
     local totalHeight = 1
 
     if frame.item then
@@ -508,12 +505,16 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
                 local t = _G[itemFrame:GetName().."Texture"]
                 if frame.useAtlasSize then
                     t:SetAtlas(texture)
+                    t:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 1))
+                elseif frame.useFullSizeTexture then
+                    t:SetTexture(texture) 
                 else
                     t:SetTexture(texture) 
                     t:ClearAllPoints()
-                    t:SetPoint("LEFT", itemFrame,"LEFT", 4, 0)
-                    t:SetSize(itemFrame:GetHeight()-8, itemFrame:GetHeight()-8)
+                    t:SetPoint("LEFT", itemFrame,"LEFT", 1, 0)
+                    t:SetSize(itemFrame:GetHeight()-2, itemFrame:GetHeight()-2)
                     t:SetTexCoord(0.1,0.9,0.1,0.9)
+	                t:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 0))
                 end
             end
             
@@ -568,8 +569,8 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
         frame.value = nil
         if multiSelector then
             _G[frame:GetName().."Text"]:SetText(string.format(TEXT_DD_MULTI_SELETED, 0))
-            _G[frame:GetName().."Text"]:SetFontObject("Font_White_S")            
-            
+            _G[frame:GetName().."Text"]:SetFontObject("Font_White_S")
+
         else
             _G[frame:GetName().."Text"]:SetText(L.SELECT)
             _G[frame:GetName().."Text"]:SetFontObject("Font_Yellow_S")
@@ -579,7 +580,6 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
     if not always_show_list then
         listFrame:SetScript("OnShow", function(self)
             table.insert(UISpecialFrames, listFrame:GetName())
-            -- table.insert(UIMenus, listFrame:GetName())
             listFrame:EnableKeyboard(1)
         end)
     end
@@ -607,51 +607,12 @@ function HDH_AT_DropDown_OnClick(self)
 end
 
 function HDH_AT_DropDown_OnLeave(self)
-    -- if not self.always_show_list and not _G[self:GetName().."List"]:IsMouseOver() then
-    --     -- _G[self:GetName().."List"]:Hide()
-    -- end
 end
-
-local function CheckMouseOver(frame) 
-    local children = frame:GetChildren()
-    if #children >= 1 then
-        for _, child in ipairs(children) do
-            if CheckMouseOver(child) then
-                return true
-            end
-            if child:IsMouseOver() then
-                return true
-            end
-        end
-    end
-    return false
-end
-
 
 function HDH_AT_DropDownList_OnLeave(self)
-    -- local parent = self:GetParent()
-    -- if not parent.always_show_list and not self:GetParent():IsMouseOver() then
-    --     local show = CheckMouseOver(self)
-    --     if not show then
-    --         self:Hide()
-    --     end
-    -- end
 end
 
 function HDH_AT_DropDownItem_OnLeave(self)
-    -- local parent = self:GetParent()
-    -- if not parent:GetParent().always_show_list and not parent:IsMouseOver() and not parent:GetParent():IsMouseOver() then
-    --     local hide = true
-    --     for _, child in ipairs(parent:GetParent().item) do
-    --         if child:IsMouseOver() then
-    --             hide = false
-    --             break
-    --         end
-    --     end
-    --     if hide then
-    --         parent:Hide()
-    --     end
-    -- end
 end
 
 
@@ -1417,4 +1378,58 @@ end
 
 function HDH_AT_SpellSearchEditBoxTemplateMixin:SetOnClickHandler(handler)
     self.OnClickSearchHandler = handler
+end
+
+---------------------------------
+-- HDH_AT_TalentCheckButtonMixin
+---------------------------------
+HDH_AT_TalentCheckButtonMixin = {}
+
+function HDH_AT_TalentCheckButton_OnClick(self)
+    self:SetChecked(not (self.isChecked or false))
+    if self.OnClickfunc then
+        self.OnClickfunc(self)
+    end
+end
+
+function HDH_AT_TalentCheckButtonMixin:SetChecked(bool)
+    self.isChecked = bool
+    if bool then
+        self:SetSize(100, 30)
+        self.Icon:SetDesaturated(false)
+        self.Icon:SetAlpha(1)
+        self.Name:Show()
+        self.Active:Show()
+    else
+        self:SetSize(50, 30)
+        self.Icon:SetDesaturated(true)
+        self.Icon:SetAlpha(0.4)
+        self.Name:Hide()
+        self.Active:Hide()
+    end
+end
+
+function HDH_AT_TalentCheckButtonMixin:SetActivate(bool)
+    self:SetChecked(bool)
+end
+
+function HDH_AT_TalentCheckButtonMixin:SetText(text)
+    self.Name:SetText(text)
+end
+
+function HDH_AT_TalentCheckButtonMixin:GetText()
+    return self.Name:GetText()
+end
+
+function HDH_AT_TalentCheckButtonMixin:SetValue(id)
+    self.id = id
+end
+
+function HDH_AT_TalentCheckButtonMixin:GetValue()
+    return self.id 
+end
+
+function HDH_AT_TalentCheckButtonMixin:SetUnassigned()
+    self.Icon:SetTexture([[Interface\ICONS\INV_Misc_QuestionMark]])
+    self.Name:SetText(L.UNASSIGNED)
 end

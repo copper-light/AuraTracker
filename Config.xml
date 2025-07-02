@@ -22,6 +22,36 @@
 
         <Frames>
 
+			<CheckButton name="$parentTalent1" parentKey="Talent1" inherits="HDH_AT_TalentCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" x="0" y="4" />
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton name="$parentTalent2"  parentKey="Talent2"  inherits="HDH_AT_TalentCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentTalent1" relativePoint="BOTTOMRIGHT" x="4" y="0" />
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton name="$parentTalent3"  parentKey="Talent3"  inherits="HDH_AT_TalentCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentTalent2" relativePoint="BOTTOMRIGHT" x="4" y="0" />
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton name="$parentTalent4"  parentKey="Talent4"  inherits="HDH_AT_TalentCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentTalent3" relativePoint="BOTTOMRIGHT" x="4" y="0" />
+				</Anchors>
+			</CheckButton>
+
+			<CheckButton name="$parentTalent5"  parentKey="Talent5"  inherits="HDH_AT_TalentCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentTalent4" relativePoint="BOTTOMRIGHT" x="4" y="0" />
+				</Anchors>
+			</CheckButton>
+
 			<Frame name="$parentReset" parentKey="ErrorReset" inherits="HDH_AT_BackgroundTemplate">
 				<Anchors>
 					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
@@ -50,40 +80,21 @@
 			</Frame>
 
             <Button name="$parentDropDownTraits" inherits="HDH_AT_DropDownTrackerTemplate">
-				<Size><AbsDimension x="112" y="40" /></Size>
+				<Size x="114" y="40"/>
                 <Anchors>
-                    <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" x="-4" y="1" />
+                    <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" x="-2" y="1" />
                     <!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
                 </Anchors>
             </Button>
 
-			<ScrollFrame name="$parentTrackerSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate">
+			<ScrollFrame name="$parentTrackerSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate">
 				<Size x="120" />
 				<Anchors>
-					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentDropDownTraits" x="0" y="0" />
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentDropDownTraits" x="0" y="-1" />
 					<!-- <Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDropDownTalent" x="6" y="0" /> -->
-					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parentDropDownTraits" x="5" y="0" />
+					<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parentDropDownTraits" x="3" y="0" />
 					<Anchor point="BOTTOM" relativePoint="BOTTOM" x="0" y="0" />
 				</Anchors>
-				<Frames>
-					<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="true">
-						<Layers>
-							<Layer level="BACKGROUND">
-								<Texture>
-									<Color r="0" g="0" b="0" a="0.3"/>
-									<Anchors>
-										<Anchor point="TOPLEFT" x="-1" y="17" />
-										<Anchor point="BOTTOMRIGHT" x="1" y="-16" />
-									</Anchors>
-								</Texture>
-							</Layer>
-						</Layers>
-						<Anchors>
-							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="-16" y="-18"/>
-							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="-16" y="16"/>
-						</Anchors>
-					</Slider>
-				</Frames>
 
 				<ScrollChild>
 					<Frame name="$parentContents" hidden="false">
@@ -119,10 +130,14 @@
 						</Frames>
 					</Frame>
 				</ScrollChild>
+				
 				<Scripts>
-					<OnShow>
+					<OnLoad>
+						self.ScrollBar:ClearAllPoints()
+						self.ScrollBar:SetPoint("TOPLEFT", -10, -2)
+						self.ScrollBar:SetPoint("BOTTOMLEFT", -10, 4)
 						self.scrollBarHideable = true
-					</OnShow>
+					</OnLoad>
 				</Scripts>
 			</ScrollFrame>
 
@@ -150,8 +165,8 @@
 										<FontString name="$parentText" parentKey="Trasits" inherits="Font_Yellow_M" text="사용 특성" justifyH="CENTER">
 											<Size x="200" y="20" />
 											<Anchors>
-												<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="0"/>
-												<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-20" y="0"/>
+												<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="10" y="0"/>
+												<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-10" y="0"/>
 											</Anchors>
 										</FontString>
 									</Layer>
@@ -234,25 +249,16 @@
 								</Frames>
 							</Frame>
 
-							<ScrollFrame name="$parentTraitsSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+							<ScrollFrame name="$parentTraitsSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate, HDH_AT_BackgroundTemplate">
 								<Size><AbsDimension x="135" y="200"/></Size>
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentLabel" x="0" y="0" />
 									<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$parentBottom" x="0" y="0" />
 								</Anchors>
 
-								<Frames>
-									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-19" y="-20"/>
-											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-19" y="20"/>
-										</Anchors>
-									</Slider>
-								</Frames>
-
 								<ScrollChild>
 									<Frame name="$parentContents" hidden="false">
-										<Size><AbsDimension x="135" y="1"/></Size>
+										<Size><AbsDimension x="148" y="1"/></Size>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="" x="0" y="0" />
@@ -271,21 +277,12 @@
 								</ScrollChild>
 							</ScrollFrame>
 
-							<ScrollFrame name="$parentConfigSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+							<ScrollFrame name="$parentConfigSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate, HDH_AT_BackgroundTemplate">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentTop" x="0" y="0" />
 									<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parentTop" x="0" y="0" />
 									<Anchor point="BOTTOM" relativePoint="TOP" relativeTo="$parentBottom" x="0" y="0" />
 								</Anchors>
-
-								<Frames>
-									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
-											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
-										</Anchors>
-									</Slider>
-								</Frames>
 
 								<ScrollChild>
 									<Frame name="$parentContents" hidden="false">
@@ -310,10 +307,6 @@
 							<Offset><AbsDimension x="0" y="0"/></Offset>
 							</Anchor>
 						</Anchors>
-						<Layers>
-							<Layer level="BACKGROUND">
-							</Layer>
-						</Layers>
 						<Frames>
 							<Button name="$parentBtnShowSpellList" inherits="HDH_AT_ButtonTemplate" hidden="false">
 								<Size x="95" y="20" />
@@ -336,32 +329,17 @@
 								</Scripts>
 							</Button>
 
-							<ScrollFrame name="$parentSF" inherits="UIPanelScrollFrameTemplate">
+							<ScrollFrame name="$parentSF" inherits="HDH_AT_ScrollFrameTemplate">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
 										<Offset><AbsDimension x="10" y="-30"/></Offset>
 									</Anchor>
 									<Anchor point="BOTTOMRIGHT"  relativePoint="BOTTOMRIGHT">
-										<Offset><AbsDimension x="-25" y="30"/></Offset>
+										<Offset><AbsDimension x="0" y="30"/></Offset>
 									</Anchor>
 								</Anchors>
 								
 								<Layers>
-									<Layer level="BACKGROUND">
-										<Texture>
-											<Size><AbsDimension x="0" y="0"/></Size>
-											<Color r="0" g="0" b="0" a="0.2"/>
-											<Anchors>
-												<Anchor point="TOPLEFT" relativeTo="$parentScrollBar" relativePoint="TOPLEFT">
-													<Offset><AbsDimension x="0" y="0"/></Offset>
-												</Anchor>
-												<Anchor point="BOTTOMRIGHT"  relativeTo="$parentScrollBar" relativePoint="BOTTOMRIGHT">
-													<Offset><AbsDimension x="0" y="0"/></Offset>
-												</Anchor>
-											</Anchors>
-										</Texture>
-									</Layer>
-									
 									<Layer level="ARTWORK">
 										<FontString name="$parentText1" inherits="Font_Yellow_S" justifyH ="LEFT" text="No">
 											<Size><AbsDimension x="20" y="25"/></Size>
@@ -372,40 +350,32 @@
 											</Anchors>
 										</FontString>
 										<FontString  name="$parentText2" inherits="Font_Yellow_S" justifyH ="LEFT" text="Spell Name">
-											<Size><AbsDimension x="100" y="25"/></Size>
+											<Size><AbsDimension x="140" y="25"/></Size>
 											<Anchors>
 												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText1">
-													<Offset><AbsDimension x="40" y="0"/></Offset>
-												</Anchor>
-											</Anchors>
-										</FontString>
-										<FontString name="$parentText3" inherits="Font_Yellow_S" justifyH ="LEFT" text="ID" hidden="true">
-											<Size><AbsDimension x="20" y="25"/></Size>
-											<Anchors>
-												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText2">
-													<Offset><AbsDimension x="47" y="0"/></Offset>
+													<Offset><AbsDimension x="35" y="0"/></Offset>
 												</Anchor>
 											</Anchors>
 										</FontString>
 
-										<FontString name="$parentText4" parentKey="LabelAlways" inherits="Font_Yellow_S" justifyH ="CENTER" text="항상표시" hidden="false">
-											<Size><AbsDimension x="50" y="25"/></Size>
+										<FontString name="$parentText3" parentKey="LabelAlways" inherits="Font_Yellow_S" justifyH ="CENTER" text="항상표시" hidden="false">
+											<Size><AbsDimension x="55" y="25"/></Size>
 											<Anchors>
-												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText3" x="-40" y="0" />
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText2" x="0" y="0" />
 											</Anchors>	
 										</FontString>
 
-										<FontString name="$parentText5" parentKey="LabelGlow" inherits="Font_Yellow_S" justifyH ="CENTER" text="반짝효과" hidden="false">
-											<Size><AbsDimension x="50" y="25"/></Size>
+										<FontString name="$parentText4" parentKey="LabelGlow" inherits="Font_Yellow_S" justifyH ="CENTER" text="반짝효과" hidden="false">
+											<Size><AbsDimension x="55" y="25"/></Size>
 											<Anchors>
-												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText4" x="2" y="0" />
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText3" x="0" y="0" />
 											</Anchors>
 										</FontString>
 
-										<FontString name="$parentText6" parentKey="LabelValue" inherits="Font_Yellow_S" justifyH ="CENTER" text="수치표시" hidden="false">
-											<Size><AbsDimension x="50" y="25"/></Size>
+										<FontString name="$parentText5" parentKey="LabelValue" inherits="Font_Yellow_S" justifyH ="CENTER" text="수치표시" hidden="false">
+											<Size><AbsDimension x="55" y="25"/></Size>
 											<Anchors>
-												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText5" x="0" y="0" />
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText4" x="0" y="0" />
 											</Anchors>
 										</FontString>
 
@@ -416,7 +386,7 @@
 											</Size>
 											<Anchors>
 												<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent" x="0" y="-1"/>
-												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-85" y="-1"/>
+												<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-110" y="-1"/>
 											</Anchors>
 										</FontString>
 
@@ -451,8 +421,6 @@
 												<Offset><AbsDimension x="0" y="0"/></Offset>
 											</Anchor>
 										</Anchors>
-										<Layers><Layer>
-										</Layer></Layers>
 										<Scripts>
 											<OnShow>self:SetAttribute("unit",self:GetParent():GetParent():GetAttribute("unit"))</OnShow>
 										</Scripts>
@@ -470,6 +438,7 @@
 											HDH_AT_L.ADDON_TIP3
 										}
 										self.tipIdx = math.floor(random() * 100)
+										self.scrollBarHideable = true
 									</OnLoad>
 
 									<OnShow>
@@ -620,25 +589,16 @@
 								</Frames>
 							</Frame>
 
-							<ScrollFrame name="$parentMenuSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+							<ScrollFrame name="$parentMenuSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate, HDH_AT_BackgroundTemplate">
 								<Size><AbsDimension x="110" y="35"/></Size>
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentTop" x="0" y="0" />
 									<Anchor point="BOTTOM" relativePoint="TOP"  relativeTo="$parentBottom" x="0" y="0" />
 								</Anchors>
 
-								<Frames>
-									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-19" y="-18"/>
-											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-19" y="18"/>
-										</Anchors>
-									</Slider>
-								</Frames>
-
 								<ScrollChild>
 									<Frame name="$parentContents" hidden="false">
-										<Size><AbsDimension x="110" y="200"/></Size>
+										<Size><AbsDimension x="113" y="200"/></Size>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
@@ -649,20 +609,11 @@
 								</ScrollChild>
 							</ScrollFrame>
 
-							<ScrollFrame name="$parentConfigSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+							<ScrollFrame name="$parentConfigSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate, HDH_AT_BackgroundTemplate">
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentMenuSF" x="0" y="0" />
 									<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT" relativeTo="$parentBottom"  x="0" y="0" />
 								</Anchors>
-
-								<Frames>
-									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
-											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
-										</Anchors>
-									</Slider>
-								</Frames>
 
 								<ScrollChild>
 									<Frame name="$parentContents" hidden="false">
@@ -898,20 +849,11 @@
 								</Anchors>
 
 								<Frames>
-									<ScrollFrame name="$parentConfigSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate">
+									<ScrollFrame name="$parentConfigSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate">
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent"  x="0" y="0" />
 										</Anchors>
-
-										<Frames>
-											<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-												<Anchors>
-													<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
-													<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
-												</Anchors>
-											</Slider>
-										</Frames>
 
 										<ScrollChild>
 											<Frame name="$parentContents" hidden="false">
@@ -976,7 +918,7 @@
 													</CheckButton>
 
 													<Frame name="$parentSwitchHideMode" inherits="HDH_AT_SwitchFrameTemplate">
-														<Size x="195" y="20"/>
+														<Size x="200" y="20"/>
 														<Anchors>
 															<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="2" y="0" />
 														</Anchors>
@@ -1010,7 +952,7 @@
 													</CheckButton>
 
 													<Frame name="$parentSpellSearchEditBox" inherits="HDH_AT_SpellSearchEditBoxTemplate">
-														<Size  x="195" y="20" /> 
+														<Size  x="200" y="20" /> 
 														<Anchors>
 															<Anchor point="LEFT" relativeTo="$parentCBConditionTrait2" relativePoint="RIGHT" x="2" y="0" />
 														</Anchors>
@@ -1022,7 +964,7 @@
 													</Frame>
 
 													<Frame name="$parentLabelSwitchHideModeLearnedTrait">
-														<Size x="195" y="20"/>
+														<Size x="200" y="20"/>
 														<Layers>
 															<Layer level="BACKGROUND">
 																<Texture parentKey="BG" hidden="false">
@@ -1052,7 +994,7 @@
 													</Frame>
 
 													<Frame name="$parentSwitchHideModeUnlearnedTrait" inherits="HDH_AT_SwitchFrameTemplate">
-														<Size x="195" y="20"/>
+														<Size x="200" y="20"/>
 														<Anchors>
 															<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentLabelSwitchHideModeLearnedTrait" x="0" y="-2" />
 														</Anchors>
@@ -1071,20 +1013,12 @@
 									<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT"  relativeTo="$parentBottom" x="0" y="0" />
 								</Anchors>
 								<Frames>
-									<ScrollFrame name="$parentMenuSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+									<ScrollFrame name="$parentMenuSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate, HDH_AT_BackgroundTemplate">
 										<Size><AbsDimension x="110" y="35"/></Size>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="0" />
 											<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parent" x="0" y="0" />
 										</Anchors>
-										<Frames>
-											<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-												<Anchors>
-													<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
-													<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
-												</Anchors>
-											</Slider>
-										</Frames>
 
 										<ScrollChild>
 											<Frame name="$parentContents" hidden="false">
@@ -1100,19 +1034,11 @@
 
 									</ScrollFrame>
 
-									<ScrollFrame name="$parentSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate, HDH_AT_BackgroundTemplate">
+									<ScrollFrame name="$parentSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate, HDH_AT_BackgroundTemplate">
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentMenuSF" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="0" y="0" />
 										</Anchors>
-										<Frames>
-											<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-												<Anchors>
-													<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-20" y="-20"/>
-													<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-20" y="20"/>
-												</Anchors>
-											</Slider>
-										</Frames>
 
 										<ScrollChild>
 											<Frame name="$parentContents" hidden="false">
@@ -1136,7 +1062,7 @@
 			<Button name="$parentTabInfo" inherits="HDH_AT_BottomTapTemplate" id="1" hidden="false">
 				<Size x="32" y="32"/>
 				<Anchors>
-					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="10" y="-3" />
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="10" y="-1" />
 				</Anchors>
 				<!-- <NormalTexture/> -->
 				<!-- <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
@@ -1191,67 +1117,93 @@
 				<HighlightTexture file="Interface\CHATFRAME\UI-ChatIM-SizeGrabber-Highlight" alphaMode="ADD"/>
 			</Button>
 
-			<Button name="$parentBtnClose" >
-				<Size><AbsDimension x="35" y="35"/></Size>
+			<Button name="$parentBtnClose" text="X" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
+				<Size><AbsDimension x="25" y="20"/></Size>
 				<Anchors>
-					<Anchor point="TOPRIGHT" x="0" y="28" />
+					<Anchor point="TOPRIGHT" x="0" y="24" />
 				</Anchors>
-				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture name="$parentBG" file="Interface\Buttons\UI-SquareButton-Disabled">
-							<Anchors>
-								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2" relativeTo="$parent" />
-								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2" relativeTo="$parent"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-				
 				<Scripts>
 					<OnClick>
 						self:GetParent():Hide(); 
 					</OnClick>
 				</Scripts>
-				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
-				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
-				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
 			</Button>
 
-			<Button name="$parentBtnMinMaxFrame">
-				<Size><AbsDimension x="35" y="35"/></Size>
+			<Button name="$parentBtnMinMaxFrame" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
+				<Size><AbsDimension x="25" y="20"/></Size>
 				<Anchors>
-					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnClose" x="5" y="0" />
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnClose" x="-4" y="0" />
 				</Anchors>
-
 				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture name="$parentBG" file="Interface\Buttons\UI-SquareButton-Disabled">
+					<Layer level="ARTWORK" textureSubLevel="2">
+						<Texture parentKey="Texture" file="Interface/AddOns/HDH_AuraTracker/Texture/Up">
+							<TexCoords left="0" right="1" top="0" bottom="1" />
+							<Size x="8" y="6" />
 							<Anchors>
-								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2" relativeTo="$parent" />
-								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2" relativeTo="$parent"/>
+								<Anchor point="CENTER" x="0" y="0"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="ARTWORK" textureSubLevel="1">
+						<Texture file="Interface/AddOns/HDH_AuraTracker/Texture/Up">
+							<TexCoords left="0" right="1" top="0" bottom="1" />
+							<Size x="8" y="6" />
+							<Color r="0" g="0" b="0" a="0.5"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.Texture" relativePoint="CENTER" x="1" y="-1"/>
 							</Anchors>
 						</Texture>
 					</Layer>
 				</Layers>
-
 				<Scripts>
-					<OnLoad>self:SetText(HDH_AT_L.MINIMUM_WINDOW)</OnLoad>
 					<OnClick>
 						HDH_AT_MinimumFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
-						HDH_AT_MinimumFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
+						HDH_AT_MinimumFrame:SetPoint("RIGHT", self, "LEFT", -4, 0);
 						HDH_AT_MinimumFrame:Show(); self:GetParent():Hide();
 					</OnClick>
 				</Scripts>
-				<NormalTexture file="Interface\Buttons\UI-Panel-CollapseButton-Up"/>
-				<PushedTexture file="Interface\Buttons\UI-Panel-CollapseButton-Down"/>
-				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
 			</Button>
+
+			<Frame name="parentLogo" inherits="HDH_AT_ConfigFrameTemplate">
+				<Size><AbsDimension x="20" y="20"/></Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnMinMaxFrame" x="-4" y="0" />
+					<!-- <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="4" /> -->
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentBG">
+							<Color r="0" g="0" b="0" a="0.5" />
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" />
+								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY">
+						<Texture name="$parentIcon" file="Interface\Addons\HDH_AuraTracker\Texture\logo">
+							<Size><AbsDimension x="18" y="18"/></Size>
+							<Anchors>
+								<Anchor point="CENTER"/>
+							</Anchors>
+							<TexCoords left="0.05" right="0.95" top="0.05" bottom="0.95"/> 
+						</Texture>
+
+						<!-- <FontString name="$parentText" inherits="GAMEFONTNORMAL" justifyH ="LEFT" justifyV="MIDDLE" text="Auratracker">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT" x="4" y="0" relativeTo="$parentIcon"/>
+								<Anchor point="RIGHT" relativePoint="RIGHT" x="-2" y="0" relativeTo="$parent"/>
+							</Anchors>
+						</FontString> -->
+					</Layer>
+				</Layers>
+			</Frame>
 
 			<Frame name="$parentLatestSpell" parentKey="LatestSpell" inherits="HDH_AT_ConfigFrameTemplate"  movable="true" enableMouse="true" hidden="true">
 				<Size x="150"/>
 				<Anchors>
-					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="10" y="0" />
-					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="10" y="0" />
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="6" y="0" />
+					<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="6" y="0" />
 				</Anchors>
 
 				<Frames>
@@ -1298,25 +1250,16 @@
 							</Layer>
 						</Layers>
 						<Frames>
-							<ScrollFrame name="$parentSF" hidden="false" inherits="UIPanelScrollFrameCodeTemplate">
+							<ScrollFrame name="$parentSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate">
 								<Size><AbsDimension x="150" y="200"/></Size>
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="-1" />
 									<Anchor point="BOTTOM" relativePoint="BOTTOM" relativeTo="$parent" x="0" y="25" />
 								</Anchors>
-
-								<Frames>
-									<Slider parentKey="ScrollBar" inherits="UIPanelScrollBarTemplate" hidden="false">
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" x="-19" y="-20"/>
-											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" x="-19" y="20"/>
-										</Anchors>
-									</Slider>
-								</Frames>
-
+								
 								<ScrollChild>
 									<Frame name="$parentContents" hidden="false">
-										<Size><AbsDimension x="150" y="1"/></Size>
+										<Size><AbsDimension x="160" y="1"/></Size>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="5" />
@@ -1328,7 +1271,6 @@
 									</Frame>
 								</ScrollChild>
 							</ScrollFrame>
-
 							<CheckButton name="$parentCBAutoPopup" inherits="HDH_AT_CheckButton2Template">
 								<Size x="150" y="20" />
 								<Anchors>
@@ -1348,30 +1290,16 @@
 						</Scripts>
 					</Frame>
 
-					<Button name="$parentBtnClose" >
-						<Size><AbsDimension x="35" y="35"/></Size>
+					<Button name="$parentBtnClose" text="X" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
+						<Size><AbsDimension x="25" y="20"/></Size>
 						<Anchors>
-							<Anchor point="TOPRIGHT" x="0" y="28" />
+							<Anchor point="TOPRIGHT" x="0" y="24" />
 						</Anchors>
-						<Layers>
-							<Layer level="BACKGROUND">
-								<Texture name="$parentBG" file="Interface\Buttons\UI-SquareButton-Disabled">
-									<Anchors>
-										<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2" relativeTo="$parent" />
-										<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2" relativeTo="$parent"/>
-									</Anchors>
-								</Texture>
-							</Layer>
-						</Layers>
-						
 						<Scripts>
 							<OnClick>
 								self:GetParent():Hide(); 
 							</OnClick>
 						</Scripts>
-						<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
-						<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
-						<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
 					</Button>
 				</Frames>
 				<Scripts>
@@ -1402,7 +1330,7 @@
     </Frame>
 
 	<Frame name="HDH_AT_MinimumFrame" movable="true" toplevel="true" parent="UIParent" frameStrata="HIGH" hidden="true" enableMouse="true" inherits="HDH_AT_ConfigFrameTemplate">
-		<Size><AbsDimension x="175" y="30"/></Size>
+		<Size><AbsDimension x="155" y="20"/></Size>
 		<Anchors>
 			<Anchor point="CENTER" x="0" y="0"/>
 		</Anchors>
@@ -1419,37 +1347,63 @@
 			<Layer level="OVERLAY">
 
 				<Texture name="$parentIcon" file="Interface\Addons\HDH_AuraTracker\Texture\logo">
-					<Size><AbsDimension x="24" y="24"/></Size>
+					<Size><AbsDimension x="18" y="18"/></Size>
 					<Anchors>
-						<Anchor point="LEFT" relativePoint="LEFT" x="2" relativeTo="$parent" />
+						<Anchor point="LEFT" relativePoint="LEFT" x="0" relativeTo="$parent" />
 					</Anchors>
+					<TexCoords left="0.05" right="0.95" top="0.05" bottom="0.95"/> 
 				</Texture>
 
-				<FontString name="$parentText" inherits="GAMEFONTNORMAL" justifyH ="CENTER" justifyV="CENTER" text="Auratracking :D">
+				<FontString name="$parentText" inherits="GAMEFONTNORMAL" justifyH ="CENTER" justifyV="MIDDLE" text="Auratracking :D">
 					<Anchors>
-						<Anchor point="LEFT" relativePoint="RIGHT" x="2" y="0" relativeTo="$parentIcon"/>
+						<Anchor point="LEFT" relativePoint="RIGHT" x="4" y="0" relativeTo="$parentIcon"/>
 						<Anchor point="RIGHT" relativePoint="RIGHT" x="-2" y="0" relativeTo="$parent"/>
 					</Anchors>
 				</FontString>
 			</Layer>
 		</Layers>
 		<Frames>
-			<Button name="$parentBtnClose" >
-				<Size><AbsDimension x="35" y="35"/></Size>
+		
+			<Button name="$parentBtnMinMaxFrame" inherits="HDH_AT_TextureButtonTemplate, HDH_AT_ConfigFrameTemplate">
+				<Size><AbsDimension x="25" y="20"/></Size>
 				<Anchors>
-					<Anchor point="TOPRIGHT" x="0" y="28" />
+					<Anchor point="LEFT" relativePoint="RIGHT" x="4" y="0" />
 				</Anchors>
 				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture name="$parentBG" file="Interface\Buttons\UI-SquareButton-Disabled">
+					<Layer level="ARTWORK" textureSubLevel="2">
+						<Texture parentKey="Texture" file="Interface/AddOns/HDH_AuraTracker/Texture/Up">
+							<TexCoords left="0" right="1" top="1" bottom="0" />
+							<Size x="8" y="6" />
 							<Anchors>
-								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2" relativeTo="$parent" />
-								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2" relativeTo="$parent"/>
+								<Anchor point="CENTER" x="0" y="0"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="ARTWORK" textureSubLevel="1">
+						<Texture file="Interface/AddOns/HDH_AuraTracker/Texture/Up">
+							<TexCoords left="0" right="1" top="1" bottom="0" />
+							<Size x="8" y="6" />
+							<Color r="0" g="0" b="0" a="0.5"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.Texture" relativePoint="CENTER" x="1" y="-1"/>
 							</Anchors>
 						</Texture>
 					</Layer>
 				</Layers>
-				
+				<Scripts>
+					<OnClick>
+						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
+						HDH_AT_ConfigFrame:SetPoint("TOPRIGHT", self:GetParent().Close,"BOTTOMRIGHT", 0, -4);
+						HDH_AT_ConfigFrame:Show(); self:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentBtnClose" parentKey="Close" text="X" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
+				<Size><AbsDimension x="25" y="20"/></Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentBtnMinMaxFrame" relativePoint="RIGHT" x="4" y="0" />
+				</Anchors>
 				<Scripts>
 					<OnClick>
 						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
@@ -1457,39 +1411,6 @@
 						self:GetParent():Hide(); 
 					</OnClick>
 				</Scripts>
-				<NormalTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Up"/>
-				<PushedTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Down"/>
-				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
-			</Button>
-
-			<Button name="$parentBtnMinMaxFrame">
-				<Size><AbsDimension x="35" y="35"/></Size>
-				<Anchors>
-					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnClose" x="5" y="0" />
-				</Anchors>
-
-				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture name="$parentBG" file="Interface\Buttons\UI-SquareButton-Disabled">
-							<Anchors>
-								<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2" relativeTo="$parent" />
-								<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2" relativeTo="$parent"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-
-				<Scripts>
-					<OnLoad>self:SetText(HDH_AT_L.MINIMUM_WINDOW)</OnLoad>
-					<OnClick>
-						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
-						HDH_AT_ConfigFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
-						HDH_AT_ConfigFrame:Show(); self:GetParent():Hide();
-					</OnClick>
-				</Scripts>
-				<NormalTexture file="Interface\Buttons\UI-Panel-ExpandButton-Up"/>
-				<PushedTexture file="Interface\Buttons\UI-Panel-ExpandButton-Down"/>
-				<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
 			</Button>
 
 		</Frames>

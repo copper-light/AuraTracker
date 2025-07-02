@@ -4,7 +4,7 @@ HDH_AT_UTIL = {}
 do -- 애드온 버전 호환성
 ----------------------------------
     ------------------------------------------------------
-	if select(4, GetBuildInfo()) <= 49999 then -- 대격변
+	if select(4, GetBuildInfo()) <= 59999 then -- 대격변
 	------------------------------------------------------
 		HDH_AT_UTIL.GetSpecialization = function()
 			return GetPrimaryTalentTree() or 5
@@ -27,8 +27,8 @@ do -- 애드온 버전 호환성
 		end
 
 		HDH_AT_UTIL.TALENTS_GROUP_LIST = {}
-		HDH_AT_UTIL.TALENTS_GROUP_LIST[1] = 'Primary Talents'
-		HDH_AT_UTIL.TALENTS_GROUP_LIST[2] = 'Secondary Talents'
+		HDH_AT_UTIL.TALENTS_GROUP_LIST[1] = HDH_AT_L.PRIMARY_SPEC
+		HDH_AT_UTIL.TALENTS_GROUP_LIST[2] = HDH_AT_L.SECONDARY_SPEC
 		HDH_AT_UTIL.GetConfigInfo = function(transitID)
 			if transitID > #HDH_AT_UTIL.TALENTS_GROUP_LIST then
 				return nil
@@ -47,8 +47,9 @@ do -- 애드온 버전 호환성
 		end
 
 		HDH_AT_UTIL.GetConfigIDsBySpecID = function(search_specID)
-			ret = {}
-			search_index = nil
+			local ret = {}
+			local search_index = nil
+			local specIndex, id, name 
 			for i = 1, HDH_AT_UTIL.MAX_TALENT_TIERS do
 				id, name = HDH_AT_UTIL.GetSpecializationInfo(i)
 				if id and id == search_specID then
@@ -222,7 +223,7 @@ do
 			local info = HDH_AT_UTIL.GetConfigInfo(id)
 			if not info then
 				if HDH_AT_UTIL.GetSpecializationInfoByID(id) then
-					traitName = HDH_AT_L.ALWAYS_USE
+					traitName = HDH_AT_L.COMMON_SPEC
 				end
 			else
 				traitName = info.name
