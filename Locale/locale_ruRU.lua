@@ -328,5 +328,5 @@ L.ONLY_FOR_AURA_CD_TOTEM = "Эта функция доступна только 
 L.UNASSIGNED = "Не назначено" -- (Unassigned)
 L.PRIMARY_SPEC = "основная спец" -- (Primary Spec)
 L.SECONDARY_SPEC = "вторичная спец" -- (Secondady Spec)
-L.COMMON_SPEC = "общий спец" -- (Common Spec)
+L.COMMON_SPEC = "общая спец" -- (Common Spec)
 
