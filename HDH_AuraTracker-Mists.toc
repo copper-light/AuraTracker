@@ -8,6 +8,7 @@
 
 Locale\locale.lua
 Locale\locale_koKR.lua
+Locale\locale_ruRU.lua
 
 Utils.lua
 UITemplates.xml

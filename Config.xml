@@ -350,40 +350,32 @@
 											</Anchors>
 										</FontString>
 										<FontString  name="$parentText2" inherits="Font_Yellow_S" justifyH ="LEFT" text="Spell Name">
-											<Size><AbsDimension x="100" y="25"/></Size>
+											<Size><AbsDimension x="140" y="25"/></Size>
 											<Anchors>
 												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText1">
 													<Offset><AbsDimension x="35" y="0"/></Offset>
 												</Anchor>
 											</Anchors>
 										</FontString>
-										<FontString name="$parentText3" inherits="Font_Yellow_S" justifyH ="LEFT" text="ID" hidden="true">
-											<Size><AbsDimension x="20" y="25"/></Size>
-											<Anchors>
-												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText2">
-													<Offset><AbsDimension x="47" y="0"/></Offset>
-												</Anchor>
-											</Anchors>
-										</FontString>
 
-										<FontString name="$parentText4" parentKey="LabelAlways" inherits="Font_Yellow_S" justifyH ="CENTER" text="항상표시" hidden="false">
-											<Size><AbsDimension x="50" y="25"/></Size>
+										<FontString name="$parentText3" parentKey="LabelAlways" inherits="Font_Yellow_S" justifyH ="CENTER" text="항상표시" hidden="false">
+											<Size><AbsDimension x="55" y="25"/></Size>
 											<Anchors>
-												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText3" x="-18" y="0" />
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText2" x="0" y="0" />
 											</Anchors>	
 										</FontString>
 
-										<FontString name="$parentText5" parentKey="LabelGlow" inherits="Font_Yellow_S" justifyH ="CENTER" text="반짝효과" hidden="false">
-											<Size><AbsDimension x="50" y="25"/></Size>
+										<FontString name="$parentText4" parentKey="LabelGlow" inherits="Font_Yellow_S" justifyH ="CENTER" text="반짝효과" hidden="false">
+											<Size><AbsDimension x="55" y="25"/></Size>
 											<Anchors>
-												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText4" x="2" y="0" />
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText3" x="0" y="0" />
 											</Anchors>
 										</FontString>
 
-										<FontString name="$parentText6" parentKey="LabelValue" inherits="Font_Yellow_S" justifyH ="CENTER" text="수치표시" hidden="false">
-											<Size><AbsDimension x="50" y="25"/></Size>
+										<FontString name="$parentText5" parentKey="LabelValue" inherits="Font_Yellow_S" justifyH ="CENTER" text="수치표시" hidden="false">
+											<Size><AbsDimension x="55" y="25"/></Size>
 											<Anchors>
-												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText5" x="0" y="0" />
+												<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentText4" x="0" y="0" />
 											</Anchors>
 										</FontString>
 
@@ -429,8 +421,6 @@
 												<Offset><AbsDimension x="0" y="0"/></Offset>
 											</Anchor>
 										</Anchors>
-										<Layers><Layer>
-										</Layer></Layers>
 										<Scripts>
 											<OnShow>self:SetAttribute("unit",self:GetParent():GetParent():GetAttribute("unit"))</OnShow>
 										</Scripts>
@@ -928,7 +918,7 @@
 													</CheckButton>
 
 													<Frame name="$parentSwitchHideMode" inherits="HDH_AT_SwitchFrameTemplate">
-														<Size x="195" y="20"/>
+														<Size x="200" y="20"/>
 														<Anchors>
 															<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="2" y="0" />
 														</Anchors>
@@ -962,7 +952,7 @@
 													</CheckButton>
 
 													<Frame name="$parentSpellSearchEditBox" inherits="HDH_AT_SpellSearchEditBoxTemplate">
-														<Size  x="195" y="20" /> 
+														<Size  x="200" y="20" /> 
 														<Anchors>
 															<Anchor point="LEFT" relativeTo="$parentCBConditionTrait2" relativePoint="RIGHT" x="2" y="0" />
 														</Anchors>
@@ -974,7 +964,7 @@
 													</Frame>
 
 													<Frame name="$parentLabelSwitchHideModeLearnedTrait">
-														<Size x="195" y="20"/>
+														<Size x="200" y="20"/>
 														<Layers>
 															<Layer level="BACKGROUND">
 																<Texture parentKey="BG" hidden="false">
@@ -1004,7 +994,7 @@
 													</Frame>
 
 													<Frame name="$parentSwitchHideModeUnlearnedTrait" inherits="HDH_AT_SwitchFrameTemplate">
-														<Size x="195" y="20"/>
+														<Size x="200" y="20"/>
 														<Anchors>
 															<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentLabelSwitchHideModeLearnedTrait" x="0" y="-2" />
 														</Anchors>
@@ -1139,11 +1129,32 @@
 				</Scripts>
 			</Button>
 
-			<Button name="$parentBtnMinMaxFrame" text="▲" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
+			<Button name="$parentBtnMinMaxFrame" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
 				<Size><AbsDimension x="25" y="20"/></Size>
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnClose" x="-4" y="0" />
 				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="2">
+						<Texture parentKey="Texture" file="Interface/AddOns/HDH_AuraTracker/Texture/Up">
+							<TexCoords left="0" right="1" top="0" bottom="1" />
+							<Size x="8" y="6" />
+							<Anchors>
+								<Anchor point="CENTER" x="0" y="0"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="ARTWORK" textureSubLevel="1">
+						<Texture file="Interface/AddOns/HDH_AuraTracker/Texture/Up">
+							<TexCoords left="0" right="1" top="0" bottom="1" />
+							<Size x="8" y="6" />
+							<Color r="0" g="0" b="0" a="0.5"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.Texture" relativePoint="CENTER" x="1" y="-1"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
 				<Scripts>
 					<OnClick>
 						HDH_AT_MinimumFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
@@ -1353,11 +1364,32 @@
 		</Layers>
 		<Frames>
 		
-			<Button name="$parentBtnMinMaxFrame" text="▼" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
+			<Button name="$parentBtnMinMaxFrame" inherits="HDH_AT_TextureButtonTemplate, HDH_AT_ConfigFrameTemplate">
 				<Size><AbsDimension x="25" y="20"/></Size>
 				<Anchors>
 					<Anchor point="LEFT" relativePoint="RIGHT" x="4" y="0" />
 				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="2">
+						<Texture parentKey="Texture" file="Interface/AddOns/HDH_AuraTracker/Texture/Up">
+							<TexCoords left="0" right="1" top="1" bottom="0" />
+							<Size x="8" y="6" />
+							<Anchors>
+								<Anchor point="CENTER" x="0" y="0"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="ARTWORK" textureSubLevel="1">
+						<Texture file="Interface/AddOns/HDH_AuraTracker/Texture/Up">
+							<TexCoords left="0" right="1" top="1" bottom="0" />
+							<Size x="8" y="6" />
+							<Color r="0" g="0" b="0" a="0.5"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.Texture" relativePoint="CENTER" x="1" y="-1"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
 				<Scripts>
 					<OnClick>
 						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
