@@ -131,7 +131,7 @@ function HDH_POWER_TRACKER:UpdateBarValue(f, elapsed, non_animate)
 				if non_animate then
 					bar:SetValue(bar.v1); 
 				else
-					bar:SetValue(self:GetAnimatedValue(bar, bar.v1, i)); 
+					bar:SetValue(self:GetAnimatedValue(bar, bar.v1, i));
 				end
 				-- bar:SetValue(f.spell.v1); 
 				if f:GetParent().parent.ui.bar.use_full_color then

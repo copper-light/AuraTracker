@@ -642,4 +642,7 @@ do
 		return newQ
 	end
 
+	function HDH_AT_UTIL.LogScale(value)
+		return ((math.log(value* 0.85 + 0.15) - math.log(0.15)) / (math.log(1) - math.log(0.15)))
+	end
 end

@@ -540,7 +540,7 @@ function HDH_TRACKER:GetAnimatedValue(bar, v) -- v:target value
 		end
 		gapTime = (GetTime() - bar.animatedStartTime);
 		if gapTime < bar.termType then
-			v = gap * (gapTime/bar.termType);
+			v = gap * HDH_AT_UTIL.LogScale(gapTime/bar.termType);
 		else
 			v = gap;
 		end
@@ -548,7 +548,7 @@ function HDH_TRACKER:GetAnimatedValue(bar, v) -- v:target value
 		v = 0;
 	end
 	bar.preTime = GetTime();
-	return bar:GetValue()+ v;
+	return bar:GetValue() + v;
 end
 
 function HDH_TRACKER:MoveSpark(bar, value)
