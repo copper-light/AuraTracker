@@ -2,7 +2,7 @@
 ## Title: AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
-## Version: 11.1.7.7
+## Version: 11.1.7.8
 ## SavedVariablesPerCharacter: HDH_AT_DB
 ## IconTexture: Interface\AddOns\HDH_AuraTracker\Texture\logo.blp
 
