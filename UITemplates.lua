@@ -65,7 +65,9 @@ end
 
 function HDH_AT_AuraRowMixin:Set(no, key, id, name, texture, display, glow, value, isItem, readOnly)
 	_G[self:GetName().."ButtonIcon"]:SetNormalTexture(texture or 0)
-	_G[self:GetName().."ButtonIcon"]:GetNormalTexture():SetTexCoord(0.08, 0.92, 0.08, 0.92);
+    _G[self:GetName().."ButtonIcon"]:GetNormalTexture():SetTexCoord(0.08, 0.92, 0.08, 0.92)
+    _G[self:GetName().."ButtonIcon"]:Show()
+    _G[self:GetName().."IconAdd"]:Hide()
 	_G[self:GetName().."TextNum"]:SetText(no)
 	_G[self:GetName().."TextName"]:SetText(name)
 	_G[self:GetName().."TextID"]:SetText(id.."")
@@ -107,8 +109,8 @@ end
 
 function HDH_AT_AuraRowMixin:Clear()
 	_G[self:GetName().."ButtonIcon"]:SetNormalTexture(0)
-    _G[self:GetName().."ButtonIcon"]:GetNormalTexture():SetAtlas("ui-hud-minimap-zoom-in")
-    _G[self:GetName().."ButtonIcon"]:GetNormalTexture():SetTexCoord(-0.09, 1.09, -0.09, 1.09)
+    _G[self:GetName().."ButtonIcon"]:Hide()
+    _G[self:GetName().."IconAdd"]:Show()
 	_G[self:GetName().."TextNum"]:SetText(nil)
 	_G[self:GetName().."TextName"]:SetText(nil)
 	_G[self:GetName().."RowDesc"]:Show()

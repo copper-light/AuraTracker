@@ -630,6 +630,76 @@
 			<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT" x='0' y='0' />
 		</Anchors>
 		<Frames>
+			<Button name="$parentButtonIcon" enableMouse="false">
+				<Layers>
+					<Layer>
+						<Texture parentKey="Top">
+							<Size x="20" y="1"/>
+							<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+							<Anchors>
+								<Anchor point="BOTTOM" relativePoint="TOP" relativeKey="$parent" x="0" y="1"/>
+							</Anchors>
+						</Texture>
+
+						<Texture parentKey="Bottom">
+							<Size x="20" y="1"/>
+							<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+							<Anchors>
+								<Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent" x="0" y="-1"/>
+							</Anchors>
+						</Texture>
+
+						<Texture parentKey="Left">
+							<Size x="1" y="18"/>
+							<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+							<Anchors>
+								<Anchor point="RIGHT" relativePoint="LEFT" relativeKey="$parent" x="-1" y="0"/>
+							</Anchors>
+						</Texture>
+
+						<Texture parentKey="Right">
+							<Size x="1" y="18"/>
+							<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent" x="1" y="0"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Size x="16" y="16"/>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="LEFT" x="25" y="0"/>
+				</Anchors>
+			</Button>
+			
+			<EditBox name="$parentEditBoxID" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false" hidden="true">
+				<Size>
+					<AbsDimension x="110" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentButtonIcon" relativePoint="RIGHT" x="8" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self.BG1:Hide()
+						self.BG2:Hide()
+						self.BG3:Hide()
+						self.Desc:SetText(HDH_AT_L.PLEASE_INPUT_SPELL)
+					</OnLoad>
+					<OnEscapePressed>HDH_AT_OnEditEscape(self)</OnEscapePressed>
+					<OnEditFocusGained>HDH_AT_OnEditFocusGained(self)</OnEditFocusGained>
+					<OnEditFocusLost>HDH_AT_OnEditFocusLost(self)</OnEditFocusLost>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
+						GameTooltip:AddLine(HDH_AT_L.INPUT_ID_TOOLTIP);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip_Hide();
+					</OnLeave>
+				</Scripts>
+			</EditBox>
+
 			<Button name="$parentButtonSet">
 				<Size>
 					<AbsDimension x="20" y="20"/>
@@ -718,35 +788,13 @@
 				</Scripts>
 			</CheckButton>
 
-			<Button name="$parentButtonDown" inherits="HDH_AT_ButtonTemplate2" text="▼" hidden="true">
-				<Size>
-					<AbsDimension x="22" y="22"/>
-				</Size>
-				<Anchors>
-					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentCheckButtonAlways">
-						<Offset><AbsDimension x="0" y="0"/></Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			
-			<Button name="$parentButtonUp" inherits="HDH_AT_ButtonTemplate2" text="▲" hidden="true">
-				<Size>
-					<AbsDimension x="22" y="22"/>
-				</Size>
-				<Anchors>
-					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentButtonDown">
-						<Offset><AbsDimension x="0" y="0"/></Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-
 			<Button name="$parentButtonDel" inherits="HDH_AT_ButtonTemplate2" text="삭제" hidden="true">
 				<Size>
-					<AbsDimension x="50" y="22"/>
+					<AbsDimension x="70" y="22"/>
 				</Size>
 				<Anchors>
-					<Anchor point="RIGHT" relativeTo="$parentButtonSet" relativePoint="RIGHT">
-					<Offset><AbsDimension x="-10" y="0"/></Offset>
+					<Anchor point="RIGHT" relativePoint="RIGHT">
+					<Offset><AbsDimension x="-5" y="0"/></Offset>
 					</Anchor>
 				</Anchors>
 				<Scripts>
@@ -806,47 +854,16 @@
 				</Scripts>
 			</CheckButton>
 			
-			<Button name="$parentButtonIcon" enableMouse="false">
-				<Size x="22" y="22"/>
-				<Anchors>
-					<Anchor point="LEFT" relativePoint="LEFT" >
-						<Offset><AbsDimension x="25" y="0"/></Offset>
-					</Anchor>
-				</Anchors>
-			</Button>
-			
-			<EditBox name="$parentEditBoxID" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false" hidden="true">
-				<Size>
-					<AbsDimension x="145" y="20"/>
-				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentButtonIcon" relativePoint="RIGHT" x="5" y="0" />
-					<Anchor point="RIGHT" relativeTo="$parentCheckButtonIsItem" relativePoint="LEFT" x="-10" y="0" />
-				</Anchors>
-				<Scripts>
-					<OnLoad>
-						self.BG1:Hide()
-						self.BG2:Hide()
-						self.BG3:Hide()
-						self.Desc:SetText(HDH_AT_L.PLEASE_INPUT_SPELL)
-					</OnLoad>
-					<OnEscapePressed>HDH_AT_OnEditEscape(self)</OnEscapePressed>
-					<OnEditFocusGained>HDH_AT_OnEditFocusGained(self)</OnEditFocusGained>
-					<OnEditFocusLost>HDH_AT_OnEditFocusLost(self)</OnEditFocusLost>
-					<OnEnter>
-						GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
-						GameTooltip:AddLine(HDH_AT_L.INPUT_ID_TOOLTIP);
-						GameTooltip:Show();
-					</OnEnter>
-					<OnLeave>
-						GameTooltip_Hide();
-					</OnLeave>
-				</Scripts>
-			</EditBox>
-			
 		</Frames>
 		<Layers>
 			<Layer level="ARTWORK">
+				<Texture name="$parentIconAdd" useAtlasSize="true" atlas="ui-hud-minimap-zoom-in">
+					<Size x="20" y="20"/>
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parentButtonIcon" x="1" y="-1"/>
+					</Anchors>
+				</Texture>
+
 				<FontString name="$parentTextNum" inherits="Font_Yellow_S">
 					<Size>
 						<AbsDimension x="20" y="25"/>
@@ -878,7 +895,7 @@
 					<Color r="1" g="1" b="1"/>
 					<Anchors>
 						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentButtonIcon">
-							<Offset><AbsDimension x="10" y="0"/></Offset>
+							<Offset><AbsDimension x="13" y="0"/></Offset>
 						</Anchor>
 					</Anchors>
 				</FontString>
@@ -916,9 +933,16 @@
 			<OnLeave>
 			</OnLeave>
 		</Scripts>
-		<HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
-			<TexCoords left="0" right="1" top="0.1" bottom="0.5" />
+		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_White_A">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent"  x="0" y="0" />
+				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="0" y="1"/>
+			</Anchors>
 		</HighlightTexture>
+		<!-- <HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
+			<Color r="1" g="1" b="1" a="0.8"/>
+			<TexCoords left="0.04" right="1.00" top="0.0" bottom="0.56" />
+		</HighlightTexture> -->
 	</Button>
 
 	<Button name="HDH_AT_UITabBtnTemplate" mixin="HDH_AT_UITabBtnMixin" virtual="true">
@@ -2692,13 +2716,47 @@
 		<Layers>
 			<Layer level="ARTWORK">
 				<Texture name="$parentIcon" parentKey="Icon" file="Interface\ICONS\INV_Misc_QuestionMark">
-					<Size><AbsDimension x="30" y="30" /></Size>
+					<Size x="20" y="20"/>
 					<Anchors>
 						<Anchor point="LEFT" relativePoint="RIGHT" x="5" y="0"/>
+					</Anchors>
+					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
+				</Texture>
+
+				<Texture parentKey="Top">
+					<Size x="24" y="1"/>
+					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="BOTTOM" relativePoint="TOP" relativeKey="$parent.Icon" x="0" y="1"/>
+					</Anchors>
+				</Texture>
+
+				<Texture parentKey="Bottom">
+					<Size x="24" y="1"/>
+					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Icon" x="0" y="-1"/>
+					</Anchors>
+				</Texture>
+
+				<Texture parentKey="Left">
+					<Size x="1" y="22"/>
+					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="RIGHT" relativePoint="LEFT" relativeKey="$parent.Icon" x="-1" y="0"/>
+					</Anchors>
+				</Texture>
+
+				<Texture parentKey="Right">
+					<Size x="1" y="22"/>
+					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.Icon" x="1" y="0"/>
 					</Anchors>
 				</Texture>
 			</Layer>
 		</Layers>
+		<HitRectInsets left="0" right="-30" top="0" bottom="0"/>
 	</Button>
 
 	<Button name="HDH_AT_CheckButtonForExportTemplate" inherits="HDH_AT_CheckButton2Template" virtual="true">

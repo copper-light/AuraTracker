@@ -685,15 +685,6 @@ local function LoadDB(trackerId, comp)
 	end
 end
 
-local function isHasTraits(id)
-	for _, tracker in ipairs(HDH_AT_DB.tracker) do
-		if tracker.trait and UTIL.HasValue(tracker.trait, id) then
-			return true
-		end
-	end
-	return false
-end
-
 local function DrawLine(frame, x, y, total, point1, point2)
 	local i = 1;
 	local size = math.abs(x) > math.abs(y) and x or y;
@@ -1972,8 +1963,11 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerElementConfig(trackerId, startRowIdx
 			rowFrame.index = i
 			if not rowFrame:IsShown() then rowFrame:Show() end
 			rowFrame:ClearAllPoints();
-			if i == 1 	then rowFrame:SetPoint("TOPLEFT",listFrame,"TOPLEFT") 
-						else rowFrame:SetPoint("TOPLEFT",listFrame,"TOPLEFT", 0, (-rowFrame:GetHeight()*(i-1))) end
+			if i == 1 	then 
+				rowFrame:SetPoint("TOPLEFT",listFrame,"TOPLEFT") 
+			else 
+				rowFrame:SetPoint("TOPLEFT",listFrame,"TOPLEFT", 0, (-rowFrame:GetHeight()*(i-1))) 
+			end
 			
 			if elemKey then
 				rowFrame:Set(i, elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, readOnly)
@@ -3191,12 +3185,12 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	local row_idx = 5
 	for _, texture in ipairs(ICON_PRESET_LIST) do
 		if comp == nil or comp.Icon:GetTexture() ~= nil then
-			col_idx = (col_idx % 3) + 1
-			comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON,     nil, nil, row_idx, col_idx)
+			col_idx = (col_idx % 4) + 1
+			comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON, nil, nil, row_idx, col_idx)
 			comp:HiddenBackground(true)
 			comp.Icon:SetTexture(texture)
 			table.insert(CHANGE_ICON_CB_LIST, comp)
-			if col_idx == 3 then
+			if col_idx == 4 then
 				row_idx = row_idx + 1
 			end
 		else
@@ -3623,9 +3617,11 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 
 	if col then
 		if col == 2 then
-			start_x = 80
+			start_x = 65
 		elseif col == 3 then
-			start_x = 160
+			start_x = 130
+		elseif col == 4 then
+			start_x = 195
 		end
 	end
 	
