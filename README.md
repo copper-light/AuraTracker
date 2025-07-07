@@ -3,12 +3,9 @@
 * [WoW Inven (In Korean)](https://wow.inven.co.kr/dataninfo/addonpds/detail.php?idx=9396&rurl=%2Fdataninfo%2Faddonpds%2Flist.php%3F)
 
 # 앞으로 해야될 것들..
-* 영문화 : 문법 교정 및 더 짧게 수정
 * 아이콘 꿀렁거림 수정
   * 0.5픽셀단위로 움직이는걸로 완화했지만, 근본적인 해결방안은 아님
 * 불필요한 소스코드 정리
-* ~~아이콘 이동 켜고 설정 바꾸면 바로 반영 안되는 오류가 있는 것 같음~~
-  * 방식을 크게 변경해야할 것 같은데.. 너무 큰 작업이라서 일단 우회적으로 해결.. 이동 옵션 껏다가 켜는걸로..
 
 # AuraTracker (구 AuraTracking)
 오라,스킬,토템,HP,MP,직업자원에 대한 쿨다운 및 수치를 별도의 아이콘(바)으로 만들어 표시
