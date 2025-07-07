@@ -2847,7 +2847,7 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 		while idx <= size do
 			value = f.queue:Get(size - (idx -1))
 			if not list[idx] then
-				item = CreateFrame("Frame", "nil"..idx, f, "HDH_AT_LatestSpellItemTemplate")
+				item = CreateFrame("Button", "nil"..idx, f, "HDH_AT_LatestSpellItemTemplate")
 				list[idx] = item
 
 				item:SetScript("OnMouseDown", OnMouseDown_LatestSpellItem)
@@ -2878,7 +2878,7 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 			item:SetParent(f)
 			item:SetHeight(height)
 			item:SetPoint("RIGHT", f, "RIGHT", -20, 0)
-			item:SetPoint("TOPLEFT", f, "TOPLEFT", 0, -(idx-1) * height)
+			item:SetPoint("TOPLEFT", f, "TOPLEFT", 1, -(idx-1) * height)
 			item:SetActive(false)
 			item.Icon:SetTexture(value[1])
 			item.Name:SetText(value[2])
