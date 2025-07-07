@@ -74,25 +74,25 @@ local EQUIPMENT_SLOT = {
 }
 
 local UI_CONFIG_TAB_LIST= {
-	{name=L.TEXT, type="LABEL"},
+	{name=L.TEXT, type="LABEL", texture="Interface\\Addons\\HDH_AuraTracker\\Texture\\text"},
 	{name=L.TIME, type="BUTTON"}, --1
 	{name=L.COUNT, type="BUTTON"}, --2
 	{name=L.VALUE, type="BUTTON"}, --3
 	{name=L.BAR_NAME, type="BUTTON"}, --4
 
-	{name=L.ICON_AND_BAR, type="LABEL"},
+	{name=L.ICON_AND_BAR, type="LABEL", texture="Interface\\Addons\\HDH_AuraTracker\\Texture\\icon"},
 	{name=L.ORDER_AND_LOCATION, type="BUTTON"}, --5
 	{name=L.ICON, type="BUTTON"},               --6
 	{name=L.BAR, type="BUTTON"}, 		        --7
 
-	{name=L.PROFILE, type="LABEL"},
+	{name=L.PROFILE, type="LABEL", texture="Interface\\Addons\\HDH_AuraTracker\\Texture\\profile"},
 	{name=L.IMPORT_PROFILE, type="BUTTON"},         -- 9
 	{name=L.EXPORT_PROFILE, type="BUTTON"},         -- 10
 	{name=L.RESET, type="BUTTON"},         -- 8
 }
 
 local DETAIL_ETC_CONFIG_TAB_LIST= {
-	{name=L.DETAIL_CONIFG, type="LABEL"}, 
+	{name=L.DETAIL_CONIFG, type="LABEL", texture="Interface\\Addons\\HDH_AuraTracker\\Texture\\config"}, 
 	{name=L.CHANGE_ICON, type="BUTTON"}, --1
 	{name=L.SPLIT_POWER_BAR, type="BUTTON"}, --2
 	{name=L.INNER_COOLDOWN_ITEM, type="BUTTON"}, --3
@@ -2542,6 +2542,14 @@ function HDH_AT_ConfigFrameMixin:AppendUITab(tabData, tabFrame, bodyFrame)
 			component = CreateFrame("Button", (tabFrame:GetName()..'Tab'..idx), tabFrame, "HDH_AT_UITabBtnLabelTemplate")
 			component:Disable()
 			_G[component:GetName().."Text"]:SetJustifyH("CENTER")
+			if data.texture then
+				component.Texture:SetTexture(data.texture)
+				component.Texture:Show()
+				_G[component:GetName().."Text"]:ClearAllPoints()
+				_G[component:GetName().."Text"]:SetJustifyH("LEFT")
+				_G[component:GetName().."Text"]:SetPoint("LEFT", component.Texture, "RIGHT", 8, 0)
+				_G[component:GetName().."Text"]:SetPoint("RIGHT", component, "RIGHT", -2, 0)
+			end
 		else
 			component = CreateFrame("Button", (tabFrame:GetName()..'Tab'..idx), tabFrame, "HDH_AT_UITabBtnTemplate")
 			component:SetScript("OnClick", HDH_AT_OnChangeTabUI)

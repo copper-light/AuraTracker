@@ -22,22 +22,16 @@
 		<Color r="0.9" g="0.7" b="0" a="0.35"/>
 	</Texture>
 
-    <Font name="Font_Yellow_L" inherits="GameFontNormalSmall" virtual="true">
+    <Font name="Font_Yellow_L" inherits="GameFontNormalLarge" virtual="true">
 		<Color r="0.9" g="0.7" b="0"/>
-		<FontHeight>
-		  <AbsValue val="20"/>
-		</FontHeight>
 		<Shadow>
 			<Offset x="1" y="-1"/>
 			<Color r="0" g="0" b="0"/>
 		</Shadow>
 	</Font>
 	
-	<Font name="Font_Yellow_M" inherits="GameFontNormalSmall" virtual="true">
+	<Font name="Font_Yellow_M" inherits="GameFontNormal"  virtual="true">
 		<Color r="0.9" g="0.7" b="0"/>
-		<FontHeight>
-		  <AbsValue val="15"/>
-		</FontHeight>
 		<Shadow>
 			<Offset x="1" y="-1"/>
 			<Color r="0" g="0" b="0"/>
@@ -46,9 +40,6 @@
 
 	<Font name="Font_Yellow_S_B" inherits="GameFontNormalSmall" outline="NORMAL" virtual="true">
 		<Color r="0.9" g="0.7" b="0"/>
-		<FontHeight>
-		  <AbsValue val="11"/>
-		</FontHeight>
 		<Shadow>
 			<Offset x="1" y="-1"/>
 			<Color r="0" g="0" b="0"/>
@@ -57,20 +48,6 @@
 
     <Font name="Font_Yellow_S" inherits="GameFontNormalSmall" virtual="true">
 		<Color r="0.9" g="0.7" b="0"/>
-		<FontHeight>
-		  <AbsValue val="11"/>
-		</FontHeight>
-		<Shadow>
-			<Offset x="1" y="-1"/>
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-
-	<Font name="Font_Yellow_XXS" inherits="GameFontNormalSmall" virtual="true">
-		<Color r="0.9" g="0.7" b="0"/>
-		<FontHeight>
-		  <AbsValue val="7"/>
-		</FontHeight>
 		<Shadow>
 			<Offset x="1" y="-1"/>
 			<Color r="0" g="0" b="0"/>
@@ -79,20 +56,14 @@
 
 	<Font name="Font_Gray_S" inherits="GameFontNormalSmall" virtual="true">
 		<Color r="0.4" g="0.4" b="0.4"/>
-		<FontHeight>
-		  <AbsValue val="11"/>
-		</FontHeight>
 		<Shadow>
 			<Offset x="1" y="-1"/>
 			<Color r="0" g="0" b="0"/>
 		</Shadow>
 	</Font>
 
-	<Font name="Font_Gray_XXS" inherits="GameFontNormalSmall" virtual="true">
-		<Color r="0.3" g="0.3" b="0.3"/>
-		<FontHeight>
-		  <AbsValue val="7"/>
-		</FontHeight>
+	<Font name="Font_Gray_XS" inherits="GameFontNormalTiny2" virtual="true">
+		<Color r="0.6" g="0.6" b="0.6"/>
 		<Shadow>
 			<Offset x="1" y="-1"/>
 			<Color r="0" g="0" b="0"/>
@@ -101,51 +72,29 @@
 
 	<Font name="Font_Red_S" inherits="GameFontNormalSmall" virtual="true">
 		<Color r="0.9" g="0.1" b="0.1"/>
-		<FontHeight>
-		  <AbsValue val="11"/>
-		</FontHeight>
 		<Shadow>
 			<Offset x="1" y="-1"/>
 			<Color r="0" g="0" b="0"/>
 		</Shadow>
 	</Font>
 	
-	<Font name="Font_White_M" inherits="GameFontNormalSmall" virtual="true">
+	<Font name="Font_White_M" inherits="GameFontNormal" virtual="true">
 		<Color r="0.85" g="0.85" b="0.85"/>
-		<FontHeight>
-		  <AbsValue val="15"/>
-		</FontHeight>
 		<Shadow>
 			<Offset x="1" y="-1"/>
 			<Color r="0" g="0" b="0"/>
 		</Shadow>
 	</Font>
 	
-	<Font name="Font_White_S" inherits="GameFontNormalSmall" virtual="true">
+	<Font name="Font_White_S" inherits="GameFontNormalSmall"  virtual="true">
 		<Color r="0.85" g="0.85" b="0.85"/>
-		<FontHeight>
-		  <AbsValue val="11"/>
-		</FontHeight>
 		<Shadow x="1" y="-1">
 			<Color r="0" g="0" b="0"/>
 		</Shadow>
 	</Font>
 
-	<Font name="Font_White_XS" inherits="GameFontNormalSmall" virtual="true">
+	<Font name="Font_White_XS" inherits="GameFontNormalTiny2" virtual="true">
 		<Color r="0.85" g="0.85" b="0.85"/>
-		<FontHeight>
-		  <AbsValue val="9"/>
-		</FontHeight>
-		<Shadow x="1" y="-1">
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-
-	<Font name="Font_White_XXS" inherits="GameFontNormalSmall" virtual="true">
-		<Color r="0.85" g="0.85" b="0.85"/>
-		<FontHeight>
-		  <AbsValue val="7"/>
-		</FontHeight>
 		<Shadow x="1" y="-1">
 			<Color r="0" g="0" b="0"/>
 		</Shadow>
@@ -153,9 +102,6 @@
 	
 	<Font name="Font_Black_S" inherits="GameFontNormalSmall" virtual="true">
 		<Color r="0" g="0" b="0"/>
-		<FontHeight>
-		  <AbsValue val="11"/>
-		</FontHeight>
 		<Shadow>
 			<Offset x="1" y="-1"/>
 			<Color r="0" g="0" b="0"/>
@@ -196,7 +142,7 @@
 		</Anchors>
 		<Layers>
 			<Layer level="ARTWORK">
-				<FontString name ="$parentText" parentKey="HeaderText" inherits="Font_Yellow_M" text="사용할 디스플레이 유형을 선택해주세요">
+				<FontString name ="$parentText" parentKey="HeaderText" inherits="Font_Yellow_L" text="사용할 디스플레이 유형을 선택해주세요">
 					<Anchors>
 						<Anchor point="CENTER" x="0" y="100"/>
 					</Anchors>
@@ -410,7 +356,7 @@
 		</Anchors>
 		<Layers>
 			<Layer level="ARTWORK">
-				<FontString name ="$parentText" inherits="Font_Yellow_M" text="">
+				<FontString name ="$parentText" inherits="Font_Yellow_L" text="">
 					<Anchors>
 						<Anchor point="CENTER" x="0" y="10"/>
 					</Anchors>
@@ -549,7 +495,7 @@
 					</Anchors>
 				</Texture>
 
-				<FontString parentKey="Tracker" inherits="Font_White_XS" maxLines="1" justifyH="RIGHT" text="">
+				<FontString parentKey="Tracker" inherits="Font_Gray_XS" maxLines="1" justifyH="RIGHT" text="">
 					<Anchors>
 						<Anchor point="TOPLEFT" x="5" y="-12"/>
 						<Anchor point="BOTTOMRIGHT" x="-10" y="0"/>
@@ -1137,6 +1083,17 @@
 	</Button>
 
 	<Button name="HDH_AT_UITabBtnLabelTemplate" inherits="HDH_AT_UITabBtnTemplate" virtual="true">
+		<Layers>
+			<Layer  level="OVERLAY">
+				<Texture parentKey="Texture" hidden="true" file="Interface\Addons\HDH_AuraTracker\Texture\icon">
+					<Color r="0.8" g="0.6" b="0"/>
+					<Size x="12" y="12"/>
+					<Anchors>
+						<Anchor point="LEFT" x="6" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
 		<NormalFont style="Font_White_S"/>
 		<HighlightFont style="Font_Yellow_S"/>
 		<DisabledFont style="Font_Yellow_S"/>
@@ -1753,8 +1710,8 @@
 			</OnShow>
 		</Scripts>
 
-		<NormalFont style="Font_Yellow_M"/>
-		<HighlightFont style="Font_Yellow_M"/>
+		<NormalFont style="Font_Yellow_L"/>
+		<HighlightFont style="Font_Yellow_L"/>
     </Button>
 
 	<Frame name="HDH_AT_CheckButtonItemTemplate" virtual="true">
@@ -2541,7 +2498,7 @@
 				</FontString>
 
 				<FontString parentKey="ID" inherits="Font_White_XS" text="주문아이디" justifyH="LEFT">
-					<Size x="50" y="10" />
+					<Size x="70" y="10" />
 					<Anchors>
 						<Anchor point="TOPLEFT" relativePoint="RIGHT" relativeTo="$parentIcon" x="5" y="0"/>
 					</Anchors>
@@ -3025,9 +2982,6 @@
 						</Scripts>
 						<NormalTexture />
 						<DisabledTexture />
-						<NormalFont style="Font_Gray_XXS"/>
-						<HighlightFont style="Font_Yellow_XXS"/>
-						<DisabledFont style="Font_Gray_XXS"/>
 					</Button>
 					<Button name="$parentScrollDownButton" inherits="HDH_AT_TextureButtonTemplate" parentKey="ScrollDownButton">
 						<Size x="10" y="10"/>
@@ -3051,9 +3005,6 @@
 						</Scripts>
 						<NormalTexture />
 						<DisabledTexture />
-						<NormalFont style="Font_Gray_XXS"/>
-						<HighlightFont style="Font_Yellow_XXS"/>
-						<DisabledFont style="Font_Gray_XXS"/>
 					</Button>
 				</Frames>
 				<Scripts>
