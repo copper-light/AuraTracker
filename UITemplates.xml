@@ -634,39 +634,43 @@
 				<Layers>
 					<Layer>
 						<Texture parentKey="Top">
-							<Size x="20" y="1"/>
-							<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+							<Size x="22" y="1"/>
+							<!-- <Color r="0.3" g="0.3" b="0.3" a="0.5"/> -->
+							<Color r="0" g="0" b="0" a="0.4"/>
 							<Anchors>
-								<Anchor point="BOTTOM" relativePoint="TOP" relativeKey="$parent" x="0" y="1"/>
+								<Anchor point="BOTTOM" relativePoint="TOP" relativeKey="$parent" x="0" y="0"/>
 							</Anchors>
 						</Texture>
 
 						<Texture parentKey="Bottom">
-							<Size x="20" y="1"/>
-							<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+							<Size x="22" y="1"/>
+							<!-- <Color r="0.3" g="0.3" b="0.3" a="0.5"/> -->
+							<Color r="0" g="0" b="0" a="0.4"/>
 							<Anchors>
-								<Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent" x="0" y="-1"/>
+								<Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent" x="0" y="-0"/>
 							</Anchors>
 						</Texture>
 
 						<Texture parentKey="Left">
-							<Size x="1" y="18"/>
-							<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+							<Size x="1" y="22"/>
+							<!-- <Color r="0.3" g="0.3" b="0.3" a="0.5"/> -->
+							<Color r="0" g="0" b="0" a="0.4"/>
 							<Anchors>
-								<Anchor point="RIGHT" relativePoint="LEFT" relativeKey="$parent" x="-1" y="0"/>
+								<Anchor point="RIGHT" relativePoint="LEFT" relativeKey="$parent" x="-0" y="0"/>
 							</Anchors>
 						</Texture>
 
 						<Texture parentKey="Right">
-							<Size x="1" y="18"/>
-							<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+							<Size x="1" y="22"/>
+							<!-- <Color r="0.3" g="0.3" b="0.3" a="0.5"/> -->
+							<Color r="0" g="0" b="0" a="0.4"/>
 							<Anchors>
-								<Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent" x="1" y="0"/>
+								<Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent" x="0" y="0"/>
 							</Anchors>
 						</Texture>
 					</Layer>
 				</Layers>
-				<Size x="16" y="16"/>
+				<Size x="20" y="20"/>
 				<Anchors>
 					<Anchor point="LEFT" relativePoint="LEFT" x="25" y="0"/>
 				</Anchors>
@@ -794,7 +798,7 @@
 				</Size>
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="RIGHT">
-					<Offset><AbsDimension x="-5" y="0"/></Offset>
+					<Offset><AbsDimension x="0" y="0"/></Offset>
 					</Anchor>
 				</Anchors>
 				<Scripts>
