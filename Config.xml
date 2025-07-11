@@ -1130,7 +1130,7 @@
 			</Frame>
 
 			<Button name="$parentTabInfo" inherits="HDH_AT_BottomTapTemplate" id="1" hidden="false">
-				<Size x="32" y="32"/>
+				<!-- <Size x="32" y="32"/> -->
 				<Anchors>
 					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="10" y="-1" />
 				</Anchors>
@@ -1144,7 +1144,7 @@
 			</Button>
 
 			<Button name="$parentTabElements" inherits="HDH_AT_BottomTapTemplate" id="2" hidden="false">
-				<Size x="32" y="32"/>
+				<!-- <Size x="32" y="32"/> -->
 				<Anchors>
 				<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentTabInfo" x="3" y="0" />
 				</Anchors>
@@ -1158,7 +1158,7 @@
 			</Button>
 
 			<Button name="$parentTabUI" inherits="HDH_AT_BottomTapTemplate" id="3"  hidden="false">
-				<Size x="32" y="32"/>
+				<!-- <Size x="32" y="32"/> -->
 				<Anchors>
 					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentTabElements" x="3" y="0" />
 				</Anchors>

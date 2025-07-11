@@ -37,7 +37,7 @@ function HDH_AT_BottomTapMixin:SetActivate(bool)
         self.LeftActive:Show()
         self.MiddleActive:Show()
         self.RightActive:Show()
-        self.Text:SetPoint("CENTER",0,-3)
+        self.Text:SetPoint("TOP",0, -13)
     else
         self:Enable()
         self.Left:Show()
@@ -46,7 +46,7 @@ function HDH_AT_BottomTapMixin:SetActivate(bool)
         self.LeftActive:Hide()
         self.MiddleActive:Hide()
         self.RightActive:Hide()
-        self.Text:SetPoint("CENTER",0,3)
+        self.Text:SetPoint("TOP",0, -8)
     end
 end
 

@@ -1,23 +1,23 @@
-if select(4, GetBuildInfo()) <= 100205 then return end
+if select(4, GetBuildInfo()) <= 50000 then return end
+
 
 HDH_STAGGER_TRACKER = {}
 local DB = HDH_AT_ConfigDB
 local STAGGER_KEY = "STAGGER"
 
-local STAGGER_STATES = {
-	RED 	= { key = "red", threshold = .60 },
-	YELLOW 	= { key = "yellow", threshold = .30 },
-	GREEN 	= { key = "green" }
-}
+-- local STAGGER_STATES = {
+-- 	RED 	= { key = "red", threshold = .60 },
+-- 	YELLOW 	= { key = "yellow", threshold = .30 },
+-- 	GREEN 	= { key = "green" }
+-- }
 
 local STAGGER_RED_TRANSITION = _G.STAGGER_RED_TRANSITION or 0.60  -- wow global var : 0.6
 local STAGGER_YELLOW_TRANSITION = _G.STAGGER_YELLOW_TRANSITION  or 0.30-- wow global var : 0.3
 local info = PowerBarColor[STAGGER_KEY]
 
-local STAGGER_GREEN_INDEX = _G.STAGGER_GREEN_INDEX or "green"
-local STAGGER_YELLOW_INDEX = _G.STAGGER_YELLOW_INDEX or "yellow"
-local STAGGER_RED_INDEX = _G.STAGGER_RED_INDEX or "red"
-
+local STAGGER_GREEN_INDEX = info[1] and 1 or "green"
+local STAGGER_YELLOW_INDEX = info[2] and 2 or "yellow"
+local STAGGER_RED_INDEX = info[3] and 3 or "red"
 
 
 HDH_STAGGER_TRACKER.POWER_INFO = {
@@ -44,7 +44,7 @@ local function STAGGER_TRACKER_OnUpdate(self, elapsed)
 	self.spell.delay = self.spell.curTime
 
 	self.spell.health_max = UnitHealthMax("player");
-	self.spell.v1 =  UnitStagger('player') or 0
+	self.spell.v1 = UnitStagger('player') or 0
 	self.spell.per = self.spell.v1 / UnitHealthMax("player")
 	self.spell.count = (self.spell.per * 100)
 	if self.spell.count == math.huge then self.spell.count = 0; end

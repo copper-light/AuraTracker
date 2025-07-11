@@ -359,7 +359,7 @@ function HDH_AT_ConfigDB:GetTrackerElement(trackerId, elementIndex)
         local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
         local name = element.name
         if element.id then
-            name = HDH_AT_UTIL.GetInfo(element.id, element.isItem)
+            name = HDH_AT_UTIL.GetInfo(element.id, element.isItem) or name
         end
 
         return element.key, element.id, name, element.texture, element.display, element.glowType, element.isValue, element.isItem
