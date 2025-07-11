@@ -513,7 +513,7 @@ end
 
 function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-	local elemKey, elemId, elemName, texture, glowType, display, isValue, isItem, glowCondition, glowValue
+	local elemKey, elemId, elemName, texture, glowType, display, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
 	local trackerId = self.id
 	local spell, f
 	
@@ -523,20 +523,20 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 	for i = 1, power_max do
 		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 		display, _, _, _ = DB:GetTrackerElementDisplay(trackerId, i)
-		glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
+		glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
 
 		f = self.frame.icon[i]
 		spell = {}
 		spell.glow = glowType
 		spell.glowCondtion = glowCondition
 		spell.glowValue = (glowValue and tonumber(glowValue)) or 0
+		spell.glowEffectType = glowEffectType
+		spell.glowEffectColor = glowEffectColor
+		spell.glowEffectPerSec = glowEffectPerSec
 		spell.per = 0
 		spell.showValue = isValue
 		spell.display = display
 		spell.v1 = 0 -- 수치를 저장할 변수
-		spell.aniEnable = true;
-		spell.aniTime = 8;
-		spell.aniOverSec = false;
 		spell.no = i
 		spell.name = elemName
 		spell.icon = texture

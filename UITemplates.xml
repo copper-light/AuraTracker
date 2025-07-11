@@ -471,7 +471,7 @@
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture name="$parentBg" parentKey="BG">
-					<Color r="0" g="0" b="0" a=".5"/>
+					<Color r="0" g="0" b="0" a=".3"/>
 					<Anchors>
 						<Anchor point="TOPLEFT" x="1" y="-1" />
 						<Anchor point="BOTTOMRIGHT" x="-5" y="1" />
@@ -488,10 +488,13 @@
 			</Layer>
 			<Layer level="OVERLAY">
 				<Texture name="$parentBgLine2" hidden="true" inherits="HDH_AT_Texture_Yellow">
-					<Size><AbsDimension x="7" y="33" /></Size>
+					<Size><AbsDimension x="2" y="33" /></Size>
 					<Anchors>
-						<Anchor point="TOPRIGHT" x="0" y="-1" relativePoint="TOPRIGHT" />
-						<Anchor point="BOTTOMRIGHT" x="0" y="1" relativePoint="BOTTOMRIGHT" />
+						<Anchor point="TOPRIGHT" x="-2" y="-2" relativePoint="TOPRIGHT" />
+						<Anchor point="BOTTOMRIGHT" x="-2" y="2" relativePoint="BOTTOMRIGHT" />
+
+						<!-- <Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT" />
+						<Anchor point="BOTTOMLEFT" x="2" y="2" relativePoint="BOTTOMLEFT" /> -->
 					</Anchors>
 				</Texture>
 
@@ -547,7 +550,7 @@
 		<ButtonText name="$parentText" parentKey="Text" maxLines="1" justifyH="CENTER">
 			<Anchors>
 				<Anchor point="TOPLEFT" x="5" y="0"/>
-				<Anchor point="BOTTOMRIGHT" x="-10" y="0"/>
+				<Anchor point="BOTTOMRIGHT" x="-5" y="0"/>
 			</Anchors>
 		</ButtonText>
 		<NormalFont style="Font_White_S"/>
@@ -952,7 +955,7 @@
 	<Button name="HDH_AT_UITabBtnTemplate" mixin="HDH_AT_UITabBtnMixin" virtual="true">
 		<Size><AbsDimension x="90" y="30" /></Size>
 		<Layers>
-			<Layer level="BORDER">
+			<Layer level="BORDER" textureSubLevel="0">
 				<Texture name="$parentBgLine1" hidden="true">
 					<Color r="0" g="0" b="0" a="0.5"/>
 					<Size><AbsDimension x="3" y="35" /></Size>
@@ -961,18 +964,22 @@
 						<Anchor point="BOTTOMLEFT" x="-2" y="0"/>
 					</Anchors>
 				</Texture>
-				<Texture name="$parentLine2" parentKey="Active1" hidden="true" inherits="HDH_AT_Texture_Yellow">
-					<Size><AbsDimension x="5" y="33" /></Size>
-					<Anchors>
-						<Anchor point="TOPRIGHT" x="-1" y="-1"/>
-						<Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
-					</Anchors>
-				</Texture>
 				<Texture alphaMode="ADD" parentKey="Active2"  hidden="true"  file="Interface\HELPFRAME\HelpFrameButton-Highlight">
-					<TexCoords left="0.6" right="0.9" top="0.1" bottom="0.5" />
+					<TexCoords left="0.5" right="0.9" top="0.1" bottom="0.5" />
 					<Anchors>
 						<Anchor point="TOPLEFT" x="1" y="-1"/>
 						<Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BORDER" textureSubLevel="1">
+				<Texture name="$parentLine2" parentKey="Active1" hidden="true" inherits="HDH_AT_Texture_Yellow">
+					<Size><AbsDimension x="2" y="33" /></Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="-1" y="-1"/>
+						<Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
+						<!-- <Anchor point="TOPLEFT" x="1" y="-1" relativePoint="TOPLEFT" />
+						<Anchor point="BOTTOMLEFT" x="1" y="1" relativePoint="BOTTOMLEFT" /> -->
 					</Anchors>
 				</Texture>
 			</Layer>
@@ -1146,7 +1153,80 @@
     <Button name="HDH_AT_ButtonTemplate" virtual="true">
 		<Size><AbsDimension x="90" y="22" /></Size>
 		<Layers>
-			<Layer level="BACKGROUND">
+			<!-- <Layer level="BACKGROUND" textureSubLevel="0">
+				<Texture name="$parentTopLeft" file="Interface\Addons\HDH_AuraTracker\Texture\roundrect" parentKey="TopLeft">
+					<Color r="1" g="0" b="0" a="0.5"/>
+					<Size x="3" y="3"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+					</Anchors>
+					<TexCoords top="0" bottom="0.2" left="0" right="0.2"/>
+				</Texture>
+				<Texture name="$parentTopRight" file="Interface\Addons\HDH_AuraTracker\Texture\roundrect" parentKey="TopRight">
+					<Color r="1" g="0" b="0" a="0.5"/>
+					<Size x="3" y="3"/>
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="0" y="0"/>
+					</Anchors>
+					<TexCoords top="0" bottom="0.2" left="0.2" right="0"/>
+				</Texture>
+				<Texture name="$parentBottomLeft" file="Interface\Addons\HDH_AuraTracker\Texture\roundrect" parentKey="BottomLeft">
+					<Color r="1" g="0" b="0" a="0.5"/>
+					<Size x="3" y="3"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" x="0" y="0"/>
+					</Anchors>
+					<TexCoords top="0.2" bottom="0.0" left="0" right="0.2"/>
+				</Texture>
+				<Texture name="$parentBottomRight" file="Interface\Addons\HDH_AuraTracker\Texture\roundrect" parentKey="BottomRight">
+					<Color r="1" g="0" b="0" a="0.5"/>
+					<Size x="3" y="3"/>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+					<TexCoords top="0.2" bottom="0.0" left="0.2" right="0.0"/>
+				</Texture>
+				<Texture name="$parentTop" >
+					<Color r="1" g="0" b="0" a="0.5"/>
+					<Size x="3" y="3"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.TopLeft" relativePoint="TOPRIGHT"/>
+						<Anchor point="TOPRIGHT" relativeKey="$parent.TopRight" relativePoint="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentBottom">
+					<Color r="1" g="0" b="0" a="0.5"/>
+					<Size x="3" y="3"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeKey="$parent.BottomLeft" relativePoint="BOTTOMRIGHT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.BottomRight" relativePoint="BOTTOMLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentLeft" >
+					<Color r="1" g="0" b="0" a="0.5"/>
+					<Size x="3" y="3"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.TopLeft" relativePoint="BOTTOMLEFT"/>
+						<Anchor point="BOTTOMLEFT" relativeKey="$parent.BottomLeft" relativePoint="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentRight">
+					<Color r="1" g="0" b="0" a="0.5"/>
+					<Size x="3" y="3"/>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeKey="$parent.TopRight" relativePoint="BOTTOMRIGHT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.BottomRight" relativePoint="TOPRIGHT"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentCenter">
+					<Color r="1" g="0" b="0" a="0.5"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeKey="$parent.TopLeft" relativePoint="BOTTOMRIGHT"/>
+						<Anchor point="BOTTOMRIGHT" relativeKey="$parent.BottomRight" relativePoint="TOPLEFT"/>
+					</Anchors>
+				</Texture>
+			</Layer> -->
+			<Layer level="BORDER">
 				<Texture name="$parentBgLine1" hidden="true">
 					<Color r="0" g="0" b="0" a="0.5"/>
 					<Size><AbsDimension x="3" y="35" /></Size>
@@ -1554,7 +1634,7 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<Button name="$parentList" parentKey="List" toplevel="true" frameStrata="FULLSCREEN_DIALOG"  hidden="true" >
+			<Button name="$parentList" parentKey="List" toplevel="true" frameStrata="TOOLTIP" hidden="true" >
 				<Size><AbsDimension y="1"/></Size>
                 <Layers>
                     <Layer level="BACKGROUND">
@@ -1737,7 +1817,12 @@
 			<OnShow>
 			</OnShow>
 		</Scripts>
-
+		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_White_A">
+			<Anchors>
+				<Anchor point="TOPLEFT" x="1" y="-1" />
+				<Anchor point="BOTTOMRIGHT" x="-1" y="1" />
+			</Anchors>
+		</HighlightTexture>
 		<NormalFont style="Font_Yellow_L"/>
 		<HighlightFont style="Font_Yellow_L"/>
     </Button>
@@ -2296,9 +2381,9 @@
 	<Frame name="HDH_AT_LineFrameTemplate" virtual="true">
 		<Layers>
 			<Layer level="ARTWORK">
-				<Texture name="$parentLine" parentKey="Line">
+				<Texture name="$parentLine" inherits="HDH_AT_Texture_Yellow" parentKey="Line">
 					<Size y="1" />
-					<Color r="1" g="1" b="1" a="0.5"/>
+					<!-- <Color r="1" g="1" b="1" a="0.5"/> -->
 					<Anchors>
 						<Anchor point="BOTTOMLEFT" x="0" y="0"/>
 						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
@@ -2325,9 +2410,18 @@
 
 	<Frame name="HDH_AT_SliderTemplate" mixin="HDH_AT_SliderTemplateMixin" virtual="true">
 		<Layers>
-			<Layer level="BACKGROUND">
+			<Layer level="BACKGROUND" textureSubLevel="0">
 				<Texture name="$parentBg" parentKey="Background">
 					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="BACKGROUND" textureSubLevel="1">
+				<Texture alphaMode="ADD" inherits="HDH_AT_Texture_White_A" parentKey="Highlight" hidden="true">
 					<Anchors>
 						<Anchor point="TOPLEFT" x="0" y="0"/>
 						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
@@ -2353,9 +2447,9 @@
 
 			<Layer level="OVERAY">
 				<Texture name="$parentBar" parentKey="AchorPoint" hidden="true" alphaMode="ADD" inherits="HDH_AT_Texture_Yellow">
-					<Size x="3" y="18" />
+					<Size x="2" y="16" />
 					<Anchors>
-						<Anchor point="CENTER" relativeTo="$parentBar" relativePoint="RIGHT" x="0" y="0"/>
+						<Anchor point="RIGHT" relativeTo="$parentBar" relativePoint="RIGHT" x="0" y="0"/>
 					</Anchors>
 				</Texture>
 			</Layer>
@@ -2393,9 +2487,11 @@
 					<OnClick function="HDH_AT_SliderTemplateMixin_OnClick"/>
 					<OnEnter>
 						self:GetParent().AchorPoint:Show()
+						self:GetParent().Highlight:Show()
 					</OnEnter>
 					<OnLeave>
 						self:GetParent().AchorPoint:Hide()
+						self:GetParent().Highlight:Hide()
 					</OnLeave>
 				</Scripts>
 			</Button>
@@ -2431,9 +2527,11 @@
 					<OnClick function="HDH_AT_SliderTemplateMixin_OnClick"/>
 					<OnEnter>
 						self:GetParent().AchorPoint:Show()
+						self:GetParent().Highlight:Show()
 					</OnEnter>
 					<OnLeave>
 						self:GetParent().AchorPoint:Hide()
+						self:GetParent().Highlight:Hide()
 					</OnLeave>
 				</Scripts>
 			</Button>
@@ -2448,13 +2546,16 @@
 				<Scripts>
 					<OnEnter>
 						self:GetParent().AchorPoint:Show()
+						self:GetParent().Highlight:Show()
 					</OnEnter>
 					<OnLeave>
 						self:GetParent().AchorPoint:Hide()
+						self:GetParent().Highlight:Hide()
 					</OnLeave>
 					<OnMouseDown>
 						self:StartMoving()
 						self:GetParent().AchorPoint:Show()
+						self:GetParent().Highlight:Show()
 						self:GetParent():SetScript("OnUpdate", self:GetParent().OnUpdate)
 					</OnMouseDown>
 					<OnMouseUp>
@@ -2469,7 +2570,8 @@
 			<EditBox name="$parentEdit" parentKey="EditBox" inherits="InputBoxScriptTemplate" enableMouse="true" autoFocus="false" >
 				<Size x="80" y="20" />
 				<Anchors>
-					<Anchor point="CENTER"  relativePoint="CENTER" x="0" y="0"/>
+					<Anchor point="LEFT"  relativePoint="RIGHT" relativeKey="$parent.Left" x="0" y="0"/>
+					<Anchor point="RIGHT"  relativePoint="LEFT" relativeKey="$parent.Right" x="0" y="0"/>
 				</Anchors>
 				<FontString inherits="Font_White_S" justifyH="CENTER" />
 				<Scripts>
@@ -2478,9 +2580,11 @@
 					<OnEditFocusLost function="HDH_AT_SliderTemplateMixin_OnEditFocusLost"/>
 					<OnEnter>
 						self:GetParent().AchorPoint:Show()
+						self:GetParent().Highlight:Show()
 					</OnEnter>
 					<OnLeave>
 						self:GetParent().AchorPoint:Hide()
+						self:GetParent().Highlight:Hide()
 					</OnLeave>
 				</Scripts>
 			</EditBox>

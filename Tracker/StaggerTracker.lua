@@ -223,7 +223,7 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 		return 
 	end
 
-	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitValues
+	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitValues, glowEffectType, glowEffectColor, glowEffectPerSec
 	local elemSize = DB:GetTrackerElementSize(trackerId)
 	local spell 
 	local f
@@ -241,7 +241,7 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 	if self:IsHaveData() then
 		for i = 1 , elemSize do
 			elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-			glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
+			glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
 			splitValues = DB:GetTrackerElementSplitValues(trackerId, i)
 
 			iconIdx = iconIdx + 1
@@ -252,12 +252,12 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.glow = glowType
 			spell.glowCondtion = glowCondition
 			spell.glowValue = (glowValue and tonumber(glowValue)) or 0
+			spell.glowEffectType = glowEffectType
+			spell.glowEffectColor = glowEffectColor
+			spell.glowEffectPerSec = glowEffectPerSec
 			spell.showValue = isValue
 			spell.display = display
 			spell.v1 = 0 -- 수치를 저장할 변수
-			spell.aniEnable = true;
-			spell.aniTime = 8;
-			spell.aniOverSec = false;
 			spell.no = i
 			spell.name = elemName
 			spell.icon = texture

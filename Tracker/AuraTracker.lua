@@ -20,7 +20,7 @@ do
 	local StaggerID = { }
 	StaggerID[124275] = true
 	StaggerID[124274] = true
-	StaggerID[124273] = true 
+	StaggerID[124273] = true
 	
 	function HDH_AURA_TRACKER.GetAuras(self)
 		local curTime = GetTime()
@@ -380,7 +380,7 @@ do
 		self.aura_filter = aura_filter
 		self.aura_caster = aura_caster
 		if not id then return end
-		local elemKey, elemId, elemName, texture, glowType, isValue, isItem, glowCondition, glowValue
+		local elemKey, elemId, elemName, texture, glowType, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
 		local display, connectedId, connectedIsItem, unlearnedHideMode
 		local elemSize = DB:GetTrackerElementSize(trackerId)
 		local spell 
@@ -403,7 +403,7 @@ do
 			for i = 1, elemSize do
 				elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 				display, connectedId, connectedIsItem, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, i)
-				glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
+				glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
 
 				if connectedId then
 					isLearned = HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(connectedId, nil, connectedIsItem)
@@ -429,12 +429,12 @@ do
 					spell.glow = glowType
 					spell.glowCondtion = glowCondition
 					spell.glowValue = (glowValue and tonumber(glowValue)) or 0
+					spell.glowEffectType = glowEffectType
+					spell.glowEffectColor = glowEffectColor
+					spell.glowEffectPerSec = glowEffectPerSec
 					spell.showValue = isValue
 					spell.display = display
 					spell.v1 = 0 -- 수치를 저장할 변수
-					spell.aniEnable = true;
-					spell.aniTime = 8;
-					spell.aniOverSec = false;
 					spell.no = iconIdx
 					spell.name = elemName
 					spell.icon = texture

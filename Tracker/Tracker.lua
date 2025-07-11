@@ -19,6 +19,7 @@ HDH_TRACKER.ENABLE_MOVE = false
 HDH_TRACKER.ONUPDATE_FRAME_TERM = 0.05;
 HDH_TRACKER.ANI_SHOW = 1
 HDH_TRACKER.ANI_HIDE = 2
+HDH_TRACKER.ANI_GLOW_COLOR_BORDER = 3
 HDH_TRACKER.FONT_STYLE = "fonts/2002.ttf";
 HDH_TRACKER.MAX_ICONS_COUNT = 10
 HDH_TRACKER.BAR_UP_ANI_TERM = .15 -- second
@@ -37,7 +38,6 @@ local function UpdateCooldown(f, elapsed)
 	
 	f.elapsed = (f.elapsed or 0) + elapsed;
 	if f.elapsed < HDH_TRACKER.ONUPDATE_FRAME_TERM then  return end  -- 30프레임
-	f.elapsed = 0
 	spell.curTime = GetTime();
 	spell.remaining = (spell.endTime or 0) - spell.curTime
 	if spell.remaining > 0.0 and spell.duration > 0 then
@@ -104,7 +104,23 @@ local function UpdateCooldown(f, elapsed)
 			tracker:UpdateGlow(f, true)
 		end
 	end
-	-- tracker:CheckCondition(f, spell.remaining);
+
+
+	f.elapsed = 0
+end
+
+local function OnUpdateGlowColor(self, elapsed)
+	self.sparkElapsed = self.sparkElapsed and self.sparkElapsed + elapsed or elapsed
+	if self.sparkElapsed < HDH_TRACKER.ONUPDATE_FRAME_TERM then return end 
+
+	self.p = HDH_AT_UTIL.LogScale(math.max(math.min((1.25 - (GetTime() % (1/self:GetParent().spell.glowEffectPerSec) + .001) / (1/self:GetParent().spell.glowEffectPerSec*0.8)), 1.), 0.3))
+	self.p_c =  math.max(self.p, 0.5)
+
+	self.spot:SetVertexColor(1 * self.p, 1 * self.p, 1 * self.p, 0.74)
+	self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1] * self.p_c, 
+										self:GetParent().spell.glowEffectColor[2] * self.p_c, 
+										self:GetParent().spell.glowEffectColor[3] * self.p_c, 
+										self:GetParent().spell.glowEffectColor[4] * self.p_c)
 end
 
 -- 매 프레임마다 bar frame 그려줌, 콜백 함수
@@ -201,6 +217,21 @@ local function frameBaseSettings(f)
 	
 	f.border = CreateFrame("Frame", nil, f.iconframe):CreateTexture(nil, 'OVERLAY')
 	f.border:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/border2.blp]])
+	
+	tempf = CreateFrame("Frame", nil, f)
+	tempf:SetFrameLevel(f.border:GetParent():GetFrameLevel()+1)
+	tempf:SetPoint('TOPLEFT', f.iconframe, 'TOPLEFT', 0, 0)
+	tempf:SetPoint('BOTTOMRIGHT', f.iconframe, 'BOTTOMRIGHT', 0, 0)
+	tempf:SetScript("Onupdate", OnUpdateGlowColor)
+	f.border.spark = tempf
+	f.border.spark.color = tempf:CreateTexture(nil, 'BORDER')
+	f.border.spark.color:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/spark_rect.blp]])
+	-- f.border.spark.color:SetBlendMode("ADD")
+	f.border.spark.color:SetPoint('CENTER', tempf, 'CENTER', 0, 0)
+	f.border.spark.spot = tempf:CreateTexture(nil, 'OVERLAY')
+	f.border.spark.spot:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/border2.blp]])
+	f.border.spark.spot:SetBlendMode("ADD")
+	f.border.spark.spot:SetPoint('CENTER', tempf, 'CENTER', 0, 0)
 end
 
 --------------------------------------------
@@ -269,9 +300,6 @@ function HDH_TRACKER.Updates(trackerId)
 			t:Update()
 		end
 	else
-		-- local curTalentId = select(1, GetSpecializationInfo(GetSpecialization()))
-		-- local curTrait = C_ClassTalents.GetLastSelectedSavedConfigID(curTalentId)
-		-- local ids = DB:GetTrackerIdsByTraits(curTalentId, curTrait)
 		for _, t in pairs(HDH_TRACKER.GetList()) do
 			if t then
 				t:Update()
@@ -281,8 +309,6 @@ function HDH_TRACKER.Updates(trackerId)
 
 	return HDH_TRACKER.objList
 end
-
--- function HDH_TRACKER.is()
 
 function HDH_TRACKER.InitVaribles(trackerId)
 	local id, name, type, unit
@@ -489,8 +515,9 @@ function HDH_TRACKER:CreateData()
 end
 
 function HDH_TRACKER:IsHaveData()
-	_, _, t_type, _, aura_filter = DB:GetTrackerInfo(self.id)
+	local aura_filter
 	local cnt;
+	_, _, _, _, aura_filter = DB:GetTrackerInfo(self.id)
 	if aura_filter ~=nil and aura_filter ~= DB.AURA_FILTER_REG then
 		cnt = HDH_TRACKER.MAX_ICONS_COUNT;
 	else
@@ -1338,7 +1365,7 @@ local function CreateMoveFrame(self)
 	self.frame.moveFrame = tf
 	t:SetPoint("TOPLEFT")
 	t:SetPoint("BOTTOMRIGHT")
-	t:SetColorTexture(1,1,1,0.5)
+	t:SetColorTexture(1,0,0,0.5)
 	t:SetAlpha(0)
 	self.frame.moveFrame.active = t
 
@@ -1402,36 +1429,52 @@ local function CreateMoveFrame(self)
 	text:SetMaxLines(1) 
 	
 	local btn = CreateFrame("Button", nil, self.frame.moveFrame, "HDH_AT_ButtonTemplate")
+	t = btn:CreateTexture(nil, 'OVERLAY')
+	t:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/Left")
+	t:SetTexCoord(0,1,0,1)
+	t:SetPoint("CENTER")
+	t:SetSize(8,10)
 	btn:SetFrameStrata("HIGH")
-	btn:SetText("◀")
-	btn:SetSize(20, 20)
+	btn:SetSize(16, 16)
 	btn:SetPoint("TOPRIGHT", self.frame.moveFrame.active, "BOTTOM", 0, 0)
 	btn:SetScript("OnClick", OnClick_MoveButton)
 	btn.x = -1
 	self.frame.moveBtn1 = btn
 
 	btn = CreateFrame("Button", nil, self.frame.moveFrame, "HDH_AT_ButtonTemplate")
+	t = btn:CreateTexture(nil, 'OVERLAY')
+	t:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/Left")
+	t:SetTexCoord(1,0,0,1)
+	t:SetPoint("CENTER")
+	t:SetSize(8,10)
 	btn:SetFrameStrata("HIGH")
-	btn:SetText("▶")
-	btn:SetSize(20, 20)
+	btn:SetSize(16, 16)
 	btn:SetPoint("TOPLEFT", self.frame.moveFrame.active, "BOTTOM", 0, 0)
 	btn:SetScript("OnClick", OnClick_MoveButton)
 	btn.x = 1
 	self.frame.moveBtn2 = btn
 
 	btn = CreateFrame("Button", nil, self.frame.moveFrame, "HDH_AT_ButtonTemplate")
+	t = btn:CreateTexture(nil, 'OVERLAY')
+	t:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/Up")
+	t:SetTexCoord(0,1,0,1)
+	t:SetPoint("CENTER")
+	t:SetSize(10,8)
 	btn:SetFrameStrata("HIGH")
-	btn:SetText("▲")
-	btn:SetSize(20, 20)
+	btn:SetSize(16, 16)
 	btn:SetPoint("BOTTOMLEFT", self.frame.moveFrame.active, "RIGHT", 0, 0)
 	btn:SetScript("OnClick", OnClick_MoveButton)
 	btn.y = 1
 	self.frame.moveBtn3 = btn
 
 	btn = CreateFrame("Button", nil, self.frame.moveFrame, "HDH_AT_ButtonTemplate")
+	t = btn:CreateTexture(nil, 'OVERLAY')
+	t:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/Up")
+	t:SetTexCoord(0,1,1,0)
+	t:SetPoint("CENTER")
+	t:SetSize(10,8)
 	btn:SetFrameStrata("HIGH")
-	btn:SetText("▼")
-	btn:SetSize(20, 20)
+	btn:SetSize(16, 16)
 	btn:SetPoint("TOPLEFT", self.frame.moveFrame.active, "RIGHT", 0, 0)
 	btn:SetScript("OnClick", OnClick_MoveButton)
 	btn.y = -1
@@ -1621,6 +1664,16 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	f.border:SetTexCoord(border, 1 - border, border, 1 - border)
 	f.border:SetPoint('CENTER', f.iconframe, 'CENTER', 0, 0)
 
+	f.border.spark.spot:SetSize(op_icon.size, op_icon.size)
+	-- f.border.spark.spot:SetTexCoord(0.2355 * (1-ICON_BORDER_VALUE[2]),
+	-- 								  1 - (0.2355 * (1-ICON_BORDER_VALUE[2])),
+	-- 								  0.2355 * (1-ICON_BORDER_VALUE[2]), 
+	-- 								  1 -  (0.2355 * (1-ICON_BORDER_VALUE[2])))
+
+	f.border.spark.spot:SetTexCoord(border, 1 - border, border, 1 - border)
+	
+	f.border.spark.color:SetSize(op_icon.size*1.25, op_icon.size*1.25)
+
 	if op_icon.cooldown == DB.COOLDOWN_CIRCLE then
 		f.cooldown2:SetSwipeColor(unpack(op_icon.cooldown_bg_color))
 	else
@@ -1737,7 +1790,9 @@ if select(4, GetBuildInfo()) <= 49999 then -- 대격변 코드
 	end
 	
 	function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
-		ActionButton_HideOverlayGlow(f.iconframe);
+		if ( f.iconframe.overlay ) then
+			ActionButton_HideOverlayGlow(f.iconframe);
+		end
 	end
 	
 	function HDH_TRACKER:IsGlowing(f)
@@ -1833,9 +1888,20 @@ HDH_TRACKER.DB_Spell = {}
 
 function HDH_TRACKER:UpdateGlow(f, bool)
 	if f.spell.ableGlow then -- 블리자드 기본 반짝임 효과면 무조건 적용
-		self:ActionButton_ShowOverlayGlow(f) return
+		if f.spell.glowEffectType == DB.GLOW_EFFECT_DEFAULT then
+			self:ActionButton_ShowOverlayGlow(f)
+			if f.border.spark:IsShown() then
+				f.border.spark:Hide() 
+				f.spell.glowColorOn = false
+			end
+		else
+			if not f.border.spark:IsShown() then
+				f.border.spark:Show() 
+				f.spell.glowColorOn = true
+			end
+		end
 	end
-	if bool and (f.spell and f.spell.glow ~= DB.GLOW_CONDITION_NONE) then
+	if bool and (f.spell and f.spell.glow ~= DB.GLOW_CONDITION_NONE) and self.ui.common.display_mode ~= DB.DISPLAY_BAR then
 		local value = 0
 		local active = false
 
@@ -1863,12 +1929,31 @@ function HDH_TRACKER:UpdateGlow(f, bool)
 			end
 		end
 		if active then
-			self:ActionButton_ShowOverlayGlow(f)
+			if f.spell.glowEffectType == DB.GLOW_EFFECT_DEFAULT then
+				self:ActionButton_ShowOverlayGlow(f)
+				if f.border.spark:IsShown() then
+					f.border.spark:Hide() 
+					f.spell.glowColorOn = false
+				end
+			else
+				if not f.border.spark:IsShown() then
+					f.border.spark:Show() 
+					f.spell.glowColorOn = true
+				end
+			end
 		else
 			self:ActionButton_HideOverlayGlow(f)
+			if f.border.spark:IsShown() then
+				f.border.spark:Hide() 
+				f.spell.glowColorOn = false
+			end
 		end
 	else
 		self:ActionButton_HideOverlayGlow(f)
+		if f.border.spark:IsShown() then
+			f.border.spark:Hide() 
+			f.spell.glowColorOn = false
+		end
 	end
 end
 
@@ -1904,6 +1989,12 @@ function HDH_TRACKER:GetAni(f, ani_type) -- row 이동 애니
 			end)
 		end
 		return f.aniShow;
+	elseif ani_type== HDH_TRACKER.ANI_GLOW_COLOR_BORDER then
+		if not f.aniShow then
+			local ag = f:CreateAnimationGroup()
+			f.aniShow = ag
+
+		end
 	end
 end
 
@@ -1930,6 +2021,8 @@ function HDH_TRACKER:StartAni(f, ani_type) -- row 이동 실행
 			f:Show();
 			self:GetAni(f, ani_type):Play();
 		end
+	elseif ani_type== HDH_TRACKER.ANI_GLOW_COLOR_BORDER then
+		
 	end
 end
 

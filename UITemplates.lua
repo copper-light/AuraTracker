@@ -242,18 +242,24 @@ HDH_AT_DropDownMixin = {
 }
 
 function HDH_AT_DropDown_OnEnteredItem(self)
-    local dropdownBtn = self:GetParent():GetParent()
+    local dropdownBtn = self.dropdownBtn
     dropdownBtn.onEnterHandler(dropdownBtn, self, self.idx, self.value)
+    if dropdownBtn.hideenBG:IsShown() then
+        dropdownBtn.hideenBG:Hide()
+    end
 end
 
 function HDH_AT_DropDown_OnSelectedItem(self)
-    local dropdownBtn = self:GetParent():GetParent()
+    local dropdownBtn = self.dropdownBtn
     dropdownBtn:SetSelectedIndex(self.idx)
     dropdownBtn.onClickHandler(dropdownBtn, self, self.idx, self.value)
+    if dropdownBtn.hideenBG:IsShown() then
+        dropdownBtn.hideenBG:Hide()
+    end
 end
 
 function HDH_AT_DropDown_OnCheckButon(self)
-    local dropdownBtn = self:GetParent():GetParent():GetParent()
+    local dropdownBtn = self:GetParent().dropdownBtn
     dropdownBtn.selectedValueCount = dropdownBtn.selectedValueCount or 0
     if self:GetChecked() then
         dropdownBtn.selectedValueCount = dropdownBtn.selectedValueCount + 1
@@ -537,6 +543,8 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
             itemFrame.value = id
             itemFrame.name = name
             itemFrame.texture = texture
+            itemFrame.dropdownBtn = frame
+
             totalHeight = totalHeight + itemFrame:GetHeight()
         end
 
@@ -604,6 +612,28 @@ function HDH_AT_DropDown_OnClick(self)
     end
     if not self.always_show_list then
         local list = _G[self:GetName().."List"]
+
+        if not self.hideenBG then
+            self.hideenBG = CreateFrame("Frame", self:GetName().."HiddenBG", UIParent)
+            self.hideenBG:SetFrameStrata("tooltip")
+            self.hideenBG:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0,0)
+            self.hideenBG:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0,0)
+            self.hideenBG:SetScript("OnMouseUP", function(self) self:Hide() self.list:Hide() end)
+            self.hideenBG:SetScript("OnShow", function(self) 
+                table.insert(UISpecialFrames, self:GetName())
+                self:EnableKeyboard(1)
+            end)
+            self.hideenBG:SetPropagateMouseClicks(true)
+            self.hideenBG.list = list
+        end
+
+        self.hideenBG:Show()
+        list:ClearAllPoints()
+        list:SetWidth(self:GetWidth())
+        list:SetParent(list.bg)
+        list:SetFrameStrata("tooltip")
+        list:SetClampedToScreen(true)
+        list:SetPoint("TOP", self, "BOTTOM", 0, 0)
         list:SetShown(not list:IsShown())
     end
 end
@@ -712,7 +742,7 @@ end
 
 local function OnSelectedColorPicker()
     if ColorPickerFrame.buttonFrame == nil then return end
-    self = ColorPickerFrame.buttonFrame
+    local self = ColorPickerFrame.buttonFrame
     local r, g, b  = ColorPickerFrame:GetColorRGB()
     self:SetColorRGBA(r, g, b, ColorPickerFrame:GetColorAlpha())
     self.handler(self, r, g, b, ColorPickerFrame:GetColorAlpha())
@@ -1096,29 +1126,26 @@ end
 HDH_AT_SliderTemplateMixin = {}
 
 function HDH_AT_SliderTemplateMixin_OnClick(self)
-    local tick = 0
     local value 
-    if self:GetParent().maxValue > 1 then
-        tick = 1
+    local slider = self:GetParent()
+
+    if self == slider.Left then
+        value = slider.value - slider.tick
     else
-        tick = 0.1
+        value = slider.value + slider.tick
     end
 
-    if self == self:GetParent().Left then
-        value = self:GetParent().value - tick
-    else
-        value = self:GetParent().value + tick
-    end
-
-    if self:GetParent().value ~= value then
-        if self:GetParent():SetValue(value) and self:GetParent().handler then
-            self:GetParent().handler(self:GetParent(), self:GetParent().value)
+    if slider.value ~= value then
+        if slider:SetValue(value) and slider.handler then
+            slider.handler(slider, slider.value)
         end
     end
 end
 
-function HDH_AT_SliderTemplateMixin:Init(value, min, max, a, b, c, format)
-    self.format = format or ( (max > 1) and "%d") or "%.1f"
+function HDH_AT_SliderTemplateMixin:Init(value, min, max, tick, format)
+    self.tick = tick or 1
+    self.tickDecimalPlaces = HDH_AT_UTIL.GetDecimalPlaces(self.tick)
+    self.format = format or ((self.tickDecimalPlaces == 0) and "%d") or "%.1f"
     self.width = self:GetWidth() - 35
     self:SetMinMaxValues(min, max)
     self:SetValue(value)
@@ -1144,12 +1171,7 @@ function HDH_AT_SliderTemplateMixin:SetValue(value)
         value = self.maxValue
     end
 
-    if self.maxValue > 1 then
-        value = math.floor(value+0.5)
-    else
-        value = math.floor((value * 10) + 0.5) / 10
-    end
-    
+    value = math.floor((value + (self.tick/2)) / self.tick) * self.tick
     if self.value ~= value then
         self.value = value
         self.Bar:SetWidth(math.max((value - self.minValue) * self.tickWidth, 0.01))

@@ -102,28 +102,18 @@
 							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 							<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
 						</Anchors>
-						
 						<Frames>
 							<Button name="$parentBtnAddTracker" inherits="HDH_AT_TrackerTapBtnTemplate">
 								<Size x="120" y="40" />
 								<Anchors>
 									<Anchor point="TOPRIGHT" relativePoint="TOPLEFT" x="2" y="0" />
-									<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 								</Anchors>
-								<Layers> 
-									<Layer level="ARTWORK">
-										<!-- <Texture atlas="ui-hud-minimap-zoom-in" alphaMode="ADD" hidden="true" >
-											<Size x="17" y="17"/>
-											<Anchors>
-												<Anchor point="LEFT" x="10" y="-1" />
-											</Anchors>
-										</Texture> -->
-									</Layer>
+								<Layers>
 								</Layers>
 								<Scripts>
 									<OnLoad>
 										self.isAddBtn = true
-										_G[self:GetName().."Text"]:SetText("   Add Tracker")
+										_G[self:GetName().."Text"]:SetText("Add Tracker")
 									</OnLoad> 
 								</Scripts>
 							</Button>
@@ -737,139 +727,188 @@
 									<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT"  relativeTo="$parentTop" x="0" y="0" />
 									<Anchor point="BOTTOMRIGHT" relativePoint="TOPRIGHT"  relativeTo="$parentBottom" x="0" y="0" />
 								</Anchors>
-
-								<Layers>
-									<Layer level="artwork">
-										<FontString parentKey="Text" name="$parentText" inherits="Font_Yellow_M" text="반짝효과 설정 (택1)" justifyH="LEFT">
-											<Size x="400" y="25" />
-											<Anchors>
-												<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-10"/>
-											</Anchors>
-										</FontString>
-									</Layer>
-								</Layers>
-
 								<Frames>
-									<CheckButton name="$parentCBCondition1" inherits="HDH_AT_CheckButton2Template">
-										<Size x="200" y="20"/>
+									<ScrollFrame name="$parentSF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate">
 										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-40" />
-											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="0" />
+											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent"  x="0" y="0" />
 										</Anchors>
-										<Scripts>
-											<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_ACTIVE)</OnLoad>
-											<OnClick function="HDH_AT_OnCheck" inherit="prepend" />
-										</Scripts>
-									</CheckButton>
 
-									<CheckButton name="$parentCBCondition2" inherits="HDH_AT_CheckButton2Template">
-										<Size x="200" y="20"/>
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition1" x="0" y="-2" />
-										</Anchors>
-										<Scripts>
-											<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_TIME)</OnLoad>
-											<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
-										</Scripts>
-									</CheckButton>
+										<ScrollChild>
+											<Frame name="$parentContents" hidden="false">
+												<Size><AbsDimension x="300" y="200"/></Size>
+												<Layers>
+													<Layer level="artwork">
+														<FontString parentKey="Text" name="$parentText" inherits="Font_Yellow_M" text="반짝효과 설정 (택1)" justifyH="LEFT">
+															<Size x="400" y="25" />
+															<Anchors>
+																<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-10"/>
+															</Anchors>
+														</FontString>
 
-									<CheckButton name="$parentCBCondition3" inherits="HDH_AT_CheckButton2Template">
-										<Size x="200" y="20"/>
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition2" x="0" y="-2" />
-										</Anchors>
-										<Scripts>
-											<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_COUNT)</OnLoad>
-											<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
-										</Scripts>
-									</CheckButton>
+														<FontString parentKey="Text2" name="$parentText2" inherits="Font_Yellow_M" text="반짝효과 설정 (택1)" justifyH="LEFT">
+															<Size x="400" y="25" />
+															<Anchors>
+																<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-165"/>
+															</Anchors>
+														</FontString>
+													</Layer>
+												</Layers>
+												<Anchors>
+													<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
+													<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
+												</Anchors>
+												<Frames>
+													<CheckButton name="$parentCBCondition1" inherits="HDH_AT_CheckButton2Template">
+														<Size x="200" y="20"/>
+														<Anchors>
+															<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-40" />
+														</Anchors>
+														<Scripts>
+															<OnLoad>self.Text:SetText(HDH_AT_L.OFF)</OnLoad>
+															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
+														</Scripts>
+													</CheckButton>
 
-									<CheckButton name="$parentCBCondition4" inherits="HDH_AT_CheckButton2Template">
-										<Size x="200" y="20"/>
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition3" x="0" y="-2" />
-										</Anchors>
-										<Scripts>
-											<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_VALUE)</OnLoad>
-											<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
-										</Scripts>
-									</CheckButton>
+													<CheckButton name="$parentCBCondition2" inherits="HDH_AT_CheckButton2Template">
+														<Size x="200" y="20"/>
+														<Anchors>
+															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition1" x="0" y="-2" />
+															<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+														</Anchors>
+														<Scripts>
+															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_ACTIVE)</OnLoad>
+															<OnClick function="HDH_AT_OnCheck" inherit="prepend" />
+														</Scripts>
+													</CheckButton>
 
-									<CheckButton name="$parentCBCondition5" inherits="HDH_AT_CheckButton2Template">
-										<Size x="200" y="20"/>
-										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition4" x="0" y="-2" />
-										</Anchors>
-										<Scripts>
-											<OnLoad>self.Text:SetText(HDH_AT_L.OFF)</OnLoad>
-											<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
-										</Scripts>
-									</CheckButton>
+													<CheckButton name="$parentCBCondition3" inherits="HDH_AT_CheckButton2Template">
+														<Size x="200" y="20"/>
+														<Anchors>
+															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition2" x="0" y="-2" />
+														</Anchors>
+														<Scripts>
+															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_TIME)</OnLoad>
+															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
+														</Scripts>
+													</CheckButton>
 
-									<Button name="$parentDDCondition2" inherits="HDH_AT_DropDownOptionTemplate">
-										<Size x="50" y="20" />
-										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="2" y="0" />
-										</Anchors>
-									</Button>
+													<CheckButton name="$parentCBCondition4" inherits="HDH_AT_CheckButton2Template">
+														<Size x="200" y="20"/>
+														<Anchors>
+															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition3" x="0" y="-2" />
+														</Anchors>
+														<Scripts>
+															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_COUNT)</OnLoad>
+															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
+														</Scripts>
+													</CheckButton>
 
-									<Button name="$parentDDCondition3" inherits="HDH_AT_DropDownOptionTemplate">
-										<Size x="50" y="20" />
-										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition3" x="2" y="0" />
-										</Anchors>
-									</Button>
+													<CheckButton name="$parentCBCondition5" inherits="HDH_AT_CheckButton2Template">
+														<Size x="200" y="20"/>
+														<Anchors>
+															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition4" x="0" y="-2" />
+														</Anchors>
+														<Scripts>
+															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_VALUE)</OnLoad>
+															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
+														</Scripts>
+													</CheckButton>
 
-									<Button name="$parentDDCondition4" inherits="HDH_AT_DropDownOptionTemplate">
-										<Size x="50" y="20" />
-										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition4" x="2" y="0" />
-										</Anchors>
-									</Button>
+													<Button name="$parentDDCondition2" inherits="HDH_AT_DropDownOptionTemplate">
+														<Size x="60" y="20" />
+														<Anchors>
+															<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition3" x="2" y="0" />
+														</Anchors>
+													</Button>
 
-									<EditBox name="$parentEBCondition2" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" numeric="true" autoFocus="false">
-										<Size>
-											<AbsDimension x="70" y="20"/>
-										</Size>
-										<Anchors>
-											<Anchor point="LEFT" relativeTo="$parentDDCondition2" relativePoint="RIGHT" x="2" y="0" />
-										</Anchors>
-										<Layers>
-											<Layer level="artwork">
-												<FontString name="$parentText" parentKey="Second" inherits="Font_White_S" text="초" justifyH="LEFT">
-													<Size x="40" y="25" />
-													<Anchors>
-														<Anchor point="LEFT" relativePoint="RIGHT" x="2" y="0"/>
-													</Anchors>
-												</FontString>
-											</Layer>
-										</Layers>
-										<Scripts>
-											<OnShow>self.Second:SetText(HDH_AT_L.SECONDS)</OnShow>
-										</Scripts>
-									</EditBox>
+													<Button name="$parentDDCondition3" inherits="HDH_AT_DropDownOptionTemplate">
+														<Size x="60" y="20" />
+														<Anchors>
+															<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition4" x="2" y="0" />
+														</Anchors>
+													</Button>
 
-									<EditBox name="$parentEBCondition3" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" numeric="true" autoFocus="false">
-										<Size>
-											<AbsDimension x="70" y="20"/>
-										</Size>
-										<Anchors>
-											<Anchor point="LEFT" relativeTo="$parentDDCondition3" relativePoint="RIGHT" x="2" y="0" />
-										</Anchors>
-										<Scripts>
-										</Scripts>
-									</EditBox>
+													<Button name="$parentDDCondition4" inherits="HDH_AT_DropDownOptionTemplate">
+														<Size x="60" y="20" />
+														<Anchors>
+															<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition5" x="2" y="0" />
+														</Anchors>
+													</Button>
 
-									<EditBox name="$parentEBCondition4" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" numeric="true" autoFocus="false">
-										<Size>
-											<AbsDimension x="70" y="20"/>
-										</Size>
-										<Anchors>
-											<Anchor point="LEFT" relativeTo="$parentDDCondition4" relativePoint="RIGHT" x="2" y="0" />
-										</Anchors>
-										<Scripts>
-										</Scripts>
-									</EditBox>
+													<EditBox name="$parentEBCondition2" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" numeric="true" autoFocus="false">
+														<Size>
+															<AbsDimension x="95" y="20"/>
+														</Size>
+														<Anchors>
+															<Anchor point="LEFT" relativeTo="$parentDDCondition2" relativePoint="RIGHT" x="2" y="0" />
+														</Anchors>
+													</EditBox>
+
+													<EditBox name="$parentEBCondition3" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" numeric="true" autoFocus="false">
+														<Size>
+															<AbsDimension x="95" y="20"/>
+														</Size>
+														<Anchors>
+															<Anchor point="LEFT" relativeTo="$parentDDCondition3" relativePoint="RIGHT" x="2" y="0" />
+														</Anchors>
+														<Scripts>
+														</Scripts>
+													</EditBox>
+
+													<EditBox name="$parentEBCondition4" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" numeric="true" autoFocus="false">
+														<Size>
+															<AbsDimension x="95" y="20"/>
+														</Size>
+														<Anchors>
+															<Anchor point="LEFT" relativeTo="$parentDDCondition4" relativePoint="RIGHT" x="2" y="0" />
+														</Anchors>
+														<Scripts>
+														</Scripts>
+													</EditBox>
+
+													<CheckButton name="$parentCBEffectType1" inherits="HDH_AT_CheckButton2Template">
+														<Size x="200" y="20"/>
+														<Anchors>
+															<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-195" />
+															<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
+														</Anchors>
+														<Scripts>
+															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_EFFECT_DEFAULT)</OnLoad>
+															<OnClick function="HDH_AT_OnCheck" inherit="prepend" />
+														</Scripts>
+													</CheckButton>
+
+													<CheckButton name="$parentCBEffectType2" inherits="HDH_AT_CheckButton2Template">
+														<Size x="200" y="20"/>
+														<Anchors>
+															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBEffectType1" x="0" y="-2" />
+														</Anchors>
+														<Scripts>
+															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_EFFECT_COLOR)</OnLoad>
+															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
+														</Scripts>
+													</CheckButton>
+
+													<Button name="$parentCPEffectColor" inherits="HDH_AT_ColorPickerTemplate">
+														<Size x="157" y="20"/>
+														<Anchors>
+															<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBEffectType2" x="2" y="0" />
+														</Anchors>
+													</Button>
+
+													<Frame name="$parentSLSparkPerSec" inherits="HDH_AT_SliderTemplate" hidden="true">
+														<Size x="157" y="20"/>
+														<Anchors>
+															<Anchor point="TOPLEFT" relativeTo="$parentCPEffectColor" relativePoint="BOTTOMLEFT" x="0" y="-2" />
+														</Anchors>
+														<Scripts>
+														</Scripts>
+													</Frame>
+												</Frames>
+											</Frame>
+										</ScrollChild>
+									</ScrollFrame>
 								</Frames>
 							</Frame>
 

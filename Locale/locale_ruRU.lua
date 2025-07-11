@@ -165,7 +165,7 @@ L.TRACKING_ALL_AURA = "Функция |cffff0000'Отслеживание все
 L.TRACKING_BOSS_AURA = "Функция |cffff0000'Отслеживание заклинаний босса'|r включена как тип фильтрации заклинаний. Нет необходимости регистрировать заклинания."
 L.SHOW_VALUE_TOOLTIP = "Отображает числовое значение эффекта заклинания.\nНе все заклинания поддерживаются, отображаются только заклинания\nс динамически изменяющимися эффектами.\n(Пример: Воспламенение, Пошатывание, Щитовые заклинания и т.д.)"
 L.GLOW_CONDITION_ACTIVE = "Усл: |cffffffffКогда иконка активна"
-L.GLOW_CONDITION_TIME = "Усл: |cffffffffОставшееся время"
+L.GLOW_CONDITION_TIME = "Усл: |cffffffffОставшееся время (Сек)"
 L.GLOW_CONDITION_COUNT = "Усл: |cffffffffТекущее количество"
 L.GLOW_CONDITION_VALUE = "Усл: |cffffffffТекущее значение"
 L.ALERT_PLEASE_INPUT_GLOW_VALUE = "Пожалуйста, введите условие для свечения"
@@ -265,7 +265,6 @@ L.ONLY_FOR_CONFIG_OF_COOLDOWN_TRACKER ="Конфигурация только д
 L.ERROR_COLOR_CODE = "'%s' — неверный код цвета.\nПожалуйста, введите 6-значный (RGB) или 8-значный (RGBA) шестнадцатеричный код."
 L.TO_FILL = "Заполнить"
 L.TO_EMPTY = "Опустошить"
-L.SECONDS = "Сек"
 L.ONLY_FOR_CONFIG_OF_AURA_TRACKER = "Конфигурация только для трекера баффов/дебаффов"
 L.TRAITS_IN_USE = "Используемые черты"
 L.MINIMUM_WINDOW = "-"
@@ -330,3 +329,8 @@ L.PRIMARY_SPEC = "основная спец" -- (Primary Spec)
 L.SECONDARY_SPEC = "вторичная спец" -- (Secondady Spec)
 L.COMMON_SPEC = "общая спец" -- (Common Spec)
 
+-- 11.1.7.9
+L.GLOW_EFFECT_CONFIG = "Тип эффекта свечения (Выберите один)" -- Glow Effect Type (Choose One)
+L.GLOW_EFFECT_DEFAULT = "Тип 1: Стандартный свечения WoW" -- Type 1: WoW default effect
+L.GLOW_EFFECT_COLOR = "Тип 2: Цветной эффект свечения" -- Type 2: Colored Glow Effect
+L.GLOW_EFFECT_PER_SEC = "Свечений в секунду |cffff0000%.1f|r" -- Glows per Sec |cffff0000%.1f|r

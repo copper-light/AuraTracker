@@ -31,7 +31,7 @@ do -- HDH_HEALTH_TRACKER class
 	function HDH_HEALTH_TRACKER:UpdateBarValue(f, elapsed, non_animate)
 		super.UpdateBarValue(self, f, elapsed, non_animate)
 		
-		if f.bar.absorb_f and elapsed then
+		if f.bar and f.bar.absorb_f and elapsed then
 			if a % 1 == 0 then
 				b = not b
 			end
@@ -112,6 +112,7 @@ do -- HDH_HEALTH_TRACKER class
 	end
 	
 	function HDH_HEALTH_TRACKER:UpdateAbsorb(f, value)
+		if f.bar == nil then return end
 		local healthBar = f.bar.bar[1];
 		local absorb_f = f.bar.absorb_f;
 		local h_max = self:GetPowerMax()

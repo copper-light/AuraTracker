@@ -814,19 +814,45 @@ function HDH_AT_OnCheck(self)
 		DB:SetTrackerElementImage(trackerId, elemIdx, texture, key, isItem)
 		HDH_TRACKER.InitVaribles(trackerId)
 
-	elseif self == F.BODY.CONFIG_DETAIL.GLOW.CB1 or 
-		   self == F.BODY.CONFIG_DETAIL.GLOW.CB2 or
+	elseif self == F.BODY.CONFIG_DETAIL.GLOW.CB2 or 
 		   self == F.BODY.CONFIG_DETAIL.GLOW.CB3 or
-		   self == F.BODY.CONFIG_DETAIL.GLOW.CB4 then
-		for _, cd in ipairs(F.BODY.CONFIG_DETAIL.GLOW.CB_LIST) do
+		   self == F.BODY.CONFIG_DETAIL.GLOW.CB4 or
+		   self == F.BODY.CONFIG_DETAIL.GLOW.CB5 then
+		for idx , cd in ipairs(F.BODY.CONFIG_DETAIL.GLOW.CB_LIST) do
 			cd[1]:SetChecked(cd[1] == self)
+			if idx >= 2 then
+				if cd[1] ~= self then
+					cd[2]:Hide()
+					cd[3]:Hide()
+				else
+					cd[2]:Show()
+					cd[3]:Show()
+				end
+			end
 		end
-		F.BODY.CONFIG_DETAIL.GLOW.CB5:SetChecked(false)
-	elseif self == F.BODY.CONFIG_DETAIL.GLOW.CB5 then
-		for _, cd in ipairs(F.BODY.CONFIG_DETAIL.GLOW.CB_LIST) do
+		F.BODY.CONFIG_DETAIL.GLOW.CB1:SetChecked(false)
+	elseif self == F.BODY.CONFIG_DETAIL.GLOW.CB1 then
+		for idx , cd in ipairs(F.BODY.CONFIG_DETAIL.GLOW.CB_LIST) do
 			cd[1]:SetChecked(false)
+			if idx >= 2 then
+				cd[2]:Hide()
+				cd[3]:Hide()
+			end
 		end
-		F.BODY.CONFIG_DETAIL.GLOW.CB5:SetChecked(true)
+		F.BODY.CONFIG_DETAIL.GLOW.CB1:SetChecked(true)
+
+	elseif self == F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE1 or 
+		   self == F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE2 then
+		F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE1:SetChecked(F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE1 == self)
+		F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE2:SetChecked(F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE2 == self)
+
+		if self == F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE2 then
+			F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR:Show()
+			F.BODY.CONFIG_DETAIL.GLOW.SL_EFFECT_PER_SEC:Show()
+		else
+			F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR:Hide()
+			F.BODY.CONFIG_DETAIL.GLOW.SL_EFFECT_PER_SEC:Hide()
+		end
 	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB1 then
 		self:SetChecked(true)
 		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Hide()
@@ -866,7 +892,6 @@ function HDH_AT_OnCheck(self)
 		for _, cb in ipairs(main.TalentButtonList) do
 			cb:SetChecked(cb == self)
 		end
-
 	end
 end
 
@@ -1388,7 +1413,7 @@ function HDH_AT_OnClick_Button(self, button)
 		local mode = F.BODY.CONFIG_DETAIL.mode
 
 		if mode == BODY_DETAIL_GLOW then
-			local checkedIdx, condition, glowValue
+			local checkedIdx, condition, glowValue, effectType, effectColor, effectPerSec
 			for idx, cd in ipairs(F.BODY.CONFIG_DETAIL.GLOW.CB_LIST) do
 				if cd[1]:GetChecked() then
 					checkedIdx = idx
@@ -1396,14 +1421,21 @@ function HDH_AT_OnClick_Button(self, button)
 					glowValue = cd[3] and UTIL.Trim(cd[3]:GetText())
 				end
 			end
+			if F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE1:GetChecked() then
+				effectType = F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE1.value
+			else
+				effectType = F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE2.value
+			end
+			effectColor = {F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR:GetColorRGBA()}
+			effectPerSec = F.BODY.CONFIG_DETAIL.GLOW.SL_EFFECT_PER_SEC:GetValue()
 			if checkedIdx then
-				if checkedIdx > 1 and (not glowValue or string.len(glowValue) == 0) then
+				if checkedIdx >= 2 and (not glowValue or string.len(glowValue) == 0) then
 					main.Dialog:AlertShow(L.ALERT_PLEASE_INPUT_GLOW_VALUE)
 					return
 				end
-				DB:UpdateTrackerElementGlow(trackerId, elemIdx, checkedIdx, condition, glowValue)
+				DB:UpdateTrackerElementGlow(trackerId, elemIdx, checkedIdx, condition, glowValue, effectType, effectColor, effectPerSec)
 			else
-				DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_NONE, nil, nil)
+				DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_NONE, nil, nil,  effectType, effectColor, effectPerSec)
 			end
 			HDH_TRACKER.InitIconFrame(trackerId)
 			if main:GetCurTrackerId() == trackerId then
@@ -2124,14 +2156,22 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			F.BODY.CONFIG_DETAIL.GLOW.checkbutton = button
 			F.BODY.CONFIG_DETAIL.GLOW.preCheck = not button:GetChecked()
 
-			local glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, elemIdx)
+			local glowType, glowCondition, glowValue, effectType, effectColor, effectPerSec = DB:GetTrackerElementGlow(trackerId, elemIdx)
 			local match
 			for idx, cd in ipairs(F.BODY.CONFIG_DETAIL.GLOW.CB_LIST) do
 				match = idx == glowType
 				F.BODY.CONFIG_DETAIL.GLOW.CB_LIST[idx][1]:SetChecked(match)
-				if idx > 1 then
+				if idx >= 2 then
 					F.BODY.CONFIG_DETAIL.GLOW.CB_LIST[idx][2]:SetSelectedIndex((match and glowCondition) or 1)
 					F.BODY.CONFIG_DETAIL.GLOW.CB_LIST[idx][3]:SetText((match and glowValue) or "")
+
+					if match then
+						cd[2]:Show()
+						cd[3]:Show()
+					else
+						cd[2]:Hide()
+						cd[3]:Hide()
+					end
 				end
 			end
 			F.BODY.CONFIG_DETAIL.GLOW.CB5:SetChecked(glowType == DB.GLOW_CONDITION_NONE)
@@ -2139,6 +2179,17 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			F.BODY.CONFIG_DETAIL.BTN_SAVE:Show()
 			F.BODY.CONFIG_DETAIL.BTN_CLOSE:ClearAllPoints()
 			F.BODY.CONFIG_DETAIL.BTN_CLOSE:SetPoint("BOTTOMLEFT", F.BODY.CONFIG_DETAIL.BTN_CLOSE:GetParent() ,"BOTTOM", 5, 5)
+			F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE1:SetChecked(effectType == DB.GLOW_EFFECT_DEFAULT)
+			F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE2:SetChecked(effectType == DB.GLOW_EFFECT_COLOR_SPARK)
+			F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR:SetColorRGBA(unpack(effectColor))
+			F.BODY.CONFIG_DETAIL.GLOW.SL_EFFECT_PER_SEC:SetValue(effectPerSec)
+			if F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE2:GetChecked() then
+				F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR:Show()
+				F.BODY.CONFIG_DETAIL.GLOW.SL_EFFECT_PER_SEC:Show()
+			else
+				F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR:Hide()
+				F.BODY.CONFIG_DETAIL.GLOW.SL_EFFECT_PER_SEC:Hide()
+			end
 		end
 
 	elseif detailMode == BODY_DETAIL_DISPLAY then
@@ -3069,35 +3120,48 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.F.BODY.CONFIG_DETAIL.ICON = _G[self:GetName().."BodyDetailConfigTopIcon"]
 	self.F.BODY.CONFIG_DETAIL.TEXT = _G[self:GetName().."BodyDetailConfigTopText"]
 	self.F.BODY.CONFIG_DETAIL.GLOW = _G[self:GetName().."BodyDetailConfigGlow"]
-	self.F.BODY.CONFIG_DETAIL.GLOW.Text:SetText(L.DETAIL_GLOW)
-	self.F.BODY.CONFIG_DETAIL.GLOW.CB1 = _G[self:GetName().."BodyDetailConfigGlowCBCondition1"]
+	_G[self:GetName().."BodyDetailConfigGlowSFContents"].Text:SetText(L.DETAIL_GLOW)
+	_G[self:GetName().."BodyDetailConfigGlowSFContents"].Text2:SetText(L.GLOW_EFFECT_CONFIG)
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB1 = _G[self:GetName().."BodyDetailConfigGlowSFContentsCBCondition1"]
 	self.F.BODY.CONFIG_DETAIL.GLOW.CB1.idx = 1
-	self.F.BODY.CONFIG_DETAIL.GLOW.CB2 = _G[self:GetName().."BodyDetailConfigGlowCBCondition2"]
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB2 = _G[self:GetName().."BodyDetailConfigGlowSFContentsCBCondition2"]
 	self.F.BODY.CONFIG_DETAIL.GLOW.CB2.idx = 2
-	self.F.BODY.CONFIG_DETAIL.GLOW.CB3 = _G[self:GetName().."BodyDetailConfigGlowCBCondition3"]
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB3 = _G[self:GetName().."BodyDetailConfigGlowSFContentsCBCondition3"]
 	self.F.BODY.CONFIG_DETAIL.GLOW.CB3.idx = 3
-	self.F.BODY.CONFIG_DETAIL.GLOW.CB4 = _G[self:GetName().."BodyDetailConfigGlowCBCondition4"]
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB4 = _G[self:GetName().."BodyDetailConfigGlowSFContentsCBCondition4"]
 	self.F.BODY.CONFIG_DETAIL.GLOW.CB4.idx = 4
-	self.F.BODY.CONFIG_DETAIL.GLOW.CB5 = _G[self:GetName().."BodyDetailConfigGlowCBCondition5"]
-	self.F.BODY.CONFIG_DETAIL.GLOW.CB_DD2 = _G[self:GetName().."BodyDetailConfigGlowDDCondition2"]
-	HDH_AT_DropDown_Init(F.BODY.CONFIG_DETAIL.GLOW.CB_DD2, DDP_CONDITION_LIST, HDH_AT_OnSelected_Dropdown)
-	F.BODY.CONFIG_DETAIL.GLOW.CB_DD2:SetSelectedIndex(3)
-	self.F.BODY.CONFIG_DETAIL.GLOW.CB_DD3 = _G[self:GetName().."BodyDetailConfigGlowDDCondition3"]
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB5 = _G[self:GetName().."BodyDetailConfigGlowSFContentsCBCondition5"]
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB_DD3 = _G[self:GetName().."BodyDetailConfigGlowSFContentsDDCondition2"]
 	HDH_AT_DropDown_Init(F.BODY.CONFIG_DETAIL.GLOW.CB_DD3, DDP_CONDITION_LIST, HDH_AT_OnSelected_Dropdown)
 	F.BODY.CONFIG_DETAIL.GLOW.CB_DD3:SetSelectedIndex(3)
-	self.F.BODY.CONFIG_DETAIL.GLOW.CB_DD4 = _G[self:GetName().."BodyDetailConfigGlowDDCondition4"]
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB_DD4 = _G[self:GetName().."BodyDetailConfigGlowSFContentsDDCondition3"]
 	HDH_AT_DropDown_Init(F.BODY.CONFIG_DETAIL.GLOW.CB_DD4, DDP_CONDITION_LIST, HDH_AT_OnSelected_Dropdown)
 	F.BODY.CONFIG_DETAIL.GLOW.CB_DD4:SetSelectedIndex(3)
-	self.F.BODY.CONFIG_DETAIL.GLOW.CB_EB2 = _G[self:GetName().."BodyDetailConfigGlowEBCondition2"]
-	self.F.BODY.CONFIG_DETAIL.GLOW.CB_EB3 = _G[self:GetName().."BodyDetailConfigGlowEBCondition3"]
-	self.F.BODY.CONFIG_DETAIL.GLOW.CB_EB4 = _G[self:GetName().."BodyDetailConfigGlowEBCondition4"]
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB_DD5 = _G[self:GetName().."BodyDetailConfigGlowSFContentsDDCondition4"]
+	HDH_AT_DropDown_Init(F.BODY.CONFIG_DETAIL.GLOW.CB_DD5, DDP_CONDITION_LIST, HDH_AT_OnSelected_Dropdown)
+	F.BODY.CONFIG_DETAIL.GLOW.CB_DD5:SetSelectedIndex(3)
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB_EB3 = _G[self:GetName().."BodyDetailConfigGlowSFContentsEBCondition2"]
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB_EB4 = _G[self:GetName().."BodyDetailConfigGlowSFContentsEBCondition3"]
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB_EB5 = _G[self:GetName().."BodyDetailConfigGlowSFContentsEBCondition4"]
 
 	self.F.BODY.CONFIG_DETAIL.GLOW.CB_LIST = {
-		{ self.F.BODY.CONFIG_DETAIL.GLOW.CB1 }, 
-		{ self.F.BODY.CONFIG_DETAIL.GLOW.CB2, self.F.BODY.CONFIG_DETAIL.GLOW.CB_DD2, self.F.BODY.CONFIG_DETAIL.GLOW.CB_EB2 },
+		{ self.F.BODY.CONFIG_DETAIL.GLOW.CB2 }, 
 		{ self.F.BODY.CONFIG_DETAIL.GLOW.CB3, self.F.BODY.CONFIG_DETAIL.GLOW.CB_DD3, self.F.BODY.CONFIG_DETAIL.GLOW.CB_EB3 },
-		{ self.F.BODY.CONFIG_DETAIL.GLOW.CB4, self.F.BODY.CONFIG_DETAIL.GLOW.CB_DD4, self.F.BODY.CONFIG_DETAIL.GLOW.CB_EB4 }
+		{ self.F.BODY.CONFIG_DETAIL.GLOW.CB4, self.F.BODY.CONFIG_DETAIL.GLOW.CB_DD4, self.F.BODY.CONFIG_DETAIL.GLOW.CB_EB4 },
+		{ self.F.BODY.CONFIG_DETAIL.GLOW.CB5, self.F.BODY.CONFIG_DETAIL.GLOW.CB_DD5, self.F.BODY.CONFIG_DETAIL.GLOW.CB_EB5 }
 	}
+
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE1 = _G[self:GetName().."BodyDetailConfigGlowSFContentsCBEffectType1"]
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE1.value = DB.GLOW_EFFECT_DEFAULT
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE2 = _G[self:GetName().."BodyDetailConfigGlowSFContentsCBEffectType2"]
+	self.F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE2.value = DB.GLOW_EFFECT_COLOR_SPARK
+	self.F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR = _G[self:GetName().."BodyDetailConfigGlowSFContentsCPEffectColor"]
+	self.F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR:SetHandler(HDH_AT_OnSeletedColor, function(self, text)
+		GetMainFrame().Dialog:AlertShow(L.ERROR_COLOR_CODE:format(UTIL.Trim(text) or " "))
+	end)
+	self.F.BODY.CONFIG_DETAIL.GLOW.SL_EFFECT_PER_SEC = _G[self:GetName().."BodyDetailConfigGlowSFContentsSLSparkPerSec"]
+	self.F.BODY.CONFIG_DETAIL.GLOW.SL_EFFECT_PER_SEC:Init(1.5, 0.5, 5, 0.5, L.GLOW_EFFECT_PER_SEC)
+	
 
 	self.F.BODY.CONFIG_DETAIL.DISPLAY = _G[self:GetName().."BodyDetailConfigDisplay"]
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.CONTENTS = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents"]
@@ -3364,7 +3428,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	HDH_AT_DropDown_Init(comp, DDP_ICON_ORDER_LIST, HDH_AT_OnSelected_Dropdown)
 
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER,       L.ICON_NUMBER_OF_HORIZONTAL,           "ui.%s.common.column_count")
-	comp:Init(1, 1, 20, true, false, nil, L.ROW_N_COL_N)
+	comp:Init(1, 1, 20, nil, L.ROW_N_COL_N)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.ICON_ORDER_DISPLAY_V,           "ui.%s.common.reverse_v")
 	comp:Init({
 		{true, L.UPWARD},
@@ -3376,9 +3440,9 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 		{false, L.TO_THE_RIGHT}
 	}, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER, 	L.ICON_MARGIN_VERTICAL,          "ui.%s.common.margin_v")
-	comp:Init(1, 0, 50, true, true, 20)
+	comp:Init(1, 0, 50)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER,       L.ICON_MARGIN_HORIZONTAL,           "ui.%s.common.margin_h")
-	comp:Init(1, 0, 50, true, true, 20)
+	comp:Init(1, 0, 50)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_GAME_TOOPTIP,           "ui.%s.common.show_tooltip")
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_WHEN_NONCOMBAT,           "ui.%s.common.always_show")
@@ -3400,13 +3464,13 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.DROPDOWN,       L.COOLDOWN_ANIMATION_DIDRECTION,         "ui.%s.icon.cooldown")
 	HDH_AT_DropDown_Init(comp, DDP_ICON_COOLDOWN_LIST, HDH_AT_OnSelected_Dropdown)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SLIDER,     L.ICON_SIZE,       "ui.%s.icon.size")
-	comp:Init(0, 10, 100, true, true, 20)
+	comp:Init(0, 10, 100)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SLIDER,     L.ICON_BORDER_SIZE,       "ui.%s.icon.border_size")
-	comp:Init(0, 0, 10, true, true, 20)
+	comp:Init(0, 0, 10)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SLIDER,     L.ACTIVED_ICON_ALPHA,       "ui.%s.icon.on_alpha")
-	comp:Init(0, 0, 1)
+	comp:Init(0, 0, 1, 0.1)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.SLIDER,     L.INACTIVED_ICON_ALPHA,       "ui.%s.icon.off_alpha")
-	comp:Init(0, 0, 1)
+	comp:Init(0, 0, 1, 0.1)
 
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,     L.ACTIVED_ICON_BORDER_COLOR,       "ui.%s.icon.active_border_color")
 	comp = HDH_AT_CreateOptionComponent(tabUIList[6].content, COMP_TYPE.COLOR_PICKER,       L.ICON_SPARK_COLOR,         "ui.%s.icon.spark_color")
@@ -3435,9 +3499,9 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	-------------------------------------------------------------------------------------
 	-- BAR 
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SLIDER, 	L.WIDTH_SIZE,          "ui.%s.bar.width")
-	comp:Init(0, 10, 300, true, true, 20)
+	comp:Init(0, 10, 300)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SLIDER,       L.HEIGHT_SIZE,           "ui.%s.bar.height")
-	comp:Init(0, 10, 300, true, true, 20)
+	comp:Init(0, 10, 300)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.DROPDOWN,       L.BAR_TEXTURE,         "ui.%s.bar.texture")
 	comp.useFullSizeTexture = true
 	HDH_AT_DropDown_Init(comp, DDP_BAR_TEXTURE_LIST, HDH_AT_OnSelected_Dropdown, nil, "HDH_AT_DropDownOptionTextureItemTemplate")
@@ -3683,7 +3747,7 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		component:SetSize(115, 20)
 		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 25 or 0, 0)
 		component:SetHandler(HDH_AT_OnChangedSlider)
-		component:Init(10, 0, 100, true, true, 10)
+		component:Init(10, 0, 100)
 
 	elseif component_type == COMP_TYPE.COLOR_PICKER then
 		component = CreateFrame("Button", (parent:GetName()..'ColorPicker'..parent.row.."_"..parent.col), parent, "HDH_AT_ColorPickerTemplate")
@@ -3738,18 +3802,10 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 		DBSync(component, component_type, db_key)
 	end
 
-	-- if component and option_name then
-	-- 	local bgTexutre = frame:CreateTexture(nil, 'BACKGROUND')
-	-- 	bgTexutre:SetColorTexture(1,1,1,0.5)
-	-- 	bgTexutre:SetPoint('TOPLEFT', frame, 'TOPLEFT', 0, 1)
-	-- 	bgTexutre:SetPoint('RIGHT', component, 'RIGHT', 4, 0)
-	-- 	bgTexutre:SetPoint('BOTTOM', frame, 'BOTTOM', 0, -1)
-	-- end
-
 	local w, h = parent:GetParent():GetSize()
 	parent:ClearAllPoints()
 	parent:SetSize(w, -(y - COMP_HEIGHT -20))
 	parent:SetPoint('TOPLEFT', parent:GetParent(), 'TOPLEFT', 0, 0)
 
-	return component, label
+	return component
 end

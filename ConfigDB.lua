@@ -81,6 +81,9 @@ CONFIG.GLOW_CONDITION_TIME = 2
 CONFIG.GLOW_CONDITION_COUNT = 3
 CONFIG.GLOW_CONDITION_VALUE = 4
 
+CONFIG.GLOW_EFFECT_DEFAULT = 0
+CONFIG.GLOW_EFFECT_COLOR_SPARK = 1
+
 CONFIG.SPELL_ALWAYS_DISPLAY = 1
 CONFIG.SPELL_HIDE_TIME_OFF = 2
 CONFIG.SPELL_HIDE_TIME_OFF_AS_SPACE = 3
@@ -194,6 +197,9 @@ HDH_AT_DB = {
     },
     tracker = {} -- [전문화][특성][추적]
 }
+
+local EFFECT_DEFUALT_COLOR = {1, 0.8, 0., 1.}
+local EFFECT_DEFUALT_PER_SEC = 2
 
 --[[
     tracker.
@@ -351,7 +357,12 @@ end
 function HDH_AT_ConfigDB:GetTrackerElement(trackerId, elementIndex)
     if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elementIndex] then
         local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
-        return element.key, element.id, element.name, element.texture, element.display, element.glowType, element.isValue, element.isItem
+        local name = element.name
+        if element.id then
+            name = HDH_AT_UTIL.GetInfo(element.id, element.isItem)
+        end
+
+        return element.key, element.id, name, element.texture, element.display, element.glowType, element.isValue, element.isItem
     else
         return nil
     end
@@ -462,19 +473,27 @@ function HDH_AT_ConfigDB:UpdateTrackerElementDisplay(trackerId, elementIndex, va
     element.connectedSpellIsItem = connectedSpellIsItem
 end
 
-function HDH_AT_ConfigDB:UpdateTrackerElementGlow(trackerId, elementIndex, glowType, condition, value)
+function HDH_AT_ConfigDB:UpdateTrackerElementGlow(trackerId, elementIndex, glowType, condition, value, effectType, effectColor, effectPerSec)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
     element.glowType = glowType
     element.glowCondition = condition
     element.glowValue = value or 0
+    element.glowEffectType = effectType or CONFIG.GLOW_EFFECT_DEFAULT
+    element.glowEffectColor = effectColor or {1., 0., 0., 1.}
+    element.glowEffectPerSec = effectPerSec or EFFECT_DEFUALT_PER_SEC
 end
 
 function HDH_AT_ConfigDB:GetTrackerElementGlow(trackerId, elementIndex)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
     if element then
-        return element.glowType or CONFIG.GLOW_CONDITION_NONE,  element.glowCondition, element.glowValue
+        return element.glowType or CONFIG.GLOW_CONDITION_NONE,
+               element.glowCondition,
+               element.glowValue,
+               element.glowEffectType or CONFIG.GLOW_EFFECT_DEFAULT,
+               element.glowEffectColor or EFFECT_DEFUALT_COLOR,
+               element.glowEffectPerSec or EFFECT_DEFUALT_PER_SEC
     else
-        return CONFIG.GLOW_CONDITION_NONE, nil, nil
+        return CONFIG.GLOW_CONDITION_NONE, nil, nil, CONFIG.GLOW_EFFECT_DEFAULT, EFFECT_DEFUALT_COLOR, EFFECT_DEFUALT_PER_SEC
     end
 end
 

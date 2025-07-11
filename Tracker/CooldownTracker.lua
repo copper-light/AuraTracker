@@ -972,7 +972,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 		return 
 	end
 
-	local elemKey, elemId, elemName, texture, defaultImg, glowType, isValue, isItem, glowCondition, glowValue
+	local elemKey, elemId, elemName, texture, defaultImg, glowType, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
 	local display, connectedId, connectedIsItem, unlearnedHideMode
 	local innerTrackingType, innerSpellId, innerCooldown
 	local elemSize = DB:GetTrackerElementSize(trackerId)
@@ -990,7 +990,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	for i = 1 , elemSize do
 		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 		display, connectedId, connectedIsItem, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, i)
-		glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
+		glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
 		defaultImg = DB:GetTrackerElementDefaultImage(trackerId, i)
 		innerTrackingType, innerSpellId, innerCooldown =  DB:GetTrackerElementInnerCooldown(trackerId, i)
 		if innerSpellId then
@@ -1033,6 +1033,9 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.glow = glowType
 			spell.glowCondtion = glowCondition
 			spell.glowValue = (glowValue and tonumber(glowValue)) or 0
+			spell.glowEffectType = glowEffectType
+			spell.glowEffectColor = glowEffectColor
+			spell.glowEffectPerSec = glowEffectPerSec
 			spell.showValue = isValue
 			spell.display = display
 			spell.isItem = (isItem or false)
@@ -1148,9 +1151,20 @@ end
 
 function HDH_C_TRACKER:UpdateGlow(f, bool)
 	if f.spell.ableGlow then -- 블리자드 기본 반짝임 효과면 무조건 적용
-		self:ActionButton_ShowOverlayGlow(f) return
+		if f.spell.glowEffectType == DB.GLOW_EFFECT_DEFAULT then
+			self:ActionButton_ShowOverlayGlow(f)
+			if f.border.spark:IsShown() then
+				f.border.spark:Hide() 
+				f.spell.glowColorOn = false
+			end
+		else
+			if not f.border.spark:IsShown() then
+				f.border.spark:Show() 
+				f.spell.glowColorOn = true
+			end
+		end
 	end
-	if bool and (f.spell and f.spell.glow ~= DB.GLOW_CONDITION_NONE) then
+	if bool and (f.spell and f.spell.glow ~= DB.GLOW_CONDITION_NONE) and self.ui.common.display_mode ~= DB.DISPLAY_BAR then
 		local value = 0
 		local active = false
 
@@ -1184,12 +1198,31 @@ function HDH_C_TRACKER:UpdateGlow(f, bool)
 			end
 		end
 		if active then
-			self:ActionButton_ShowOverlayGlow(f)
+			if f.spell.glowEffectType == DB.GLOW_EFFECT_DEFAULT then
+				self:ActionButton_ShowOverlayGlow(f)
+				if f.border.spark:IsShown() then
+					f.border.spark:Hide() 
+					f.spell.glowColorOn = false
+				end
+			else
+				if not f.border.spark:IsShown() then
+					f.border.spark:Show() 
+					f.spell.glowColorOn = true
+				end
+			end
 		else
 			self:ActionButton_HideOverlayGlow(f)
+			if f.border.spark:IsShown() then
+				f.border.spark:Hide() 
+				f.spell.glowColorOn = false
+			end
 		end
 	else
 		self:ActionButton_HideOverlayGlow(f)
+		if f.border.spark:IsShown() then
+			f.border.spark:Hide() 
+			f.spell.glowColorOn = false
+		end
 	end
 end
 

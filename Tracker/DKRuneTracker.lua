@@ -350,7 +350,7 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 		return 
 	end
 
-	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue
+	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
 	
 	local spell 
 	local f
@@ -367,7 +367,7 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 
 	for i = 1 , elemSize do
 		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-		glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, i)
+		glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
 			
 		iconIdx = iconIdx + 1
 		f = self.frame.icon[iconIdx]
@@ -377,13 +377,12 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 		spell.glow = glowType
 		spell.glowCondtion = glowCondition
 		spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-
+		spell.glowEffectType = glowEffectType
+		spell.glowEffectColor = glowEffectColor
+		spell.glowEffectPerSec = glowEffectPerSec
 		spell.showValue = isValue
 		spell.display = display
 		spell.v1 = 0 -- 수치를 저장할 변수
-		spell.aniEnable = true;
-		spell.aniTime = 8;
-		spell.aniOverSec = false;
 		spell.no = i
 		spell.name = elemName
 		spell.icon = texture
