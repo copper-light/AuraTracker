@@ -629,11 +629,11 @@ function HDH_AT_DropDown_OnClick(self)
 
         self.hideenBG:Show()
         list:ClearAllPoints()
-        list:SetWidth(self:GetWidth())
-        list:SetParent(list.bg)
+        list:SetParent(self.hideenBG)
         list:SetFrameStrata("tooltip")
         list:SetClampedToScreen(true)
-        list:SetPoint("TOP", self, "BOTTOM", 0, 0)
+        list:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
+        list:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, 0)
         list:SetShown(not list:IsShown())
     end
 end
