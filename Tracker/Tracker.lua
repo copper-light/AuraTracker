@@ -598,15 +598,18 @@ function HDH_TRACKER:MoveSpark(bar, value)
 	
 	if self.ui.bar.to_fill then
 		bar.per = 1 - bar.per
+		bar.adjust = 0.5
+	else
+		bar.adjust = 0
 	end
 	if self.ui.bar.cooldown_progress == DB.COOLDOWN_LEFT then
-		bar.spark:SetPoint("CENTER", bar,"LEFT", bar:GetWidth() * bar.per, 0);
+		bar.spark:SetPoint("CENTER", bar,"LEFT", bar:GetWidth() * bar.per + bar.adjust, 0);
 	elseif self.ui.bar.cooldown_progress == DB.COOLDOWN_RIGHT then
-		bar.spark:SetPoint("CENTER", bar,"RIGHT", -bar:GetWidth() * bar.per, 0);
+		bar.spark:SetPoint("CENTER", bar,"RIGHT", -bar:GetWidth() * bar.per - bar.adjust, 0);
 	elseif self.ui.bar.cooldown_progress == DB.COOLDOWN_DOWN then
-		bar.spark:SetPoint("CENTER", bar,"BOTTOM", 0, bar:GetHeight() * bar.per);		
+		bar.spark:SetPoint("CENTER", bar,"BOTTOM", 0, bar:GetHeight() * bar.per + bar.adjust);
 	else
-		bar.spark:SetPoint("CENTER", bar,"TOP", 0, -bar:GetHeight() * bar.per);
+		bar.spark:SetPoint("CENTER", bar,"TOP", 0, -bar:GetHeight() * bar.per - bar.adjust);
 	end
 end
 

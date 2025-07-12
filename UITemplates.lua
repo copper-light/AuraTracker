@@ -632,8 +632,8 @@ function HDH_AT_DropDown_OnClick(self)
         list:SetParent(self.hideenBG)
         list:SetFrameStrata("tooltip")
         list:SetClampedToScreen(true)
-        list:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
-        list:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, 0)
+        list:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, 0)
+        list:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", 0, 0)
         list:SetShown(not list:IsShown())
     end
 end
