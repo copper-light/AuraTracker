@@ -1133,7 +1133,7 @@ function HDH_AT_SliderTemplateMixin_OnClick(self)
     local value 
     local slider = self:GetParent()
 
-    if self == slider.Left then
+    if self == slider.Left or self == slider.HiddenLeft then
         value = slider.value - slider.tick
     else
         value = slider.value + slider.tick
@@ -1179,7 +1179,8 @@ function HDH_AT_SliderTemplateMixin:SetValue(value)
     if self.value ~= value then
         self.value = value
         self.Bar:SetWidth(math.max((value - self.minValue) * self.tickWidth, 0.01))
-        self.EditBox:SetText(self.format:format(self.value))
+        -- self.EditBox:SetText(self.format:format(self.value))
+        self.Text:SetText(self.format:format(self.value))
         return true
     else
         return false

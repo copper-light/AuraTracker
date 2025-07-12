@@ -2409,14 +2409,26 @@
 				</Texture>
 			</Layer>
 
-			<Layer level="OVERAY">
-				<Texture name="$parentBar" parentKey="AchorPoint" hidden="true" alphaMode="ADD" inherits="HDH_AT_Texture_Yellow">
-					<Size x="2" y="16" />
+			<Layer level="OVERLAY" textureSubLevel="0">
+				<Texture name="$parentBar" parentKey="AchorPoint" hidden="true">
+					<Size x="3" y="16" />
+					<Color r="1" g="1" b="1"/>
 					<Anchors>
-						<Anchor point="RIGHT" relativeTo="$parentBar" relativePoint="RIGHT" x="0" y="0"/>
+						<Anchor point="CENTER" relativeTo="$parentBar" relativePoint="RIGHT" x="0" y="0"/>
 					</Anchors>
 				</Texture>
 			</Layer>
+
+			<Layer level="OVERLAY" textureSubLevel="1">
+				<FontString name="$parentText" parentKey="Text" inherits="Font_White_S" justifyH="CENTER">
+					<Size x="80" y="20" />
+					<Anchors>
+						<Anchor point="LEFT"  relativePoint="RIGHT" relativeKey="$parent.Left" x="0" y="0"/>
+						<Anchor point="RIGHT"  relativePoint="LEFT" relativeKey="$parent.Right" x="0" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+
 		</Layers>
 
 		<Frames>
@@ -2500,10 +2512,10 @@
 				</Scripts>
 			</Button>
 
-			<Button parentKey="Anchor" inherits="HDH_AT_ButtonTemplate" virtual="true" text=""  movable="true">
-				<Size x="17" y="20"/>
+			<Button parentKey="Anchor" inherits="HDH_AT_ButtonTemplate" virtual="true" text="" movable="true">
+				<Size x="13" y="20"/>
 				<Anchors>
-					<Anchor point="center" relativeTo="$parentBar" relativePoint="RIGHT" x="0" y="0"/>
+					<Anchor point="CENTER" relativeTo="$parentBar" relativePoint="RIGHT" x="0" y="0"/>
 				</Anchors>
 				<NormalTexture/>
 				<HighlightTexture/>
@@ -2531,7 +2543,46 @@
 				</Scripts>
 			</Button>
 
-			<EditBox name="$parentEdit" parentKey="EditBox" inherits="InputBoxScriptTemplate" enableMouse="true" autoFocus="false" >
+			<Button parentKey="HiddenLeft">
+				<Size x="17" y="20"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.Left" relativePoint="RIGHT" x="0" y="0"/>
+					<Anchor point="RIGHT" relativeKey="$parent.AchorPoint" relativePoint="LEFT" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						self:GetParent().AchorPoint:Show()
+						self:GetParent().Highlight:Show()
+					</OnEnter>
+					<OnLeave>
+						self:GetParent().AchorPoint:Hide()
+						self:GetParent().Highlight:Hide()
+					</OnLeave>
+					<OnClick function="HDH_AT_SliderTemplateMixin_OnClick"/>
+				</Scripts>
+			</Button>
+
+			<Button parentKey="HiddenRight">
+				<Size x="17" y="20"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeKey="$parent.AchorPoint"  relativePoint="RIGHT" x="0" y="0"/>
+					<Anchor point="RIGHT" relativeKey="$parent.Right" relativePoint="LEFT" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						self:GetParent().AchorPoint:Show()
+						self:GetParent().Highlight:Show()
+					</OnEnter>
+					<OnLeave>
+						self:GetParent().AchorPoint:Hide()
+						self:GetParent().Highlight:Hide()
+					</OnLeave>
+					<OnClick function="HDH_AT_SliderTemplateMixin_OnClick"/>
+				</Scripts>
+			</Button>
+
+			<!-- 키보드 입력 사용 안함 - 이유: 현재 설정 값들의 입력 범위가 크지 않고 키보드 커서가 생겨서 바조절을 마우스로 못하니까 오히려 불편함. -->
+			<EditBox name="$parentEdit" parentKey="EditBox" inherits="InputBoxScriptTemplate" autoFocus="false" hidden="true">
 				<Size x="80" y="20" />
 				<Anchors>
 					<Anchor point="LEFT"  relativePoint="RIGHT" relativeKey="$parent.Left" x="0" y="0"/>

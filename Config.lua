@@ -2174,7 +2174,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 					end
 				end
 			end
-			F.BODY.CONFIG_DETAIL.GLOW.CB5:SetChecked(glowType == DB.GLOW_CONDITION_NONE)
+			F.BODY.CONFIG_DETAIL.GLOW.CB1:SetChecked(glowType == DB.GLOW_CONDITION_NONE)
 			button:SetChecked(F.BODY.CONFIG_DETAIL.GLOW.preCheck)
 			F.BODY.CONFIG_DETAIL.BTN_SAVE:Show()
 			F.BODY.CONFIG_DETAIL.BTN_CLOSE:ClearAllPoints()
