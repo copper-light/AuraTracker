@@ -879,14 +879,30 @@
 					</Anchors>
 				</Texture>
 
-				<Texture inherits="HDH_AT_Texture_Yellow">
-					<Size x="10" y="2"/>
+				
+				<Texture inherits="HDH_AT_Texture_Gray_A">
+					<Size x="12" y="4"/>
 					<Anchors>
 						<Anchor point="CENTER" relativeTo="$parentIconAdd"/>
 					</Anchors>
 				</Texture>
-				<Texture inherits="HDH_AT_Texture_Yellow">
+				<Texture inherits="HDH_AT_Texture_Gray_A">
+					<Size x="4" y="12"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentIconAdd" />
+					</Anchors>
+				</Texture>
+
+				<Texture >
+					<Size x="10" y="2"/>
+					<Color r="0.8" g="0.6" b="0" a="1"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentIconAdd"/>
+					</Anchors>
+				</Texture>
+				<Texture >
 					<Size x="2" y="10"/>
+					<Color r="0.8" g="0.6" b="0" a="1"/>
 					<Anchors>
 						<Anchor point="CENTER" relativeTo="$parentIconAdd" />
 					</Anchors>
