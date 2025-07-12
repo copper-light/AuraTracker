@@ -875,7 +875,20 @@
 				<Texture name="$parentIconAdd" useAtlasSize="true">
 					<Size x="20" y="20"/>
 					<Anchors>
-						<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parentButtonIcon" x="1" y="-1"/>
+						<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parentButtonIcon" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+
+				<Texture inherits="HDH_AT_Texture_Yellow">
+					<Size x="10" y="2"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentIconAdd"/>
+					</Anchors>
+				</Texture>
+				<Texture inherits="HDH_AT_Texture_Yellow">
+					<Size x="2" y="10"/>
+					<Anchors>
+						<Anchor point="CENTER" relativeTo="$parentIconAdd" />
 					</Anchors>
 				</Texture>
 
