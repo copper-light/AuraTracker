@@ -422,8 +422,10 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			
 			if bar_op.to_fill then
 				bar:SetReverseFill(true)
+				bar.adjust = 0
 			else
 				bar:SetReverseFill(false)
+				bar.adjust = -0.5
 			end
 			
 		elseif bar_op.cooldown_progress == DB.COOLDOWN_RIGHT then
@@ -445,8 +447,10 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			bar.spark:SetSize(9, bar_op.height);
 			
 			if bar_op.to_fill then
+				bar.adjust = -0.5
 				bar:SetReverseFill(false)
 			else
+				bar.adjust = 0
 				bar:SetReverseFill(true)
 			end
 
@@ -467,8 +471,10 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 			bar.spark:SetSize(bar_op.width, 9);
 			if bar_op.to_fill then
+				bar.adjust = 0
 				bar:SetReverseFill(false)
 			else
+				bar.adjust = 0.5
 				bar:SetReverseFill(true)
 			end
 			
@@ -490,8 +496,10 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 			bar.spark:SetSize(bar_op.width, 9);
 			if bar_op.to_fill then
+				bar.adjust = 0.5
 				bar:SetReverseFill(true)
 			else
+				bar.adjust = 0
 				bar:SetReverseFill(false)
 			end
 		end
