@@ -618,15 +618,19 @@ function HDH_AT_DropDown_OnClick(self)
             self.hideenBG:SetFrameStrata("tooltip")
             self.hideenBG:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0,0)
             self.hideenBG:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0,0)
-            self.hideenBG:SetScript("OnMouseUP", function(self) self:Hide() self.list:Hide() end)
+            self.hideenBG:SetScript("OnMouseDown", function(self) self:Hide() end)
             self.hideenBG:SetScript("OnShow", function(self) 
                 table.insert(UISpecialFrames, self:GetName())
                 self:EnableKeyboard(1)
             end)
             self.hideenBG:SetPropagateMouseClicks(true)
             self.hideenBG.list = list
-        end
 
+            self.hideenBG2 = CreateFrame("Frame", self:GetName().."HiddenBG2", self.hideenBG)
+            self.hideenBG2:SetPoint("TOPLEFT", self, "TOPLEFT", 0,0)
+            self.hideenBG2:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0,0)
+            self.hideenBG2:SetScript("OnMouseDown", function(self) self:GetParent():Hide() end)
+        end
         self.hideenBG:Show()
         list:ClearAllPoints()
         list:SetParent(self.hideenBG)
@@ -634,7 +638,7 @@ function HDH_AT_DropDown_OnClick(self)
         list:SetClampedToScreen(true)
         list:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, 0)
         list:SetPoint("TOPRIGHT", self, "BOTTOMRIGHT", 0, 0)
-        list:SetShown(not list:IsShown())
+        list:SetShown(true)
     end
 end
 
