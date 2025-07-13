@@ -1179,12 +1179,35 @@
 				<Anchors>
 					<Anchor point="BOTTOMRIGHT" x="-2" y="2" />
 				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="2">
+						<Texture file="Interface\CHATFRAME\UI-ChatIM-SizeGrabber-Up" >
+							<Color r="1" g="1" b="1"/>
+							<Size x="15" y="15" />
+							<Anchors>
+								<Anchor point="CENTER" x="0" y="0"/>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\CHATFRAME\UI-ChatIM-SizeGrabber-Up" alphaMode="ADD">
+							<Color r="1" g="1" b="1"/>
+							<Size x="15" y="15" />
+							<Anchors>
+								<Anchor point="CENTER" x="0" y="0"/>
+							</Anchors>
+						</Texture>
+						
+					</Layer>
+				</Layers>
 				<Scripts>
 					<OnMouseDown>self:GetParent():StartSizing()</OnMouseDown>
 					<OnMouseUp>self:GetParent():StopMovingOrSizing()</OnMouseUp>
 				</Scripts>
-				<NormalTexture file="Interface\CHATFRAME\UI-ChatIM-SizeGrabber-Up"  alphaMode="ADD"/>
-				<HighlightTexture file="Interface\CHATFRAME\UI-ChatIM-SizeGrabber-Highlight" alphaMode="ADD"/>
+				<NormalTexture file="Interface\CHATFRAME\UI-ChatIM-SizeGrabber-Up" alphaMode="ADD">
+					<Color r="1" g="1" b="1"/>
+				</NormalTexture>
+				<HighlightTexture file="Interface\CHATFRAME\UI-ChatIM-SizeGrabber-Up" alphaMode="ADD">
+					<Color r="1" g="1" b="1" />
+				</HighlightTexture>
 			</Button>
 
 			<Button name="$parentBtnClose" text="X" inherits="HDH_AT_ButtonTemplate, HDH_AT_ConfigFrameTemplate">
