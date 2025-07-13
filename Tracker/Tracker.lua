@@ -111,16 +111,34 @@ end
 
 local function OnUpdateGlowColor(self, elapsed)
 	self.sparkElapsed = self.sparkElapsed and self.sparkElapsed + elapsed or elapsed
-	if self.sparkElapsed < HDH_TRACKER.ONUPDATE_FRAME_TERM then return end 
-
+	if self.sparkElapsed < (HDH_TRACKER.ONUPDATE_FRAME_TERM/2) then return end
+	self.playing = self.playing and self.playing + self.sparkElapsed or self.sparkElapsed
+	self.sparkElapsed = 0
 	self.p = HDH_AT_UTIL.LogScale(math.max(math.min((1.25 - (GetTime() % (1/self:GetParent().spell.glowEffectPerSec) + .001) / (1/self:GetParent().spell.glowEffectPerSec*0.8)), 1.), 0.3))
 	self.p_c =  math.max(self.p, 0.5)
 
-	self.spot:SetVertexColor(1 * self.p, 1 * self.p, 1 * self.p, 0.74)
-	self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1] * self.p_c, 
-										self:GetParent().spell.glowEffectColor[2] * self.p_c, 
-										self:GetParent().spell.glowEffectColor[3] * self.p_c, 
-										self:GetParent().spell.glowEffectColor[4] * self.p_c)
+	self.icon_size = self:GetParent():GetParent().parent.ui.icon.size
+	if (math.min(1.4, self.playing/0.25)) == 1.4 then
+		self.color:SetSize(self.icon_size * 1.25, self.icon_size * 1.25)
+		self.spot:SetVertexColor(self.p, self.p, self.p, 0.74)
+		self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1] * self.p_c, 
+								  self:GetParent().spell.glowEffectColor[2] * self.p_c, 
+								  self:GetParent().spell.glowEffectColor[3] * self.p_c, 
+								  self:GetParent().spell.glowEffectColor[4] * self.p_c)
+		self.spot:SetSize(self.icon_size, self.icon_size)
+	else -- starting animation
+		self.color:SetSize(
+			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.45)), 
+			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.45)))
+		self.spot:SetSize(self.icon_size * (0.9 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)),  
+						  self.icon_size * (0.9 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)))
+		self.spot:SetVertexColor(1, 1, 1, 1)
+		self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1], 
+								  self:GetParent().spell.glowEffectColor[2], 
+								  self:GetParent().spell.glowEffectColor[3], 
+								  self:GetParent().spell.glowEffectColor[4])
+	end
+
 end
 
 -- 매 프레임마다 bar frame 그려줌, 콜백 함수
@@ -1934,6 +1952,10 @@ function HDH_TRACKER:UpdateGlow(f, bool)
 				active =  (value <= f.spell.glowValue)
 			elseif f.spell.glowCondtion == DB.CONDITION_EQ then
 				active =  (value == f.spell.glowValue) 
+			elseif f.spell.glowCondtion == DB.CONDITION_GT then
+				active =  (value > f.spell.glowValue) 
+			elseif f.spell.glowCondtion == DB.CONDITION_LT then
+				active =  (value < f.spell.glowValue) 
 			end
 		end
 		if active then
@@ -1945,6 +1967,7 @@ function HDH_TRACKER:UpdateGlow(f, bool)
 				end
 			else
 				if not f.border.spark:IsShown() then
+					f.border.spark.playing = 0
 					f.border.spark:Show() 
 					f.spell.glowColorOn = true
 				end

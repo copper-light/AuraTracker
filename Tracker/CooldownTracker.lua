@@ -1195,6 +1195,10 @@ function HDH_C_TRACKER:UpdateGlow(f, bool)
 				active =  (value <= f.spell.glowValue)
 			elseif f.spell.glowCondtion == DB.CONDITION_EQ then
 				active =  (value == f.spell.glowValue) 
+			elseif f.spell.glowCondtion == DB.CONDITION_GT then
+				active =  (value > f.spell.glowValue) 
+			elseif f.spell.glowCondtion == DB.CONDITION_LT then
+				active =  (value < f.spell.glowValue) 
 			end
 		end
 		if active then
@@ -1206,6 +1210,7 @@ function HDH_C_TRACKER:UpdateGlow(f, bool)
 				end
 			else
 				if not f.border.spark:IsShown() then
+					f.border.spark.playing = 0
 					f.border.spark:Show() 
 					f.spell.glowColorOn = true
 				end

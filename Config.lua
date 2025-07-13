@@ -325,6 +325,8 @@ local DDP_CONDITION_LIST = {
 	{DB.CONDITION_GT_OR_EQ, L.CONDITION_GT_OR_EQ},
 	{DB.CONDITION_LT_OR_EQ, L.CONDITION_LT_OR_EQ},
 	{DB.CONDITION_EQ, L.CONDITION_EQ},
+	{DB.CONDITION_GT, L.CONDITION_GT},
+	{DB.CONDITION_LT, L.CONDITION_LT},
 }
 
 local SPEC_TEXTURE_FORMAT = "spec-thumbnail-%s";
@@ -1044,7 +1046,7 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 	elseif self == F.BODY.CONFIG_UI.SW_CONFIG_MODE then
 		if main:GetCurTrackerId() then
 			if value == DB.USE_SEVERAL_CONFIG then
-				main.Dialog:AlertShow(L.ALERT_CONFIRM_CHANGE_TO_ONLY_THIS_TRACKER_CONFIGURATION, main.Dialog.DLG_TYPE.YES_NO,
+				main.Dialog:AlertShow(L.ALERT_CONFIRM_CHANGE_TO_ONLY_THIS_TRACKER_CONFIGURATION, HDH_AT_DLG_TYPE.YES_NO,
 					function()
 						local main = GetMainFrame()
 						local trackerId = main:GetCurTrackerId()
@@ -1063,7 +1065,7 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 					end
 				)
 			else
-				main.Dialog:AlertShow(L.ALERT_CONFIRM_CHANGE_TO_GLOBAL_CONFIGURATION, main.Dialog.DLG_TYPE.YES_NO,
+				main.Dialog:AlertShow(L.ALERT_CONFIRM_CHANGE_TO_GLOBAL_CONFIGURATION, HDH_AT_DLG_TYPE.WARNING_YES_NO,
 					function()
 						local main = GetMainFrame()
 						local trackerId = main:GetCurTrackerId()
@@ -1325,7 +1327,7 @@ function HDH_AT_OnClick_Button(self, button)
 	elseif self == F.BODY.CONFIG_TRACKER.BTN_DELETE then
 		local id = main:GetCurTrackerId()
 		local name = select(2, DB:GetTrackerInfo(id))
-		main.Dialog:AlertShow(L.DO_YOU_WANT_TO_DELETE_THIS_ITEM:format(name), main.Dialog.DLG_TYPE.YES_NO, function() 
+		main.Dialog:AlertShow(L.DO_YOU_WANT_TO_DELETE_THIS_ITEM:format(name), HDH_AT_DLG_TYPE.WARNING_YES_NO, function() 
 			local main = GetMainFrame()
 			local id = main:GetCurTrackerId()
 			local trait = main:GetCurTraits()
@@ -1348,7 +1350,7 @@ function HDH_AT_OnClick_Button(self, button)
 	elseif self == F.BODY.CONFIG_TRACKER.BTN_COPY then
 		local id = main:GetCurTrackerId()
 		local name = select(2, DB:GetTrackerInfo(id))
-		main.Dialog:AlertShow(L.ALRET_CONFIRM_COPY_TRACKER:format(name), main.Dialog.DLG_TYPE.EDIT, function() 
+		main.Dialog:AlertShow(L.ALRET_CONFIRM_COPY_TRACKER:format(name), HDH_AT_DLG_TYPE.EDIT, function() 
 			local copyName =  main.Dialog.EditBox:GetText()
 			copyName = UTIL.Trim(copyName)
 			if copyName and string.len(copyName) > 0 then
@@ -1357,7 +1359,7 @@ function HDH_AT_OnClick_Button(self, button)
 				F.BODY.CONFIG_TRACKER:Hide()
 				GetMainFrame():UpdateFrame()
 				HDH_TRACKER.InitVaribles()
-				main.Dialog:AlertShow(L.ALRET_CONFIRM_COPY:format(copyName))
+				main.Dialog:AlertShow(L.ALRET_CONFIRM_COPY:format(copyName), HDH_AT_DLG_TYPE.OK)
 
 				if HDH_TRACKER.ENABLE_MOVE then
 					HDH_TRACKER.SetMoveAll(false)
@@ -1370,7 +1372,7 @@ function HDH_AT_OnClick_Button(self, button)
 		end)
 
 	elseif self == F.BODY.CONFIG_UI.BTN_RESET then
-		main.Dialog:AlertShow(L.ALERT_RESET, main.Dialog.DLG_TYPE.YES_NO, function() 
+		main.Dialog:AlertShow(L.ALERT_RESET, HDH_AT_DLG_TYPE.WARNING_YES_NO, function() 
 			DB:Reset()
 			ReloadUI()
 		end)
@@ -1441,7 +1443,7 @@ function HDH_AT_OnClick_Button(self, button)
 			if main:GetCurTrackerId() == trackerId then
 				main:LoadTrackerElementConfig(trackerId, elemIdx, elemIdx)
 			end
-			main.Dialog:AlertShow(L.SAVED_CONFIG)
+			main.Dialog:AlertShow(L.SAVED_CONFIG, HDH_AT_DLG_TYPE.OK)
 
 		elseif mode == BODY_DETAIL_DISPLAY then
 			local checkbutton = F.BODY.CONFIG_DETAIL.DISPLAY.checkbutton
@@ -1476,7 +1478,7 @@ function HDH_AT_OnClick_Button(self, button)
 			if ui.common.order_by ~= DB.ORDERBY_REG and value == DB.SPELL_HIDE_AS_SPACE then
 				main.Dialog:AlertShow(L.SAVED_CONFIG_WARN_DONT_REG_ORDER)
 			else
-				main.Dialog:AlertShow(L.SAVED_CONFIG)
+				main.Dialog:AlertShow(L.SAVED_CONFIG, HDH_AT_DLG_TYPE.OK)
 			end
 		end
 
@@ -1506,7 +1508,7 @@ function HDH_AT_OnClick_Button(self, button)
 		if #exportTracker > 0 then
 			local data = WeakAuraLib_TableToString(exportTracker, true)
 			F.BODY.CONFIG_UI.ED_EXPORT_STRING:SetText(data)
-			main.Dialog:AlertShow(L.DIALOG_CREATE_SHARE_STRING)
+			main.Dialog:AlertShow(L.DIALOG_CREATE_SHARE_STRING, HDH_AT_DLG_TYPE.OK)
 		else
 			main.Dialog:AlertShow(L.PLEASE_SELECT_TRACKER_FOR_EXPORT)
 		end
@@ -1525,7 +1527,7 @@ function HDH_AT_OnClick_Button(self, button)
 			return 
 		end
 
-		main.Dialog:AlertShow(L.DO_YOU_WANT_IMPORT_PROFILE, main.Dialog.DLG_TYPE.YES_NO, function() 	
+		main.Dialog:AlertShow(L.DO_YOU_WANT_IMPORT_PROFILE, HDH_AT_DLG_TYPE.WARNING_YES_NO, function() 	
 			local data = F.BODY.CONFIG_UI.ED_IMPORT_STRING:GetText()
 			data = WeakAuraLib_StringToTable(data, true)
 			DB:AppendProfile(GET_TRACKER_TYPE_NAME, data)
@@ -1635,12 +1637,12 @@ function HDH_AT_OnClick_Button(self, button)
 
 		DB:UpdateTrackerElementInnerCooldown(trackerId, elemIdx, DB.INNER_CD_BUFF, innerSpellId, innerCooldown)
 		HDH_TRACKER.InitVaribles(trackerId)
-		main.Dialog:AlertShow(L.SAVED_CONFIG)
+		main.Dialog:AlertShow(L.SAVED_CONFIG, HDH_AT_DLG_TYPE.OK)
 	
 	elseif self == F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_BTN_DELETE then
 		local trackerId = F.BODY.CONFIG_DETAIL.trackerId
 		local elemIdx = F.BODY.CONFIG_DETAIL.elemIdx
-		main.Dialog:AlertShow(L.DO_YOU_WANT_TO_DELETE_THIS_ITEM:format(L.INNER_COOLDOWN_ITEM_CONFIG), main.Dialog.DLG_TYPE.YES_NO,
+		main.Dialog:AlertShow(L.DO_YOU_WANT_TO_DELETE_THIS_ITEM:format(L.INNER_COOLDOWN_ITEM_CONFIG), HDH_AT_DLG_TYPE.WARNING_YES_NO,
 			function()
 				F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_CD:SetText("")
 				F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_SPELL_ID:SetText("")

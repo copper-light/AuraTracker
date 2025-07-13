@@ -356,14 +356,15 @@
 		</Anchors>
 		<Layers>
 			<Layer level="ARTWORK">
-				<FontString name ="$parentText" inherits="Font_Yellow_L" text="">
+				<FontString name ="$parentText" inherits="Font_Yellow_M" text="">
 					<Anchors>
-						<Anchor point="CENTER" x="0" y="10"/>
+						<Anchor point="LEFT" x="10" y="10"/>
+						<Anchor point="RIGHT" x="-10" y="10"/>
 					</Anchors>
 				</FontString>
 				
-				<Texture file="Interface\DialogFrame\UI-Dialog-Icon-AlertNew" alphaMode="ADD">
-					<Size><AbsDimension x="40" y="40" /></Size>
+				<Texture parentKey="Icon" file="Interface\DialogFrame\UI-Dialog-Icon-AlertOther" >
+					<Size><AbsDimension x="50" y="50" /></Size>
 					<Anchors>
 						<Anchor point="CENTER" relativePoint="CENTER" x="0" y="60"/>
 					</Anchors>
@@ -445,23 +446,8 @@
 		</Frames>
 		<Scripts>
 			<OnLoad></OnLoad>
-			<OnShow>_G[self:GetName().."Text"]:SetText(self.text);
-					if self.dlg_type == self.DLG_TYPE.YES_NO then
-						_G[self:GetName().."ButtonClose2"]:Hide()
-						_G[self:GetName().."ButtonClose"]:Show()
-						_G[self:GetName().."ButtonOK"]:Show()
-						_G[self:GetName().."Edit"]:Hide()
-					elseif self.dlg_type == self.DLG_TYPE.OK then
-						_G[self:GetName().."ButtonClose"]:Hide()
-						_G[self:GetName().."ButtonOK"]:Hide()
-						_G[self:GetName().."ButtonClose2"]:Show()
-						_G[self:GetName().."Edit"]:Hide()
-					elseif self.dlg_type == self.DLG_TYPE.EDIT then
-						_G[self:GetName().."Edit"]:Show()
-						_G[self:GetName().."ButtonClose2"]:Hide()
-						_G[self:GetName().."ButtonClose"]:Show()
-						_G[self:GetName().."ButtonOK"]:Show()
-					end
+			<OnShow>
+				self:OnShow()
 			</OnShow>
 		</Scripts>
 	</Frame>

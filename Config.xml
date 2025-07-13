@@ -69,7 +69,7 @@
 								self:SetText(HDH_AT_L.RESET_ADDON)
 							</OnLoad>
 							<OnClick>
-								self:GetParent():GetParent().Dialog:AlertShow(HDH_AT_L.ALERT_RESET, self:GetParent():GetParent().Dialog.DLG_TYPE.YES_NO, function() 
+								self:GetParent():GetParent().Dialog:AlertShow(HDH_AT_L.ALERT_RESET, HDH_AT_DLG_TYPE.WARNING_YES_NO, function() 
 									HDH_AT_ConfigDB:Reset()
 									ReloadUI()
 								end)

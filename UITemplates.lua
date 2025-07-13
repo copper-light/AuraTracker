@@ -835,11 +835,19 @@ end
 -----------------------------------
 
 HDH_AT_DialogFrameTemplateMixin = {}
-HDH_AT_DialogFrameTemplateMixin.DLG_TYPE = {OK =1, YES_NO=2, EDIT=3, NONE= 4};
+HDH_AT_DLG_TYPE = {OK=1, YES_NO=2, EDIT=3, NONE= 4, WARNING=5, WARNING_YES_NO=6};
+HDH_AT_DLG_ICON = {
+    "Interface/DialogFrame/UI-Dialog-Icon-AlertOther",
+    "Interface/DialogFrame/UI-Dialog-Icon-AlertOther",
+    "Interface/DialogFrame/UI-Dialog-Icon-AlertOther",
+    "Interface/DialogFrame/UI-Dialog-Icon-AlertOther",
+    "Interface/DialogFrame/UI-Dialog-Icon-AlertNew",
+    "Interface/DialogFrame/UI-Dialog-Icon-AlertNew",
+}
 
 function HDH_AT_DialogFrameTemplateMixin:AlertShow(msg, type, func, cancelFunc, ...)
     local main = self:GetParent()
-    type = type or self.DLG_TYPE.OK
+    type = type or HDH_AT_DLG_TYPE.WARNING
 	if self:IsShown() then return end
 	self.text = msg;
 	self.dlg_type = type;
@@ -852,6 +860,29 @@ end
 function HDH_AT_DialogFrameTemplateMixin:Close()
 	self:Hide();
 end 
+
+function HDH_AT_DialogFrameTemplateMixin:OnShow()
+	_G[self:GetName().."Text"]:SetText(self.text);
+    self.Icon:SetTexture(HDH_AT_DLG_ICON[self.dlg_type])
+    if self.dlg_type == HDH_AT_DLG_TYPE.YES_NO or self.dlg_type == HDH_AT_DLG_TYPE.WARNING_YES_NO then
+        _G[self:GetName().."ButtonClose2"]:Hide()
+        _G[self:GetName().."ButtonClose"]:Show()
+        _G[self:GetName().."ButtonOK"]:Show()
+        _G[self:GetName().."Edit"]:Hide()
+    elseif self.dlg_type == HDH_AT_DLG_TYPE.OK or self.dlg_type == HDH_AT_DLG_TYPE.WARNING then
+        _G[self:GetName().."ButtonClose"]:Hide()
+        _G[self:GetName().."ButtonOK"]:Hide()
+        _G[self:GetName().."ButtonClose2"]:Show()
+        _G[self:GetName().."Edit"]:Hide()
+    elseif self.dlg_type == HDH_AT_DLG_TYPE.EDIT then
+        _G[self:GetName().."Edit"]:Show()
+        _G[self:GetName().."ButtonClose2"]:Hide()
+        _G[self:GetName().."ButtonClose"]:Show()
+        _G[self:GetName().."ButtonOK"]:Show()
+    end
+end 
+
+
 
 
 -----------------------------------
