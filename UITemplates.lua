@@ -869,16 +869,22 @@ function HDH_AT_DialogFrameTemplateMixin:OnShow()
         _G[self:GetName().."ButtonClose"]:Show()
         _G[self:GetName().."ButtonOK"]:Show()
         _G[self:GetName().."Edit"]:Hide()
+        _G[self:GetName().."ButtonEditOK"]:Hide()
+        _G[self:GetName().."ButtonEditCancel"]:Hide()
     elseif self.dlg_type == HDH_AT_DLG_TYPE.OK or self.dlg_type == HDH_AT_DLG_TYPE.WARNING then
         _G[self:GetName().."ButtonClose"]:Hide()
         _G[self:GetName().."ButtonOK"]:Hide()
         _G[self:GetName().."ButtonClose2"]:Show()
         _G[self:GetName().."Edit"]:Hide()
+        _G[self:GetName().."ButtonEditOK"]:Hide()
+        _G[self:GetName().."ButtonEditCancel"]:Hide()
     elseif self.dlg_type == HDH_AT_DLG_TYPE.EDIT then
         _G[self:GetName().."Edit"]:Show()
         _G[self:GetName().."ButtonClose2"]:Hide()
-        _G[self:GetName().."ButtonClose"]:Show()
-        _G[self:GetName().."ButtonOK"]:Show()
+        _G[self:GetName().."ButtonClose"]:Hide()
+        _G[self:GetName().."ButtonOK"]:Hide()
+        _G[self:GetName().."ButtonEditOK"]:Show()
+        _G[self:GetName().."ButtonEditCancel"]:Show()
     end
 end 
 

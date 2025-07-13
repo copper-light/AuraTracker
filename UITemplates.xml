@@ -356,7 +356,7 @@
 		</Anchors>
 		<Layers>
 			<Layer level="ARTWORK">
-				<FontString name ="$parentText" inherits="Font_Yellow_M" text="">
+				<FontString name ="$parentText" parentKey="Text" inherits="Font_Yellow_M" text="">
 					<Anchors>
 						<Anchor point="LEFT" x="10" y="10"/>
 						<Anchor point="RIGHT" x="-10" y="10"/>
@@ -366,7 +366,7 @@
 				<Texture parentKey="Icon" file="Interface\DialogFrame\UI-Dialog-Icon-AlertOther" >
 					<Size><AbsDimension x="50" y="50" /></Size>
 					<Anchors>
-						<Anchor point="CENTER" relativePoint="CENTER" x="0" y="60"/>
+						<Anchor point="BOTTOM" relativeKey="$parent.Text" relativePoint="TOP" x="0" y="20"/>
 					</Anchors>
 				</Texture>
 			</Layer>
@@ -383,6 +383,46 @@
 					<OnShow>self:SetText("")</OnShow>
 				</Scripts>
 			</EditBox>
+
+			<Button name="$parentButtonEditOK" inherits="HDH_AT_ButtonTemplate" text="확인">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentEdit" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="-10" y="-45"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>self:SetText(HDH_AT_L.OK)</OnLoad>
+					<OnClick> self:GetParent():Hide(); 
+							if self:GetParent().func then
+								if type(self:GetParent().arg) == "table" then
+									self:GetParent().func(unpack(self:GetParent().arg));
+								else
+									self:GetParent().func(self:GetParent().arg);
+								end
+							end
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Button name="$parentButtonEditCancel" inherits="HDH_AT_ButtonTemplate" text="취소">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentEdit" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="10" y="-45"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>self:SetText(HDH_AT_L.CANCEL)</OnLoad>
+					<OnClick> self:GetParent():Hide()
+						if self:GetParent().cancelFunc then
+							if type(self:GetParent().arg) == "table" then
+								self:GetParent().cancelFunc(unpack(self:GetParent().arg));
+							else
+								self:GetParent().cancelFunc(self:GetParent().arg);
+							end
+						end
+					</OnClick>
+				</Scripts>
+			</Button>
 
 			<Button name="$parentButtonOK" inherits="HDH_AT_ButtonTemplate" text="예">
 				<Anchors>

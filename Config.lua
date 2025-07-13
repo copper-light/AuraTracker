@@ -1046,7 +1046,8 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 	elseif self == F.BODY.CONFIG_UI.SW_CONFIG_MODE then
 		if main:GetCurTrackerId() then
 			if value == DB.USE_SEVERAL_CONFIG then
-				main.Dialog:AlertShow(L.ALERT_CONFIRM_CHANGE_TO_ONLY_THIS_TRACKER_CONFIGURATION, HDH_AT_DLG_TYPE.YES_NO,
+				local _, name, _, _ = DB:GetTrackerInfo(main:GetCurTrackerId())
+				main.Dialog:AlertShow(L.ALERT_CONFIRM_CHANGE_TO_ONLY_THIS_TRACKER_CONFIGURATION:format(name), HDH_AT_DLG_TYPE.YES_NO,
 					function()
 						local main = GetMainFrame()
 						local trackerId = main:GetCurTrackerId()
@@ -1508,7 +1509,7 @@ function HDH_AT_OnClick_Button(self, button)
 		if #exportTracker > 0 then
 			local data = WeakAuraLib_TableToString(exportTracker, true)
 			F.BODY.CONFIG_UI.ED_EXPORT_STRING:SetText(data)
-			main.Dialog:AlertShow(L.DIALOG_CREATE_SHARE_STRING, HDH_AT_DLG_TYPE.OK)
+			main.Dialog:AlertShow(L.DIALOG_CREATE_SHARE_STRING:format(HDH_AT_UTIL.CommaValue(string.len(data))), HDH_AT_DLG_TYPE.OK)
 		else
 			main.Dialog:AlertShow(L.PLEASE_SELECT_TRACKER_FOR_EXPORT)
 		end
@@ -1521,13 +1522,14 @@ function HDH_AT_OnClick_Button(self, button)
 			return 
 		end
 
-		if not DB:VaildationProfile(data) then
+		local size = DB:VaildationProfile(data)
+		if size == -1 then
 			local adoon_version = data.adoon_version or "Unknown"
 			main.Dialog:AlertShow(L.NOT_COMPATIBLE_DB_VERSION:format(adoon_version))
 			return 
 		end
 
-		main.Dialog:AlertShow(L.DO_YOU_WANT_IMPORT_PROFILE, HDH_AT_DLG_TYPE.WARNING_YES_NO, function() 	
+		main.Dialog:AlertShow(L.DO_YOU_WANT_IMPORT_PROFILE:format(size), HDH_AT_DLG_TYPE.WARNING_YES_NO, function() 	
 			local data = F.BODY.CONFIG_UI.ED_IMPORT_STRING:GetText()
 			data = WeakAuraLib_StringToTable(data, true)
 			DB:AppendProfile(GET_TRACKER_TYPE_NAME, data)

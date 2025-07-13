@@ -686,17 +686,16 @@ end
 
 function HDH_AT_ConfigDB:VaildationProfile(data)
     if not data.version then
-        return false
+        return -1
     end
 
     if HDH_AT_DB.version ~= data.version then
-        return false
+        return -1
     end
     for _, config in ipairs(data) do
         if not config.ui or not config.tracker then
-            return false
+            return -1
         end
     end
-
-    return true
+    return #data
 end
