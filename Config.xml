@@ -196,29 +196,19 @@
 									<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
 								</Anchors>
 								<Frames>
-									<Button name="$parentBtnSaveTracker" inherits="HDH_AT_ButtonTemplate" text="적용">
+									<Button name="$parentBtnDelete" inherits="HDH_AT_ButtonWhiteTemplate" text="삭제">
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="LEFT" x="20" y="0" />
+											<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parent" x="10" y="0" />
 										</Anchors>
 										<Scripts>
-											<OnLoad>self:SetText(HDH_AT_L.APPLY)</OnLoad>
+											<OnLoad>self:SetText(HDH_AT_L.DELETE)</OnLoad>
 											<OnClick function="HDH_AT_OnClick_Button" />
 										</Scripts>
 									</Button>
 
-									<Button name="$parentBtnCancel" inherits="HDH_AT_ButtonTemplate" text="취소">
+									<Button name="$parentBtnCopy" inherits="HDH_AT_ButtonWhiteTemplate" text="복사">
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBtnSaveTracker" x="2" y="0" />
-										</Anchors>
-										<Scripts>
-											<OnLoad>self:SetText(HDH_AT_L.CANCEL)</OnLoad>
-											<OnClick function="HDH_AT_OnClick_Button" />
-										</Scripts>
-									</Button>
-
-									<Button name="$parentBtnCopy" inherits="HDH_AT_ButtonTemplate" text="복사">
-										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBtnCancel" x="2" y="0" />
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBtnDelete" x="5" y="0" />
 										</Anchors>
 										<Scripts>
 											<OnLoad>self:SetText(HDH_AT_L.COPY)</OnLoad>
@@ -226,12 +216,12 @@
 										</Scripts>
 									</Button>
 
-									<Button name="$parentBtnDelete" inherits="HDH_AT_ButtonTemplate" text="삭제">
+									<Button name="$parentBtnSaveTracker" inherits="HDH_AT_ButtonTemplate" text="적용">
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBtnCopy" x="2" y="0" />
+											<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parent" x="-10" y="0" />
 										</Anchors>
 										<Scripts>
-											<OnLoad>self:SetText(HDH_AT_L.DELETE)</OnLoad>
+											<OnLoad>self:SetText(HDH_AT_L.APPLY)</OnLoad>
 											<OnClick function="HDH_AT_OnClick_Button" />
 										</Scripts>
 									</Button>
@@ -686,39 +676,53 @@
 							</Frame>
 
 							<Frame name="$parentBottom" inherits="HDH_AT_BackgroundTemplate">
-								<Size y = "30" />
+								<Size y="30" />
 								<Anchors>
 									<Anchor point="BOTTOMLEFT" x="0" y="0" />
 									<Anchor point="BOTTOMRIGHT" x="0" y="0" />
 								</Anchors>
 								<Frames>
+
+									<Button name="$parentButtonSaveClose" inherits="HDH_AT_ButtonTemplate" text="적용 후 닫기">
+										<Anchors>
+											<Anchor point="RIGHT" relativePoint="RIGHT" x="-10" y="0" />
+										</Anchors>
+										<Scripts>
+											<OnLoad>self:SetText(HDH_AT_L.APPLY_AND_CLOSE)</OnLoad>
+											<OnClick function="HDH_AT_OnClick_Button"/> 
+										</Scripts>
+									</Button>
+
 									<Button name="$parentButtonApply" inherits="HDH_AT_ButtonTemplate" text="적용">
 										<Anchors>
-											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOM">
-											<Offset><AbsDimension x="-5" y="5"/></Offset>
-											</Anchor>
+											<Anchor point="RIGHT" relativePoint="LEFT"  relativeTo="$parentButtonSaveClose"  x="-5" y="0" />
 										</Anchors>
-
 										<Scripts>
 											<OnLoad>self:SetText(HDH_AT_L.APPLY)</OnLoad>
-											<OnClick> 
-												HDH_AT_OnClick_Button(self)
-											</OnClick>
+											<OnClick function="HDH_AT_OnClick_Button"/> 
+										</Scripts>
+									</Button>
+
+									<Button name="$parentButtonClose" inherits="HDH_AT_ButtonWhiteTemplate" text="취소">
+										<Anchors>
+											<Anchor point="RIGHT" relativePoint="LEFT"  relativeTo="$parentButtonApply"  x="-5" y="0" />
+										</Anchors>
+										<Scripts>
+											<OnLoad>self:SetText(HDH_AT_L.CANCEL)</OnLoad>
+											<OnClick function="HDH_AT_OnClick_Button"/> 
 										</Scripts>
 									</Button>	
-									<Button name="$parentButtonClose" inherits="HDH_AT_ButtonTemplate" text="취소">
-										<Anchors>
-											<Anchor point="BOTTOMLEFT" relativePoint="BOTTOM">
-											<Offset><AbsDimension x="5" y="5"/></Offset>
-											</Anchor>
-										</Anchors>
 
+									<Button name="$parentButtonETCClose" inherits="HDH_AT_ButtonTemplate" text="취소">
+										<Anchors>
+											<Anchor point="RIGHT" relativePoint="RIGHT" x="-10" y="0" />
+										</Anchors>
 										<Scripts>
 											<OnLoad>self:SetText(HDH_AT_L.CLOSE)</OnLoad>
-											<OnClick> HDH_AT_OnClick_Button(self)	
-											</OnClick>
+											<OnClick function="HDH_AT_OnClick_Button"/> 
 										</Scripts>
 									</Button>	
+									
 								</Frames>
 							</Frame>
 

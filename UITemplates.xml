@@ -70,6 +70,14 @@
 		</Shadow>
 	</Font>
 
+	<Font name="Font_Disable_S" inherits="GameFontNormalSmall" virtual="true">
+		<Color r="0.2" g="0.2" b="0.2"/>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+
 	<Font name="Font_Red_S" inherits="GameFontNormalSmall" virtual="true">
 		<Color r="0.9" g="0.1" b="0.1"/>
 		<Shadow>
@@ -384,30 +392,10 @@
 				</Scripts>
 			</EditBox>
 
-			<Button name="$parentButtonEditOK" inherits="HDH_AT_ButtonTemplate" text="확인">
+			<Button name="$parentButtonEditCancel" inherits="HDH_AT_ButtonWhiteTemplate" text="취소">
 				<Anchors>
 					<Anchor point="RIGHT" relativeTo="$parentEdit" relativePoint="BOTTOM">
-					<Offset><AbsDimension x="-10" y="-45"/></Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnLoad>self:SetText(HDH_AT_L.OK)</OnLoad>
-					<OnClick> self:GetParent():Hide(); 
-							if self:GetParent().func then
-								if type(self:GetParent().arg) == "table" then
-									self:GetParent().func(unpack(self:GetParent().arg));
-								else
-									self:GetParent().func(self:GetParent().arg);
-								end
-							end
-					</OnClick>
-				</Scripts>
-			</Button>
-			
-			<Button name="$parentButtonEditCancel" inherits="HDH_AT_ButtonTemplate" text="취소">
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentEdit" relativePoint="BOTTOM">
-					<Offset><AbsDimension x="10" y="-45"/></Offset>
+					<Offset><AbsDimension x="-3" y="-45"/></Offset>
 					</Anchor>
 				</Anchors>
 				<Scripts>
@@ -424,14 +412,14 @@
 				</Scripts>
 			</Button>
 
-			<Button name="$parentButtonOK" inherits="HDH_AT_ButtonTemplate" text="예">
+			<Button name="$parentButtonEditOK" inherits="HDH_AT_ButtonTemplate" text="확인">
 				<Anchors>
-					<Anchor point="RIGHT" relativeTo="$parentText" relativePoint="BOTTOM">
-					<Offset><AbsDimension x="-10" y="-45"/></Offset>
+					<Anchor point="LEFT" relativeTo="$parentEdit" relativePoint="BOTTOM">
+					<Offset><AbsDimension x="3" y="-45"/></Offset>
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnLoad>self:SetText(HDH_AT_L.YES)</OnLoad>
+					<OnLoad>self:SetText(HDH_AT_L.OK)</OnLoad>
 					<OnClick> self:GetParent():Hide(); 
 							if self:GetParent().func then
 								if type(self:GetParent().arg) == "table" then
@@ -444,11 +432,9 @@
 				</Scripts>
 			</Button>
 			
-			<Button name="$parentButtonClose" inherits="HDH_AT_ButtonTemplate" text="아니오">
+			<Button name="$parentButtonClose" inherits="HDH_AT_ButtonWhiteTemplate" text="아니오">
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentText" relativePoint="BOTTOM">
-					<Offset><AbsDimension x="10" y="-45"/></Offset>
-					</Anchor>
+					<Anchor point="RIGHT" relativeTo="$parentText" relativePoint="BOTTOM" x="-3" y="-45"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>self:SetText(HDH_AT_L.NO)</OnLoad>
@@ -460,6 +446,24 @@
 								self:GetParent().cancelFunc(self:GetParent().arg);
 							end
 						end
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentButtonOK" inherits="HDH_AT_ButtonTemplate" text="예">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentText" relativePoint="BOTTOM" x="3" y="-45"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>self:SetText(HDH_AT_L.YES)</OnLoad>
+					<OnClick> self:GetParent():Hide(); 
+							if self:GetParent().func then
+								if type(self:GetParent().arg) == "table" then
+									self:GetParent().func(unpack(self:GetParent().arg));
+								else
+									self:GetParent().func(self:GetParent().arg);
+								end
+							end
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -843,7 +847,7 @@
 				</Scripts>
 			</Button>
 		
-			<Button name="$parentButtonAdd" inherits="HDH_AT_ButtonTemplate2" text="등록" hidden="true">
+			<Button name="$parentButtonAdd" inherits="HDH_AT_ButtonTemplate2" text="추가" hidden="true">
 				<Size>
 					<AbsDimension x="70" y="22"/>
 				</Size>
@@ -853,7 +857,7 @@
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnLoad>self:SetText(HDH_AT_L.SAVE)</OnLoad>
+					<OnLoad>self:SetText(HDH_AT_L.ADD)</OnLoad>
 					<OnClick></OnClick>
 				</Scripts>
 			</Button>
@@ -1236,7 +1240,7 @@
 		</Layers>
 		<ButtonText name="$parentText"/>
 		<NormalFont style="Font_White_S"/>
-		<DisabledFont style="Font_Gray_S"/>
+		<DisabledFont style="Font_Disable_S"/>
 		<NormalTexture inherits="HDH_AT_Texture_Yellow">
 			<Anchors>
 				<Anchor point="TOPLEFT" x="2" y="-2"/>
@@ -1250,12 +1254,22 @@
 			</Anchors>
 		</HighlightTexture>
 		<DisabledTexture>
-			<Color r="0.5" g="0.5" b="0.5" a="0.8"/>
+			<Color r="0.2" g="0.2" b="0.2" a="0.5"/>
 			<Anchors>
 				<Anchor point="TOPLEFT" x="2" y="-2"/>
 				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
 			</Anchors>
 		</DisabledTexture>
+	</Button>
+
+	<Button name="HDH_AT_ButtonWhiteTemplate" inherits="HDH_AT_ButtonTemplate" virtual="true">
+		<NormalTexture>
+			<Color r="0.3" g="0.3" b="0.3" a="0.8"/>
+			<Anchors>
+				<Anchor point="TOPLEFT" x="2" y="-2"/>
+				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+			</Anchors>					
+		</NormalTexture>
 	</Button>
 
 	<Button name="HDH_AT_ButtonTemplate2" virtual="true">
@@ -1289,7 +1303,7 @@
 			</Anchors>
 		</HighlightTexture>
 		<DisabledTexture>
-			<Color r="0.5" g="0.5" b="0.5" a="0.8"/>
+			<Color r="0.4" g="0.4" b="0.4" a="0.8"/>
 			<Anchors>
 				<Anchor point="TOPLEFT" x="2" y="-2"/>
 				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
@@ -1538,6 +1552,18 @@
 		</HighlightTexture>
         <Scripts>
             <OnLeave function="HDH_AT_DropDownItem_OnLeave" />
+			<OnEnter>
+				local visibleWidth = self.Text:GetWidth()
+				local fullWidth = self.Text:GetUnboundedStringWidth()
+				if fullWidth > visibleWidth then
+					GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
+					GameTooltip:AddLine(self.Text:GetText());
+					GameTooltip:Show();
+				end
+			</OnEnter>
+			<OnLeave>
+				GameTooltip_Hide();
+			</OnLeave>
         </Scripts>
     </Button>
 
@@ -2093,6 +2119,16 @@
 				</Anchors>
 			</Button>
 		</Frames>
+		<Scripts>
+			<OnEnable>
+				self.BtnPrev:Show()
+				self.BtnNext:Show()
+			</OnEnable>
+			<OnDisable>
+				self.BtnPrev:Hide()
+				self.BtnNext:Hide()
+			</OnDisable>
+		</Scripts>
 	</Button>
 
 	<Button name="HDH_AT_TextureButtonTemplate" inherits="HDH_AT_ButtonTemplate" virtual="true" >

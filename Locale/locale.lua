@@ -336,3 +336,7 @@ L.GLOW_EFFECT_CONFIG = "Glow Effect Type (Choose one)"
 L.GLOW_EFFECT_DEFAULT = "Type 1: WoW Default Effect"
 L.GLOW_EFFECT_COLOR = "Type 2: Colored Glow Effect"
 L.GLOW_EFFECT_PER_SEC = "|cffff0000%.1f|r glows/sec"
+
+-- 11.1.7.10
+L.APPLY_AND_CLOSE = "Apply & Close"
+L.ADD = "Add"

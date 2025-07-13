@@ -1344,9 +1344,9 @@ function HDH_AT_OnClick_Button(self, button)
 			end
 		end)
 
-	elseif self == F.BODY.CONFIG_TRACKER.BTN_CANCEL then
-		F.BODY.CONFIG_TRACKER:Hide()
-		F.BODY.CONFIG_TRACKER_ELEMENTS:Show()
+	-- elseif self == F.BODY.CONFIG_TRACKER.BTN_CANCEL then
+	-- 	F.BODY.CONFIG_TRACKER:Hide()
+	-- 	F.BODY.CONFIG_TRACKER_ELEMENTS:Show()
 
 	elseif self == F.BODY.CONFIG_TRACKER.BTN_COPY then
 		local id = main:GetCurTrackerId()
@@ -1410,7 +1410,7 @@ function HDH_AT_OnClick_Button(self, button)
 			HDH_TRACKER.SetMoveAll(true)
 		end
 
-	elseif self == F.BODY.CONFIG_DETAIL.BTN_SAVE then
+	elseif self == F.BODY.CONFIG_DETAIL.BTN_SAVE or self == F.BODY.CONFIG_DETAIL.BTN_SAVE_CLOSE then
 		local trackerId = F.BODY.CONFIG_DETAIL.trackerId
 		local elemIdx = F.BODY.CONFIG_DETAIL.elemIdx
 		local mode = F.BODY.CONFIG_DETAIL.mode
@@ -1444,6 +1444,7 @@ function HDH_AT_OnClick_Button(self, button)
 			if main:GetCurTrackerId() == trackerId then
 				main:LoadTrackerElementConfig(trackerId, elemIdx, elemIdx)
 			end
+
 			main.Dialog:AlertShow(L.SAVED_CONFIG, HDH_AT_DLG_TYPE.OK)
 
 		elseif mode == BODY_DETAIL_DISPLAY then
@@ -1483,7 +1484,11 @@ function HDH_AT_OnClick_Button(self, button)
 			end
 		end
 
-	elseif self == F.BODY.CONFIG_DETAIL.BTN_CLOSE then
+		if self == F.BODY.CONFIG_DETAIL.BTN_SAVE_CLOSE then
+			main:ChangeBody(BODY_ELEMENTS)
+		end
+
+	elseif self == F.BODY.CONFIG_DETAIL.BTN_CLOSE or self == F.BODY.CONFIG_DETAIL.ETC.BTN_CLOSE then
 		main:ChangeBody(BODY_ELEMENTS)
 
 	elseif self == F.BODY.CONFIG_UI.BTN_EXPORT_STRING then
@@ -2180,9 +2185,10 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			end
 			F.BODY.CONFIG_DETAIL.GLOW.CB1:SetChecked(glowType == DB.GLOW_CONDITION_NONE)
 			button:SetChecked(F.BODY.CONFIG_DETAIL.GLOW.preCheck)
+			F.BODY.CONFIG_DETAIL.ETC.BTN_CLOSE:Hide()
 			F.BODY.CONFIG_DETAIL.BTN_SAVE:Show()
-			F.BODY.CONFIG_DETAIL.BTN_CLOSE:ClearAllPoints()
-			F.BODY.CONFIG_DETAIL.BTN_CLOSE:SetPoint("BOTTOMLEFT", F.BODY.CONFIG_DETAIL.BTN_CLOSE:GetParent() ,"BOTTOM", 5, 5)
+			F.BODY.CONFIG_DETAIL.BTN_CLOSE:Show()
+			F.BODY.CONFIG_DETAIL.BTN_SAVE_CLOSE:Show()
 			F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE1:SetChecked(effectType == DB.GLOW_EFFECT_DEFAULT)
 			F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE2:SetChecked(effectType == DB.GLOW_EFFECT_COLOR_SPARK)
 			F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR:SetColorRGBA(unpack(effectColor))
@@ -2260,9 +2266,10 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			end
 
 			button:SetChecked(F.BODY.CONFIG_DETAIL.DISPLAY.preCheck)
+			F.BODY.CONFIG_DETAIL.ETC.BTN_CLOSE:Hide()
 			F.BODY.CONFIG_DETAIL.BTN_SAVE:Show()
-			F.BODY.CONFIG_DETAIL.BTN_CLOSE:ClearAllPoints()
-			F.BODY.CONFIG_DETAIL.BTN_CLOSE:SetPoint("BOTTOMLEFT", F.BODY.CONFIG_DETAIL.BTN_CLOSE:GetParent() ,"BOTTOM", 5, 5)
+			F.BODY.CONFIG_DETAIL.BTN_CLOSE:Show()
+			F.BODY.CONFIG_DETAIL.BTN_SAVE_CLOSE:Show()
 		end
 	elseif detailMode == BODY_DETAIL_ETC then
 		local trackerType = select(3, DB:GetTrackerInfo(trackerId))
@@ -2273,9 +2280,10 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CB_ION_DEFAULT.Icon:SetTexture(deFaultTexture)
 		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon.key = key
 		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon.isItem = isItem
-		F.BODY.CONFIG_DETAIL.BTN_CLOSE:ClearAllPoints()
-		F.BODY.CONFIG_DETAIL.BTN_CLOSE:SetPoint("BOTTOM", F.BODY.CONFIG_DETAIL.BTN_CLOSE:GetParent() ,"BOTTOM", 0, 5)
+		F.BODY.CONFIG_DETAIL.ETC.BTN_CLOSE:Show()
 		F.BODY.CONFIG_DETAIL.BTN_SAVE:Hide()
+		F.BODY.CONFIG_DETAIL.BTN_CLOSE:Hide()
+		F.BODY.CONFIG_DETAIL.BTN_SAVE_CLOSE:Hide()
 
 		-- Load ChangeIcon
 		if key then
@@ -2410,11 +2418,10 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerConfig(value)
 			F.DD_TRACKER_TYPE:SetSelectedValue(type)
 			F.DD_TRACKER_TRAIT:SetSelectedValue(trait)
 			F.BODY.CONFIG_TRACKER.BTN_DELETE:Enable()
-			F.BODY.CONFIG_TRACKER.BTN_CANCEL:Enable()
+			-- F.BODY.CONFIG_TRACKER.BTN_CANCEL:Enable()
 			F.BODY.CONFIG_TRACKER.BTN_COPY:Enable()
 			F.BTN_PREV_NEXT.Value:SetText(id)
-			F.BTN_PREV_NEXT.BtnNext:Enable()
-			F.BTN_PREV_NEXT.BtnPrev:Enable()
+			F.BTN_PREV_NEXT:Enable()
 
 			self:UpdateTraitsSelector()
 			return true
@@ -2440,11 +2447,10 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerConfig(value)
 		F.DD_TRACKER_AURA_FILTER:Disable()
 		F.DD_TRACKER_UNIT:Disable()
 		F.BODY.CONFIG_TRACKER.BTN_DELETE:Disable()
-		F.BODY.CONFIG_TRACKER.BTN_CANCEL:Disable()
+		-- F.BODY.CONFIG_TRACKER.BTN_CANCEL:Disable()
 		F.BODY.CONFIG_TRACKER.BTN_COPY:Disable()
 		F.BTN_PREV_NEXT.Value:SetText("-")
-		F.BTN_PREV_NEXT.BtnNext:Disable()
-		F.BTN_PREV_NEXT.BtnPrev:Disable()
+		F.BTN_PREV_NEXT:Disable()
 		return false
 	end
 end
@@ -3200,6 +3206,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.F.BODY.CONFIG_DETAIL.ETC = _G[self:GetName().."BodyDetailConfigETC"]
 	self.F.BODY.CONFIG_DETAIL.ETC.MENU = _G[self:GetName().."BodyDetailConfigETCMenuSFContents"]
 	self.F.BODY.CONFIG_DETAIL.ETC.CONTENTS = _G[self:GetName().."BodyDetailConfigETCSFContents"]
+	self.F.BODY.CONFIG_DETAIL.ETC.BTN_CLOSE = _G[self:GetName().."BodyDetailConfigBottomButtonETCClose"]
 
 	--------------------------------------------------------------------------------------------------------------------------------------------------
 	-- START: DETAIL_ETC_TAB
@@ -3291,21 +3298,25 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:SetScript("OnEditFocusGained", function() 
 		GetMainFrame().F.LATEST_SPELL_WINDOW:Show()
 	end)
-	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[3].content, COMP_TYPE.BUTTON, " ")
-	comp:SetText(L.APPLY)
-	comp:SetSize(55, 22)
-	self.F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_BTN_APPLY = comp
+
 	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[3].content, COMP_TYPE.BUTTON, " ")
 	comp:SetText(L.DELETE)
 	comp:SetSize(55, 22)
-	comp:SetPoint("LEFT", self.F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_BTN_APPLY, "RIGHT", 5, 0)
+	comp:GetNormalTexture():SetColorTexture(0.3, 0.3, 0.3, 0.8)
 	self.F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_BTN_DELETE = comp
+
+	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[3].content, COMP_TYPE.BUTTON, " ")
+	comp:SetText(L.APPLY)
+	comp:SetSize(55, 22)
+	comp:SetPoint("LEFT", self.F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_BTN_DELETE, "RIGHT", 5, 0)
+	self.F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_BTN_APPLY = comp
 
 	--------------------------------------------------------------------------------------------------------------------------------------------------
 	-- END : DETAIL_ETC_TAB
 	--------------------------------------------------------------------------------------------------------------------------------------------------
 	self.F.BODY.CONFIG_DETAIL.BTN_SAVE = _G[self:GetName().."BodyDetailConfigBottomButtonApply"]
 	self.F.BODY.CONFIG_DETAIL.BTN_CLOSE = _G[self:GetName().."BodyDetailConfigBottomButtonClose"]
+	self.F.BODY.CONFIG_DETAIL.BTN_SAVE_CLOSE = _G[self:GetName().."BodyDetailConfigBottomButtonSaveClose"]
 
 	self.F.BODY.CONFIG_TRACKER = _G[self.F.BODY:GetName().."Tracker"]
 	self.F.BODY.CONFIG_TRACKER.TITLE = _G[self.F.BODY:GetName().."TrackerTopText"]
@@ -3313,7 +3324,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	self.F.BODY.CONFIG_TRACKER.TRAIT = _G[self.F.BODY:GetName().."TrackerTraitsSFContents"]
 	self.F.BODY.CONFIG_TRACKER.BTN_SAVE = _G[self.F.BODY:GetName().."TrackerBottomBtnSaveTracker"]
 	self.F.BODY.CONFIG_TRACKER.BTN_DELETE = _G[self.F.BODY:GetName().."TrackerBottomBtnDelete"]
-	self.F.BODY.CONFIG_TRACKER.BTN_CANCEL = _G[self.F.BODY:GetName().."TrackerBottomBtnCancel"]
+	-- self.F.BODY.CONFIG_TRACKER.BTN_CANCEL = _G[self.F.BODY:GetName().."TrackerBottomBtnCancel"]
 	self.F.BODY.CONFIG_TRACKER.BTN_COPY = _G[self.F.BODY:GetName().."TrackerBottomBtnCopy"]
 
 	self.F.DD_TRACKER_TRAIT = _G[self.F.BODY.CONFIG_TRACKER.TRAIT:GetName().."Traits"]

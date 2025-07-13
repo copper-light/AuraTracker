@@ -334,3 +334,7 @@ L.GLOW_EFFECT_CONFIG = "Тип эффекта свечения (Выберите
 L.GLOW_EFFECT_DEFAULT = "Тип 1: Стандартный свечения WoW" -- Type 1: WoW default effect
 L.GLOW_EFFECT_COLOR = "Тип 2: Цветной эффект свечения" -- Type 2: Colored Glow Effect
 L.GLOW_EFFECT_PER_SEC = "Свечений в секунду |cffff0000%.1f|r" -- Glows per Sec |cffff0000%.1f|r
+
+-- 11.1.7.10
+L.APPLY_AND_CLOSE = "Прим. & Закр." -- Apply & Close
+L.ADD = "Добавить" -- Add
