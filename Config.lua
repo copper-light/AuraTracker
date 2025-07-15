@@ -7,8 +7,17 @@ local L = HDH_AT_L
 local DB = HDH_AT_ConfigDB
 local UTIL = HDH_AT_UTIL
 
-local UI_COMP_LIST = {}
-local UI_CONFIG_TAB_LIST
+local FRAME_WIDTH = 404
+local FRAME_MAX_H = 1000
+local FRAME_MIN_H = 260
+local STR_TRAIT_FORMAT = "|cffffc800%s\r\n|cffaaaaaa%s"
+local STR_TRACKER_FORMAT = "%s%s"
+local MAX_TALENT_TABS = 4
+local GRID_SIZE = 30;
+local ROW_HEIGHT = 26 -- 오라 row 높이
+local DDM_TRACKER_ALL = 0
+local DDM_TRACKER_UNUSED = -1
+
 
 local COMP_TYPE = {}
 COMP_TYPE.CHECK_BOX = 1
@@ -25,54 +34,8 @@ COMP_TYPE.SWITCH = 11
 COMP_TYPE.SPLIT_LINE = 12
 COMP_TYPE.MULTILINE_EDITBOX = 13
 COMP_TYPE.BLANK_LINE = 14
-          
-local FRAME_WIDTH = 404
-local FRAME_MAX_H = 1000
-local FRAME_MIN_H = 260
 
-local STR_TRAIT_FORMAT = "|cffffc800%s\r\n|cffaaaaaa%s"
-local STR_TRACKER_FORMAT = "%s%s"
-
-local MAX_TALENT_TABS = 4
-
-local GRID_SIZE = 30;
-local FRAME_W = 400
-local FRAME_H = 500
-local MAX_H = 1000
-local MIN_H = 260
-local MAX_SPLIT_ADDFRAME = 5;
-local ROW_HEIGHT = 26 -- 오라 row 높이
-local EDIT_WIDTH_L = 145
-local EDIT_WIDTH_S = 0
-local FLAG_ROW_CREATE = 1 -- row 생성 모드
-local ANI_MOVE_UP = 1
-local ANI_MOVE_DOWN = 0
-
-
-local DDM_TRACKER_ALL = 0
-local DDM_TRACKER_UNUSED = -1
-
-local EQUIPMENT_SLOT = {
-	"AMMOSLOT",
-	"HEADSLOT",
-	"NECKSLOT",
-	"SHOULDERSLOT",
-	"CHESTSLOT",
-	"WAISTSLOT",
-	"LEGSSLOT",
-	"FEETSLOT",
-	"WRISTSLOT",
-	"HANDSSLOT",
-	"FINGER0SLOT",
-	"FINGER1SLOT",
-	"TRINKET0SLOT",
-	"TRINKET1SLOT",
-	"BACKSLOT",
-	"MAINHANDSLOT",
-	"SECONDARYHANDSLOT",
-	"TABARDSLOT",
-}
-
+local UI_COMP_LIST = {}
 local UI_CONFIG_TAB_LIST= {
 	{name=L.TEXT, type="LABEL", texture="Interface\\Addons\\HDH_AuraTracker\\Texture\\text"},
 	{name=L.TIME, type="BUTTON"}, --1
@@ -98,85 +61,78 @@ local DETAIL_ETC_CONFIG_TAB_LIST= {
 	{name=L.INNER_COOLDOWN_ITEM, type="BUTTON"}, --3
 }
 
-local MyClassKor, MyClass = UnitClass("player");
-local DDP_TRACKER_LIST = {
-	{HDH_TRACKER.TYPE.BUFF, L.BUFF},
-	{HDH_TRACKER.TYPE.DEBUFF, L.DEBUFF},
-	{HDH_TRACKER.TYPE.COOLDOWN, L.SKILL_COOLDOWN},
-	{HDH_TRACKER.TYPE.HEALTH, L.HEALTH}
-}
-
-local powerList = {}
-local totemName = L.TOTEM
-
-local function HDH_AT_AddTrackerList(power_type, name)
-	if power_type then
-		table.insert(DDP_TRACKER_LIST, {power_type, name})
+local GET_TRACKER_TYPE_NAME = {}
+local DDP_TRACKER_LIST = {}
+local function AddTrackerList(type, name)
+	if type then
+		table.insert(DDP_TRACKER_LIST, {type, name})
+		GET_TRACKER_TYPE_NAME[type] = name
 	end
 end
+
+local _, MyClass = UnitClass("player");
+local totemName = L.TOTEM
+
+AddTrackerList(HDH_TRACKER.TYPE.BUFF, L.BUFF)
+AddTrackerList(HDH_TRACKER.TYPE.DEBUFF, L.DEBUFF)
+AddTrackerList(HDH_TRACKER.TYPE.COOLDOWN, L.SKILL_COOLDOWN)
+AddTrackerList(HDH_TRACKER.TYPE.HEALTH, L.HEALTH)
 
 if MyClass == "MAGE" then 
 	-- totemName = L.MAGE_TOTEM
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, L.POWER_ARCANE_CHARGES)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, L.POWER_ARCANE_CHARGES)
 elseif MyClass == "PALADIN" then 
 	totemName = L.PALADIN_TOTEM
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_HOLY_POWER, L.POWER_HOLY_POWER)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_HOLY_POWER, L.POWER_HOLY_POWER)
 elseif MyClass == "WARRIOR" then 
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE)
 elseif MyClass == "DRUID" then 
 	-- totemName = L.DRUID_TOTEM
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_LUNAR, L.POWER_LUNAR)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_COMBO_POINTS, L.POWER_COMBO_POINTS)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_LUNAR, L.POWER_LUNAR)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_COMBO_POINTS, L.POWER_COMBO_POINTS)
 elseif MyClass == "DEATHKNIGHT" then 
 	totemName = L.DK_TOTEM
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_RUNIC, L.POWER_RUNIC)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_RUNE, L.POWER_RUNE)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_RUNIC, L.POWER_RUNIC)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_RUNE, L.POWER_RUNE)
 elseif MyClass == "HUNTER" then 
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_FOCUS, L.POWER_FOCUS)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_FOCUS, L.POWER_FOCUS)
 elseif MyClass == "PRIEST" then 
 	totemName = L.PRIEST_TOTEM
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_INSANITY, L.POWER_INSANITY)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_INSANITY, L.POWER_INSANITY)
 	-- addTrackerList(HDH_TRACKER.TYPE.PRIEST_SHADOWY_APPARITION, L.PRIEST_SHADOWY_APPARITION})
 elseif MyClass == "ROGUE" then
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_COMBO_POINTS, L.POWER_COMBO_POINTS)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_COMBO_POINTS, L.POWER_COMBO_POINTS)
 elseif MyClass == "SHAMAN" then 
 	totemName = L.SHAMAN_TOTEM
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MAELSTROM, L.POWER_ELE_MAELSTROM)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM, L.POWER_ENH_MAELSTROM)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_MAELSTROM, L.POWER_ELE_MAELSTROM)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM, L.POWER_ENH_MAELSTROM)
 elseif MyClass == "WARLOCK" then 
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_SOUL_SHARDS, L.POWER_SOUL_SHARDS)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_SOUL_SHARDS, L.POWER_SOUL_SHARDS)
 elseif MyClass == "MONK" then 
 	totemName = L.MONK_TOTEM
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_CHI, L.POWER_CHI)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.STAGGER, L.STAGGER)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_CHI, L.POWER_CHI)
+	AddTrackerList(HDH_TRACKER.TYPE.STAGGER, L.STAGGER)
 elseif MyClass == "DEMONHUNTER" then 
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_FURY, L.POWER_FURY)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_FURY, L.POWER_FURY)
 	-- addTrackerList(HDH_TRACKER.TYPE.POWER_PAIN, L.POWER_PAIN}) -- 삭제됨
 elseif MyClass == "EVOKER" then
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.POWER_ESSENCE, L.POWER_ESSENCE)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	AddTrackerList(HDH_TRACKER.TYPE.POWER_ESSENCE, L.POWER_ESSENCE)
 end
 
 if select(4, GetBuildInfo()) >= 100000 or MyClass == "SHAMAN" then
-	HDH_AT_AddTrackerList(HDH_TRACKER.TYPE.TOTEM, totemName)
-end
-
-GET_TRACKER_TYPE_NAME = {}
-for _, v in ipairs(DDP_TRACKER_LIST) do
-	if v[1] ~= nil then
-		GET_TRACKER_TYPE_NAME[v[1]] = v[2]
-	end
+	AddTrackerList(HDH_TRACKER.TYPE.TOTEM, totemName)
 end
 
 local UNIT_TO_LABEL = {
@@ -219,16 +175,10 @@ local DDP_AURA_UNIT_LIST = {
 	{'arena5', L.ARENA5},
 }
 
-local DDP_COOLDOWN_UNIT_LIST = {
-	{'player', L.UNIT_PLAYER},
-	-- {'pet', L.UNIT_PET}
-}
-
-local DDP_AURA_LIST = {
-	{1, L.ONLY_MINE_AURA},
-	{2, L.ALL_AURA},
-	{3, L.ONLY_BOSS_AURA}
-}
+-- local DDP_COOLDOWN_UNIT_LIST = {
+-- 	{'player', L.UNIT_PLAYER},
+-- 	-- {'pet', L.UNIT_PET}
+-- }
 
 local DDP_FONT_CD_FORMAT_LIST = {
 	{DB.TIME_TYPE_CEIL, L.TIME_TYPE_CEIL},
@@ -428,8 +378,8 @@ local BODY_DETAIL_GLOW = 5
 local BODY_DETAIL_ETC = 6
 local BODY_DETAIL_DISPLAY = 7
 
-local DETAIL_ETC_CHANGE_ICON = 1
-local DETAIL_ETC_SPLIT_BAR = 2
+-- local DETAIL_ETC_CHANGE_ICON = 1
+-- local DETAIL_ETC_SPLIT_BAR = 2
 
 ---------------------------------------------------------
 -- local functions
@@ -441,7 +391,7 @@ end
 
 local function GetTalentIdByTraits(searchTraitsId)
 	local ret = {}
-	local traitIds
+	local traitIds, talentId
 	if not searchTraitsId then return nil end
 	for i = 1, MAX_TALENT_TABS do
 		talentId, _, _, _ = HDH_AT_UTIL.GetSpecializationInfo(i)
@@ -480,9 +430,9 @@ local function ChangeTab(list, idx)
 	end
 end
 
-local function GetTabIdx(tabs)
-	return tabs.tabIdx
-end
+-- local function GetTabIdx(tabs)
+-- 	return tabs.tabIdx
+-- end
 
 function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, subType, ...)
 	local args = ...
@@ -568,7 +518,15 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		ChangeTab(ui_list, self.subType)
 
 		if self.subType == 9 then
-			self:LoadTrackerListForExport()
+			local ids = DB:GetTrackerIds()
+			local data = {}
+			
+			for idx, id in ipairs(ids) do
+				local id, name, type, _, _, _, trait = DB:GetTrackerInfo(id)
+				data[idx] = {id, name, type, trait}
+			end
+
+			self:LoadTrackerListForImportExport(self.UI_TAB[9].content, data, true)
 		end
 
 	elseif self.bodyType == BODY_DETAIL_GLOW then
@@ -995,7 +953,7 @@ end
 local function HDH_AT_OnEventTrackerElement(self, elemIdx)
 	local name = self:GetName()
 	local main = GetMainFrame()
-	local F = main.F
+	-- local F = main.F
 	local trackerId = main:GetCurTrackerId()
 
 	if string.find(name, "ButtonSet") then
@@ -1161,7 +1119,7 @@ function HDH_AT_OnClick_Button(self, button)
 	local F = main.F
 
 	if self == F.BODY.CONFIG_TRACKER.BTN_SAVE then
-		local info = nil
+		-- local info = nil
 		local name = F.ED_TRACKER_NAME:GetText()
 		local type = F.DD_TRACKER_TYPE:GetSelectedValue()
 		local unit = F.DD_TRACKER_UNIT:GetSelectedValue()
@@ -1461,9 +1419,6 @@ function HDH_AT_OnClick_Button(self, button)
 
 			isItem = F.BODY.CONFIG_DETAIL.DISPLAY.EB_CONNECT_TRAIT:GetIsItem()
 
-			-- {DB.SPELL_HIDE_AS_SPACE, HDH_AT_L.USE_SPACE},
-			-- {DB.SPELL_HIDE, HDH_AT_L.DONT_USE_SPACE}
-
 			if F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2:GetChecked() then
 				spellId = F.BODY.CONFIG_DETAIL.DISPLAY.EB_CONNECT_TRAIT:GetValue()
 				spellId, isItem = main:SetSearchEdit(F.BODY.CONFIG_DETAIL.DISPLAY.EB_CONNECT_TRAIT, spellId, isItem)
@@ -1501,7 +1456,16 @@ function HDH_AT_OnClick_Button(self, button)
 			if item:GetChecked() then
 				tracker = DB:GetTracker(item.id)
 				tracker = UTIL.Deepcopy(tracker)
-				tracker.trait = item.trait
+				
+				local talentList = {}
+				-- 중복 체크하지 않음
+				-- 특성 ID를 저장하는 이유는 프로필을 불러오는 캐릭터에 trait이 삭제된 경우,
+				-- 동일한 인덱스의 특성ID로 치환하기 위한 목적임 
+				for _, t in ipairs(tracker.trait) do
+					local talentID = GetTalentIdByTraits(t)
+					table.insert(talentList, talentID)
+				end
+				tracker.talentList = talentList
 				table.insert(exportTracker, {
 					tracker = tracker, 
 					ui = UTIL.Deepcopy((DB:GetTrackerUI(item.id) or DB:GetTrackerUI()))
@@ -1510,37 +1474,80 @@ function HDH_AT_OnClick_Button(self, button)
 		end
 		exportTracker.version = DB:GetVersion()
 		exportTracker.adoon_version = C_AddOns.GetAddOnMetadata("HDH_AuraTracker", "Version")
+		exportTracker.class = MyClass
 
 		if #exportTracker > 0 then
-			local data = WeakAuraLib_TableToString(exportTracker, true)
-			F.BODY.CONFIG_UI.ED_EXPORT_STRING:SetText(data)
-			main.Dialog:AlertShow(L.DIALOG_CREATE_SHARE_STRING:format(HDH_AT_UTIL.CommaValue(string.len(data))), HDH_AT_DLG_TYPE.OK)
+			-- local data = WeakAuraLib_TableToString(exportTracker, true)
+			local data = HDH_AT_UTIL.ObjectToString(exportTracker)
+			
+			main.Dialog:AlertShow(L.DIALOG_CREATE_SHARE_STRING:format(HDH_AT_UTIL.CommaValue(string.len(data))), HDH_AT_DLG_TYPE.MULTILINE_EDIT_OK, nil, nil, data)
+
 		else
 			main.Dialog:AlertShow(L.PLEASE_SELECT_TRACKER_FOR_EXPORT)
 		end
 
-	elseif self == F.BODY.CONFIG_UI.BTN_IMPORT_STRING then
-		local data = F.BODY.CONFIG_UI.ED_IMPORT_STRING:GetText()
-		data = WeakAuraLib_StringToTable(data, true)
-		if not data then
-			main.Dialog:AlertShow(L.SHARE_STRING_IS_WRONG)
-			return 
-		end
+	elseif self == F.BODY.CONFIG_UI.BTN_ENTER_STRING then
+		main.Dialog:AlertShow(L.INPUT_PROFILE_STRING, HDH_AT_DLG_TYPE.MULTILINE_EDIT_YES_NO, function(dlg)
+			local data = dlg.EditBox:GetText()
+			-- data = WeakAuraLib_StringToTable(data, true)
+			data = HDH_AT_UTIL.StringToObject(data)
 
-		local size = DB:VaildationProfile(data)
-		if size == -1 then
-			local adoon_version = data.adoon_version or "Unknown"
-			main.Dialog:AlertShow(L.NOT_COMPATIBLE_DB_VERSION:format(adoon_version))
-			return 
-		end
+			if not data then
+				main.Dialog:AlertShow(L.SHARE_STRING_IS_WRONG)
+				return 
+			end
+			local size = DB:VaildationProfile(data)
+			if size == -1 then
+				local adoon_version = data.adoon_version or "Unknown"
+				main.Dialog:AlertShow(L.INCOMPATIBLE_DB_VERSION:format(adoon_version))
+				return 
+			end
 
-		main.Dialog:AlertShow(L.DO_YOU_WANT_IMPORT_PROFILE:format(size), HDH_AT_DLG_TYPE.WARNING_YES_NO, function() 	
-			local data = F.BODY.CONFIG_UI.ED_IMPORT_STRING:GetText()
-			data = WeakAuraLib_StringToTable(data, true)
-			DB:AppendProfile(GET_TRACKER_TYPE_NAME, data)
-			ReloadUI()
+			if data.class ~= MyClass then
+				main.Dialog:AlertShow(L.INCOMPATIBLE_CLASS:format(HDH_AT_UTIL.GetLocalizedClassName(data.class)))
+			end
+			
+			local dataInfo = {}
+			for _, item in ipairs(data) do
+				dataInfo[#dataInfo+1] = {item.tracker.id, item.tracker.name, item.tracker.type, item.tracker.trait, item.tracker.talentList}
+			end
+			main.UI_TAB[8].content.data = data
+			main:LoadTrackerListForImportExport(main.UI_TAB[8].content, dataInfo)
 		end)
 
+	elseif self == F.BODY.CONFIG_UI.BTN_ADD_PROFILE_STRING then
+		local list = main.UI_TAB[8].content.List
+		local data = main.UI_TAB[8].content.data
+		local selectedData = {}
+		if list then
+			local selected_list = {}
+			for _, item in ipairs(list) do
+				if item:GetChecked() then
+					selected_list[#selected_list + 1] = item.dataIndex
+				end
+			end
+			for _, index in ipairs(selected_list) do
+				selectedData[#selectedData + 1] = data[index]
+			end
+		else
+			main.Dialog:AlertShow(L.PLEASE_SELECT_TRACKER_FOR_IMPORT)
+		end
+
+		if #selectedData == 0 then
+			main.Dialog:AlertShow(L.PLEASE_SELECT_TRACKER_FOR_IMPORT)
+		else
+			local dlg_msg
+			if data.class ~= MyClass then
+				dlg_msg = L.DO_YOU_WANT_IMPORT_MISMATCH_CLASS_PROFILE:format(#selectedData)
+			else
+				dlg_msg = L.DO_YOU_WANT_IMPORT_PROFILE:format(#selectedData)
+			end
+			selectedData.class = data.class
+			main.Dialog:AlertShow(dlg_msg, HDH_AT_DLG_TYPE.WARNING_YES_NO, function(dlg, import_data)
+				DB:AppendProfile(import_data)
+				ReloadUI()
+			end, nil, nil, selectedData)
+		end
 	elseif self == F.BODY.CONFIG_DETAIL.ETC.CUSTOM_BTN_SEARCH then
 		local trackerId = F.BODY.CONFIG_DETAIL.trackerId
 		local elemIdx = F.BODY.CONFIG_DETAIL.elemIdx
@@ -1668,7 +1675,6 @@ function HDH_AT_OnClick_Button(self, button)
 			end
 		)
 	end
-	
 end
 
 function HDH_AT_OnClick_ButtomTapButton(self)
@@ -1679,7 +1685,6 @@ function HDH_AT_OnClick_ButtomTapButton(self)
 	else
 		GetMainFrame():ChangeBody(BODY_UI, nil, nil, nil)
 	end
-	
 end
 
 function HDH_AT_OnCancelColorPicker()
@@ -2054,48 +2059,42 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerElementConfig(trackerId, startRowIdx
 	end
 end
 
--- function HDH_AT_ConfigFrameMixin:GetSpell()
--- 	HDH_AT_UTIL.GetCacheSpellInfo(spellName)
--- end
-
-function HDH_AT_ConfigFrameMixin:LoadTrackerListForExport()
-	local content = self.UI_TAB[9].content
-	local ids = DB:GetTrackerIds()
+function HDH_AT_ConfigFrameMixin:LoadTrackerListForImportExport(content, data, isExport)
+	local F = GetMainFrame().F
 	local item, iconIndex
-	local id, name, type, trait, icon
+	local id, name, type, trait, talentID, icon, talentList
 	local talentCache = {}
-	local talentList = {}
-	local talentID
-
+	local talentIconList = {}
+	local startFrame = content.startFrame
 	content.List = content.List or {}
 
-	local label = self.F.BODY.CONFIG_UI.LABEL_EXPORT
-
 	if not content.SelectAll then
-		content.SelectAll = CreateFrame("Button", nil, label, "HDH_AT_CheckButton2Template")
-		content.SelectAll:SetPoint("TOPLEFT", label, "BOTTOMLEFT", 0, -1)
-		content.SelectAll:SetPoint("RIGHT", label, "RIGHT", 0, 0)
+		content.SelectAll = CreateFrame("Button", nil, startFrame, "HDH_AT_CheckButton2Template")
+		content.SelectAll:SetPoint("TOPLEFT", startFrame, "BOTTOMLEFT", 0, -2)
+		content.SelectAll:SetPoint("RIGHT", startFrame, "RIGHT", 0, 0)
 		content.SelectAll:SetHeight(20)
 		content.SelectAll.Text:SetText(L.SELECT_ALL)
 		content.SelectAll:SetScript("OnClick", function(self)
-			local list = GetMainFrame().UI_TAB[9].content.List
+			local list = content.List
 			for _, comp in ipairs(list) do
-				comp:SetChecked(self:GetChecked())
+				if comp:IsEnabled() then
+					comp:SetChecked(self:GetChecked())
+				end
 			end
 		end)
 	end
-
 	content.SelectAll:SetChecked(false)
-
-	for index, id in ipairs(ids) do
+	local unsupport = {}
+	for index, row in ipairs(data) do
+		id, name, type, trait, talentList = unpack(row)
 		if not content.List[index] then
-			item = CreateFrame("Button", "HDH_AT_CheckButtonForExport"..index, content.SelectAll, "HDH_AT_CheckButtonForExportTemplate")
+			item = CreateFrame("Button", content:GetName().."ProfileTrackerItem"..index, content, "HDH_AT_CheckButtonForExportTemplate")
 			item:SetPoint("TOPLEFT", content.SelectAll, "TOPLEFT", 0, -((index) * 22))
-			item:SetPoint("RIGHT", content.SelectAll,"RIGHT", 0, 0)
+			item:SetPoint("RIGHT", content.SelectAll, "RIGHT", 0, 0)
 			item:SetHeight(20)
 			item:SetScript("OnClick", function(self)
-				local list = GetMainFrame().UI_TAB[9].content.List
-				local selectAll = GetMainFrame().UI_TAB[9].content.SelectAll
+				local list = content.List
+				local selectAll = content.SelectAll
 				local count = 0
 				for _, comp in ipairs(list) do
 					if comp:GetChecked() then count = count + 1 end
@@ -2105,42 +2104,97 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerListForExport()
 			item.IconList = {item.Icon1, item.Icon2, item.Icon3, item.Icon4}
 			content.List[index] = item
 		end
-		item = content.List[index]
-		id, name, type, _, _, _, trait = DB:GetTrackerInfo(id)
-		talentCache = {}
-		talentList = {}
-		for _, t in ipairs(trait) do
-			talentID = GetTalentIdByTraits(t)
-			icon = select(4, HDH_AT_UTIL.GetSpecializationInfoByID(talentID))
-			if icon and not talentCache[talentID] then
-				talentCache[talentID] = icon
-				table.insert(talentList, icon)
-			end
-		end
+		item = content.List[index - #unsupport]
 
-		iconIndex = 0
-		table.sort(talentList, function(a,b) return a > b end)
-		for _, t in ipairs(talentList) do
-			iconIndex = iconIndex + 1
-			item.IconList[iconIndex]:SetTexture(t)
-			item.IconList[iconIndex]:Show()
+		if GET_TRACKER_TYPE_NAME[type] then
+			talentCache = {}
+			talentIconList = {}
+			if talentList then
+				for _, talentID in ipairs(talentList) do
+					icon = select(4, HDH_AT_UTIL.GetSpecializationInfoByID(talentID))
+					if icon and not talentCache[talentID] then
+						talentCache[talentID] = icon
+						table.insert(talentIconList, icon)
+					end
+				end
+			else
+				for _, t in ipairs(trait) do
+					icon = nil
+					talentID = GetTalentIdByTraits(t)
+					if talentID then
+						icon = select(4, HDH_AT_UTIL.GetSpecializationInfoByID(talentID))
+					end
+					if icon and not talentCache[talentID] then
+						talentCache[talentID] = icon
+						table.insert(talentIconList, icon)
+					end
+				end
+			end
+
+			iconIndex = 0
+			if #talentIconList == 0 then
+				iconIndex = 1
+				item.IconList[iconIndex]:SetTexture([[Interface\ICONS\INV_Misc_QuestionMark]])
+			else
+				table.sort(talentIconList, function(a,b) return a > b end)
+				for _, t in ipairs(talentIconList) do
+					iconIndex = iconIndex + 1
+					item.IconList[iconIndex]:SetTexture(t)
+					item.IconList[iconIndex]:Show()
+				end
+			end
+			
+			for i = iconIndex + 1 , 4 do
+				item.IconList[i]:Hide()
+			end
+			item.Text:SetText(name.." ("..GET_TRACKER_TYPE_NAME[type]..")")
+			item:SetChecked(false)
+			item.dataIndex = index
+			item.id = id
+			item:Enable()
+		else
+			unsupport[#unsupport+1] = row
 		end
-		
-		for i = iconIndex + 1 , 4 do
-			item.IconList[i]:Hide()
-		end
-		
-		item.Text:SetText(name.." ("..GET_TRACKER_TYPE_NAME[type]..")")
-		item:SetChecked(false)
-		item.id = id
-		item.trait = talentList
 		item:Show()
 	end
 
-	for i = #ids+1, #content.List do
+	for index, row in ipairs(unsupport) do
+		id, name, type, trait, talentList = unpack(row)
+		item = content.List[index +  #data - #unsupport]
+		item.Text:SetText(name.." ("..L.UNSUPPORT..")")
+		item:SetChecked(false)
+		item:Disable()
+		for i = 1 , 4 do
+			item.IconList[i]:Hide()
+		end
+	end
+
+	if not content.button then
+		content.button = CreateFrame("Button", content:GetName().."Button", content, "HDH_AT_ButtonTemplate")
+		content.button:SetScript("OnClick", HDH_AT_OnClick_Button)
+		content.button:SetPoint("RIGHT", content.SelectAll, "RIGHT", 2, 0)
+
+		local line = CreateFrame("Frame", content.button:GetName().."Line", content.button, "HDH_AT_LineFrameTemplate")
+		line:SetHeight(2)
+		line:SetPoint("TOPLEFT", content.button, "TOPLEFT", 2, 2)
+		line:SetPoint("RIGHT", content.button, "RIGHT", -2, 0)
+		line.Line:SetColorTexture(1,1,1,0.5)
+
+		if isExport then
+			content.button:SetText(L.CREATE_SHARE_STRING)
+			F.BODY.CONFIG_UI.BTN_EXPORT_STRING = content.button
+		else
+			content.button:SetText(L.ADD_PROFILE_STRING)
+			F.BODY.CONFIG_UI.BTN_ADD_PROFILE_STRING = content.button
+		end
+	end
+	content.button:SetPoint("TOPLEFT", content.SelectAll, "TOPLEFT", -2, -((#data+1) * 22) -1)
+
+	for i = #data+1, #content.List do
 		content.List[i]:Hide()
-		item.id = nil
-		item.trait = nil
+		content.List[i].id = nil
+		content.List[i].dataIndex = nil
+		content.List[i]:SetChecked(false)
 	end
 end
 
@@ -2432,17 +2486,14 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerConfig(value)
 		F.BODY.CONFIG_TRACKER.is_creation = true
 		F.BODY.CONFIG_TRACKER.TITLE:SetText(L.CREATE_TRACKER)
 		F.ED_TRACKER_NAME:SetText("")
-		
 		F.DD_TRACKER_TYPE:SelectClear()
 		F.DD_TRACKER_UNIT:SelectClear()
 		F.DD_TRACKER_AURA_CASTER:SelectClear()
 		F.DD_TRACKER_AURA_FILTER:SelectClear()
 		F.DD_TRACKER_TRAIT:SelectClear()
-
 		F.DD_TRACKER_AURA_CASTER:Enable()
 		F.DD_TRACKER_AURA_FILTER:Enable()
 		F.DD_TRACKER_UNIT:Enable()
-
 		F.DD_TRACKER_AURA_CASTER:Disable()
 		F.DD_TRACKER_AURA_FILTER:Disable()
 		F.DD_TRACKER_UNIT:Disable()
@@ -2526,7 +2577,6 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(traitId)
 			component:SetScript('OnDragStart', HDH_AT_OP_OnDragStartRow)
 			component:SetScript('OnDragStop', HDH_AT_OP_OnDragStopRow)
 			component:RegisterForClicks("LeftButtonUp", "RightButtonUp");
-			
 			component:RegisterForDrag('LeftButton')
 			component:EnableMouse(true)
 			component:SetMovable(true)
@@ -2545,15 +2595,9 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(traitId)
 		component:SetPoint('TOPRIGHT', parent, 'TOPRIGHT', 2, -((component:GetHeight())  * (idx -1) + MARGIN_Y))
 
 		local unitName = ""
-		typeName = "Unknown Tracker"
+		typeName = GET_TRACKER_TYPE_NAME[type] or "Unknown Tracker"
 		if type == HDH_TRACKER.TYPE.BUFF or type == HDH_TRACKER.TYPE.DEBUFF then
 			unitName = ": " .. UNIT_TO_LABEL[unit]
-		end
-
-		for i, label in ipairs(DDP_TRACKER_LIST) do
-			if label[1] == type then
-				typeName = label[2]
-			end
 		end
 		component:SetText(name) --STR_TRACKER_FORMAT:format(name, typeName, unitName)
 		component.Tracker:SetText(STR_TRACKER_FORMAT:format(typeName, unitName))
@@ -2564,7 +2608,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerList(traitId)
 		F.BTN_SHOW_ADD_TRACKER_CONFIG.index = #parent.list
 		F.BTN_SHOW_ADD_TRACKER_CONFIG.mode = HDH_AT_AuraRowMixin.MODE.EMPTY
 	end
-	
+
 	if #trackerIds < #parent.list-1 then
 		for i = #trackerIds+1, #parent.list-1 do
 			parent.list[i]:Hide()
@@ -2901,7 +2945,7 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 	else
 		f.queue = nil
 	end
-	
+
 	if self.F.LATEST_SPELL_WINDOW:IsShown() then
 		local size = (f.queue and f.queue:GetSize()) or 0
 		local value
@@ -2968,7 +3012,6 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 				item.filter = nil
 			end
 			idx = idx + 1
-			
 		end
 
 		while size < #list do
@@ -2978,7 +3021,6 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 		f:SetHeight((idx -1) * height + 5)
 	end
 
-	
 	for k, v in pairs(f.buffQueue.activeSpell) do
 		if not v then
 			f.buffQueue.activeSpell[k] = nil
@@ -3019,7 +3061,7 @@ function HDH_AT_ConfigFrameMixin:UpdateFrame()
 	local talentID = select(1, HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))
 	local traitID = talentID and HDH_AT_UTIL.GetLastSelectedSavedConfigID(talentID)
 	local traitName = traitID and UTIL.GetTraitsName(traitID)
-	
+
 	self:LoadTraits()
 	if ddm:GetIndex(DDM_TRACKER_UNUSED) then
 		ddm:SetSelectedValue(-1)
@@ -3036,7 +3078,7 @@ function HDH_AT_ConfigFrameMixin:UpdateFrame()
 			end
 		end
 		self:LoadTrackerList(ddm:GetSelectedValue())
-		
+
 		if self.bodyType == nil then 
 			self.bodyType = BODY_ELEMENTS
 		end
@@ -3047,9 +3089,6 @@ function HDH_AT_ConfigFrameMixin:UpdateFrame()
 		self:ChangeBody(BODY_TRACKER_NEW)
 	end
 	LoadDB(nil, self.F.LATEST_SPELL.CB_AUTO_POPUP)
-
-
-	
 
 	local id, name, _, icon, lastIdx
 	for i=1, #self.TalentButtonList do
@@ -3171,11 +3210,10 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	end)
 	self.F.BODY.CONFIG_DETAIL.GLOW.SL_EFFECT_PER_SEC = _G[self:GetName().."BodyDetailConfigGlowSFContentsSLSparkPerSec"]
 	self.F.BODY.CONFIG_DETAIL.GLOW.SL_EFFECT_PER_SEC:Init(1.5, 0.5, 5, 0.5, L.GLOW_EFFECT_PER_SEC)
-	
 
 	self.F.BODY.CONFIG_DETAIL.DISPLAY = _G[self:GetName().."BodyDetailConfigDisplay"]
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.CONTENTS = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContents"]
-	
+
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.CONTENTS.Title1:SetText(L.DETAIL_DISPLAY)
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB1 = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContentsCBCondition1"]
 	self.F.BODY.CONFIG_DETAIL.DISPLAY.CB2 = _G[self:GetName().."BodyDetailConfigDisplayConfigSFContentsCBCondition2"]
@@ -3338,18 +3376,11 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 
 	self.F.BODY.CONFIG_UI = _G[self.F.BODY:GetName().."UI"]
 	self.F.BODY.CONFIG_UI.SW_DISPLAY_MODE = _G[self.F.BODY:GetName().."UITopSwithDisplayMode"]
-	self.F.BODY.CONFIG_UI.SW_DISPLAY_MODE:Init({
-		{1, HDH_AT_L.USE_DISPLAY_ICON},
-		{2, HDH_AT_L.USE_DISPLAY_BAR}, 
-		{3, HDH_AT_L.USE_DISPLAY_ICON_AND_BAR}
-	}, HDH_AT_OnSelected_Dropdown)
+	self.F.BODY.CONFIG_UI.SW_DISPLAY_MODE:Init(DDP_DISPLAY_MODE_LIST, HDH_AT_OnSelected_Dropdown)
 	DBSync(F.BODY.CONFIG_UI.SW_DISPLAY_MODE, COMP_TYPE.SWITCH, "ui.%s.common.display_mode")
 
 	self.F.BODY.CONFIG_UI.SW_CONFIG_MODE = _G[self.F.BODY:GetName().."UITopSwithConfigMode"]
-	self.F.BODY.CONFIG_UI.SW_CONFIG_MODE:Init({
-		{1, HDH_AT_L.USE_GLOBAL_CONFIG}, 
-		{2, HDH_AT_L.USE_SEVERAL_CONFIG}
-	}, HDH_AT_OnSelected_Dropdown)
+	self.F.BODY.CONFIG_UI.SW_CONFIG_MODE:Init(DDP_CONFIG_MODE_LIST, HDH_AT_OnSelected_Dropdown)
 
 	self.F.BODY.CONFIG_UI.CB_MOVE = _G[self.F.BODY:GetName().."UIBottomCBMove"]
 	self.F.BODY.CONFIG_UI.CB_SHOW_ID_TOOPTIP = _G[self.F.BODY:GetName().."UIBottomCBShowIdInTooltip"]
@@ -3546,27 +3577,19 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	------------------------------------------------------- import
 	-- comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.SPLIT_LINE, L.IMPORT_SHARE_STRING)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.BUTTON,       L.IMPORT_SHARE_STRING)
-	comp:SetText(L.APPLY_SHARE_STRING)
-	self.F.BODY.CONFIG_UI.BTN_IMPORT_STRING = comp
-	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.EDIT_BOX)
-	comp:SetSize(263,26)
-	comp:SetFontObject("Font_White_XS")
-	comp:SetMaxLetters(0)
-	self.F.BODY.CONFIG_UI.ED_IMPORT_STRING = comp
+	comp:SetText(L.IMPORT_SHARE_STRING)
+	self.F.BODY.CONFIG_UI.BTN_ENTER_STRING = comp
+
+	comp = HDH_AT_CreateOptionComponent(tabUIList[8].content, COMP_TYPE.SPLIT_LINE,       L.PLEASE_SELECT_TRACKER_FOR_IMPORT)
+	self.F.BODY.CONFIG_UI.LABEL_IMPORT = comp
+	tabUIList[8].content.startFrame = comp
 
 	------------------------------------------------------- export
 	-- comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.SPLIT_LINE,       L.EXPORT_SHARE_STRING)
-	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.BUTTON,       L.EXPORT_SHARE_STRING)
-	comp:SetText(L.CREATE_SHARE_STRING)
-	self.F.BODY.CONFIG_UI.BTN_EXPORT_STRING = comp
-	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.EDIT_BOX)
-	comp:SetSize(263,26)
-	comp.Desc:SetText("")
-	comp:SetMaxLetters(0)
-	comp:SetFontObject("Font_White_XS")
-	self.F.BODY.CONFIG_UI.ED_EXPORT_STRING = comp
+
 	comp = HDH_AT_CreateOptionComponent(tabUIList[9].content, COMP_TYPE.SPLIT_LINE,       L.PLEASE_SELECT_TRACKER_FOR_EXPORT)
 	self.F.BODY.CONFIG_UI.LABEL_EXPORT = comp
+	tabUIList[9].content.startFrame = comp
 
 	------------------------------------------------------- reset
 	comp = HDH_AT_CreateOptionComponent(tabUIList[10].content, COMP_TYPE.BUTTON,       L.RESET_ADDON)
@@ -3627,7 +3650,6 @@ function HDH_AT_ConfigFrameMixin:OnEvent(event, ...)
 		local _, event, _, srcGUID, srcName, _, _, _, _, _, _, spellID, spellName =  CombatLogGetCurrentEventInfo()
 		if srcGUID == UnitGUID('player') then
 			if event == "SPELL_DAMAGE" or event == "SPELL_HEAL" or event == "SPELL_CAST_SUCCESS" or event == "SPELL_SUMMON" or event == "SPELL_CREATE" then -- event == "SPELL_AURA_APPLIED" or 
-				name, _, icon = HDH_AT_UTIL.GetInfo(spellID, false)
 				table.insert(self.cacheCastSpell, spellID)
 				UTIL.RunTimer(self, "UPDATE_LATEST", 0.5, HDH_AT_ConfigFrameMixin.UpdateLatest, self)
 			end
@@ -3644,7 +3666,7 @@ end
 
 function HDH_AT_ConfigFrame_OnShow(self)
 	self.ErrorReset:Show()
-	local IsLoaded = select(1, HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))
+	-- local IsLoaded = select(1, HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))
 	
 	if HDH_AT_UTIL.GetSpecialization() == 5 then
 		self.Dialog:AlertShow(L.NOT_FOUND_TALENT)

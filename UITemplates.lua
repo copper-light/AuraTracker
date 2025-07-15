@@ -119,7 +119,7 @@ function HDH_AT_AuraRowMixin:Clear()
     _G[self:GetName().."CheckButtonGlow"]:SetChecked(false)
     _G[self:GetName().."CheckButtonValue"]:SetChecked(false)
 	_G[self:GetName().."EditBoxID"]:SetText("")
-	_G[self:GetName().."ButtonAdd"]:SetText(L.SAVE)
+	_G[self:GetName().."ButtonAdd"]:SetText(L.ADD)
 	_G[self:GetName().."CheckButtonIsItem"]:SetChecked(false)
 	_G[self:GetName().."EditBoxID"]:ClearFocus() -- ButtonAddAndDel 의 값때문에 순서 굉장히 중요함
     _G[self:GetName().."CheckButtonAlways"]:Hide()
@@ -172,7 +172,7 @@ function HDH_AT_OnEditFocusGained(self)
 	local btn = _G[self:GetParent():GetName().."ButtonAdd"]
 	local chk = _G[self:GetParent():GetName().."CheckButtonIsItem"]
 	if(self:GetText() == "") then
-		btn:SetText(L.SAVE)
+		btn:SetText(L.ADD)
 	else
 		btn:SetText(L.EDIT)
 	end
@@ -804,7 +804,7 @@ function HDH_AT_OnClickColorPicker(self)
     else
         ColorPickerOkayButton:HookScript("OnClick", OnSelectedColorPicker)
     end
-    
+
 	ColorPickerFrame:SetupColorPickerAndShow(info);
 end
 
@@ -818,7 +818,6 @@ function HDH_AT_TrackerTapBtnTemplateMixin:SetActivate(bool)
     if bool then
         _G[self:GetName().."BgLine2"]:Show()
         _G[self:GetName().."On"]:Show()
-        
         self.BG:SetColorTexture(0,0,0,0.5)
         self.Text:SetTextColor(1,0.8,0)
     else
@@ -835,8 +834,9 @@ end
 -----------------------------------
 
 HDH_AT_DialogFrameTemplateMixin = {}
-HDH_AT_DLG_TYPE = {OK=1, YES_NO=2, EDIT=3, NONE= 4, WARNING=5, WARNING_YES_NO=6};
+HDH_AT_DLG_TYPE = {OK=1, YES_NO=2, EDIT=3, MULTILINE_EDIT_OK=4, MULTILINE_EDIT_YES_NO=5, WARNING=6, WARNING_YES_NO=7};
 HDH_AT_DLG_ICON = {
+    "Interface/DialogFrame/UI-Dialog-Icon-AlertOther",
     "Interface/DialogFrame/UI-Dialog-Icon-AlertOther",
     "Interface/DialogFrame/UI-Dialog-Icon-AlertOther",
     "Interface/DialogFrame/UI-Dialog-Icon-AlertOther",
@@ -845,12 +845,12 @@ HDH_AT_DLG_ICON = {
     "Interface/DialogFrame/UI-Dialog-Icon-AlertNew",
 }
 
-function HDH_AT_DialogFrameTemplateMixin:AlertShow(msg, type, func, cancelFunc, ...)
-    local main = self:GetParent()
-    type = type or HDH_AT_DLG_TYPE.WARNING
+function HDH_AT_DialogFrameTemplateMixin:AlertShow(msg, type, func, cancelFunc, editboxText, ...)
 	if self:IsShown() then return end
+    self.EditBox:SetText(editboxText or "")
+    self.EditBox:SetText(HDH_AT_UTIL.Trim(self.EditBox:GetText()))
 	self.text = msg;
-	self.dlg_type = type;
+	self.dlg_type = type or HDH_AT_DLG_TYPE.WARNING
 	self.func = func;
     self.cancelFunc = cancelFunc;
 	self.arg = {...};
@@ -859,7 +859,7 @@ end
 
 function HDH_AT_DialogFrameTemplateMixin:Close()
 	self:Hide();
-end 
+end
 
 function HDH_AT_DialogFrameTemplateMixin:OnShow()
 	_G[self:GetName().."Text"]:SetText(self.text);
@@ -875,21 +875,43 @@ function HDH_AT_DialogFrameTemplateMixin:OnShow()
         _G[self:GetName().."ButtonClose"]:Hide()
         _G[self:GetName().."ButtonOK"]:Hide()
         _G[self:GetName().."ButtonClose2"]:Show()
+        -- _G[self:GetName().."ButtonClose2"]:SetPoint('CENTER', _G[self:GetName().."Text"], 'BOTTOM', 0, -45)
         _G[self:GetName().."Edit"]:Hide()
         _G[self:GetName().."ButtonEditOK"]:Hide()
         _G[self:GetName().."ButtonEditCancel"]:Hide()
     elseif self.dlg_type == HDH_AT_DLG_TYPE.EDIT then
         _G[self:GetName().."Edit"]:Show()
+        _G[self:GetName().."Edit"]:SetMultiLine(false)
+        _G[self:GetName().."Edit"]:SetHeight(24)
+        _G[self:GetName().."Edit"]:SetWidth(200)
+        _G[self:GetName().."ButtonClose2"]:Hide()
+        _G[self:GetName().."ButtonClose"]:Hide()
+        _G[self:GetName().."ButtonOK"]:Hide()
+        _G[self:GetName().."ButtonEditOK"]:Show()
+        _G[self:GetName().."ButtonEditCancel"]:Show()
+    elseif self.dlg_type == HDH_AT_DLG_TYPE.MULTILINE_EDIT_OK then
+        _G[self:GetName().."Edit"]:Show()
+        -- _G[self:GetName().."Edit"]:SetMultiLine(true)
+         _G[self:GetName().."Edit"]:SetHeight(24)
+        _G[self:GetName().."Edit"]:SetWidth(350)
+        -- _G[self:GetName().."ButtonClose2"]:SetPoint('CENTER', _G[self:GetName().."Text"], 'BOTTOM', 0, -45 - 62)
+        _G[self:GetName().."ButtonClose2"]:Show()
+        _G[self:GetName().."ButtonClose"]:Hide()
+        _G[self:GetName().."ButtonOK"]:Hide()
+        _G[self:GetName().."ButtonEditOK"]:Hide()
+        _G[self:GetName().."ButtonEditCancel"]:Hide()
+    elseif self.dlg_type == HDH_AT_DLG_TYPE.MULTILINE_EDIT_YES_NO then
+        _G[self:GetName().."Edit"]:Show()
+        -- _G[self:GetName().."Edit"]:SetMultiLine(true)
+         _G[self:GetName().."Edit"]:SetHeight(24)
+        _G[self:GetName().."Edit"]:SetWidth(350)
         _G[self:GetName().."ButtonClose2"]:Hide()
         _G[self:GetName().."ButtonClose"]:Hide()
         _G[self:GetName().."ButtonOK"]:Hide()
         _G[self:GetName().."ButtonEditOK"]:Show()
         _G[self:GetName().."ButtonEditCancel"]:Show()
     end
-end 
-
-
-
+end
 
 -----------------------------------
 -- HDH_AT_SplitBarTemplateMixin
@@ -1331,7 +1353,6 @@ function HDH_AT_CheckButton2TemplateMixin:SetChecked(bool)
         if not self.isHideBackground then
             self.Active1:Show()
         end
-
         self.ActiveBorderTop:Show()
         self.ActiveBorderLeft:Show()
         self.ActiveBorderRight:Show()
@@ -1360,6 +1381,10 @@ function HDH_AT_CheckButton2TemplateMixin:SetScript(scriptTypeName, func)
     end
 end
 
+
+-------------------------------------
+--  HDH_AT_SpellSearchEditBoxTemplateMixin
+-------------------------------------
 ---
 HDH_AT_SpellSearchEditBoxTemplateMixin = {}
 
@@ -1498,4 +1523,37 @@ end
 function HDH_AT_TalentCheckButtonMixin:SetUnassigned()
     self.Icon:SetTexture([[Interface\ICONS\INV_Misc_QuestionMark]])
     self.Name:SetText(L.UNASSIGNED)
+end
+
+
+----------------------------------------
+-- HDH_AT_MultiLineEditBoxTemplateMixin
+----------------------------------------
+HDH_AT_MultiLineEditBoxTemplateMixin = {}
+
+function HDH_AT_MultiLineEditBoxTemplateMixin:SetText(text)
+    self.SF.EditBox:SetText(text)
+end
+
+function HDH_AT_MultiLineEditBoxTemplateMixin:GetText()
+    return self.SF.EditBox:GetText()
+end
+
+function HDH_AT_MultiLineEditBoxTemplateMixin:GetEditBox()
+    return self.SF.EditBox
+end
+
+function HDH_AT_MultiLineEditBoxTemplateMixin:SetMultiLine(bool)
+    self.SF.EditBox:SetMultiLine(bool)
+    if bool then
+        self.SF:SetPoint("TOPLEFT", self, "TOPLEFT", 0, -7)
+        self.SF:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 7)
+    else
+        self.SF:SetPoint("TOPLEFT", self, "TOPLEFT", 0, -2)
+        self.SF:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0)
+    end
+end
+
+function HDH_AT_MultiLineEditBoxTemplateMixin:SetAutoFocus(bool)
+    self.SF.EditBox:SetAutoFocus(bool)
 end

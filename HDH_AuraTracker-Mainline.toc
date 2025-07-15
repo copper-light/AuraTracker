@@ -27,9 +27,4 @@ Tracker\StaggerTracker.lua
 Tracker\EnhancementMaelstrom.lua
 Tracker\HealthTracker.lua
 
-# https://www.wowace.com/projects/libcompress
-Lib\LibCompress\LibStub.lua
-Lib\LibCompress\LibCompress.lua
-Lib\AceSerializer-3.0\AceSerializer-3.0.lua
-Lib\WeakAuraLib\Transmission.lua
 Config.xml

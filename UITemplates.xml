@@ -380,32 +380,29 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<EditBox name="$parentEdit" parentKey="EditBox" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false"  >
-				<Size x="200" y="26" />
+			<Frame name="$parentEdit" parentKey="EditBox" inherits="HDH_AT_MultiLineEditBoxTemplate">
+				<Size x="200" y="24" />
 				<Anchors>
 					<Anchor point="TOP" relativeTo="$parentText" relativePoint="BOTTOM">
 					<Offset><AbsDimension x="0" y="-5"/></Offset>
 					</Anchor>
 				</Anchors>
 				<Scripts>
-					<OnShow>self:SetText("")</OnShow>
 				</Scripts>
-			</EditBox>
+			</Frame>
 
 			<Button name="$parentButtonEditCancel" inherits="HDH_AT_ButtonWhiteTemplate" text="취소">
 				<Anchors>
-					<Anchor point="RIGHT" relativeTo="$parentEdit" relativePoint="BOTTOM">
-					<Offset><AbsDimension x="-3" y="-45"/></Offset>
-					</Anchor>
+					<Anchor point="LEFT" relativeTo="$parentEdit" relativePoint="BOTTOM" x="3" y="-45"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>self:SetText(HDH_AT_L.CANCEL)</OnLoad>
 					<OnClick> self:GetParent():Hide()
 						if self:GetParent().cancelFunc then
 							if type(self:GetParent().arg) == "table" then
-								self:GetParent().cancelFunc(unpack(self:GetParent().arg));
+								self:GetParent().cancelFunc(self:GetParent(), unpack(self:GetParent().arg));
 							else
-								self:GetParent().cancelFunc(self:GetParent().arg);
+								self:GetParent().cancelFunc(self:GetParent(), self:GetParent().arg);
 							end
 						end
 					</OnClick>
@@ -414,18 +411,16 @@
 
 			<Button name="$parentButtonEditOK" inherits="HDH_AT_ButtonTemplate" text="확인">
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentEdit" relativePoint="BOTTOM">
-					<Offset><AbsDimension x="3" y="-45"/></Offset>
-					</Anchor>
+					<Anchor point="RIGHT" relativeTo="$parentEdit" relativePoint="BOTTOM" x="-3" y="-45"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>self:SetText(HDH_AT_L.OK)</OnLoad>
 					<OnClick> self:GetParent():Hide(); 
 							if self:GetParent().func then
 								if type(self:GetParent().arg) == "table" then
-									self:GetParent().func(unpack(self:GetParent().arg));
+									self:GetParent().func(self:GetParent(), unpack(self:GetParent().arg));
 								else
-									self:GetParent().func(self:GetParent().arg);
+									self:GetParent().func(self:GetParent(), self:GetParent().arg);
 								end
 							end
 					</OnClick>
@@ -434,16 +429,16 @@
 			
 			<Button name="$parentButtonClose" inherits="HDH_AT_ButtonWhiteTemplate" text="아니오">
 				<Anchors>
-					<Anchor point="RIGHT" relativeTo="$parentText" relativePoint="BOTTOM" x="-3" y="-45"/>
+					<Anchor point="LEFT" relativeTo="$parentText" relativePoint="BOTTOM" x="3" y="-45"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>self:SetText(HDH_AT_L.NO)</OnLoad>
 					<OnClick> self:GetParent():Hide()
 						if self:GetParent().cancelFunc then
 							if type(self:GetParent().arg) == "table" then
-								self:GetParent().cancelFunc(unpack(self:GetParent().arg));
+								self:GetParent().cancelFunc(self:GetParent(), unpack(self:GetParent().arg));
 							else
-								self:GetParent().cancelFunc(self:GetParent().arg);
+								self:GetParent().cancelFunc(self:GetParent(), self:GetParent().arg);
 							end
 						end
 					</OnClick>
@@ -452,16 +447,16 @@
 
 			<Button name="$parentButtonOK" inherits="HDH_AT_ButtonTemplate" text="예">
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentText" relativePoint="BOTTOM" x="3" y="-45"/>
+					<Anchor point="RIGHT" relativeTo="$parentText" relativePoint="BOTTOM" x="-3" y="-45"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>self:SetText(HDH_AT_L.YES)</OnLoad>
 					<OnClick> self:GetParent():Hide(); 
 							if self:GetParent().func then
 								if type(self:GetParent().arg) == "table" then
-									self:GetParent().func(unpack(self:GetParent().arg));
+									self:GetParent().func(self:GetParent(), unpack(self:GetParent().arg));
 								else
-									self:GetParent().func(self:GetParent().arg);
+									self:GetParent().func(self:GetParent(), self:GetParent().arg);
 								end
 							end
 					</OnClick>
@@ -470,18 +465,16 @@
 
 			<Button name="$parentButtonClose2" inherits="HDH_AT_ButtonTemplate" text="확인">
 				<Anchors>
-					<Anchor point="CENTER" relativeTo="$parentText" relativePoint="BOTTOM">
-					<Offset><AbsDimension x="0" y="-45"/></Offset>
-					</Anchor>
+					<Anchor point="CENTER" relativeTo="$parentText" relativePoint="BOTTOM" x="0" y="-45" />
 				</Anchors>
 				<Scripts>
 					<OnLoad>self:SetText(HDH_AT_L.OK)</OnLoad>
 					<OnClick> self:GetParent():Hide()
 							if self:GetParent().func then
 								if type(self:GetParent().arg) == "table" then
-									self:GetParent().func(unpack(self:GetParent().arg));
+									self:GetParent().func(self:GetParent(), unpack(self:GetParent().arg));
 								else
-									self:GetParent().func(self:GetParent().arg);
+									self:GetParent().func(self:GetParent(), self:GetParent().arg);
 								end
 							end
 					</OnClick>
@@ -1508,6 +1501,146 @@
 			<OnEditFocusGained inherits="prepend">self.Desc:Hide(); EditBox_HighlightText(self);</OnEditFocusGained>
 		</Scripts>
 	</EditBox>
+
+	<Frame name="HDH_AT_MultiLineEditBoxTemplate" mixin="HDH_AT_MultiLineEditBoxTemplateMixin"  virtual="true">
+		<Size x="120" y="24" />
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="BG1" hidden="false">
+					<Color r="0.8" g="0.8" b="0.8" a="0.2"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BORDER" textureSubLevel="0">
+				<Texture parentKey="Active" hidden="true" inherits="HDH_AT_Texture_White_A">
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="BORDER" textureSubLevel="1">
+				<Texture parentKey="BG2"  hidden="false">
+					<Color r="0" g="0" b="0" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="2" y="-2"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-2" y="2"/>
+					</Anchors>
+				</Texture>
+
+				<Texture parentKey="BG3" hidden="false">
+					<Color r="0.06" g="0.06" b="0.06" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="3" y="-3"/>
+						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-3" y="3"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="OVERAY">
+				<FontString name="$parentDesc" parentKey="Desc" inherits="Font_Yellow_S" text="텍스트 입력" justifyH="LEFT" hidden="false">
+					<Size x="1" y="1" />
+					<Color r="0.3" g="0.3" b="0.3" a="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="5" y="-5"/>
+					</Anchors>
+				</FontString>
+
+				<FontString parentKey="NumLetter" inherits="Font_Yellow_S" text="텍스트 입력" justifyH="RIGHT" hidden="false">
+					<Size x="100" y="14" />
+					<Color r="0.3" g="0.3" b="0.3" a="1"/>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="-5"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		
+		<Frames>
+			<ScrollFrame name="$parentSF" parentKey="SF" hidden="false" inherits="HDH_AT_ScrollFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="-2" />
+					<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="0" y="0" />
+				</Anchors>
+
+				<ScrollChild>
+					<EditBox parentKey="EditBox" inherits="InputBoxScriptTemplate" autoFocus="false" countInvisibleLetters="true" letters="0">
+						<Size x="26" y="20" />
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="0" />
+							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$parent" x="-10" y="0" />
+						</Anchors>
+						<Layers>
+							<Layer level="OVERAY">
+								<FontString name="$parentDesc" parentKey="Desc" inherits="Font_Yellow_S" text="텍스트 입력" justifyH="LEFT" hidden="false">
+									<Size x="1" y="1" />
+									<Color r="0.3" g="0.3" b="0.3" a="1"/>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="5" y="0"/>
+										<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-5" y="0"/>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<FontString inherits="Font_White_S" justifyH="LEFT" justifyV="TOP"/>
+						<TextInsets left="5" right="5" bottom="0" top="0"/>
+						<Scripts>
+							<OnLoad>
+								self.Desc:SetText(HDH_AT_L.PLEASE_INPUT)
+							</OnLoad>
+							<OnTextSet>
+								local value = HDH_AT_UTIL.Trim(self:GetText()) or ""
+								if string.len(value) > 0 then
+									self.Desc:Hide()
+								else
+									self:SetText("")
+									self.Desc:Show()
+								end
+							</OnTextSet>
+							<OnLeave inherits="prepend">self:GetParent():GetParent().Active:Hide()</OnLeave>
+							<OnEnter inherits="prepend">self:GetParent():GetParent().Active:Show()</OnEnter>
+							<OnEditFocusLost inherits="prepend">
+								local value = HDH_AT_UTIL.Trim(self:GetText()) or ""
+								if string.len(value) > 0 then
+									self.Desc:Hide()
+								else
+									self:SetText("")
+									self.Desc:Show()
+								end
+							</OnEditFocusLost>
+							<OnTextChanged>
+								HDH_AT_OnTextChanged(self)
+								self:GetParent():GetParent().NumLetter:SetText(HDH_AT_L.NUM_LETTERS:format(HDH_AT_UTIL.CommaValue(self:GetNumLetters())))
+							</OnTextChanged>
+							<OnCursorChanged function="ScrollingEdit_OnCursorChanged"/>
+							<OnUpdate>
+								ScrollingEdit_OnUpdate(self, elapsed, self:GetParent());
+							</OnUpdate>
+							<OnEditFocusGained inherits="prepend">self.Desc:Hide(); EditBox_HighlightText(self);</OnEditFocusGained>
+							<OnShow>self:SetFocus(true)</OnShow>
+							<!-- <OnMouseDown>EditBox_HighlightText(self);</OnMouseDown> -->
+						</Scripts>
+					</EditBox>
+				</ScrollChild>
+				<Scripts>
+					<OnLeave inherits="prepend">self:GetParent().Active:Hide()</OnLeave>
+					<OnEnter inherits="prepend">self:GetParent().Active:Show()</OnEnter>
+					<OnMouseDown>
+						self.EditBox:SetFocus(true)
+					</OnMouseDown>
+				</Scripts>
+			</ScrollFrame>
+		</Frames>
+		<Scripts>
+			<OnSizeChanged>
+				self.SF.EditBox:SetWidth(self:GetWidth()-4)
+			</OnSizeChanged>
+		</Scripts>
+	</Frame>
 
     <Button name="HDH_AT_DropDownItemTemplate" virtual="true">
         <Size x="100" y="22" />
@@ -2823,7 +2956,6 @@
 			</Layer>
 
 			<Layer level="BORDER">
-
 				<Texture parentKey="ActiveBorderTop" hidden="true" inherits="HDH_AT_Texture_Yellow">
 					<Size x="16" y="2" />
 					<Anchors>
@@ -2893,6 +3025,8 @@
 
 		<Scripts>
 			<OnClick function="HDH_AT_CheckButton2_OnClick" />
+			<OnEnable>self.Text:SetFontObject("Font_White_S")</OnEnable>
+			<OnDisable>self.Text:SetFontObject("Font_Gray_S")</OnDisable>
 		</Scripts>
 
 	</Button>
@@ -3117,6 +3251,7 @@
 					<Anchor point="LEFT" relativeTo="$parentIconBackground" relativePoint="RIGHT" x="2" y="0" />
 					<Anchor point="RIGHT" relativeTo="$parentCheckButtonIsItem" relativePoint="LEFT" x="-2" y="0" />
 				</Anchors>
+				<FontString inherits="Font_White_XS" justifyH="LEFT"/>
 				<Scripts>
 					<OnLoad>self.Desc:SetText("")</OnLoad>
 					<OnEditFocusGained>
@@ -3184,7 +3319,7 @@
 	<ScrollFrame name="HDH_AT_ScrollFrameTemplate" inherits="UIPanelScrollFrameCodeTemplate" virtual="true" hidden="false">
 		<Size x="120" />
 		<Frames>
-			<Slider parentKey="ScrollBar"  hidden="false">
+			<Slider parentKey="ScrollBar" hidden="true">
 				<Size x="16" y="0"/>
 				<Anchors>
 					<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="3" y="-9"/>

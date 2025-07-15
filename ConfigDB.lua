@@ -649,38 +649,45 @@ function HDH_AT_ConfigDB:CopyTracker(trackerId, copyName)
     return newId
 end
 
-function HDH_AT_ConfigDB:AppendProfile(supportTrackerList, data)
+function HDH_AT_ConfigDB:AppendProfile(data)
+    local _, MyClass = UnitClass("player")
     local ids = self:GetTrackerIds()
-    local id = #ids
+    local id
     local match = false
     local talentID
-    for _, config in ipairs(data) do
-        id = id + 1
+    local tmp, newArray
+    for index, config in ipairs(data) do
         match = false
-        for _, trait in ipairs(config.tracker.trait) do
-            for i = 1, MAX_TALENT_TABS do
-                talentId, _, _, _ = HDH_AT_UTIL.GetSpecializationInfo(i)
-                if talentId == nil then
-                    break
-                end
-                if trait == talentId then
-                    match = true
-                    break
+        id = #ids + index
+
+        if data.class == MyClass and #config.tracker.trait > 0 then
+            -- trait 이 있으면 그대로 쓰고 없으면 talentId 로 치환함
+            for j, trait in ipairs(config.tracker.trait) do
+                if not HDH_AT_UTIL.GetTraitsName(trait) then
+                    config.tracker.trait[j] = config.tracker.talentList[j]
                 end
             end
-            if match then
-                break
+            config.tracker.talentList = nil
+            
+            -- 중복 제거
+            tmp = {}
+            newArray = {}
+            for _, trait in ipairs(config.tracker.trait) do
+                if not tmp[trait] then
+                    tmp[trait] = true
+                    table.insert(newArray, trait)
+                end
             end
-        end
-        if not match then
+            config.tracker.trait = newArray
+        else
+            -- talentId는 애초에 중복 체크하지 않고 저장 했기 때문에, 여기서 중복 처리한 후에 반영해야함
             talentID = select(1,HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))
             config.tracker.trait = {talentID}
         end
-        if supportTrackerList[config.tracker.type] then
-            config.tracker.id = id
-            HDH_AT_DB.tracker[id] = config.tracker
-            HDH_AT_DB.ui[id] = config.ui
-        end
+
+        config.tracker.id = id
+        HDH_AT_DB.tracker[id] = config.tracker
+        HDH_AT_DB.ui[id] = config.ui
     end
 end
 

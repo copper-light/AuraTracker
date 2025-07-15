@@ -196,19 +196,10 @@
 									<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
 								</Anchors>
 								<Frames>
-									<Button name="$parentBtnDelete" inherits="HDH_AT_ButtonWhiteTemplate" text="삭제">
-										<Anchors>
-											<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parent" x="10" y="0" />
-										</Anchors>
-										<Scripts>
-											<OnLoad>self:SetText(HDH_AT_L.DELETE)</OnLoad>
-											<OnClick function="HDH_AT_OnClick_Button" />
-										</Scripts>
-									</Button>
-
+								
 									<Button name="$parentBtnCopy" inherits="HDH_AT_ButtonWhiteTemplate" text="복사">
 										<Anchors>
-											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBtnDelete" x="5" y="0" />
+											<Anchor point="CENTER" relativePoint="CENTER" x="0" y="0" />
 										</Anchors>
 										<Scripts>
 											<OnLoad>self:SetText(HDH_AT_L.COPY)</OnLoad>
@@ -218,10 +209,20 @@
 
 									<Button name="$parentBtnSaveTracker" inherits="HDH_AT_ButtonTemplate" text="적용">
 										<Anchors>
-											<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parent" x="-10" y="0" />
+											<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnCopy" x="-5" y="0" />
 										</Anchors>
 										<Scripts>
 											<OnLoad>self:SetText(HDH_AT_L.APPLY)</OnLoad>
+											<OnClick function="HDH_AT_OnClick_Button" />
+										</Scripts>
+									</Button>
+
+									<Button name="$parentBtnDelete" inherits="HDH_AT_ButtonWhiteTemplate" text="삭제">
+										<Anchors>
+											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentBtnCopy" x="5" y="0" />
+										</Anchors>
+										<Scripts>
+											<OnLoad>self:SetText(HDH_AT_L.DELETE)</OnLoad>
 											<OnClick function="HDH_AT_OnClick_Button" />
 										</Scripts>
 									</Button>
@@ -291,7 +292,7 @@
 							<Button name="$parentBtnShowSpellList" inherits="HDH_AT_ButtonTemplate" hidden="false">
 								<Size x="95" y="20" />
 								<Anchors>
-									<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-10" y="7" />
+									<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-5" y="4" />
 									<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 								</Anchors>
 								<Scripts>
@@ -440,7 +441,7 @@
 
 						<Frames>
 							<Frame name="$parentTop" inherits="HDH_AT_BackgroundTemplate">
-								<Size y="55" />
+								<Size y="54" />
 								<Anchors>
 									<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 									<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" />
@@ -461,7 +462,7 @@
 										</Layers>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="110" y="-5" />
-											<Anchor point="RIGHT" relativePoint="RIGHT" x="-10" y="0" />
+											<Anchor point="RIGHT" relativePoint="RIGHT" x="-5" y="0" />
 										</Anchors>
 										<Scripts>
 											<OnLoad>
@@ -472,7 +473,7 @@
 										</Scripts>
 									</Frame>
 
-									<Frame name="$parentSwithDisplayMode" inherits="HDH_AT_SwitchFrameTemplate">
+									<Frame name="$parentSwithDisplayMode" inherits="HDH_AT_SwitchFrameTemplate" >
 										<Size y="20"/>
 										<Layers>
 											<Layer level="artwork">
@@ -485,8 +486,8 @@
 											</Layer>
 										</Layers>
 										<Anchors>
-											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentSwithConfigMode" x="0" y="-5" />
-											<Anchor point="RIGHT" relativePoint="RIGHT" x="-10" y="-5" />
+											<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentSwithConfigMode" x="0" y="-4" />
+											<Anchor point="RIGHT" relativePoint="RIGHT" x="-5" y="-5" />
 										</Anchors>
 
 										<Scripts>
@@ -537,7 +538,7 @@
 							</Frame>
 
 							<Frame name="$parentBottom" inherits="HDH_AT_BackgroundTemplate">
-								<Size y="40" />
+								<Size y="30" />
 								<Anchors>
 									<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" x="0" y="0" />
 									<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
@@ -617,7 +618,7 @@
 						<Frames>
 
 							<Frame name="$parentTop" inherits="HDH_AT_BackgroundTemplate">
-								<Size y="40" />
+								<Size y="30" />
 								<Anchors>
 									<Anchor point="TOPLEFT" x="0" y="0" />
 									<Anchor point="TOPRIGHT" x="0" y="0" />
@@ -685,7 +686,7 @@
 
 									<Button name="$parentButtonSaveClose" inherits="HDH_AT_ButtonTemplate" text="적용 후 닫기">
 										<Anchors>
-											<Anchor point="RIGHT" relativePoint="RIGHT" x="-10" y="0" />
+											<Anchor point="CENTER" relativePoint="CENTER" x="0" y="0" />
 										</Anchors>
 										<Scripts>
 											<OnLoad>self:SetText(HDH_AT_L.APPLY_AND_CLOSE)</OnLoad>
@@ -705,7 +706,7 @@
 
 									<Button name="$parentButtonClose" inherits="HDH_AT_ButtonWhiteTemplate" text="취소">
 										<Anchors>
-											<Anchor point="RIGHT" relativePoint="LEFT"  relativeTo="$parentButtonApply"  x="-5" y="0" />
+											<Anchor point="LEFT" relativePoint="RIGHT"  relativeTo="$parentButtonSaveClose"  x="5" y="0" />
 										</Anchors>
 										<Scripts>
 											<OnLoad>self:SetText(HDH_AT_L.CANCEL)</OnLoad>
@@ -715,7 +716,7 @@
 
 									<Button name="$parentButtonETCClose" inherits="HDH_AT_ButtonTemplate" text="취소">
 										<Anchors>
-											<Anchor point="RIGHT" relativePoint="RIGHT" x="-10" y="0" />
+											<Anchor point="CENTER" relativePoint="CENTER" x="0" y="0" />
 										</Anchors>
 										<Scripts>
 											<OnLoad>self:SetText(HDH_AT_L.CLOSE)</OnLoad>
@@ -1181,7 +1182,7 @@
 					<AbsInset left="0" right="-6" top="0" bottom="-6"/>
 				</HitRectInsets>
 				<Anchors>
-					<Anchor point="BOTTOMRIGHT" x="-2" y="2" />
+					<Anchor point="BOTTOMRIGHT" x="0" y="0" />
 				</Anchors>
 				<Layers>
 					<Layer level="ARTWORK" textureSubLevel="2">

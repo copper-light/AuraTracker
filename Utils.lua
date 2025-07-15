@@ -97,7 +97,6 @@ do -- 애드온 버전 호환성
 			end
 		end
 
-		HDH_AT_UTIL.GetSpellCastCount = GetSpellCount
 		HDH_AT_UTIL.IsSpellInRange = function(name) 
 			local inRange = IsSpellInRange(name)
 			if inRange and inRange == 0 then
@@ -587,5 +586,24 @@ do
 		else
 			return 0
 		end
+	end
+
+	function HDH_AT_UTIL.GetLocalizedClassName(englishClass)
+		local gender = UnitSex("player")
+		local localizedClass
+		if gender == 3 then -- FEMALE
+			localizedClass = LOCALIZED_CLASS_NAMES_FEMALE[englishClass]
+		else
+			localizedClass = LOCALIZED_CLASS_NAMES_MALE[englishClass]
+		end
+		return localizedClass
+	end
+
+	function HDH_AT_UTIL.ObjectToString(object)
+		return C_EncodingUtil.EncodeBase64(C_EncodingUtil.CompressString(C_EncodingUtil.SerializeCBOR(object), 1, 2))
+	end
+
+	function HDH_AT_UTIL.StringToObject(str)
+		return  C_EncodingUtil.DeserializeCBOR(C_EncodingUtil.DecompressString(C_EncodingUtil.DecodeBase64(str), 1, 2))
 	end
 end

@@ -180,7 +180,7 @@ L.MAGE_TOTEM = "Тотем: Руна мощи"
 L.DRUID_TOTEM = "Тотем: Цветение"
 L.PRIEST_TOTEM = "Тотем: Тень"
 L.PALADIN_TOTEM = "Тотем: Освящение"
-L.ROW_N_COL_N = "Ряд:|cffff5555n|r x Колонка:|cffff5555%d|r"
+L.ROW_N_COL_N = "|cffff5555N|r x |cffff5555%d|r"
 L.PARTY1 = "Группа1"
 L.PARTY2 = "Группа2"
 L.PARTY3 = "Группа3"
@@ -289,7 +289,7 @@ L.LATEST_SPELL = "Последние заклинания"
 L.AUTO_POPUP = "Автоматическое всплывающее окно"
 L.SELECT_ALL = "Выбрать все"
 L.PLEASE_SELECT_TRACKER_FOR_EXPORT = "Выберите трекеры для экспорта."
-L.NOT_COMPATIBLE_DB_VERSION = "Невозможно загрузить.\nНастройка не совместима\nс текущей версией.\n(Версия конфигурации: %s)"
+L.INCOMPATIBLE_DB_VERSION = "Невозможно загрузить.\nНастройка не совместима\nс текущей версией.\n(Версия конфигурации: %s)"
 L.PRIEST_SHADOWY_APPARITION = "Жрец: Теневая видимость"
 L.DISPLAY_GLOBAL_COOLDOWN = "Отображать глобальную перезарядку"
 L.INNER_COOLDOWN_ITEM = "Внутренняя перезарядка"
@@ -338,3 +338,12 @@ L.GLOW_EFFECT_PER_SEC = "Свечений в секунду |cffff0000%.1f|r" --
 -- 11.1.7.10
 L.APPLY_AND_CLOSE = "Прим. & Закр." -- Apply & Close
 L.ADD = "Добавить" -- Add
+
+-- 11.1.7.11
+L.NUM_LETTERS = "(%s символов)" -- Characters
+L.PLEASE_SELECT_TRACKER_FOR_IMPORT = "Выберите трекеры для добавления" -- Select the Trackers to add
+L.LOAD_PROFILE_STRING = "Ввод Строка обмена"
+L.INPUT_PROFILE_STRING = "Пожалуйста, введите строку настроек."
+L.ADD_PROFILE_STRING = "Добавить выбранные"
+L.INCOMPATIBLE_CLASS = "Настройки этого профиля для |cffff0000%s|r не соответствуют классу текущего персонажа. Некоторые типы отслеживания, предназначенные только для определённых классов, не могут быть загружены."
+

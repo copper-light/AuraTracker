@@ -247,7 +247,6 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 		isNotEnoughMana = false
 	else
 		local spellCooldownInfo = HDH_AT_UTIL.GetSpellCooldown(id)
-		castCount = HDH_AT_UTIL.GetSpellCastCount(id)
 		if spellCooldownInfo then
 			startTime = spellCooldownInfo.startTime
 			duration = spellCooldownInfo.duration
@@ -279,7 +278,7 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 		chargeRemaining = math.max(chargeRemaining, 0)
 	end
 
-	return startTime or 0, duration or 0, remaining or 0, count or 0, chargeStartTime or 0, chargeDuration or 0, chargeRemaining or 0, chargeCount or 0, chargeCountMax or 0, castCount or 0, inRange or false, isAble or false, isNotEnoughMana or false
+	return startTime or 0, duration or 0, remaining or 0, count or 0, chargeStartTime or 0, chargeDuration or 0, chargeRemaining or 0, chargeCount or 0, chargeCountMax or 0, inRange or false, isAble or false, isNotEnoughMana or false
 end
 
 function HDH_C_TRACKER:UpdateCombatSpellInfo(f, id)
@@ -330,7 +329,7 @@ function HDH_C_TRACKER:UpdateIcon(f)
 	if spell.blankDisplay then return end
 	
 	if not HDH_TRACKER.ENABLE_MOVE and not spell.isInnerCDItem then
-		startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, castCount, inRange, isAble, isNotEnoughMana = self:UpdateSpellInfo(f.spell.id, f.spell.name, f.spell.isItem, f.spell.isToy)
+		startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana = self:UpdateSpellInfo(f.spell.id, f.spell.name, f.spell.isItem, f.spell.isToy)
 		
 		spell.isGlobalCooldown = (duration < HDH_C_TRACKER.GlobalCooldown)
 		if show_global_cooldown then
@@ -352,7 +351,6 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		spell.charges.remaining = chargeRemaining
 		spell.charges.endTime = chargeStartTime + chargeDuration
 		spell.charges.duration = chargeDuration
-		spell.castCount = castCount
 		spell.isCharging = (chargeRemaining > 0 and chargeCount >= 1) and true or false
 		spell.isAble = isAble
 		spell.inRange = inRange
@@ -542,10 +540,8 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		if (cooldown_type == DB.COOLDOWN_CIRCLE) or (cooldown_type == DB.COOLDOWN_NONE) then
 			f.charges:SetCooldown(chargeStartTime, chargeDuration or 0); 
 		end
-	elseif spell.stackable then
-		f.counttext:SetText(count)
-	elseif castCount > 0 then
-		f.counttext:SetText(castCount)
+	elseif spell.stackable or spell.count > 0 then
+		f.counttext:SetText(spell.count)
 	else
 		f.counttext:SetText(nil)
 	end
@@ -876,7 +872,7 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 		spell.charges.remaining = 0;
 		spell.endTime = curTime + spell.duration
 		spell.startTime = curTime
-
+		spell.castCount = 0
 		spell.inRange = true
 		spell.isAble = true
 		spell.isNotEnoughMana = false
@@ -1071,7 +1067,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.charges.remaining = 0
 			spell.charges.startTime = 0
 			spell.charges.endTime = 0
-
+			spell.castCount = 0
 			spell.inRange = true
 			spell.isAble = true
 			spell.isNotEnoughMana = false
