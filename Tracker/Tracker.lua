@@ -119,7 +119,7 @@ local function OnUpdateGlowColor(self, elapsed)
 
 	self.icon_size = self:GetParent():GetParent().parent.ui.icon.size
 	if (math.min(1.4, self.playing/0.25)) == 1.4 then
-		self.color:SetSize(self.icon_size * 1.25, self.icon_size * 1.25)
+		self.color:SetSize(self.icon_size * 1.31, self.icon_size * 1.31)
 		self.spot:SetVertexColor(self.p, self.p, self.p, 0.74)
 		self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1] * self.p_c, 
 								  self:GetParent().spell.glowEffectColor[2] * self.p_c, 
@@ -128,10 +128,10 @@ local function OnUpdateGlowColor(self, elapsed)
 		self.spot:SetSize(self.icon_size, self.icon_size)
 	else -- starting animation
 		self.color:SetSize(
-			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.45)), 
-			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.45)))
-		self.spot:SetSize(self.icon_size * (0.9 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)),  
-						  self.icon_size * (0.9 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)))
+			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.7)), 
+			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.7)))
+		self.spot:SetSize(self.icon_size * (0.9 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.5)),  
+						  self.icon_size * (0.9 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.5)))
 		self.spot:SetVertexColor(1, 1, 1, 1)
 		self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1], 
 								  self:GetParent().spell.glowEffectColor[2], 
@@ -1691,14 +1691,9 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	f.border:SetPoint('CENTER', f.iconframe, 'CENTER', 0, 0)
 
 	f.border.spark.spot:SetSize(op_icon.size, op_icon.size)
-	-- f.border.spark.spot:SetTexCoord(0.2355 * (1-ICON_BORDER_VALUE[2]),
-	-- 								  1 - (0.2355 * (1-ICON_BORDER_VALUE[2])),
-	-- 								  0.2355 * (1-ICON_BORDER_VALUE[2]), 
-	-- 								  1 -  (0.2355 * (1-ICON_BORDER_VALUE[2])))
-
-	f.border.spark.spot:SetTexCoord(border, 1 - border, border, 1 - border)
-	
-	f.border.spark.color:SetSize(op_icon.size*1.25, op_icon.size*1.25)
+	local spot_border = math.min(0.2355 * (1 - (ICON_BORDER_VALUE[5] or 0)), 0.2355 * (1 - (ICON_BORDER_VALUE[op_icon.border_size] or 0)))
+	f.border.spark.spot:SetTexCoord(spot_border, 1 - spot_border, spot_border, 1 - spot_border)
+	f.border.spark.color:SetSize(op_icon.size*4, op_icon.size*4)
 
 	if op_icon.cooldown == DB.COOLDOWN_CIRCLE then
 		f.cooldown2:SetSwipeColor(unpack(op_icon.cooldown_bg_color))
@@ -1809,9 +1804,6 @@ if select(4, GetBuildInfo()) <= 49999 then -- 대격변 코드
 			f.overlay:SetPoint("TOPLEFT", f, "TOPLEFT", -frameWidth * 0.3, frameHeight * 0.3);
 			f.overlay:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", frameWidth * 0.3, -frameHeight * 0.3);
 			f.overlay.animIn:Play();
-			if f.spell and f.spell.conditionSound and not OptionFrame:IsShown() then
-				HDH_PlaySoundFile(f.spell.conditionSound, "SFX")
-			end
 		end
 	end
 	
@@ -1829,32 +1821,32 @@ else -- 용군단 코드
 
 	function HDH_TRACKER:ActionButton_SetupOverlayGlow(f)
 		if f.SpellActivationAlert then
-			return;
+			return
 		end
 		local name = f:GetParent():GetName()..'g'..time()
-		local frameWidth, frameHeight = f:GetSize();
-
+		local frameWidth, frameHeight = f:GetSize()
 		f.SpellActivationAlert = CreateFrame("Frame", name, f, "ActionButtonSpellAlertTemplate")
-		f.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6);
-		f.SpellActivationAlert:SetPoint("CENTER", f, "CENTER", 0, 0);
+		f.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6)
+		f.SpellActivationAlert:SetPoint("CENTER", f, "CENTER", 0, 0)
 		f.SpellActivationAlert:Hide()
+		f.SpellActivationAlert.ProcStartFlipbook:SetSize(frameWidth * 4.05, frameWidth * 4.05)
 	end
 	
 	function HDH_TRACKER:ActionButton_ResizeOverlayGlow(f)
 		f = f.iconframe
 		if not f.SpellActivationAlert then
-			return;
+			return
 		end
 		f.SpellActivationAlert:Hide()
-		local frameWidth, frameHeight = f:GetSize();
-		f.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6);
+		local frameWidth, frameHeight = f:GetSize()
+		f.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6)
 	end
 	
 	function HDH_TRACKER:ActionButton_ReleaseOverlayGlow(f)
-		border = f.border
+		local border = f.border
 		f = f.iconframe
 		if not f.SpellActivationAlert then
-			return;
+			return
 		end
 		f.SpellActivationAlert:Hide()
 		f.SpellActivationAlert:SetParent(nil)
@@ -1863,54 +1855,37 @@ else -- 용군단 코드
 	end
 	
 	function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
-		border = f.border
-		f = f.iconframe;
+		local border = f.border
+		f = f.iconframe
 		self:ActionButton_SetupOverlayGlow(f)
 		if not f.SpellActivationAlert:IsShown() or (not f.SpellActivationAlert.ProcStartAnim:IsPlaying() and not f.SpellActivationAlert.ProcLoop:IsPlaying()) then
-			f.SpellActivationAlert:Show();
-			f.SpellActivationAlert.ProcStartAnim:Play();
+			f.SpellActivationAlert:Show()
+			f.SpellActivationAlert.ProcStartAnim:Play()
 			border:Hide()
 		end
 	end
 	
 	function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
-		border = f.border
+		local border = f.border
 		f = f.iconframe
 		if not f.SpellActivationAlert then
-			return;
+			return
 		end
 	
 		if f:IsVisible() then
-			f.SpellActivationAlert:Hide();
-			border:Show();
+			f.SpellActivationAlert:Hide()
+			border:Show()
 		end
 	end
 	
 	function HDH_TRACKER:IsGlowing(f)
-		if f.SpellActivationAlert and (f.SpellActivationAlert:IsShown())then
+		if f.SpellActivationAlert and (f.SpellActivationAlert:IsShown()) then
 			return true
 		else
 			return false
 		end
 	end
 end
-
-HDH_TRACKER.DB_Spell = {}
--- function HDH_TRACKER:IsIgnoreSpellByTalentSpell(spell_id)
--- 	local ret = false;
--- 	if not spell_id then return true end
--- 	if DB_Spell.Ignore and DB_Spell.Ignore[1] then
--- 		local name = DB_Spell.Ignore[1].Spell;
--- 		local show = DB_Spell.Ignore[1].Show;
--- 		local selected = IsPlayerSpell(spell_id); -- true / false / nil: not found talent
--- 		if selected == true then
--- 			ret = (not show);
--- 		elseif selected == false then
--- 			ret = show;
--- 		end
--- 	end
--- 	return ret;
--- end
 
 function HDH_TRACKER:UpdateGlow(f, bool)
 	if f.spell.ableGlow then -- 블리자드 기본 반짝임 효과면 무조건 적용
@@ -1922,10 +1897,12 @@ function HDH_TRACKER:UpdateGlow(f, bool)
 			end
 		else
 			if not f.border.spark:IsShown() then
+				f.border.spark.playing = 0
 				f.border.spark:Show() 
 				f.spell.glowColorOn = true
 			end
 		end
+		return
 	end
 	if bool and (f.spell and f.spell.glow ~= DB.GLOW_CONDITION_NONE) and self.ui.common.display_mode ~= DB.DISPLAY_BAR then
 		local value = 0
@@ -2287,8 +2264,6 @@ local function VersionUpdateDB()
 							else
 								reg = false
 							end
-						else
-							reg = true
 						end
 						if reg then
 							element.connectedSpellId = element.id
@@ -2301,6 +2276,31 @@ local function VersionUpdateDB()
 			end
 		end
 		DB:SetVersion(3.0)
+	end
+
+	if DB:GetVersion() == 3.0 then
+		local element
+		local reg = false
+		local equipSlot
+		for _, trackerId in ipairs(DB:GetTrackerIds()) do
+			local id, name, type, unit, aura_filter, aura_caster, trait = DB:GetTrackerInfo(id)
+			if HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM == type then
+				for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
+					if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
+						local values = DB:GetTrackerElementSplitValues(trackerId, elemIdx)
+						local newValues = {}
+						if values and #values > 0 then
+							for _, v in ipairs(values) do 
+								v = math.floor(v / 10)
+								table.insert(newValues, v)
+							end
+							DB:SetTrackerElementSplitValues(trackerId, elemIdx, newValues)
+						end
+					end
+				end
+			end
+		end
+		DB:SetVersion(3.1)
 	end
 end
 

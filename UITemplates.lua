@@ -29,6 +29,12 @@ end
 HDH_AT_BottomTapMixin = {}
 
 function HDH_AT_BottomTapMixin:SetActivate(bool)
+    -- HDH_AT_ConfigFrame.Bottom:Hide()
+    -- HDH_AT_ConfigFrame.Bottom2:Hide()
+
+    -- self.Top:Hide()
+    -- self.Top2:Hide()
+
     if bool then
         self:Disable()
         self.Left:Hide()
@@ -37,7 +43,8 @@ function HDH_AT_BottomTapMixin:SetActivate(bool)
         self.LeftActive:Show()
         self.MiddleActive:Show()
         self.RightActive:Show()
-        self.Text:SetPoint("TOP",0, -13)
+        -- self:SetHeight(32)
+        self.Text:SetPoint("TOP",0, -11)
     else
         self:Enable()
         self.Left:Show()
@@ -46,7 +53,10 @@ function HDH_AT_BottomTapMixin:SetActivate(bool)
         self.LeftActive:Hide()
         self.MiddleActive:Hide()
         self.RightActive:Hide()
-        self.Text:SetPoint("TOP",0, -8)
+        -- self.AtiveBorder:Hide()
+        -- self.Border:Show()
+        -- self:SetHeight(25)
+        self.Text:SetPoint("TOP",0, -7)
     end
 end
 
@@ -244,8 +254,8 @@ HDH_AT_DropDownMixin = {
 function HDH_AT_DropDown_OnEnteredItem(self)
     local dropdownBtn = self.dropdownBtn
     dropdownBtn.onEnterHandler(dropdownBtn, self, self.idx, self.value)
-    if dropdownBtn.hideenBG:IsShown() then
-        dropdownBtn.hideenBG:Hide()
+    if dropdownBtn.hiddenBG and dropdownBtn.hiddenBG:IsShown() then
+        dropdownBtn.hiddenBG:Hide()
     end
 end
 
@@ -253,8 +263,8 @@ function HDH_AT_DropDown_OnSelectedItem(self)
     local dropdownBtn = self.dropdownBtn
     dropdownBtn:SetSelectedIndex(self.idx)
     dropdownBtn.onClickHandler(dropdownBtn, self, self.idx, self.value)
-    if dropdownBtn.hideenBG:IsShown() then
-        dropdownBtn.hideenBG:Hide()
+    if dropdownBtn.hiddenBG and dropdownBtn.hiddenBG:IsShown() then
+        dropdownBtn.hiddenBG:Hide()
     end
 end
 
@@ -613,27 +623,27 @@ function HDH_AT_DropDown_OnClick(self)
     if not self.always_show_list then
         local list = _G[self:GetName().."List"]
 
-        if not self.hideenBG then
-            self.hideenBG = CreateFrame("Frame", self:GetName().."HiddenBG", UIParent)
-            self.hideenBG:SetFrameStrata("Dialog")
-            self.hideenBG:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0,0)
-            self.hideenBG:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0,0)
-            self.hideenBG:SetScript("OnMouseDown", function(self) self:Hide() end)
-            self.hideenBG:SetScript("OnShow", function(self) 
+        if not self.hiddenBG then
+            self.hiddenBG = CreateFrame("Frame", self:GetName().."HiddenBG", UIParent)
+            self.hiddenBG:SetFrameStrata("Dialog")
+            self.hiddenBG:SetPoint("TOPLEFT", UIParent, "TOPLEFT", 0,0)
+            self.hiddenBG:SetPoint("BOTTOMRIGHT", UIParent, "BOTTOMRIGHT", 0,0)
+            self.hiddenBG:SetScript("OnMouseDown", function(self) self:Hide() end)
+            self.hiddenBG:SetScript("OnShow", function(self) 
                 table.insert(UISpecialFrames, self:GetName())
                 self:EnableKeyboard(1)
             end)
-            self.hideenBG:SetPropagateMouseClicks(true)
-            self.hideenBG.list = list
+            self.hiddenBG:SetPropagateMouseClicks(true)
+            self.hiddenBG.list = list
 
-            self.hideenBG2 = CreateFrame("Frame", self:GetName().."HiddenBG2", self.hideenBG)
-            self.hideenBG2:SetPoint("TOPLEFT", self, "TOPLEFT", 0,0)
-            self.hideenBG2:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0,0)
-            self.hideenBG2:SetScript("OnMouseDown", function(self) self:GetParent():Hide() end)
+            self.hiddenBG2 = CreateFrame("Frame", self:GetName().."HiddenBG2", self.hiddenBG)
+            self.hiddenBG2:SetPoint("TOPLEFT", self, "TOPLEFT", 0,0)
+            self.hiddenBG2:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0,0)
+            self.hiddenBG2:SetScript("OnMouseDown", function(self) self:GetParent():Hide() end)
         end
-        self.hideenBG:Show()
+        self.hiddenBG:Show()
         list:ClearAllPoints()
-        list:SetParent(self.hideenBG)
+        list:SetParent(self.hiddenBG)
         list:SetFrameStrata("Dialog")
         list:SetClampedToScreen(true)
         list:SetPoint("TOPLEFT", self, "BOTTOMLEFT", 0, 0)
@@ -883,7 +893,7 @@ function HDH_AT_DialogFrameTemplateMixin:OnShow()
         _G[self:GetName().."Edit"]:Show()
         _G[self:GetName().."Edit"]:SetMultiLine(false)
         _G[self:GetName().."Edit"]:SetHeight(24)
-        _G[self:GetName().."Edit"]:SetWidth(200)
+        _G[self:GetName().."Edit"]:SetWidth(350)
         _G[self:GetName().."ButtonClose2"]:Hide()
         _G[self:GetName().."ButtonClose"]:Hide()
         _G[self:GetName().."ButtonOK"]:Hide()
@@ -1135,6 +1145,7 @@ function HDH_AT_SwitchFrameTemplateMixin:Init(itemList, onChangedHandler)
         end
         btn = self.list[index]
         btn:ClearAllPoints()
+        btn:SetFrameLevel(10)
         btn:SetPoint("TOPLEFT", self, "TOPLEFT", ((itemWidth) * (index - 1)) + 2, -2)
         btn:SetSize(itemWidth, itemHeight)
         btn:SetText(value[2])
@@ -1181,6 +1192,19 @@ function HDH_AT_SwitchFrameTemplateMixin:GetSelectedValue()
     return self.value
 end
 
+function HDH_AT_SwitchFrameTemplateMixin:Enable()
+    self.DisableLayer:Hide()
+    -- for _, item in ipairs(self.list) do
+    --     item:Enable()
+    -- end
+end
+
+function HDH_AT_SwitchFrameTemplateMixin:Disable()
+    self.DisableLayer:Show()
+    -- for _, item in ipairs(self.list) do
+    --     item:Disable()
+    -- end
+end
 
 ------------------------------------------
 -- HDH_AT_SliderTemplateMixin

@@ -458,8 +458,12 @@ function HDH_AT_ConfigDB:GetTrackerElementImage(trackerId, elementIndex)
 end
 
 function HDH_AT_ConfigDB:GetTrackerElementDefaultImage(trackerId, elementIndex)
-    local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
-    return element.defaultTexture
+    if HDH_AT_DB.tracker[trackerId] then
+        local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
+        return element.defaultTexture
+    else
+        return nil
+    end
 end
 
 function HDH_AT_ConfigDB:GetTrackerElementDisplay(trackerId, elementIndex)

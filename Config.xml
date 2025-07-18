@@ -292,7 +292,7 @@
 							<Button name="$parentBtnShowSpellList" inherits="HDH_AT_ButtonTemplate" hidden="false">
 								<Size x="95" y="20" />
 								<Anchors>
-									<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-5" y="4" />
+									<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="-6" y="8" />
 									<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 								</Anchors>
 								<Scripts>
@@ -1137,7 +1137,7 @@
 			<Button name="$parentTabInfo" inherits="HDH_AT_BottomTapTemplate" id="1" hidden="false">
 				<!-- <Size x="32" y="32"/> -->
 				<Anchors>
-					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="10" y="-1" />
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" x="5" y="-1" />
 				</Anchors>
 				<!-- <NormalTexture/> -->
 				<!-- <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
@@ -1151,7 +1151,7 @@
 			<Button name="$parentTabElements" inherits="HDH_AT_BottomTapTemplate" id="2" hidden="false">
 				<!-- <Size x="32" y="32"/> -->
 				<Anchors>
-				<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentTabInfo" x="3" y="0" />
+				<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentTabInfo" x="-16" y="0" />
 				</Anchors>
 				<!-- <NormalTexture/> -->
 				<!-- <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>
@@ -1165,7 +1165,7 @@
 			<Button name="$parentTabUI" inherits="HDH_AT_BottomTapTemplate" id="3"  hidden="false">
 				<!-- <Size x="32" y="32"/> -->
 				<Anchors>
-					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentTabElements" x="3" y="0" />
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentTabElements" x="-16" y="0" />
 				</Anchors>
 				<!-- <NormalTexture/> -->
 				<!-- <HighlightTexture file="Interface\Buttons\ButtonHilight-Square" alphaMode="ADD"/>

@@ -67,7 +67,8 @@ do -- 애드온 버전 호환성
 			return ret
 		end
 
-		HDH_AT_UTIL.GetSpellCooldown = function(id) 
+		HDH_AT_UTIL.GetSpellCooldown = function(id)
+			if not id then return nil end
 			local start, duration, enabled, modRate = GetSpellCooldown(id)
 			if start then
 				local info = { 
@@ -600,10 +601,28 @@ do
 	end
 
 	function HDH_AT_UTIL.ObjectToString(object)
-		return C_EncodingUtil.EncodeBase64(C_EncodingUtil.CompressString(C_EncodingUtil.SerializeCBOR(object), 1, 2))
+		local ok, v  = pcall(C_EncodingUtil.SerializeCBOR, object)
+		if not ok then return nil end
+
+		ok, v = pcall(C_EncodingUtil.CompressString, v, 0, 2)
+		if not ok then return nil end
+
+		ok, v = pcall(C_EncodingUtil.EncodeBase64, v)
+		if not ok then return nil end
+		
+		return v
 	end
 
 	function HDH_AT_UTIL.StringToObject(str)
-		return  C_EncodingUtil.DeserializeCBOR(C_EncodingUtil.DecompressString(C_EncodingUtil.DecodeBase64(str), 1, 2))
+		local ok, v  = pcall(C_EncodingUtil.DecodeBase64, str, 1)
+		if not ok then return nil end
+
+		ok, v = pcall(C_EncodingUtil.DecompressString, v, 0, 2)
+		if not ok then return nil end
+
+		ok, v = pcall(C_EncodingUtil.DeserializeCBOR, v)
+		if not ok then return nil end
+
+		return v
 	end
 end

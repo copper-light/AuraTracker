@@ -2,11 +2,14 @@ local DB = HDH_AT_ConfigDB
 HDH_ENH_MAELSTROM_TRACKER = {}
 
 if select(4, GetBuildInfo()) <= 59999 then -- 대격변
-	HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID = 53817
+	HDH_ENH_MAELSTROM_TRACKER.TRACKING_SPELL_ID = 53817
+	HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES = {1,2,3,4}
 else
-	HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID = 344179
+	HDH_ENH_MAELSTROM_TRACKER.TRACKING_SPELL_ID = 344179
+	HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES = {1,2,3,4,5}
 end
 
+-- 거인의 힘 : 446738
 
 ------------------------------------------
  -- AURA TRACKER Class
@@ -36,7 +39,7 @@ do
 			if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
 			self.counttext:SetText(self.spell.count .. "%"); 
 			if self.spell.showValue and self.spell.v1 > 0 then 
-				self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1 / 10, self:GetParent().parent.ui.font.v1_abbreviate)); 
+				self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1, self:GetParent().parent.ui.font.v1_abbreviate)); 
 			else 
 				self.v1:SetText(nil) 
 			end
@@ -68,7 +71,7 @@ do
 		for i = 1, 40 do 
 			aura = C_UnitAuras.GetAuraDataByIndex('player', i, 'HELPFUL')
 			if not aura then break end
-			if aura.spellId == HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID then
+			if aura.spellId == HDH_ENH_MAELSTROM_TRACKER.TRACKING_SPELL_ID then
 				f = self.frame.pointer[aura.spellId]
 				if f and f.spell then
 					spell = f.spell
@@ -96,7 +99,7 @@ do
 					ret = ret + 1;
 					spell.isUpdate = true
 				end
-				power = aura.applications * 10
+				power = aura.applications -- * 10
 				break
 			end
 		end
@@ -108,10 +111,10 @@ do
     end
     
     function HDH_ENH_MAELSTROM_TRACKER:CreateData()
-		local name, rank, texture = HDH_AT_UTIL.GetInfo(HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID)
+		local name, rank, texture = HDH_AT_UTIL.GetInfo(HDH_ENH_MAELSTROM_TRACKER.TRACKING_SPELL_ID)
         local trackerId = self.id
-        local key = HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID
-        local id = HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID
+        local key = HDH_ENH_MAELSTROM_TRACKER.TRACKING_SPELL_ID
+        local id = HDH_ENH_MAELSTROM_TRACKER.TRACKING_SPELL_ID
         local display = DB.SPELL_ALWAYS_DISPLAY
         local isValue = true
         local isItem = false
@@ -121,14 +124,13 @@ do
         end
         local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
 
-
-		if select(4, GetBuildInfo()) <= 49999 then -- 대격변
-			DB:SetTrackerElementSplitValues(trackerId, elemIdx, {10,20,30,40})
+		if select(4, GetBuildInfo()) <= 59999 then -- 대격변
+			DB:SetTrackerElementSplitValues(trackerId, elemIdx, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES)
 		else
-			DB:SetTrackerElementSplitValues(trackerId, elemIdx, {50})
+			DB:SetTrackerElementSplitValues(trackerId, elemIdx, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES)
 		end
         
-		DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_VALUE, DB.CONDITION_GT_OR_EQ, 50)
+		DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_VALUE, DB.CONDITION_GT_OR_EQ, 5)
 		DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 		
         local maxValue = self:GetPowerMax()
@@ -162,7 +164,7 @@ do
     
     function HDH_ENH_MAELSTROM_TRACKER:IsHaveData()
         local key = DB:GetTrackerElement(self.id, 1)
-        if HDH_ENH_MAELSTROM_TRACKER.MAEL_SPELL_ID == key then
+        if HDH_ENH_MAELSTROM_TRACKER.TRACKING_SPELL_ID == key then
             return true
         else
             return false
@@ -231,7 +233,6 @@ do
 			f.spell.v1 = self:GetPower()
 			f.spell.max = self:GetPowerMax()
 			f.spell.count = (f.spell.v1/f.spell.max * 100);
-			
 			if self:UpdateAllIcons() > 0 then
 				show = true 
 			end
@@ -254,10 +255,10 @@ do
 			return 
 		end
 
-		if select(4, GetBuildInfo()) <= 49999 then -- 대격변
-			self.powerMax = 50
+		if select(4, GetBuildInfo()) <= 59999 then -- 대격변
+			self.powerMax = 5
 		else
-			self.powerMax = ((263 == select(1,  HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))) and 100) or 50
+			self.powerMax = ((263 == select(1,  HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))) and 10) or 5
 		end
 		local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitValues, glowEffectType, glowEffectColor, glowEffectPerSec
 		local elemSize = DB:GetTrackerElementSize(trackerId)
