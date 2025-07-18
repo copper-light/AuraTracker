@@ -6,7 +6,7 @@ if select(4, GetBuildInfo()) <= 59999 then -- 대격변
 	HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES = {1,2,3,4}
 else
 	HDH_ENH_MAELSTROM_TRACKER.TRACKING_SPELL_ID = 344179
-	HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES = {1,2,3,4,5}
+	HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES = {5}
 end
 
 -- 거인의 힘 : 446738
@@ -29,36 +29,33 @@ do
 		
 		if self.spell.curTime - (self.spell.delay or 0) < 0.02  then return end 
 		self.spell.delay = self.spell.curTime
-		local curValue = self:GetParent().parent:GetPower()
-		local maxValue = self:GetParent().parent:GetPowerMax()
-		local tracker = self:GetParent().parent		
+		local tracker = self:GetParent().parent
 		
-		if self.spell.v1 ~= curValue  then 
-			self.spell.v1 = curValue;
-			self.spell.count = math.ceil(self.spell.v1 / maxValue * 100);
-			if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
-			self.counttext:SetText(self.spell.count .. "%"); 
-			if self.spell.showValue and self.spell.v1 > 0 then 
-				self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1, self:GetParent().parent.ui.font.v1_abbreviate)); 
-			else 
-				self.v1:SetText(nil) 
-			end
+		-- if self.spell.isUpdate then 
+		-- 	if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
+		-- 	self.counttext:SetText(self.spell.count .. "%"); 
+		-- 	if self.spell.showValue and self.spell.v1 > 0 then 
+		-- 		self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1, tracker.ui.font.v1_abbreviate)); 
+		-- 	else 
+		-- 		self.v1:SetText(nil) 
+		-- 	end
 			
-			if self.spell.v1 > 0 then
-				if self.spell.isOn ~= true then
-					self:GetParent().parent:Update();
-					self.spell.isOn = true;
-				end
-			else
-				if self.spell.isOn ~= false then
-					self:GetParent().parent:Update();
-					self.spell.isOn = false;
-				end
-			end
-		end
-		
-		self:GetParent().parent:UpdateGlow(self, true);
-		self:GetParent().parent:UpdateBarValue(self);
+		-- 	-- if self.spell.v1 > 0 then
+		-- 	-- 	if self.spell.isOn ~= true then
+		-- 	-- 		tracker:Update();
+		-- 	-- 		self.spell.isOn = true;
+		-- 	-- 	end
+		-- 	-- else
+		-- 	-- 	if self.spell.isOn ~= false then
+		-- 	-- 		tracker:Update();
+		-- 	-- 		self.spell.isOn = false;
+		-- 	-- 	end
+		-- 	-- end
+		-- 	self.spell.isUpdate = false
+		-- 	tracker:UpdateBarValue(self);
+		-- end
+		tracker:UpdateBarValue(self);
+		tracker:UpdateGlow(self, true);
 	end
 
     function HDH_ENH_MAELSTROM_TRACKER:GetPower()
@@ -103,6 +100,18 @@ do
 				break
 			end
 		end
+		f = self.frame.icon[1]
+		
+		if f and not f.spell.isUpdate and f.spell.remaining > 0 then
+			spell = f.spell
+			spell.isUpdate = true
+			spell.endTime = 0
+			spell.remaining = 0
+			spell.v1 = 0
+			spell.duration = 0
+			spell.startTime = 0
+		end
+
 		return power
     end
     
@@ -184,11 +193,6 @@ do
 			ret = 1;
 			self:UpdateGlow(f, true)
 			f:Show();
-			if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-				self:UpdateBarValue(f);
-				f.bar:Show();
-				-- f.name:SetText(f.spell.name);
-			end
 			if cooldown_type ~= DB.COOLDOWN_CIRCLE and  cooldown_type ~= DB.COOLDOWN_NONE then
 				f.icon:SetAlpha(self.ui.icon.off_alpha)
 				f.border:SetAlpha(self.ui.icon.off_alpha)
@@ -203,12 +207,17 @@ do
 				f.icon:SetDesaturated(nil)
 				f.cd:Show()
 				
-				if HDH_TRACKER.startTime < f.spell.startTime or (f.spell.duration == 0) then
+				if HDH_TRACKER.startTime < f.spell.startTime or (f.spell.duration > 0) then
 					f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
 				end
 			end
+			if f.spell.count == 100 and f.spell.v1 ~= f.spell.maxValue then f.spell.count = 99 end
+			f.counttext:SetText(f.spell.count .. "%")
+			f.v1:SetText(f.spell.v1)
 		else
 			if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then
+				f.v1:SetText("")
+				f.counttext:SetText("")
 				f.icon:SetDesaturated(1)
 				f.icon:SetAlpha(self.ui.icon.off_alpha)
 				f.border:SetAlpha(self.ui.icon.off_alpha)
@@ -220,6 +229,12 @@ do
 				f:Hide();
 			end
 		end
+		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
+			if not f.bar:IsShown() then
+				f.bar:Show()
+			end
+		end
+		f.spell.isUpdate = false
 		f:SetPoint('RIGHT');
 		return ret
 	end
@@ -249,6 +264,7 @@ do
 	function HDH_ENH_MAELSTROM_TRACKER:InitIcons()
 		local trackerId = self.id
 		local id, name, _, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
+		self.unit = "player"
 		self.aura_filter = aura_filter
 		self.aura_caster = aura_caster
 		if not id then 

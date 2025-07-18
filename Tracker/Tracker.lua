@@ -2294,7 +2294,7 @@ local function VersionUpdateDB()
 								v = math.floor(v / 10)
 								table.insert(newValues, v)
 							end
-							DB:SetTrackerElementSplitValues(trackerId, elemIdx, newValues)
+							DB:SetTrackerElementSplitValues(trackerId, elemIdx, values)
 						end
 					end
 				end
