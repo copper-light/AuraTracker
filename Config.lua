@@ -462,7 +462,6 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 	if self.bodyType == BODY_TRACKER_EDIT and self.trackerIndex == #tracker_list then
 		self.bodyType = BODY_TRACKER_NEW
 	end
-
 	if self.bodyType == BODY_TRACKER_NEW then
 		self.F.BODY.CONFIG_TRACKER_ELEMENTS:Hide()
 		self.F.BODY.CONFIG_TRACKER:Show()
@@ -2697,7 +2696,7 @@ function HDH_AT_ConfigFrameMixin:LoadUIConfig(tackerId)
 	end
 
 	-- when activating "Add Tracker TAP"
-	if not tackerId or tackerId == #self.F.TRACKER.list then
+	if not tackerId then
 		F.BODY.CONFIG_UI.SW_CONFIG_MODE:Disable()
 	else
 		F.BODY.CONFIG_UI.SW_CONFIG_MODE:Enable()

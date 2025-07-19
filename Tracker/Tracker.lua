@@ -653,36 +653,6 @@ function HDH_TRACKER:UpdateArtBar(f)
 			f.name = f.bar:CreateFontString(nil,"OVERLAY");
 		end
 		f.bar.bg:SetVertexColor(unpack(op.bg_color));
-
-		if  font.name_location ~= DB.FONT_LOCATION_HIDE  then
-			if font.name_location == DB.FONT_LOCATION_BAR_L then
-				f.name:SetJustifyH("LEFT");
-				-- f.name:SetJustifyV("CENTER");
-				f.name:SetJustifyV('MIDDLE');
-			elseif font.name_location == DB.FONT_LOCATION_BAR_R then
-				f.name:SetJustifyH("RIGHT");
-				-- f.name:SetJustifyV("CENTER");
-				f.name:SetJustifyV('MIDDLE');
-			elseif font.name_location == DB.FONT_LOCATION_BAR_C then
-				f.name:SetJustifyH("CENTER");
-				-- f.name:SetJustifyV("CENTER");
-				f.name:SetJustifyV('MIDDLE');
-			elseif font.name_location == DB.FONT_LOCATION_BAR_T then
-				f.name:SetJustifyH("CENTER");
-				f.name:SetJustifyV("TOP");
-			else -- BOTTOM
-				f.name:SetJustifyH("CENTER");
-				f.name:SetJustifyV("BOTTOM");
-			end
-			f.name:Show();
-		else
-			f.name:Hide();
-		end
-
-		f.name:SetFont(HDH_TRACKER.FONT_STYLE, font.name_size, "OUTLINE");
-		f.name:SetTextColor(unpack(font.name_color));
-		f.name:SetPoint('TOPLEFT', f.bar, 'TOPLEFT', font.name_margin_left, -3)
-		f.name:SetPoint('BOTTOMRIGHT', f.bar, 'BOTTOMRIGHT', -font.name_margin_right, 3)
 		f.bar.spark:SetVertexColor(unpack(op.spark_color or {1, 1, 1, 0.7}))
 		
 		if op.cooldown_progress == DB.COOLDOWN_LEFT then
@@ -731,7 +701,6 @@ function HDH_TRACKER:UpdateArtBar(f)
 
 			f.bar:SetRotatesTexture(true);
 		else -- bottom
-			
 			f.bar:SetOrientation("Vertical"); 
 			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 			f.bar.spark:SetSize(op.width, 9);
@@ -767,6 +736,39 @@ function HDH_TRACKER:UpdateArtBar(f)
 		f.bar:SetSize(op.width-2, op.height-2);
 		f.bar:SetStatusBarColor(unpack(op.color));
 		f.bar.spark:Hide();
+
+		if font.name_location ~= DB.FONT_LOCATION_HIDE then
+			if font.name_location == DB.FONT_LOCATION_BAR_L then
+				f.name:SetJustifyH("LEFT");
+				f.name:SetJustifyV('MIDDLE');
+			elseif font.name_location == DB.FONT_LOCATION_BAR_R then
+				f.name:SetJustifyH("RIGHT");
+				f.name:SetJustifyV('MIDDLE');
+			elseif font.name_location == DB.FONT_LOCATION_BAR_C then
+				f.name:SetJustifyH("CENTER");
+				f.name:SetJustifyV('MIDDLE');
+			elseif font.name_location == DB.FONT_LOCATION_BAR_T then
+				f.name:SetJustifyH("CENTER");
+				f.name:SetJustifyV("TOP");
+			else -- BOTTOM
+				f.name:SetJustifyH("CENTER");
+				f.name:SetJustifyV("BOTTOM");
+			end
+			-- SetJustify 의 값이 변경될 경우,
+			-- 텍스트가 재할당될떄까지 값이 적용되지 않아서 텍스트 수동으로 재할당함
+			if string.len(f.name:GetText() or "") > 0 then
+				local tmp = f.name:GetText()
+				f.name:SetText("")
+				f.name:SetText(tmp)
+			end
+			f.name:Show()
+		else
+			f.name:Hide()
+		end
+		f.name:SetFont(HDH_TRACKER.FONT_STYLE, font.name_size, "OUTLINE")
+		f.name:SetPoint('TOPLEFT', f.bar, 'TOPLEFT', font.name_margin_left, -3)
+		f.name:SetPoint('BOTTOMRIGHT', f.bar, 'BOTTOMRIGHT', -font.name_margin_right, 3)
+
 		self:SetGameTooltip(f.bar, show_tooltip or false)
 		if not HDH_TRACKER.ENABLE_MOVE then
 			f.bar:SetMouseClickEnabled(false)
@@ -839,10 +841,11 @@ function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
 		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
 
 	else
-		f.iconSatCooldown:Hide() 
-		f.iconSatCooldown.spark:Hide() 
 		f.cd = f.cooldown2
 		f.cooldown1:Hide()
+
+		f.iconSatCooldown:Hide() 
+		f.iconSatCooldown.spark:Hide()
 		f.iconSatCooldown:SetSize(f.icon:GetSize())
 		f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, 0.93)
 	end
@@ -1590,10 +1593,10 @@ function HDH_TRACKER:SetGameTooltip(f, show)
 end
 
 local function ChangeFontLocation(f, fontf, location, op_font)
-	local location_list = {op_font.count_location, op_font.cd_location, op_font.v2_location, op_font.v1_location}
-	local size_list = {op_font.coun_tsize, op_font.cd_size , op_font.v2_size, op_font.v2_size}
-	local margin = 0
-	parent = f.iconframe;
+	-- local location_list = {op_font.count_location, op_font.cd_location, op_font.v2_location, op_font.v1_location}
+	-- local size_list = {op_font.coun_tsize, op_font.cd_size , op_font.v2_size, op_font.v2_size}
+	-- local margin = 0
+	local parent = f.iconframe;
 	fontf:ClearAllPoints();
 	fontf:Show();
 	if location == DB.FONT_LOCATION_TL then
@@ -1678,7 +1681,6 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	local op_font = self.ui.font
 	local op_bar = self.ui.bar
 	local op_common = self.ui.common
-	local b = 0
 	local border = 0.2355 * (1 - (ICON_BORDER_VALUE[op_icon.border_size] or 0))
 	local size = 1 - (0.455 * (ICON_SIZE_VALUE[op_icon.border_size] or 0))
 	f:SetSize(op_icon.size, op_icon.size)

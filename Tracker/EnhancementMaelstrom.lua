@@ -31,29 +31,6 @@ do
 		self.spell.delay = self.spell.curTime
 		local tracker = self:GetParent().parent
 		
-		-- if self.spell.isUpdate then 
-		-- 	if self.spell.count == 100 and self.spell.v1 ~= maxValue then self.spell.count = 99 end
-		-- 	self.counttext:SetText(self.spell.count .. "%"); 
-		-- 	if self.spell.showValue and self.spell.v1 > 0 then 
-		-- 		self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1, tracker.ui.font.v1_abbreviate)); 
-		-- 	else 
-		-- 		self.v1:SetText(nil) 
-		-- 	end
-			
-		-- 	-- if self.spell.v1 > 0 then
-		-- 	-- 	if self.spell.isOn ~= true then
-		-- 	-- 		tracker:Update();
-		-- 	-- 		self.spell.isOn = true;
-		-- 	-- 	end
-		-- 	-- else
-		-- 	-- 	if self.spell.isOn ~= false then
-		-- 	-- 		tracker:Update();
-		-- 	-- 		self.spell.isOn = false;
-		-- 	-- 	end
-		-- 	-- end
-		-- 	self.spell.isUpdate = false
-		-- 	tracker:UpdateBarValue(self);
-		-- end
 		tracker:UpdateBarValue(self);
 		tracker:UpdateGlow(self, true);
 	end
@@ -253,7 +230,7 @@ do
 			end
 		end
 	
-		if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
+		if (not (self.ui.common.hide_in_raid and IsInRaid())) 
 				and (HDH_TRACKER.ENABLE_MOVE or UnitAffectingCombat("player") or show or self.ui.common.always_show) then
 			self:ShowTracker();
 		else
@@ -368,30 +345,14 @@ function HDH_ENH_MAELSTROM_UNIT_AURA(self)
 	end
 end
 
-
 function HDH_ENH_MAELSTROM_OnEventTracker(self, event, ...)
 	if not self.parent then return end
 	if event == 'UNIT_AURA' then
-		local unit = select(1,...)
-		if self.parent and unit == self.parent.unit then
-			HDH_ENH_MAELSTROM_UNIT_AURA(self.parent)
-		end
-	elseif event =="PLAYER_TARGET_CHANGED" then
-		HDH_AT_UTIL.RunTimer(self.parent, "PLAYER_TARGET_CHANGED", 0.02, HDH_ENH_MAELSTROM_UNIT_AURA, self.parent) 
-	elseif event == 'PLAYER_FOCUS_CHANGED' then
-		HDH_ENH_MAELSTROM_UNIT_AURA(self.parent)
-	elseif event == 'INSTANCE_ENCOUNTER_ENGAGE_UNIT' then
-		HDH_ENH_MAELSTROM_UNIT_AURA(self.parent)
-	elseif event == 'GROUP_ROSTER_UPDATE' then
-		HDH_ENH_MAELSTROM_UNIT_AURA(self.parent)
-	elseif event == 'UNIT_PET' then
-		HDH_AT_UTIL.RunTimer(self.parent, "UNIT_PET", 0.5, HDH_ENH_MAELSTROM_UNIT_AURA, self.parent) 
-	elseif event == 'ARENA_OPPONENT_UPDATE' then
-		HDH_AT_UTIL.RunTimer(self.parent, "ARENA_OPPONENT_UPDATE", 0.5, HDH_ENH_MAELSTROM_UNIT_AURA, self.parent) 
+		if self.parent and select(1, ...) == self.parent.unit then HDH_ENH_MAELSTROM_UNIT_AURA(self.parent) end
 	elseif event == "ENCOUNTER_START" then
-		self.parent.isRaiding = true;
+		HDH_ENH_MAELSTROM_UNIT_AURA(self.parent)
 	elseif event == "ENCOUNTER_END" then
-		self.parent.isRaiding = false;
+		HDH_ENH_MAELSTROM_UNIT_AURA(self.parent)
 	end
 end
 

@@ -267,7 +267,7 @@ do
 					end
 					if display_mode ~= DB.DISPLAY_ICON and f.bar then
 						if not f.bar:IsShown() then f.bar:Show(); end
-						f.name:SetText(f.spell.name);
+						f.name:SetText(f.spell.name)
 						if f.spell.duration == 0 then
 							f.spell.remaining = 1;
 							f.spell.endTime = 1;

@@ -4,8 +4,6 @@ HDH_C_TRACKER = {}
 HDH_C_TRACKER.GlobalCooldown = 1.9; -- default GC: 1.332
 HDH_C_TRACKER.EndCooldown = 0.09;
 
-local CombatSpellCache = {}
-
 -- 아이콘 변경을 위한 아이디 보정
 local ADJUST_ID = {};
 ADJUST_ID[274281] = 274281;--new moon
@@ -27,18 +25,18 @@ ADJUST_ID[188499] = 210152
 -- cooldown db
 ------------------------------------
 
-local DefaultCooldownDB = {
-	icon = {
-		cooldown_color = {0,0,0},
-		desaturation = true,
-		max_time = -1,
-		not_enough_mana_color = {0.5,0.5,1},
-		out_range_color = {0.8,0.1,0.1},
-		desaturation_not_mana = false,
-		desaturation_out_range = false,
-		show_global_cooldown = true
-	}
-};
+-- local DefaultCooldownDB = {
+-- 	icon = {
+-- 		cooldown_color = {0,0,0},
+-- 		desaturation = true,
+-- 		max_time = -1,
+-- 		not_enough_mana_color = {0.5,0.5,1},
+-- 		out_range_color = {0.8,0.1,0.1},
+-- 		desaturation_not_mana = false,
+-- 		desaturation_out_range = false,
+-- 		show_global_cooldown = true
+-- 	}
+-- };
 
 ------------------------------------
 -- HDH_C_TRACKER class
@@ -270,7 +268,6 @@ end
 function HDH_C_TRACKER:UpdateAuras(f)
 	local curTime = GetTime()
 	local aura
-	local ret = 0;
 	local spell = f.spell
 
 	for i = 1, 40 do 
@@ -290,7 +287,7 @@ end
 
 
 function HDH_C_TRACKER:UpdateIcon(f)
-	if not f or not f.spell or not self or not self.ui then return false end
+	if not f or not f.spell or not self or not self.ui or f.spell.blankDisplay then return false end
 	local ui = self.ui
 	local spell = f.spell
 	local isUpdate = false
@@ -304,8 +301,6 @@ function HDH_C_TRACKER:UpdateIcon(f)
 	local out_range_color = (self.ui.cooldown.out_range_color or {0.53, 0.1, 0.1})
 	local use_not_enough_mana_color = self.ui.cooldown.use_not_enough_mana_color
 	local use_out_range_color = self.ui.cooldown.use_out_range_color
-
-	if spell.blankDisplay then return false end
 
 	if not HDH_TRACKER.ENABLE_MOVE and not spell.isInnerCDItem then
 		startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana = self:UpdateSpellInfo(f.spell.id, f.spell.name, f.spell.isItem, f.spell.isToy)
@@ -508,6 +503,10 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		f.counttext:SetText(nil)
 	end
 
+	if display_mode ~= DB.DISPLAY_ICON and string.len(f.name:GetText() or "") == 0 then 
+		f.name:SetText(spell.name)
+	end
+
 	if self.OrderFunc then self:OrderFunc(self) end
 	self:UpdateLayout()
 	return isUpdate
@@ -610,7 +609,7 @@ function HDH_C_TRACKER:UpdateAllSlot(onlyNotMappingSpell)
 		_, id, _ = GetActionInfo(i)
 
 		if onlyNotMappingSpell then
-			if id and self.unmatch_slot_spell[id] then
+			if id and self.unmatch_slot_spell[id] and self.frame.pointer[id] then
 				self.frame.pointer[id].spell.slot = i;
 				self.slot_pointer[i] = self.frame.pointer[id];
 			end
@@ -1070,10 +1069,6 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			end
 
 			f.spell = spell
-
-			if self.ui.common.display_mode ~= DB.DISPLAY_ICON then 
-				f.name:SetText(spell.name); 
-			end
 			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 			f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 			f.iconSatCooldown:SetDesaturated(nil)
@@ -1105,14 +1100,6 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 		end
 	end
 
-	self.isManualChange = false
-	self.unmatch_slot_count = 0
-	self.unmatch_slot_spell = {}	
-	self.slot_pointer = {}
-	self:UpdateAllSlot();
-	-- for i = 1 , #self.frame.icon do
-	-- 	self:UpdateSlotIcon(self.frame.icon[i].spell.slot);
-	-- end
 	self:LoadOrderFunc();
 	self.frame:SetScript("OnEvent", CT_OnEvent_Frame)
 	self.frame:RegisterEvent('PLAYER_TALENT_UPDATE')
@@ -1121,7 +1108,6 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	self.frame:RegisterEvent('CURSOR_CHANGED')
 	self.frame:RegisterEvent('COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED')
 	
-
 	if needEquipmentEvent then
 		self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
 	end
@@ -1138,6 +1124,11 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 		self:ReleaseIcon(i)
 	end
 
+	self.isManualChange = false
+	self.unmatch_slot_count = 0
+	self.unmatch_slot_spell = {}
+	self.slot_pointer = {}
+	self:UpdateAllSlot()
 	self:Update()
 end
 
@@ -1310,20 +1301,13 @@ function CT_OnEvent_Frame(self, event, ...)
 		HDH_AT_UTIL.RunTimer(tracker, "PLAYER_EQUIPMENT_CHANGED", 0.5, HDH_C_TRACKER.InitIcons, tracker)
 	elseif event == "ACTIONBAR_SLOT_CHANGED" then
 		tracker:ACTIONBAR_SLOT_CHANGED(...)
-
 	elseif event == 'UNIT_AURA' then
-		local unit = select(1, ...)
-		if unit == "player" then
-			tracker:Update()
-		end
-
+		if select(1, ...) == "player" then tracker:Update() end
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
-		local _, subEvent, _, srcGUID, srcName, _, _, _, _, _, _, spellID, spellName =  CombatLogGetCurrentEventInfo()
+		local _, subEvent, _, srcGUID, _, _, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
 		tracker:COMBAT_LOG_EVENT_UNFILTERED(subEvent, srcGUID, spellID)
-
 	elseif event == 'COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED' then
 		tracker:COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED(...)
-
 	elseif event == 'CURSOR_CHANGED' then
 		tracker:CURSOR_CHANGED(...)
 	end
@@ -1333,9 +1317,7 @@ end
 function CT_OnEventIcon(self, event, ...)
 	local tracker = self:GetParent().parent
 	if event == "ACTIONBAR_UPDATE_USABLE" then
-		if not HDH_TRACKER.ENABLE_MOVE then
-			tracker:UpdateIcon(self);
-		end
+		if not HDH_TRACKER.ENABLE_MOVE then tracker:UpdateIcon(self) end
 	elseif event == "ACTIONBAR_UPDATE_COOLDOWN" or event =="BAG_UPDATE_COOLDOWN" or event =="BAG_UPDATE" then
 		if not HDH_TRACKER.ENABLE_MOVE and (tracker:UpdateIcon(self) or (not tracker.ui.common.always_show and not UnitAffectingCombat("player"))) then
 			tracker:UpdateLayout(self)
@@ -1345,9 +1327,6 @@ function CT_OnEventIcon(self, event, ...)
 	elseif event == "SPELL_ACTIVATION_OVERLAY_GLOW_HIDE" then
 		tracker:ACTIVATION_OVERLAY_GLOW_HIDE(self, ...)
 	end
-	-- elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
-	-- 	CT_COMBAT_LOG_EVENT_UNFILTERED(self, ...)
-	-- end
 end
 
 -------------------------------------------
