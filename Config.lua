@@ -437,7 +437,7 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		self.trackerId = self.F.TRACKER.list[self.trackerIndex].id
 	end
 
-	if (self.bodyType == BODY_ELEMENTS or self.bodyType == BODY_UI) and self:GetTrackerListSize() < 1 then
+	if self.bodyType == BODY_ELEMENTS and self:GetTrackerListSize() < 1 then
 		self.bodyType = BODY_TRACKER_NEW
 	end
 
@@ -2876,7 +2876,7 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 	self.cacheCastSpell = {}
 
 	for _, id in pairs(self.cacheUesdItem) do
-		isItem = not tracker:IsLearnedSpellOrEquippedItem(id)
+		isItem = not HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(id)
 		name, _, icon = HDH_AT_UTIL.GetInfo(id, true)
 		if f.skillQueue.activeSpell[id] == nil then
 			if f.skillQueue.cache[id] then

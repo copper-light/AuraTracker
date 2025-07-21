@@ -659,15 +659,14 @@ function HDH_TRACKER:UpdateArtBar(f)
 			f.bar:SetOrientation("Horizontal"); 
 			f.bar:SetRotatesTexture(false);
 			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-			f.bar.spark:SetSize(9, op.height);
+			f.bar.spark:SetSize(9, op.height)
+			f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture)
 			if op.to_fill then
 				f.bar.adjust = 0.5
 				f.bar:SetReverseFill(true)
-				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r);
 			else
 				f.bar.adjust = -0.5
 				f.bar:SetReverseFill(false)
-				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture);
 			end
 
 		elseif op.cooldown_progress == DB.COOLDOWN_RIGHT then
@@ -675,28 +674,26 @@ function HDH_TRACKER:UpdateArtBar(f)
 			f.bar:SetRotatesTexture(false);
 			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
 			f.bar.spark:SetSize(9, op.height);
+			f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r)
 			if op.to_fill then
 				f.bar.adjust = -0.5
 				f.bar:SetReverseFill(false)
-				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture);
 			else
 				f.bar.adjust = 0.5
 				f.bar:SetReverseFill(true)
-				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r);
 			end
 
 		elseif op.cooldown_progress == DB.COOLDOWN_UP then
 			f.bar:SetOrientation("Vertical"); 
 			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-			f.bar.spark:SetSize(op.width, 9);
+			f.bar.spark:SetSize(op.width, 9)
+			f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture)
 			if op.to_fill then
 				f.bar.adjust = -0.5
 				f.bar:SetReverseFill(false)
-				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture);
 			else
 				f.bar.adjust = 0.5
 				f.bar:SetReverseFill(true)
-				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r); 
 			end
 
 			f.bar:SetRotatesTexture(true);
@@ -704,15 +701,13 @@ function HDH_TRACKER:UpdateArtBar(f)
 			f.bar:SetOrientation("Vertical"); 
 			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
 			f.bar.spark:SetSize(op.width, 9);
-
+			f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r)
 			if op.to_fill then
 				f.bar.adjust = 0.5
 				f.bar:SetReverseFill(true)
-				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r); 
 			else
 				f.bar.adjust = -0.5
 				f.bar:SetReverseFill(false)
-				f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture);
 			end
 			
 			f.bar:SetRotatesTexture(true);
@@ -1669,6 +1664,9 @@ local function ChangeFontLocation(f, fontf, location, op_font)
 	else
 		fontf:Hide()
 	end
+	local refresh = fontf:GetText()
+	fontf:SetText("")
+	fontf:SetText(refresh)
 end
 
 -- bar 세부 속성 세팅하는 함수 (나중에 option 을 통해 바 값을 변경할수 있기에 따로 함수로 지정해둠)
@@ -2253,15 +2251,13 @@ local function VersionUpdateDB()
 	if DB:GetVersion() == 2.9 then
 		local element
 		local reg = false
-		local equipSlot
 		for _, trackerId in ipairs(DB:GetTrackerIds()) do
 			for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
 				if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
 					element = HDH_AT_DB.tracker[trackerId].element[elemIdx]
 					if HDH_AT_DB.tracker[trackerId].type == HDH_TRACKER.TYPE.COOLDOWN or HDH_AT_DB.tracker[trackerId].type == HDH_TRACKER.TYPE.TOTEM then
 						if element.isItem then
-							equipSlot = select(9, GetItemInfo(element.id))
-							if equipSlot and equipSlot ~= "" and equipSlot ~= "INVTYPE_NON_EQUIP_IGNORE" then 
+							if C_Item.IsEquippableItem(element.id) then 
 								reg = true
 							else
 								reg = false
@@ -2281,9 +2277,6 @@ local function VersionUpdateDB()
 	end
 
 	if DB:GetVersion() == 3.0 then
-		local element
-		local reg = false
-		local equipSlot
 		for _, trackerId in ipairs(DB:GetTrackerIds()) do
 			local id, name, type, unit, aura_filter, aura_caster, trait = DB:GetTrackerInfo(id)
 			if HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM == type then
@@ -2340,7 +2333,26 @@ local function PLAYER_ENTERING_WORLD()
 	for _, t in pairs(trackerList) do
 		t:PLAYER_ENTERING_WORLD()
 	end
-	HDH_TRACKER.IsLoaded = true;
+	HDH_TRACKER.IsLoaded = true
+
+	c = CreateFrame("Frame", "HHHHHHHHHH", UIParent, "HDH_AT_MultiStatusBarTemplate")
+	c:Init(
+		2,
+		16,
+		{8},
+		DB.BAR_SPLIT_FIXED_VALUE,
+		DB.COOLDOWN_DOWN,
+		true,
+		"Interface/AddOns/HDH_AuraTracker/Texture/BantoBar",
+		"Interface/AddOns/HDH_AuraTracker/Texture/BantoBar_r"
+	)
+	c:SetSize(500, 100)
+	c:SetPoint("CENTER")
+	c:SetStatusBarColor(1,0,0,1)
+	c:SetStatusBarFullColor(1,0,1,1)
+	c:SetBackgroundColor(0,0,0,0.3)
+	c:ShowSpark(true)
+	c:SetValue(16, true)
 end
 
 -- 이벤트 콜백 함수
@@ -2393,3 +2405,5 @@ HDH_AT_ADDON_FRAME = CreateFrame("Frame", "HDH_AT_iconframe", UIParent) -- 애�
 HDH_AT_ADDON_FRAME:SetScript("OnEvent", OnEvent)
 HDH_AT_ADDON_FRAME:SetScript("OnUpdate", MainOnUpdate)
 OnLoad(HDH_AT_ADDON_FRAME)
+
+

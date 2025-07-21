@@ -1581,3 +1581,316 @@ end
 function HDH_AT_MultiLineEditBoxTemplateMixin:SetAutoFocus(bool)
     self.SF.EditBox:SetAutoFocus(bool)
 end
+
+
+------------------------------------------
+--- HDH_AT_MultiStatusBarTemplateMixin
+------------------------------------------
+HDH_AT_MultiStatusBarTemplateMixin = {}
+local DB = HDH_AT_ConfigDB
+local BAR_SCALE = 1000
+local BAR_ANIMATE_DURATION = 3. --.15
+
+function HDH_AT_MultiStatusBarTemplateMixin:CreateBars(size)
+    for i = 1, size do
+        _ = self.list[i]
+    end
+end 
+
+function HDH_AT_MultiStatusBarTemplateMixin:UpdateAllPoints()
+    local w, h = self:GetSize()
+    local margin_x = self.margin_x
+    local margin_y = self.margin_y
+    local length = (#self.points + 1)
+    local bar
+    local barSize
+    local direction = self.direction or DB.COOLDOWN_LEFT
+    local toFill = self.toFill
+    if direction == DB.COOLDOWN_UP or direction == DB.COOLDOWN_RIGHT then
+        toFill = not toFill
+    end
+
+    local sumMinValue = 0
+    local sumMaxValue = 0
+    for i=1, length do
+        bar = self.list[i]
+        bar:ClearAllPoints()
+        bar.Spark:ClearAllPoints()
+
+        barSize = ((self.points[i] or BAR_SCALE) - (self.points[i-1] or 0))
+        sumMaxValue = barSize + sumMinValue
+
+        bar.StatusBar:SetMinMaxValues(i ~= 0 and sumMinValue + 1 or 0, sumMaxValue)
+        bar.StatusBar:SetReverseFill(toFill)
+
+        if direction == DB.COOLDOWN_LEFT then
+            bar.StatusBar:SetOrientation("Horizontal")
+            bar.StatusBar:SetRotatesTexture(false)
+            bar.Spark:SetPoint("CENTER", bar.StatusBar:GetStatusBarTexture(), toFill and "LEFT" or "RIGHT", 0, 0)
+            bar.Spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark")
+            bar.Spark:SetSize(9, h)
+            bar:SetSize((w - (margin_x * #self.points)) * (barSize / BAR_SCALE), h)
+            if     i == 1      then bar:SetPoint("RIGHT", 0, 0)
+            elseif i == length then bar:SetPoint("LEFT", 0, 0)
+                                    bar:SetPoint("RIGHT", self.list[i-1], "LEFT", -margin_x, 0)
+                               else bar:SetPoint("RIGHT", self.list[i-1], "LEFT", -margin_x, 0) end
+
+        elseif direction == DB.COOLDOWN_RIGHT then
+            bar.StatusBar:SetOrientation("Horizontal")
+            bar.StatusBar:SetRotatesTexture(false)
+            bar.Spark:SetPoint("CENTER", bar.StatusBar:GetStatusBarTexture(), toFill and "LEFT" or "RIGHT", 0, 0)
+            bar.Spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark")
+            bar.Spark:SetSize(9, h)
+            bar:SetSize((w - (margin_x * #self.points)) * (barSize / BAR_SCALE), h)
+            if     i == 1      then bar:SetPoint("LEFT", 0, 0)
+            elseif i == length then bar:SetPoint("RIGHT", 0, 0)
+                                    bar:SetPoint("LEFT", self.list[i-1], "RIGHT", margin_x, 0)
+                               else bar:SetPoint("LEFT", self.list[i-1], "RIGHT", margin_x, 0) end
+
+        elseif direction == DB.COOLDOWN_UP then
+            bar.StatusBar:SetOrientation("vertical")
+            bar.StatusBar:SetRotatesTexture(true)
+            bar.Spark:SetPoint("CENTER", bar.StatusBar:GetStatusBarTexture(), toFill and "TOP" or "BOTTOM", 0, 0)
+            bar.Spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v")
+            bar.Spark:SetSize(w, 9)
+            bar:SetSize(w, (h - (margin_y * #self.points)) * (barSize / BAR_SCALE))
+            if     i == 1      then bar:SetPoint("BOTTOM", 0, 0)
+			elseif i == length then bar:SetPoint("TOP", 0, 0)
+                                    bar:SetPoint("BOTTOM", self.list[i-1], "TOP", 0, margin_y)
+                               else bar:SetPoint("BOTTOM", self.list[i-1], "TOP", 0, margin_y) end
+
+        else -- COOLDOWN_DOWN
+            bar.StatusBar:SetOrientation("vertical")
+            bar.StatusBar:SetRotatesTexture(true)
+            bar.Spark:SetPoint("CENTER", bar.StatusBar:GetStatusBarTexture(), toFill and "BOTTOM" or "TOP", 0, 0)
+            bar.Spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v")
+            bar.Spark:SetSize(w, 9)
+            bar:SetSize(w, (h - (margin_y * #self.points)) * (barSize / BAR_SCALE))
+            if     i == 1      then bar:SetPoint("TOP", 0, 0)
+			elseif i == length then bar:SetPoint("BOTTOM", 0, 0)
+                                    bar:SetPoint("TOP", self.list[i-1], "BOTTOM", 0, -margin_y)
+                               else bar:SetPoint("TOP", self.list[i-1], "BOTTOM", 0, -margin_y) end
+        end
+        sumMinValue = sumMaxValue
+        if not bar:IsShown() then bar:Show() end
+    end
+
+    for i=length + 1, #self.list do
+        self:RelaseBar(i)
+    end
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:SetSize(w, h)
+    self:SetWidth(w)
+    self:SetHeight(h)
+    self:UpdateAllPoints()
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:RelaseBar(index)
+    self.list[index]:Hide()
+    self.list[index] = nil
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:Init(minValue, maxValue, points, pointType, direction, toFill, texture, texture_r)
+    self.points = {}
+    self.list = {}
+    self.margin_x = 2
+    self.margin_y = 2
+    self.minValue = minValue
+    self.maxValue = maxValue
+    self.direction = direction or DB.COOLDOWN_RIGHT
+    self.toFill = toFill
+    self.texture = texture or "Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg"
+    self.texture_r = texture_r or "Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg"
+    self.pointType = pointType
+    self.backgroundColor = {0, 0, 0, 0.3}
+    self.fullColor = {1, 0, 0, 1}
+    self.normalColor = {0 , 1, 0, 1}
+    self.value = 0
+
+    self:SetScript("OnUpdate", HDH_AT_MultiStatusBar_OnUpdate)
+
+    setmetatable(self.list, {
+        __index = function(list, index)
+            local newBar = CreateFrame("Frame", self:GetName().."Container"..index, self)
+            newBar.StatusBar = CreateFrame("StatusBar", newBar:GetName().."StatusBar", newBar)
+            newBar.StatusBar:SetPoint("TOPLEFT", newBar, "TOPLEFT", 1, -1)
+            newBar.StatusBar:SetPoint("BOTTOMRIGHT", newBar, "BOTTOMRIGHT", -1, 1)
+			newBar.Background = newBar:CreateTexture(nil,"BACKGROUND")
+			newBar.Background:SetPoint('TOPLEFT', newBar, 'TOPLEFT', 0, 0)
+			newBar.Background:SetPoint('BOTTOMRIGHT', newBar, 'BOTTOMRIGHT', 0, 0)
+			newBar.Background:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg")
+			newBar.Spark = newBar.StatusBar:CreateTexture(nil, "OVERLAY")
+			newBar.Spark:SetBlendMode("ADD")
+            newBar.Spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark")
+            list[index] = newBar
+            return newBar
+        end
+    })
+
+    if points and #points > 0 then
+        self.points = points
+        if pointType == DB.BAR_SPLIT_RATIO then
+            for i, v in ipairs(points) do
+                self.points[i] = v * BAR_SCALE
+            end
+        else
+            for i, v in ipairs(points) do
+                self.points[i] = v / (self.maxValue - self.minValue) * BAR_SCALE
+            end
+        end
+    end
+
+    self:UpdateAllPoints()
+    for _, bar in ipairs(self.list) do
+        if self.direction == DB.COOLDOWN_LEFT or  self.direction == DB.COOLDOWN_DOWN then
+            bar.StatusBar:SetStatusBarTexture(self.texture)
+        else
+            bar.StatusBar:SetStatusBarTexture(self.texture_r)
+        end
+        bar.StatusBar:SetValue(0)
+    end
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:GetSplitPoints()
+    return self.points
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:GetTargetValue()
+    if self.targetValue then
+        return  math.floor(((self.targetValue / BAR_SCALE) * (self.maxValue - self.minValue) + self.minValue) * BAR_SCALE) / BAR_SCALE
+    else
+        return  math.floor(((self.value / BAR_SCALE) * (self.maxValue - self.minValue) + self.minValue) * BAR_SCALE) / BAR_SCALE
+    end
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:GetGap()
+    if self.gap then
+        return  math.floor(((self.gap / BAR_SCALE) * (self.maxValue - self.minValue) + self.minValue) * BAR_SCALE) / BAR_SCALE
+    else
+        return  math.floor(((self.value / BAR_SCALE) * (self.maxValue - self.minValue) + self.minValue) * BAR_SCALE) / BAR_SCALE
+    end
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:GetStartValue()
+    return  math.floor(((self.startValue / BAR_SCALE) * (self.maxValue - self.minValue) + self.minValue) * BAR_SCALE) / BAR_SCALE
+end 
+
+function HDH_AT_MultiStatusBarTemplateMixin:GetValue()
+    return  (self.value / BAR_SCALE) * (self.maxValue - self.minValue) + self.minValue
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:SetBackgroundColor(r, g, b, a)
+    if not r or not g or not b or not a then return end
+    self.backgroundColor = {r, g, b, a}
+    for _, bar in ipairs(self.list) do
+        bar.Background:SetVertexColor(r, g, b, a)
+    end
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:UpdateStatusBarColor()
+    local color
+    for i, bar in ipairs(self.list) do
+        bar.StatusBar:SetValue(self.value)
+        if self.points[i] or BAR_SCALE <= self.value then
+            color = self.fullColor
+        else
+            color = self.normalColor
+        end
+        bar.StatusBar:SetStatusBarColor(color[1], color[2], color[3], color[4])
+    end
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:SetStatusBarFullColor(r, g, b, a)
+    self.fullColor = {r, g, b, a}
+    self:UpdateStatusBarColor()
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:ShowSpark(bool)
+    
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:SetSparkColor(r, g, b, a)
+    -- self.Spark:
+end
+
+function HDH_AT_MultiStatusBar_OnUpdate(self, elapsed)
+    self.elapsed = (self.elapsed or 0) + elapsed
+    if self.elapsed < 0.015 then return end
+    self.elapsed = 0
+
+    if self.gap and self.gap >= 0 then
+        local gapRatio = math.min(1., HDH_AT_UTIL.LogScale((GetTime() - self.animatedStartTime) / BAR_ANIMATE_DURATION))
+        -- self:SetValue(self:GetStartValue() + (self.gap * gapRatio))
+        self:SetRealValue(self.startValue + (self.gap * gapRatio))
+    end
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:SetValue(value, animate)
+    if value == self.value then return end
+    value = math.min(math.max(self.minValue or 0, value), self.maxValue)
+    value = (value - self.minValue) / (self.maxValue - self.minValue) * BAR_SCALE
+    if animate then
+        self.animatedStartTime = GetTime()
+        self.targetValue = value
+        self.startValue = self.value
+        self.gap = self.targetValue - self.value
+    else
+        self.value = value
+    end
+    if self.targetValue and self.targetValue <= self.value then
+        self.gap  = nil
+    end
+    local color
+    for i, bar in ipairs(self.list) do
+        bar.StatusBar:SetValue(math.floor(self.value))
+        if (self.points[i] or BAR_SCALE) <= value then
+            color = self.fullColor
+        else
+            color = self.normalColor
+        end
+        bar.StatusBar:SetStatusBarColor(color[1], color[2], color[3], color[4])
+    end
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:SetRealValue(value)
+    if value == self.value then return end
+    self.value = math.floor(value)
+    if self.targetValue and self.targetValue <= self.value then
+        self.gap  = nil
+    end
+    local color
+    local selected = 0
+    for i, bar in ipairs(self.list) do
+        bar.StatusBar:SetValue(self.value)
+        if (self.points[i] or BAR_SCALE) <= value then
+            color = self.fullColor
+            bar.Spark:Hide()
+            selected = i
+        else
+            color = self.normalColor
+            bar.Spark:SetShown(i == (selected + 1))
+        end
+        bar.StatusBar:SetStatusBarColor(color[1], color[2], color[3], color[4])
+    end
+end
+
+-- 동적
+function HDH_AT_MultiStatusBarTemplateMixin:SetStatusBarColor(r, g, b, a)
+    if not r or not g or not b or not a then return end
+    self.normalColor = {r, g, b, a}
+    self:UpdateStatusBarColor()
+end
+
+-- 동적
+function HDH_AT_MultiStatusBarTemplateMixin:SetMinMaxValues(minValue, maxValue)
+    if self.minValue == minValue and self.maxValue == maxValue then return false end
+    if #self.points >= 1 and self.points[#self.points] >= ((minValue - maxValue) / (self.maxValue- self.minValue) * BAR_SCALE) then return false end
+    self.minValue = minValue
+    self.maxValue = maxValue
+    self:UpdateAllPoints()
+    return true
+end
+
+
+

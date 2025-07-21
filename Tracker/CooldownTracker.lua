@@ -214,7 +214,7 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 
 	if isItem then
 		startTime, duration = C_Container.GetItemCooldown(id)
-		count = C_Item.GetItemCount(id) or 0
+		count = C_Item.GetItemCount(id, false, true) or 0
 		inRange = C_Item.IsItemInRange(id, "target")
 		if not isToy then
 			isAble = C_Item.IsUsableItem(id)
@@ -231,7 +231,7 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 		count = HDH_AT_UTIL.GetSpellCastCount(id) or 0
 		inRange = HDH_AT_UTIL.IsSpellInRange(name, "target")
 		isAble, isNotEnoughMana = HDH_AT_UTIL.IsSpellUsable(id)
-		isAble = isAble or isNotEnoughMana
+		isAble = isAble or isNotEnoughManas
 	end
 
 	if startTime and duration then
@@ -318,6 +318,9 @@ function HDH_C_TRACKER:UpdateIcon(f)
 				spell.duration = duration
 			end
 			spell.isGlobalCooldown = false
+		end
+		if count >= 2 and f.spell.isItem then
+			spell.stackable = true
 		end
 		spell.count = count
 		spell.charges.count = chargeCount

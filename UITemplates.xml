@@ -3501,4 +3501,8 @@
 			</OnLoad>
 		</Scripts>
 	</ScrollFrame>
+	
+	<Frame name="HDH_AT_MultiStatusBarTemplate" mixin="HDH_AT_MultiStatusBarTemplateMixin" virtual="true">
+		<!-- 입력된 값에 따라서 모든걸 조정할 것이기 때문에 코드로 내부 구조를 생성함 -->
+	</Frame>
 </Ui> 

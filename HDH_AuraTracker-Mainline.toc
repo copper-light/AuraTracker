@@ -11,9 +11,10 @@ Locale\locale_koKR.lua
 Locale\locale_ruRU.lua
 
 Utils.lua
+ConfigDB.lua
+
 UITemplates.xml
 Tooltip.lua
-ConfigDB.lua
 
 Tracker\Tracker.lua
 Tracker\AuraTracker.lua

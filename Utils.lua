@@ -196,8 +196,7 @@ do
 	function HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(id, name, isItem) -- 특성 스킬의 변경에 따른 스킬 표시 여부를 결정하기 위함
 		if not id or id == 0 then return false end
 		if isItem then 
-			local equipSlot = select(9,GetItemInfo(id)) -- 착용 가능한 장비인가요? (착용 불가능이면, nil, INVTYPE_NON_EQUIP_IGNORE)
-			if equipSlot and equipSlot ~= "" and equipSlot ~= "INVTYPE_NON_EQUIP_IGNORE" then 
+			if C_Item.IsEquippableItem(id) then 
 				return IsEquippedItem(id) -- 착용중인가요?
 			else
 				return true

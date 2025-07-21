@@ -440,7 +440,8 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			else
 				bar:SetPoint("LEFT", bf.bar[i-1], "RIGHT", self.ui.common.margin_h + 2, 0)
 			end
-			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture); 
+			
+			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture_r); 
 			bar:SetOrientation("Horizontal"); 
 			bar:SetRotatesTexture(false);
 			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
@@ -465,7 +466,7 @@ function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
 			else
 				bar:SetPoint("BOTTOM", bf.bar[i-1], "TOP", 0, self.ui.common.margin_v + 2)
 			end
-			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture_r); 
+			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture); 
 			bar:SetOrientation("Vertical"); 
 			bar:SetRotatesTexture(true);
 			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
