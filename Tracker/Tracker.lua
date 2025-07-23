@@ -2337,12 +2337,11 @@ local function PLAYER_ENTERING_WORLD()
 
 	c = CreateFrame("Frame", "HHHHHHHHHH", UIParent, "HDH_AT_MultiStatusBarTemplate")
 	c:Init(
-		2,
-		16,
-		{8},
+		{2, 16},
+		{},
 		DB.BAR_SPLIT_FIXED_VALUE,
-		DB.COOLDOWN_DOWN,
-		true,
+		DB.COOLDOWN_LEFT,
+		false,
 		"Interface/AddOns/HDH_AuraTracker/Texture/BantoBar",
 		"Interface/AddOns/HDH_AuraTracker/Texture/BantoBar_r"
 	)

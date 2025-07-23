@@ -549,10 +549,9 @@
 										<Size x="170" y="20" />
 										<Anchors>
 											<Anchor point="LEFT" relativePoint="LEFT" x="10" y="0" />
-											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 										</Anchors>
 										<Scripts>
-											<OnLoad>self.Text:SetText(HDH_AT_L.MOVE_UI)</OnLoad>
+											<OnLoad>self:SetText(HDH_AT_L.MOVE_UI)</OnLoad>
 											<OnClick function="HDH_AT_OnCheck" inherit="prepend" />
 										</Scripts>
 									</CheckButton>
@@ -563,7 +562,7 @@
 											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBMove" x="5" y="0" />
 										</Anchors>
 										<Scripts>
-											<OnLoad>self.Text:SetText(HDH_AT_L.DISPLAY_ID_IN_TOOPTIP)</OnLoad>
+											<OnLoad>self:SetText(HDH_AT_L.DISPLAY_ID_IN_TOOPTIP)</OnLoad>
 											<OnClick function="HDH_AT_OnCheck" inherit="prepend" />
 										</Scripts>
 									</CheckButton>
@@ -770,7 +769,7 @@
 															<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-40" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.OFF)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.OFF)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
 														</Scripts>
 													</CheckButton>
@@ -782,7 +781,7 @@
 															<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_ACTIVE)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.GLOW_CONDITION_ACTIVE)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend" />
 														</Scripts>
 													</CheckButton>
@@ -793,7 +792,7 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition2" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_TIME)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.GLOW_CONDITION_TIME)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
 														</Scripts>
 													</CheckButton>
@@ -804,7 +803,7 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition3" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_COUNT)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.GLOW_CONDITION_COUNT)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
 														</Scripts>
 													</CheckButton>
@@ -815,7 +814,7 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition4" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_VALUE)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.GLOW_CONDITION_VALUE)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
 														</Scripts>
 													</CheckButton>
@@ -879,7 +878,7 @@
 															<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_EFFECT_DEFAULT)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.GLOW_EFFECT_DEFAULT)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend" />
 														</Scripts>
 													</CheckButton>
@@ -890,7 +889,7 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBEffectType1" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_EFFECT_COLOR)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.GLOW_EFFECT_COLOR)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
 														</Scripts>
 													</CheckButton>
@@ -965,7 +964,7 @@
 															<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.ALWAYS_SHOW)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.ALWAYS_SHOW)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" />
 														</Scripts>
 													</CheckButton>
@@ -976,7 +975,7 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition1" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.HIDE_WHEN_TIME_OFF)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.HIDE_WHEN_TIME_OFF)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" />
 														</Scripts>
 													</CheckButton>
@@ -987,7 +986,7 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition2" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.HIDE_WHEN_TIME_ON)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.HIDE_WHEN_TIME_ON)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" />
 														</Scripts>
 													</CheckButton>
@@ -997,10 +996,6 @@
 														<Anchors>
 															<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="2" y="0" />
 														</Anchors>
-														<Scripts>
-															<OnShow>
-															</OnShow>
-														</Scripts>
 													</Frame>
 
 													<CheckButton name="$parentCBConditionTrait1" inherits="HDH_AT_CheckButton2Template">
@@ -1010,7 +1005,7 @@
 															<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.OFF)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.OFF)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" />
 														</Scripts>
 													</CheckButton>
@@ -1021,7 +1016,7 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBConditionTrait1" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.LEARNED_TRAIT_SPELL_INPUT)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.LEARNED_TRAIT_SPELL_INPUT)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" />
 														</Scripts>
 													</CheckButton>
@@ -1362,10 +1357,6 @@
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="5" />
 										</Anchors>
-
-										<Frames>
-											
-										</Frames>
 									</Frame>
 								</ScrollChild>
 							</ScrollFrame>
@@ -1376,7 +1367,7 @@
 									<Anchor point="RIGHT" relativePoint="RIGHT" x="-5" y="5" />
 								</Anchors>
 								<Scripts>
-									<OnLoad>self.Text:SetText(HDH_AT_L.AUTO_POPUP)</OnLoad>
+									<OnLoad>self:SetText(HDH_AT_L.AUTO_POPUP)</OnLoad>
 									<OnClick function="HDH_AT_OnCheck" inherit="prepend" />
 								</Scripts>
 							</CheckButton>

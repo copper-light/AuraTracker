@@ -956,15 +956,15 @@ local function HDH_AT_OnEventTrackerElement(self, elemIdx)
 	local main = GetMainFrame()
 	local trackerId = main:GetCurTrackerId()
 
-	if string.find(name, "ButtonSet") then
+	if string.find(name, "ButtonConfig") then
 		main:ChangeBody(BODY_DETAIL_ETC, nil, elemIdx, nil, self)
 
 	elseif string.find(name, "CheckButtonAlways") then
-		local value = self:GetChecked()
+		-- local value = self:GetChecked()
 		main:ChangeBody(BODY_DETAIL_DISPLAY, nil, elemIdx, nil, self)
 
 	elseif string.find(name, "CheckButtonGlow") then
-		local value = self:GetChecked()
+		-- local value = self:GetChecked()
 		main:ChangeBody(BODY_DETAIL_GLOW, nil, elemIdx, nil, self)
 
 	elseif string.find(name, "CheckButtonValue") then
@@ -1942,7 +1942,7 @@ function HDH_AT_ConfigFrameMixin:GetElementFrame(listFrame, trackerId, index)
 		row:SetMovable(true)
 		row.idx  = index
 		_G[row:GetName().."EditBoxID"]:SetScript("OnEnterPressed", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
-		_G[row:GetName().."ButtonSet"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
+		_G[row:GetName().."ButtonConfig"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
 		_G[row:GetName().."CheckButtonGlow"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
 		_G[row:GetName().."CheckButtonValue"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
 		_G[row:GetName().."CheckButtonAlways"]:SetScript("OnClick", function(self) HDH_AT_OnEventTrackerElement(self, self:GetParent().index) end)
@@ -2005,7 +2005,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerElementConfig(trackerId, startRowIdx
 			rowFrame.index = i
 			if not rowFrame:IsShown() then rowFrame:Show() end
 			rowFrame:ClearAllPoints();
-			if i == 1 	then 
+			if i == 1 then 
 				rowFrame:SetPoint("TOPLEFT",listFrame,"TOPLEFT") 
 			else 
 				rowFrame:SetPoint("TOPLEFT",listFrame,"TOPLEFT", 0, (-rowFrame:GetHeight()*(i-1))) 
@@ -2065,11 +2065,11 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerListForImportExport(content, data, i
 	content.List = content.List or {}
 
 	if not content.SelectAll then
-		content.SelectAll = CreateFrame("Button", nil, startFrame, "HDH_AT_CheckButton2Template")
+		content.SelectAll = CreateFrame("Button", nil, startFrame, "HDH_AT_CheckButtonTemplate")
 		content.SelectAll:SetPoint("TOPLEFT", startFrame, "BOTTOMLEFT", 0, -2)
 		content.SelectAll:SetPoint("RIGHT", startFrame, "RIGHT", 0, 0)
 		content.SelectAll:SetHeight(20)
-		content.SelectAll.Text:SetText(L.SELECT_ALL)
+		content.SelectAll:SetText(L.SELECT_ALL)
 		content.SelectAll:SetScript("OnClick", function(self)
 			local list = content.List
 			local cnt = 0
@@ -2103,7 +2103,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerListForImportExport(content, data, i
 				selectAll:SetChecked(count == #list)
 				content.selectCountText:SetText(L.SELECTED_COUNT:format(count))
 			end)
-			item.IconList = {item.Icon1, item.Icon2, item.Icon3, item.Icon4}
+			item.IconList = {item.Talent.Icon1, item.Talent.Icon2, item.Talent.Icon3, item.Talent.Icon4}
 			content.List[index] = item
 		end
 		item = content.List[index - #unsupport]
@@ -2149,7 +2149,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerListForImportExport(content, data, i
 			for i = iconIndex + 1 , 4 do
 				item.IconList[i]:Hide()
 			end
-			item.Text:SetText(name.." ("..GET_TRACKER_TYPE_NAME[type]..")")
+			item:SetText(name.." ("..GET_TRACKER_TYPE_NAME[type]..")")
 			item:SetChecked(false)
 			item.dataIndex = index
 			item.id = id
@@ -2163,7 +2163,7 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerListForImportExport(content, data, i
 	for index, row in ipairs(unsupport) do
 		id, name, type, trait, talentList = unpack(row)
 		item = content.List[index +  #data - #unsupport]
-		item.Text:SetText(name.." ("..L.UNSUPPORT..")")
+		item:SetText(name.." ("..L.UNSUPPORT..")")
 		item:SetChecked(false)
 		item:Disable()
 		for i = 1 , 4 do
@@ -3271,13 +3271,11 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	
 	-- Change icon texture layer
 	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON, L.USE_DEFAULT_ICON, nil, 1, 1)
-	comp:HiddenBackground(true)
 	comp.Icon:SetTexture(nil)
 	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CB_ION_DEFAULT = comp
 	table.insert(CHANGE_ICON_CB_LIST, comp)
 
 	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON, L.USE_SEARCH_ICON, nil, 2, 1)
-	comp:HiddenBackground(true)
 	comp.Icon:SetTexture("Interface/Icons/INV_Misc_QuestionMark")
 	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON = comp
 	table.insert(CHANGE_ICON_CB_LIST, comp)
@@ -3291,11 +3289,10 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 		GetMainFrame().F.LATEST_SPELL_WINDOW:Show()
 	end)
 
-	local component2 = CreateFrame("CheckButton", (comp:GetName()..'CheckButtonIsItem'), comp, "HDH_AT_CheckButton2Template")
+	local component2 = CreateFrame("CheckButton", (comp:GetName()..'CheckButtonIsItem'), comp, "HDH_AT_CheckButtonTemplate")
 	component2:SetPoint('TOPLEFT', component1, 'BOTTOMLEFT', -2, -3)
-	component2.Text:SetText(L.ITEM_TOOLTIP)
+	component2:SetText(L.ITEM_TOOLTIP)
 	component2:SetSize(82,20)
-	component2:HiddenBackground(true)
 	self.F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CB_IS_ITEM = component2
 
 	local component3 = CreateFrame("Button", (comp:GetName()..'BUTTOM'), comp, "HDH_AT_ButtonTemplate")
@@ -3318,7 +3315,6 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 		if comp == nil or comp.Icon:GetTexture() ~= nil then
 			col_idx = (col_idx % 4) + 1
 			comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[1].content, COMP_TYPE.IMAGE_CHECKBUTTON, nil, nil, row_idx, col_idx)
-			comp:HiddenBackground(true)
 			comp.Icon:SetTexture(texture)
 			table.insert(CHANGE_ICON_CB_LIST, comp)
 			if col_idx == 4 then
