@@ -73,4 +73,4 @@ end
 
 HDH_AT_ADDON_FRAME = CreateFrame("Frame", "HDH_AT_MainFrame", UIParent) -- 애드온 최상위 프레임
 HDH_AT_ADDON_FRAME:SetScript("OnEvent", OnEvent)
-self:RegisterEvent('PLAYER_ENTERING_WORLD')
+HDH_AT_ADDON_FRAME:RegisterEvent('PLAYER_ENTERING_WORLD')
