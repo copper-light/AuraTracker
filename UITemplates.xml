@@ -3834,4 +3834,29 @@
 	<Frame name="HDH_AT_MultiStatusBarTemplate" mixin="HDH_AT_MultiStatusBarTemplateMixin" virtual="true">
 		<!-- 입력된 값에 따라서 모든걸 조정할 것이기 때문에 코드로 내부 구조를 생성함 -->
 	</Frame>
+
+	<StatusBar name="HDH_AT_StatusBarTemplate" mixin="HDH_AT_StatusBarTemplateMixin" virtual="true">
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture parentKey="Spark" alphaMode="ADD">
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnValueChanged function="HDH_AT_StatusBar_OnValueChanged"/>
+		</Scripts>
+	</StatusBar>
+
+	<Frame name="HDH_AT_SpellIconTemplate" mixin="HDH_AT_SpellIconTemplateeMixin" virtual="true">
+		<Size x="120" y="120" />
+		<Layers>
+			<Layer>
+				<Texture parentKey="Icon" file="Interface/ICONS/INV_Misc_Gem_Pearl_04">
+					<Anchors>
+						<Anchor point="TOP" relativeKey="$parent" relativePoint="TOP" x="0" y="0" />
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
 </Ui> 

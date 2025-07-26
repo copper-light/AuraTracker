@@ -234,7 +234,7 @@ do
 	function HDH_AT_UTIL.GetInfo(value, isItem) -- name, id, texture, isItem
 		if not value then return nil end
 		if not isItem and HDH_AT_UTIL.GetCacheSpellInfo(value) then
-			local spell = HDH_AT_UTIL.GetCacheSpellInfo(value) 
+			local spell = HDH_AT_UTIL.GetCacheSpellInfo(value)
 			return spell.name, spell.spellID, spell.iconID, false
 		elseif C_Item.GetItemInfo(value) then
 			local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(value)
@@ -576,7 +576,8 @@ do
 
 	function HDH_AT_UTIL.LogScale(value)
 		-- return ((math.log(value* 0.85 + 0.15) - math.log(0.15)) / (math.log(1) - math.log(0.15)))
-		return	 (1 - math.min(1, (math.log(value or 0.01)) / (math.log(.01))))
+		return	 (1 - math.min(1, (math.log(value or 0.01)) / (math.log(.01))))	
+		-- return value
 	end
 
 	function HDH_AT_UTIL.GetDecimalPlaces(num)

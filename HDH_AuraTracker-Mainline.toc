@@ -16,16 +16,7 @@ ConfigDB.lua
 UITemplates.xml
 Tooltip.lua
 
-Tracker\Tracker.lua
-Tracker\AuraTracker.lua
-Tracker\CooldownTracker.lua
-Tracker\TotemTracker.lua
-Tracker\PowerTracker.lua
-Tracker\ComboPointTracker.lua
-Tracker\DKRuneTracker.lua
-Tracker\EssenceTracker.lua
-Tracker\StaggerTracker.lua
-Tracker\EnhancementMaelstrom.lua
-Tracker\HealthTracker.lua
+Tracker\Tracker.xml
+HDH_AuraTracker.lua
 
 Config.xml

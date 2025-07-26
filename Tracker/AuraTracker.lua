@@ -129,18 +129,6 @@ do
 			self.frame.icon[i]:Hide()
 		end
 	end
-
-	function HDH_AURA_TRACKER:IsRaiding()
-		local boss_unit, boss_guid
-		for i = 1, MAX_BOSS_FRAMES do
-			boss_unit = "boss"..i;
-			boss_guid = UnitGUID(boss_unit);
-			if boss_guid then
-				return true
-			end
-		end
-		return false
-	end
 	
 	function HDH_AURA_TRACKER:MatchBossUnit(target_unit)
 		local ret = false;
@@ -252,8 +240,14 @@ do
 							DebuffTypeColor[f.spell.dispelType or ""].r, 
 							DebuffTypeColor[f.spell.dispelType or ""].g, 
 							DebuffTypeColor[f.spell.dispelType or ""].b,
-							1
-						)
+							1)
+						if f.bar then
+							f.bar:SetStatusBarColor(
+								DebuffTypeColor[f.spell.dispelType or ""].r,
+								DebuffTypeColor[f.spell.dispelType or ""].g,
+								DebuffTypeColor[f.spell.dispelType or ""].b, 
+								1)
+						end
 					end
 					if cooldown_type == DB.COOLDOWN_CIRCLE or cooldown_type == DB.COOLDOWN_NONE then
 						if HDH_TRACKER.startTime < f.spell.startTime or (f.spell.duration == 0) then
@@ -266,15 +260,15 @@ do
 						f.cd:SetValue(GetTime());
 					end
 					if display_mode ~= DB.DISPLAY_ICON and f.bar then
-						if not f.bar:IsShown() then f.bar:Show(); end
-						f.name:SetText(f.spell.name)
+						f.bar:SetText(f.spell.name)
 						if f.spell.duration == 0 then
-							f.spell.remaining = 1;
-							f.spell.endTime = 1;
-							f.spell.startTime = 0;
+							f.spell.remaining = 0
+							f.spell.endTime = 1
+							f.spell.startTime = 0
+							self:UpdateBarValue(f, f.spell.startTime, f.spell.endTime, 0)
+						else
+							self:UpdateBarValue(f, f.spell.startTime, f.spell.endTime, GetTime())
 						end
-						f.iconSatCooldown.spark:Hide()
-						self:UpdateBarValue(f);
 					end
 					f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
 					i = i + 1
@@ -309,10 +303,17 @@ do
 						f.iconSatCooldown.spark:Hide() 
 						f.iconSatCooldown:Hide() 
 						if display_mode ~= DB.DISPLAY_ICON and f.bar then 
-							if not f.bar:IsShown() then f.bar:Show(); end
-							f.name:SetText(f.spell.name);
-							self:UpdateBarValue(f, true);
-						end--f.bar:Hide();
+							f.bar:SetText(f.spell.name);
+							f.spell.remaining = 0
+							f.spell.endTime = 1
+							f.spell.startTime = 0
+							if self.ui.common.default_color and f.spell.dispelType then
+								f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r,
+														DebuffTypeColor[f.spell.dispelType or ""].g,
+														DebuffTypeColor[f.spell.dispelType or ""].b)
+							end
+							self:UpdateBarValue(f, 0, 1, 1);
+						end--f.bar:Hide();)
 						f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
 						i = i + 1
 						if i % column_count == 0 then 
@@ -455,13 +456,13 @@ do
 				end
 			end
 			self.GetAurasFunc = HDH_AURA_TRACKER.GetAuras
-			for i = #(self.frame.icon) , iconIdx+1, -1  do
+			for i = #(self.frame.icon) , iconIdx+1, -1 do
 				self:ReleaseIcon(i)
 			end
 		end
 		self:LoadOrderFunc();
 
-		self.frame:SetScript("OnEvent", HDH_AURA_OnEvent)
+		self.frame:SetScript("OnEvent", self.OnEvent)
 		self.frame:UnregisterAllEvents()
 
 		if aura_filter == DB.AURA_FILTER_ONLY_BOSS then
@@ -496,10 +497,6 @@ do
 		return iconIdx;
 	end
 
-	function HDH_AURA_TRACKER:PLAYER_ENTERING_WORLD()
-		self.isRaiding = self:IsRaiding()
-	end
-
 ------------------------------------------
 end -- TRACKER class
 ------------------------------------------
@@ -508,42 +505,44 @@ end -- TRACKER class
 -------------------------------------------
 -- 이벤트 메세지 function
 -------------------------------------------
-function HDH_AURA_UNIT_AURA(self)
-	if self then
-		self:Update()
-	end
+
+-- 차상위에서 호출됨
+-- function HDH_AURA_TRACKER:PLAYER_ENTERING_WORLD()
+-- end
+
+function HDH_AURA_TRACKER:UNIT_AURA()
+	self:Update()
 end
 
-function HDH_AURA_PLAYER_EQUIPMENT_CHANGED(self)
+function HDH_AURA_TRACKER:PLAYER_EQUIPMENT_CHANGED()
 	self:InitIcons()
 end
 
-function HDH_AURA_OnEvent(self, event, ...)
-	if not self.parent then return end
+function HDH_AURA_TRACKER:OnEvent(event, ...)
+	local self = self.parent
+	if not self then return end
 	if event == 'UNIT_AURA' then
 		local unit = select(1,...)
-		if self.parent and unit == self.parent.unit then
-			HDH_AURA_UNIT_AURA(self.parent)
+		if self and unit == self.unit then
+			self:UNIT_AURA()
 		end
 	elseif event =="PLAYER_TARGET_CHANGED" then
-		local t = self.parent
-		HDH_AT_UTIL.RunTimer(t, "PLAYER_TARGET_CHANGED", 0.02, HDH_AURA_UNIT_AURA, self.parent) 
+		HDH_AT_UTIL.RunTimer(self, "PLAYER_TARGET_CHANGED", 0.02, self.UNIT_AURA, self) 
 	elseif event == 'PLAYER_FOCUS_CHANGED' then
-		HDH_AURA_UNIT_AURA(self.parent)
+		self:UNIT_AURA()
 	elseif event == 'INSTANCE_ENCOUNTER_ENGAGE_UNIT' then
-		HDH_AURA_UNIT_AURA(self.parent)
+		self:UNIT_AURA()
 	elseif event == 'GROUP_ROSTER_UPDATE' then
-		HDH_AURA_UNIT_AURA(self.parent)
+		self:UNIT_AURA()
 	elseif event == 'UNIT_PET' then
-		HDH_AT_UTIL.RunTimer(self.parent, "UNIT_PET", 0.5, HDH_AURA_UNIT_AURA, self.parent) 
+		HDH_AT_UTIL.RunTimer(self, "UNIT_PET", 0.5, self.UNIT_AURA, self) 
 	elseif event == 'ARENA_OPPONENT_UPDATE' then
-		HDH_AT_UTIL.RunTimer(self.parent, "ARENA_OPPONENT_UPDATE", 0.5, HDH_AURA_UNIT_AURA, self.parent) 
+		HDH_AT_UTIL.RunTimer(self, "ARENA_OPPONENT_UPDATE", 0.5, self.UNIT_AURA, self) 
 	elseif event == "ENCOUNTER_START" then
-		self.parent.isRaiding = true;
+		self.isRaiding = true;
 	elseif event == "ENCOUNTER_END" then
-		self.parent.isRaiding = false;
+		self.isRaiding = false;
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
-		HDH_AURA_PLAYER_EQUIPMENT_CHANGED(self.parent)
+		self:PLAYER_EQUIPMENT_CHANGED()
 	end
 end
-

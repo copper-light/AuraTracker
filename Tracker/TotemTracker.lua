@@ -35,6 +35,7 @@ do
 		local slot = ... or MAX_TOTEMS
 		local ui = self.ui
 		local f
+		local key
 		local ret = 1;
 		if not self.frame.pointer or not ui then return end
 		if ( slot <= MAX_TOTEMS ) then
@@ -50,10 +51,8 @@ do
 						f.no = i;
 						ret = ret +1;
 					else
-						if HDH_TT_TRACKER.AdjustSpell[name] then
-							name = HDH_TT_TRACKER.AdjustSpell[name]
-						end
-						f = self.frame.pointer[name];
+						key = HDH_TT_TRACKER.AdjustSpell[name] or name
+						f = self.frame.pointer[key];
 					end
 					if f and f.spell then
 						f.spell.duration = duration
@@ -63,7 +62,7 @@ do
 						f.spell.isUpdate = true
 						f.spell.name = name
 						endTime = startTime + duration;
-						f.spell.remaining = endTime-GetTime();
+						f.spell.remaining = endTime - GetTime();
 						if f.spell.endTime ~= endTime then
 							f.spell.endTime = endTime;
 							f.spell.happenTime = GetTime();

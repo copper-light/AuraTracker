@@ -206,11 +206,6 @@ do
 				f:Hide();
 			end
 		end
-		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-			if not f.bar:IsShown() then
-				f.bar:Show()
-			end
-		end
 		f.spell.isUpdate = false
 		f:SetPoint('RIGHT');
 		return ret
@@ -309,12 +304,12 @@ do
 				f.iconSatCooldown:SetDesaturated(nil)
 				self:ChangeCooldownType(f, self.ui.icon.cooldown)
 				self:UpdateGlow(f, false)
-				self:UpdateArtBar(f)
+				self:UpdateBarSettings(f)
 				f:SetScript("OnUpdate", HDH_ENH_MAELSTROM_OnUpdate);
 				f:Hide();
 				self:ActionButton_HideOverlayGlow(f)
 			end
-			self.frame:SetScript("OnEvent", HDH_ENH_MAELSTROM_OnEventTracker)
+			self.frame:SetScript("OnEvent", self.OnEvent)
 			self.frame:RegisterUnitEvent('UNIT_AURA')
 			self:Update()
 		else
@@ -327,10 +322,6 @@ do
 		return iconIdx
 	end
 
-	function HDH_ENH_MAELSTROM_TRACKER:PLAYER_ENTERING_WORLD()
-		-- self.isRaiding = self:IsRaiding()
-	end
-	
 ------------------------------------------
 end -- TRACKER class
 ------------------------------------------
@@ -339,20 +330,19 @@ end -- TRACKER class
 -------------------------------------------
 -- 이벤트 메세지 function
 -------------------------------------------
-function HDH_ENH_MAELSTROM_UNIT_AURA(self)
-	if self then
-		self:Update()
-	end
+function HDH_ENH_MAELSTROM_TRACKER:UNIT_AURA()
+	self:Update()
 end
 
-function HDH_ENH_MAELSTROM_OnEventTracker(self, event, ...)
-	if not self.parent then return end
+function HDH_ENH_MAELSTROM_TRACKER:OnEvent(event, ...)
+	local self = self.parent
+	if not self then return end
 	if event == 'UNIT_AURA' then
-		if self.parent and select(1, ...) == self.parent.unit then HDH_ENH_MAELSTROM_UNIT_AURA(self.parent) end
+		if select(1, ...) == self.unit then self:UNIT_AURA() end
 	elseif event == "ENCOUNTER_START" then
-		HDH_ENH_MAELSTROM_UNIT_AURA(self.parent)
+		self:UNIT_AURA()
 	elseif event == "ENCOUNTER_END" then
-		HDH_ENH_MAELSTROM_UNIT_AURA(self.parent)
+		self:UNIT_AURA()
 	end
 end
 

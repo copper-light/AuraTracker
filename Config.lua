@@ -1203,8 +1203,8 @@ function HDH_AT_OnClick_Button(self, button)
 			main.DIALOG_SELECT_DISPLAY_TYPE.HeaderText:SetText(L.PLEASE_SELECT_DISPLAY_TYPE)
 			main.DIALOG_SELECT_DISPLAY_TYPE.DescIconText:SetText(L.DESC_CONFIG_ICON)
 			main.DIALOG_SELECT_DISPLAY_TYPE.DescBarText:SetText(L.DESC_CONFIG_BAR)
-			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1.Text:SetText(L.USE_DISPLAY_ICON) 
-			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2.Text:SetText(L.USE_DISPLAY_BAR) 
+			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1:SetText(L.USE_DISPLAY_ICON)
+			main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2:SetText(L.USE_DISPLAY_BAR)
 
 			main.DIALOG_SELECT_DISPLAY_TYPE.Button:SetScript("OnClick", function(self)
 				local trackerId = self:GetParent().trackerId
@@ -1245,8 +1245,8 @@ function HDH_AT_OnClick_Button(self, button)
 				main.DIALOG_SELECT_DISPLAY_TYPE.HeaderText:SetText(L.PLEASE_SELECT_CONFIG_TYPE)
 				main.DIALOG_SELECT_DISPLAY_TYPE.DescIconText:SetText(L.DESC_USE_GLOBAL_CONFIG)
 				main.DIALOG_SELECT_DISPLAY_TYPE.DescBarText:SetText(L.DESC_USE_SEVERAL_CONFIG)
-				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1.Text:SetText(L.USE_GLOBAL_CONFIG) 
-				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2.Text:SetText(L.USE_SEVERAL_CONFIG)
+				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton1:SetText(L.USE_GLOBAL_CONFIG) 
+				main.DIALOG_SELECT_DISPLAY_TYPE.CheckButton2:SetText(L.USE_SEVERAL_CONFIG)
 				main.DIALOG_SELECT_DISPLAY_TYPE.trackerId = id
 
 				for i = 1, 5 do
@@ -1581,26 +1581,31 @@ function HDH_AT_OnClick_Button(self, button)
 
 		if self:GetParent().ButtonAdd == self then
 			local v = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR.ED_LIST[index]:GetValue()
+			local pointType = DB.BAR_SPLIT_RATIO
 			if v == 0 then
 				main.Dialog:AlertShow(L.PLEASE_INPUT_VALUE)
 				return
 			end
 			if minValue < v and maxValue > v then
-				values[index] = v
+				if pointType == DB.BAR_SPLIT_RATIO then
+					values[index] = v / 100
+				else
+
+				end
 				table.sort(values)
 
-				local tick_value = math.max((maxValue - minValue) / 20, 1)
+				-- local tick_value = math.max((maxValue - minValue) / 20, 1)
 
-				if (maxValue - v) < tick_value or (v - minValue) < tick_value then
-					main.Dialog:AlertShow(L.NEED_TO_INTER_VALUE)
-					return 
-				end
-				for i = 1, #values-1 do
-					if (values[i+1] - values[i] < tick_value) then
-						main.Dialog:AlertShow(L.NEED_TO_INTER_VALUE)
-						return 
-					end
-				end
+				-- if (maxValue - v) < tick_value or (v - minValue) < tick_value then
+				-- 	main.Dialog:AlertShow(L.NEED_TO_INTER_VALUE)
+				-- 	return 
+				-- end
+				-- for i = 1, #values-1 do
+				-- 	if (values[i+1] - values[i] < tick_value) then
+				-- 		main.Dialog:AlertShow(L.NEED_TO_INTER_VALUE)
+				-- 		return 
+				-- 	end
+				-- end
 			else
 				main.Dialog:AlertShow(L.PLEASE_INPUT_MINMAX_VALUE)
 				return
@@ -3484,6 +3489,19 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:Init(1, 1, 50)
 
 	-- DEFAULT
+	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_WHEN_NONCOMBAT,           "ui.%s.common.always_show")
+	comp:Init({
+		{true, L.ALWAYS},
+		{false, L.IN_COMBAT}
+	}, HDH_AT_OnSelected_Dropdown)
+	self.F.BODY.CONFIG_UI.CB_DISPLAY_WHEN_NONCOMBAT = comp
+
+	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_WHEN_IN_RAID,           "ui.%s.common.hide_in_raid")
+	comp:Init({
+		{false, L.ALWAYS},
+		{true, L.HIDE}
+	}, HDH_AT_OnSelected_Dropdown)
+
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.DROPDOWN,       L.ICON_ORDER,         "ui.%s.common.order_by")
 	HDH_AT_DropDown_Init(comp, DDP_ICON_ORDER_LIST, HDH_AT_OnSelected_Dropdown)
 
@@ -3505,18 +3523,6 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	comp:Init(1, 0, 50)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_GAME_TOOPTIP,           "ui.%s.common.show_tooltip")
 	comp:Init(nil, HDH_AT_OnSelected_Dropdown)
-	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_WHEN_NONCOMBAT,           "ui.%s.common.always_show")
-	comp:Init({
-		{true, L.ALWAYS},
-		{false, L.IN_COMBAT}
-	}, HDH_AT_OnSelected_Dropdown)
-	self.F.BODY.CONFIG_UI.CB_DISPLAY_WHEN_NONCOMBAT = comp
-
-	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SWITCH,       L.DISPLAY_WHEN_IN_RAID,           "ui.%s.common.hide_in_raid")
-	comp:Init({
-		{false, L.ALWAYS},
-		{true, L.HIDE}
-	}, HDH_AT_OnSelected_Dropdown)
 	self.F.BODY.CONFIG_UI.SW_DISPLAY_WHEN_IN_RAID = comp
 
 	-------------------------------------------------------------------------------------
@@ -3557,9 +3563,9 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	-------------------------------------------------------------------------------------
 	-- BAR 
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SLIDER, 	L.WIDTH_SIZE,          "ui.%s.bar.width")
-	comp:Init(0, 10, 300)
+	comp:Init(0, 10, 500)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.SLIDER,       L.HEIGHT_SIZE,           "ui.%s.bar.height")
-	comp:Init(0, 10, 300)
+	comp:Init(0, 10, 500)
 	comp = HDH_AT_CreateOptionComponent(tabUIList[7].content, COMP_TYPE.DROPDOWN,       L.BAR_TEXTURE,         "ui.%s.bar.texture")
 	comp.useFullSizeTexture = true
 	HDH_AT_DropDown_Init(comp, DDP_BAR_TEXTURE_LIST, HDH_AT_OnSelected_Dropdown, nil, "HDH_AT_DropDownOptionTextureItemTemplate")

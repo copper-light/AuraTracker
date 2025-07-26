@@ -19,7 +19,6 @@ HDH_TRACKER.ENABLE_MOVE = false
 HDH_TRACKER.ONUPDATE_FRAME_TERM = 0.05;
 HDH_TRACKER.ANI_SHOW = 1
 HDH_TRACKER.ANI_HIDE = 2
-HDH_TRACKER.ANI_GLOW_COLOR_BORDER = 3
 HDH_TRACKER.FONT_STYLE = "fonts/2002.ttf";
 HDH_TRACKER.MAX_ICONS_COUNT = 10
 HDH_TRACKER.BAR_UP_ANI_TERM = .15 -- second
@@ -30,6 +29,73 @@ HDH_TRACKER.startTime = 0
 -------------------------------------------
 -- EVENT SCRIPT
 -------------------------------------------
+
+function HDH_AT_UpdateCooldownSatIcon(f, per, direction, reverse)
+	if per > 0 then
+		f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * per * 10) /10
+		f.iconSatCooldown.curSize = f.iconSatCooldown.curSize - (f.iconSatCooldown.curSize % 0.5)
+		f.iconSatCooldown.curSize = math.min(math.max(f.iconSatCooldown.curSize, 0.1), f.icon:GetHeight())
+		if not f.iconSatCooldown.spark:IsShown() then
+			f.iconSatCooldown.spark:Show()
+		end
+	else
+		if f.iconSatCooldown.spark:IsShown() then
+			f.iconSatCooldown:Hide()
+		end
+		-- per = 0.01
+		-- f.iconSatCooldown.curSize = 1
+	end
+	f.spell.per = per
+
+	if reverse then
+		if (f.iconSatCooldown.curSize ~= f.iconSatCooldown.preSize) then
+			if (f.iconSatCooldown.curSize == 0) then f.iconSatCooldown:Hide() end
+			if direction == DB.COOLDOWN_LEFT then
+				f.spell.texcoord = 0.93 - (0.86 * per)
+				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
+				f.iconSatCooldown:SetTexCoord(f.spell.texcoord, 0.93, 0.07, 0.93)
+
+			elseif direction == DB.COOLDOWN_RIGHT then
+				f.spell.texcoord = 0.07 + (0.86 * per)
+				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
+				f.iconSatCooldown:SetTexCoord(0.07, f.spell.texcoord, 0.07, 0.93)
+
+			elseif direction == DB.COOLDOWN_UP then
+				f.spell.texcoord = 0.93 - (0.86 * per)
+				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
+				f.iconSatCooldown:SetTexCoord(0.07, 0.93, f.spell.texcoord, 0.93)
+			else
+				f.spell.texcoord = 0.07 + (0.86 * per)
+				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
+				f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, f.spell.texcoord)
+			end
+			f.iconSatCooldown.preSize = f.iconSatCooldown.curSize
+		end
+	else
+		if (f.iconSatCooldown.curSize ~= f.iconSatCooldown.preSize) then
+			f.tex = 0.86 * per
+			if (f.iconSatCooldown.curSize == 0) then f.iconSatCooldown:Hide() end
+			if direction == DB.COOLDOWN_LEFT then
+				f.spell.texcoord = 0.07 + (f.tex)
+				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
+				f.iconSatCooldown:SetTexCoord(0.07, f.spell.texcoord, 0.07, 0.93)
+			elseif direction == DB.COOLDOWN_RIGHT then
+				f.spell.texcoord = (0.93 - f.tex)
+				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
+				f.iconSatCooldown:SetTexCoord(f.spell.texcoord, 0.93, 0.07, 0.93)
+			elseif direction == DB.COOLDOWN_UP then
+				f.spell.texcoord = (0.07 + f.tex)
+				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
+				f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, f.spell.texcoord)
+			else
+				f.spell.texcoord = (0.93 - f.tex)
+				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
+				f.iconSatCooldown:SetTexCoord(0.07, 0.93, f.spell.texcoord, 0.93)
+			end
+			f.iconSatCooldown.preSize = f.iconSatCooldown.curSize
+		end
+	end
+end
 
 local function UpdateCooldown(f, elapsed)
 	local spell = f.spell;
@@ -47,72 +113,27 @@ local function UpdateCooldown(f, elapsed)
 				f.cd:SetValue(spell.curTime) 
 			end
 		end
-		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar and f.bar.GetMinMaxValues then
-			local minV, maxV = f.bar:GetMinMaxValues();
-			f.bar:SetValue(tracker.ui.bar.to_fill and (maxV-spell.remaining) or (spell.remaining));
-			
-			--spell.per = max((spell.remaining/(spell.endTime-spell.startTime)), 0)
-			tracker:MoveSpark(f.bar);
+		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
+			f.bar:SetValue(GetTime())
 		end
 
 		if tracker.ui.common.display_mode ~= DB.DISPLAY_BAR then
 			if tracker.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE and tracker.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
-				spell.per = spell.remaining / spell.duration
-
-				if spell.per < 0.99 and spell.per > 0.01 then
-					if not f.iconSatCooldown.spark:IsShown() then
-						f.iconSatCooldown.spark:Show()
-					end
-				else
-					if f.iconSatCooldown.spark:IsShown() then
-						f.iconSatCooldown.spark:Hide()
-					end
-				end
-				f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * spell.per * 10) / 10
-				f.iconSatCooldown.curSize = f.iconSatCooldown.curSize - (f.iconSatCooldown.curSize % 0.5)
-				f.iconSatCooldown.curSize = math.max(f.iconSatCooldown.curSize, 0.1)
-				if (f.iconSatCooldown.curSize ~= f.iconSatCooldown.preSize) then
-					f.tex = 0.86 * spell.per
-					if (f.iconSatCooldown.curSize == 0) then f.iconSatCooldown:Hide() end
-					if tracker.ui.icon.cooldown == DB.COOLDOWN_LEFT then
-						spell.texcoord = 0.07 + (f.tex)
-						f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
-						-- spell.texcoord = math.ceil(spell.texcoord * 10) / 10
-						f.iconSatCooldown:SetTexCoord(0.07, spell.texcoord, 0.07, 0.93)
-					elseif tracker.ui.icon.cooldown == DB.COOLDOWN_RIGHT then
-						spell.texcoord = (0.93 - f.tex)
-						f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
-						-- spell.texcoord = math.ceil(spell.texcoord * 10) /10
-						f.iconSatCooldown:SetTexCoord(spell.texcoord, 0.93, 0.07, 0.93)
-					elseif tracker.ui.icon.cooldown == DB.COOLDOWN_UP then
-						spell.texcoord = (0.07 + f.tex)
-						f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
-						-- spell.texcoord = math.ceil(spell.texcoord * 10) /10
-						f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, spell.texcoord)
-					else
-						spell.texcoord = (0.93 - f.tex)
-						f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
-						-- spell.texcoord = math.ceil(spell.texcoord * 10) /10
-						f.iconSatCooldown:SetTexCoord(0.07, 0.93, spell.texcoord, 0.93)
-					end
-					-- print(spell.per, spell.texcoord, f.iconSatCooldown.curSize)
-					f.iconSatCooldown.preSize = f.iconSatCooldown.curSize
-				end
+				-- spell.per = spell.remaining / spell.duration
+				HDH_AT_UpdateCooldownSatIcon(f, (spell.remaining / spell.duration), tracker.ui.icon.cooldown, false)
 			end
 		end
 		if f.spell.glow == DB.GLOW_CONDITION_TIME then
 			tracker:UpdateGlow(f, true)
 		end
 	end
-
-
 	f.elapsed = 0
 end
 
 local function OnUpdateGlowColor(self, elapsed)
 	self.sparkElapsed = self.sparkElapsed and self.sparkElapsed + elapsed or elapsed
 	if self.sparkElapsed < (HDH_TRACKER.ONUPDATE_FRAME_TERM/2) then return end
-	self.playing = self.playing and self.playing + self.sparkElapsed or self.sparkElapsed
+	self.playing = self.playing and (self.playing + self.sparkElapsed) or self.sparkElapsed
 	self.sparkElapsed = 0
 	self.p = HDH_AT_UTIL.LogScale(math.max(math.min((1.25 - (GetTime() % (1/self:GetParent().spell.glowEffectPerSec) + .001) / (1/self:GetParent().spell.glowEffectPerSec*0.8)), 1.), 0.3))
 	self.p_c =  math.max(self.p, 0.5)
@@ -128,10 +149,10 @@ local function OnUpdateGlowColor(self, elapsed)
 		self.spot:SetSize(self.icon_size, self.icon_size)
 	else -- starting animation
 		self.color:SetSize(
-			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.7)), 
-			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.7)))
-		self.spot:SetSize(self.icon_size * (0.9 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.5)),  
-						  self.icon_size * (0.9 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.5)))
+			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.5)), 
+			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.5)))
+		self.spot:SetSize(self.icon_size * (0.9 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)),  
+						  self.icon_size * (0.9 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)))
 		self.spot:SetVertexColor(1, 1, 1, 1)
 		self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1], 
 								  self:GetParent().spell.glowEffectColor[2], 
@@ -139,16 +160,6 @@ local function OnUpdateGlowColor(self, elapsed)
 								  self:GetParent().spell.glowEffectColor[4])
 	end
 
-end
-
--- 매 프레임마다 bar frame 그려줌, 콜백 함수
-local function OnUpdateCooldown(self, elapsed)
-	UpdateCooldown(self:GetParent():GetParent(), elapsed);
-end
-
--- 아이콘이 보이지 않도록 설정되면, 바에서 업데이트 처리를 한다
-function HDH_TRACKER:OnUpdateBarValue(elapsed)
-	UpdateCooldown(self:GetParent(), elapsed);
 end
 
 -------------------------------------------
@@ -171,7 +182,7 @@ local function frameBaseSettings(f)
 	f.icon:SetPoint('BOTTOMRIGHT', f.iconframe, 'BOTTOMRIGHT', 0, 0)
 	
 	f.cooldown1 = CreateFrame("StatusBar", nil, f.iconframe)
-	f.cooldown1:SetScript('OnUpdate', OnUpdateCooldown)
+	-- f.cooldown1:SetScript('OnUpdate', OnUpdateCooldown)
 	f.cooldown1:SetPoint('TOPLEFT', f.iconframe, 'TOPLEFT', 0, 0)
 	f.cooldown1:SetPoint('BOTTOMRIGHT', f.iconframe, 'BOTTOMRIGHT', 0, 0)
 	f.cooldown1:SetStatusBarTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg.blp");
@@ -183,7 +194,7 @@ local function frameBaseSettings(f)
 	f.cooldown2:SetPoint('TOPLEFT', f.iconframe, 'TOPLEFT', 0, 0)
 	f.cooldown2:SetPoint('BOTTOMRIGHT', f.iconframe, 'BOTTOMRIGHT', 0, 0)
 	f.cooldown2:SetMovable(true);
-	f.cooldown2:SetScript('OnUpdate', OnUpdateCooldown)
+	-- f.cooldown2:SetScript('OnUpdate', OnUpdateCooldown)
 	f.cooldown2:SetHideCountdownNumbers(true) 
 	f.cooldown2:SetSwipeTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg.blp"); -- Interface/AddOns/HDH_AuraTracker/cooldown_bg.blp
 	f.cooldown2:SetDrawSwipe(true) 
@@ -250,15 +261,13 @@ local function frameBaseSettings(f)
 	f.border.spark.spot:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/border2.blp]])
 	f.border.spark.spot:SetBlendMode("ADD")
 	f.border.spark.spot:SetPoint('CENTER', tempf, 'CENTER', 0, 0)
+
+	f:SetScript('OnUpdate', UpdateCooldown)
 end
 
 --------------------------------------------
 -- do -- TRACKER Static function
 --------------------------------------------
-
-	-- function HDH_TRACKER.ReLoad()
-	-- 	HDH_TRACKER.objListx
-	-- end
 
 function HDH_TRACKER.GetClass(type)
 	return HDH_TRACKER.CLASSLIST[type]
@@ -569,204 +578,63 @@ function HDH_TRACKER:UpdateSetting()
 	self.location.y = y
 end
 
-
-function HDH_TRACKER:GetAnimatedValue(bar, v) -- v:target value
-	if bar.targetValue ~= v then
-		bar.animatedStartTime = bar.preTime or GetTime();
-		bar.targetValue = v;
-	end
-	local gap = bar.targetValue - bar:GetValue();
-	local gapTime;
-	if gap ~= 0 then
-		if gap > 0 then
-			bar.termType = HDH_TRACKER.BAR_UP_ANI_TERM
-		else
-			bar.termType = HDH_TRACKER.BAR_DOWN_ANI_TERM
-		end
-		gapTime = (GetTime() - bar.animatedStartTime);
-		if gapTime < bar.termType then
-			v = gap * HDH_AT_UTIL.LogScale(gapTime/bar.termType);
-		else
-			v = gap;
-		end
-	else
-		v = 0;
-	end
-	bar.preTime = GetTime();
-	return bar:GetValue() + v;
-end
-
-function HDH_TRACKER:MoveSpark(bar, value)
-	if not bar or not self.ui.bar.show_spark then return end
-	bar.min, bar.max = bar:GetMinMaxValues()
-	bar.tmpV = (bar:GetValue() - bar.min)
-	if bar.tmpV > 0.0 then
-		bar.per = bar.tmpV / (bar.max - bar.min)
-		if bar.per >= 1.0 then
-			bar.per = 1
-			bar.spark:Hide()
-			return
-		else
-			bar.spark:Show()
-		end
-	else
-		bar.per = 0
-		bar.spark:Hide()
-	end
-	
-	if self.ui.bar.to_fill then
-		bar.per = 1 - bar.per
-	end
-	if self.ui.bar.cooldown_progress == DB.COOLDOWN_LEFT then
-		bar.spark:SetPoint("CENTER", bar,"LEFT", bar:GetWidth() * bar.per + bar.adjust, 0);
-	elseif self.ui.bar.cooldown_progress == DB.COOLDOWN_RIGHT then
-		bar.spark:SetPoint("CENTER", bar,"RIGHT", -bar:GetWidth() * bar.per + bar.adjust, 0);
-	elseif self.ui.bar.cooldown_progress == DB.COOLDOWN_DOWN then
-		bar.spark:SetPoint("CENTER", bar,"BOTTOM", 0, bar:GetHeight() * bar.per + bar.adjust);
-	else
-		bar.spark:SetPoint("CENTER", bar,"TOP", 0, -bar:GetHeight() * bar.per + bar.adjust);
-	end
-end
-
-function HDH_TRACKER:UpdateArtBar(f)
+function HDH_TRACKER:UpdateBarSettings(f)
 	local op = self.ui.bar;
 	local font = self.ui.font;
 	local show_tooltip = self.ui.common.show_tooltip;
 	local display_mode = self.ui.common.display_mode
 	local hide_icon = (display_mode == DB.DISPLAY_BAR)
+	local splitPoints = nil
+	local splitPointType = nil
+	if f.spell then
+		splitPoints = f.spell.splitPoints
+		splitPointType = f.spell.splitPointType
+	end
 
 	if display_mode ~= DB.DISPLAY_ICON then
-		if (f.bar and f.bar:GetObjectType() ~= "StatusBar") then
-			f.bar:Hide();
-			f.bar:SetParent(nil);
-			f.bar = nil;
-		end
 		if not f.bar then
-			f.bar = CreateFrame("StatusBar", nil, f);
-			local t= f.bar:CreateTexture(nil,"BACKGROUND");
-			t:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg.blp");
-			t:SetPoint('TOPLEFT', f.bar, 'TOPLEFT', -1, 1)
-			t:SetPoint('BOTTOMRIGHT', f.bar, 'BOTTOMRIGHT', 1, -1)
-			f.bar.bg = t;
-			f.bar.spark = f.bar:CreateTexture(nil, "OVERLAY");
-			f.bar.spark:SetBlendMode("ADD");
-			f.name = f.bar:CreateFontString(nil,"OVERLAY");
+			f.bar = CreateFrame("Frame", nil, f, "HDH_AT_MultiStatusBarTemplate")
 		end
-		f.bar.bg:SetVertexColor(unpack(op.bg_color));
-		f.bar.spark:SetVertexColor(unpack(op.spark_color or {1, 1, 1, 0.7}))
-		
-		if op.cooldown_progress == DB.COOLDOWN_LEFT then
-			f.bar:SetOrientation("Horizontal"); 
-			f.bar:SetRotatesTexture(false);
-			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-			f.bar.spark:SetSize(9, op.height)
-			f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture)
-			if op.to_fill then
-				f.bar.adjust = 0.5
-				f.bar:SetReverseFill(true)
-			else
-				f.bar.adjust = -0.5
-				f.bar:SetReverseFill(false)
-			end
-
-		elseif op.cooldown_progress == DB.COOLDOWN_RIGHT then
-			f.bar:SetOrientation("Horizontal"); 
-			f.bar:SetRotatesTexture(false);
-			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-			f.bar.spark:SetSize(9, op.height);
-			f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r)
-			if op.to_fill then
-				f.bar.adjust = -0.5
-				f.bar:SetReverseFill(false)
-			else
-				f.bar.adjust = 0.5
-				f.bar:SetReverseFill(true)
-			end
-
-		elseif op.cooldown_progress == DB.COOLDOWN_UP then
-			f.bar:SetOrientation("Vertical"); 
-			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-			f.bar.spark:SetSize(op.width, 9)
-			f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture)
-			if op.to_fill then
-				f.bar.adjust = -0.5
-				f.bar:SetReverseFill(false)
-			else
-				f.bar.adjust = 0.5
-				f.bar:SetReverseFill(true)
-			end
-
-			f.bar:SetRotatesTexture(true);
-		else -- bottom
-			f.bar:SetOrientation("Vertical"); 
-			f.bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-			f.bar.spark:SetSize(op.width, 9);
-			f.bar:SetStatusBarTexture(DB.BAR_TEXTURE[op.texture].texture_r)
-			if op.to_fill then
-				f.bar.adjust = 0.5
-				f.bar:SetReverseFill(true)
-			else
-				f.bar.adjust = -0.5
-				f.bar:SetReverseFill(false)
-			end
-			
-			f.bar:SetRotatesTexture(true);
+		local bar = f.bar
+		bar:Setup(nil, splitPoints, splitPointType, op.cooldown_progress, op.to_fill, DB.BAR_TEXTURE[op.texture].texture, DB.BAR_TEXTURE[op.texture].texture_r)
+		bar:SetBackgroundColor(unpack(op.bg_color))
+		if op.use_full_color and not self.ui.common.default_color then
+			bar:UseChangedStatusColor(op.color, op.full_color)
+		else
+			bar:UseChangedStatusColor(nil)
+			bar:SetStatusBarColor(unpack(op.color))
 		end
+		bar:EnableSpark(op.show_spark, op.spark_color or {1, 1, 1, 0.7})
+		bar:SetSize(op.width, op.height)
+		bar:SetTextLocation(font.name_location, font.name_margin_left, font.name_margin_right)
+		bar:SetTextSize(font.name_size, HDH_TRACKER.FONT_STYLE)
+		bar:SetTextColor(font.name_color, font.name_color_off)
 
-		f.bar:ClearAllPoints();
+		bar:ClearAllPoints();
 		if op.location == DB.BAR_LOCATION_T then     
-			f.bar:SetPoint("BOTTOM",f, hide_icon and "BOTTOM" or "TOP", 0, 1); 
+			bar:SetPoint("BOTTOM",f, hide_icon and "BOTTOM" or "TOP", 0, 1)
 		elseif op.location == DB.BAR_LOCATION_B then 
-			f.bar:SetPoint("TOP",f, hide_icon and "TOP" or "BOTTOM", 0, -1); 
+			bar:SetPoint("TOP",f, hide_icon and "TOP" or "BOTTOM", 0, -1)
 		elseif op.location == DB.BAR_LOCATION_L then 
-			f.bar:SetPoint("RIGHT",f, hide_icon and "RIGHT" or "LEFT", -1, 0); 
+			bar:SetPoint("RIGHT",f, hide_icon and "RIGHT" or "LEFT", -1, 0)
 		else 
-			f.bar:SetPoint("LEFT",f, hide_icon and "LEFT" or "RIGHT", 1, 0); 
+			bar:SetPoint("LEFT",f, hide_icon and "LEFT" or "RIGHT", 1, 0)
 		end
 
 		if hide_icon then
 			f:GetSize(bar)
 		end
 
-		f.bar:SetSize(op.width-2, op.height-2);
-		f.bar:SetStatusBarColor(unpack(op.color));
-		f.bar.spark:Hide();
-
-		if font.name_location ~= DB.FONT_LOCATION_HIDE then
-			if font.name_location == DB.FONT_LOCATION_BAR_L then
-				f.name:SetJustifyH("LEFT");
-				f.name:SetJustifyV('MIDDLE');
-			elseif font.name_location == DB.FONT_LOCATION_BAR_R then
-				f.name:SetJustifyH("RIGHT");
-				f.name:SetJustifyV('MIDDLE');
-			elseif font.name_location == DB.FONT_LOCATION_BAR_C then
-				f.name:SetJustifyH("CENTER");
-				f.name:SetJustifyV('MIDDLE');
-			elseif font.name_location == DB.FONT_LOCATION_BAR_T then
-				f.name:SetJustifyH("CENTER");
-				f.name:SetJustifyV("TOP");
-			else -- BOTTOM
-				f.name:SetJustifyH("CENTER");
-				f.name:SetJustifyV("BOTTOM");
-			end
-			-- SetJustify 의 값이 변경될 경우,
-			-- 텍스트가 재할당될떄까지 값이 적용되지 않아서 텍스트 수동으로 재할당함
-			if string.len(f.name:GetText() or "") > 0 then
-				local tmp = f.name:GetText()
-				f.name:SetText("")
-				f.name:SetText(tmp)
-			end
-			f.name:Show()
-		else
-			f.name:Hide()
-		end
-		f.name:SetFont(HDH_TRACKER.FONT_STYLE, font.name_size, "OUTLINE")
-		f.name:SetPoint('TOPLEFT', f.bar, 'TOPLEFT', font.name_margin_left, -3)
-		f.name:SetPoint('BOTTOMRIGHT', f.bar, 'BOTTOMRIGHT', -font.name_margin_right, 3)
-
-		self:SetGameTooltip(f.bar, show_tooltip or false)
+		self:SetGameTooltip(bar, show_tooltip or false)
 		if not HDH_TRACKER.ENABLE_MOVE then
-			f.bar:SetMouseClickEnabled(false)
+			bar:SetMouseClickEnabled(false)
+		end
+		f.bar:Show()
+	else
+		if f.bar then
+			f.bar:Hide()
+			f.bar:SetParent(nil)
+			f.bar = nil
 		end
 	end
 end
@@ -861,60 +729,13 @@ function HDH_TRACKER:UpdateTimeText(text, value)
 	end
 end
 
-function HDH_TRACKER:UpdateBarValue(f, isEnding)
-	if f.bar and f.name then
-		if self.ui.bar.to_fill then
-			if isEnding then
-				f.bar:SetMinMaxValues(0,1); 
-				f.bar:SetValue(1); 
-				f.name:SetTextColor(unpack(self.ui.font.name_color_off));
-				if  self.ui.common.default_color and f.spell.dispelType then
-					f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r,
-											DebuffTypeColor[f.spell.dispelType or ""].g,
-											DebuffTypeColor[f.spell.dispelType or ""].b)
-				elseif self.ui.bar.use_full_color then
-					f.bar:SetStatusBarColor(unpack(self.ui.bar.full_color));
-				end
-				f.bar.spark:Hide();
-			else
-				if self.ui.common.default_color and f.spell.dispelType then
-					f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r,
-											DebuffTypeColor[f.spell.dispelType or ""].g,
-											DebuffTypeColor[f.spell.dispelType or ""].b)
-				else
-					f.bar:SetStatusBarColor(unpack(self.ui.bar.color));
-				end
-				local maxV = f.spell.endTime - f.spell.startTime;
-				f.bar:SetMinMaxValues(0, maxV); 
-				f.bar:SetValue(maxV-f.spell.remaining);
-				f.name:SetTextColor(unpack(self.ui.font.name_color));
-				if self.ui.bar.show_spark and f.spell.duration > 0 then f.bar.spark:Show(); 
-				else f.bar.spark:Hide(); end
-			end
-		else
-			if isEnding then
-				f.bar:SetMinMaxValues(0,1); 
-				f.bar:SetValue(0); 
-				f.name:SetTextColor(unpack(self.ui.font.name_color_off));
-				f.bar.spark:Hide();
-			else
-				local maxV = f.spell.endTime - f.spell.startTime;
-				f.bar:SetMinMaxValues(0, maxV); 
-				f.bar:SetValue(f.spell.remaining); 
-				if self.ui.common.default_color and f.spell.dispelType then
-					f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r,
-											DebuffTypeColor[f.spell.dispelType or ""].g,
-											DebuffTypeColor[f.spell.dispelType or ""].b)
-				elseif f.spell.remaining == maxV and self.ui.bar.use_full_color then
-					f.bar:SetStatusBarColor(unpack(self.ui.bar.full_color));
-				else
-					f.bar:SetStatusBarColor(unpack(self.ui.bar.color));
-				end
-				f.name:SetTextColor(unpack(self.ui.font.name_color));
-				if self.ui.bar.show_spark and f.spell.duration > 0 then f.bar.spark:Show(); 
-				else f.bar.spark:Hide(); end
-			end
+function HDH_TRACKER:UpdateBarValue(f, minV, maxV, value, r, g, b, a)
+	if f.bar then
+		if r then
+			f.bar:SetStatusBarColor(r, g, b, a or 1)
 		end
+		f.bar:SetMinMaxValues(minV, maxV)
+		f.bar:SetValue(value)
 	end
 end
 
@@ -1044,7 +865,6 @@ function HDH_TRACKER:CreateDummySpell(count)
 			f.iconSatCooldown:SetTexture("Interface/ICONS/TEMP")
 		end
 		f:ClearAllPoints()
-		prevf = f
 		spell = f.spell
 		if not spell then spell = {} f.spell = spell end
 		spell.display = DB.SPELL_ALWAYS_DISPLAY
@@ -1058,6 +878,7 @@ function HDH_TRACKER:CreateDummySpell(count)
 		spell.endTime = curTime + spell.duration
 		spell.startTime = curTime
 		spell.remaining = spell.startTime + spell.duration
+		f.icon:Hide()
 		if spell.showValue then
 			if spell.showV1 then
 				spell.v1 = 1000
@@ -1073,7 +894,7 @@ function HDH_TRACKER:CreateDummySpell(count)
 		end
 		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 			f:SetScript("OnUpdate",nil);
-			self:UpdateBarValue(f);
+			self:UpdateBarValue(f, spell.startTime, spell.endTime, spell.startTime);
 			f.bar:Show();
 			spell.name = spell.name or ("NAME"..i);
 		end
@@ -1090,6 +911,18 @@ function HDH_TRACKER:CreateDummySpell(count)
 		f:Show()
 	end
 	return count;
+end
+
+function HDH_TRACKER:IsRaiding()
+	local boss_unit, boss_guid
+	for i = 1, MAX_BOSS_FRAMES do
+		boss_unit = "boss"..i;
+		boss_guid = UnitGUID(boss_unit);
+		if boss_guid then
+			return true
+		end
+	end
+	return false
 end
 
 function HDH_TRACKER:UpdateMoveFrame(isDragging)
@@ -1131,19 +964,19 @@ function HDH_TRACKER:UpdateMoveFrame(isDragging)
 		end
 
 		if self.ui.common.reverse_v then
-			top = self.frame.icon[#self.frame.icon].bar.bg
-			bottom = self.frame.icon[1].bar.bg
+			top = self.frame.icon[#self.frame.icon].bar
+			bottom = self.frame.icon[1].bar
 		else
-			top = self.frame.icon[1].bar.bg
-			bottom = self.frame.icon[#self.frame.icon].bar.bg
+			top = self.frame.icon[1].bar
+			bottom = self.frame.icon[#self.frame.icon].bar
 		end
 
 		if self.ui.common.reverse_h then
-			left = self.frame.icon[col_size].bar.bg
-			right = self.frame.icon[1].bar.bg
+			left = self.frame.icon[col_size].bar
+			right = self.frame.icon[1].bar
 		else
-			left = self.frame.icon[1].bar.bg
-			right = self.frame.icon[col_size].bar.bg
+			left = self.frame.icon[1].bar
+			right = self.frame.icon[col_size].bar
 		end
 	else
 		if self.ui.bar.location == DB.BAR_LOCATION_T or self.ui.bar.location == DB.BAR_LOCATION_B then
@@ -1162,72 +995,72 @@ function HDH_TRACKER:UpdateMoveFrame(isDragging)
 
 		if self.ui.common.reverse_v then
 			if self.ui.bar.location == DB.BAR_LOCATION_T then
-				top = self.frame.icon[#self.frame.icon].bar.bg
+				top = self.frame.icon[#self.frame.icon].bar
 				bottom = self.frame.icon[1]
 			elseif self.ui.bar.location == DB.BAR_LOCATION_B then
 				editingY = editingY + self.ui.bar.height
 				top = self.frame.icon[#self.frame.icon]
-				bottom = self.frame.icon[1].bar.bg
+				bottom = self.frame.icon[1].bar
 			else
 				if self.ui.icon.size > self.ui.bar.height then
 					top = self.frame.icon[#self.frame.icon]
 					bottom = self.frame.icon[1]
 				else
-					top = self.frame.icon[#self.frame.icon].bar.bg
-					bottom = self.frame.icon[1].bar.bg
+					top = self.frame.icon[#self.frame.icon].bar
+					bottom = self.frame.icon[1].bar
 				end
 			end
 		else
 			if self.ui.bar.location == DB.BAR_LOCATION_T then
 				editingY = editingY - self.ui.bar.height
-				top = self.frame.icon[1].bar.bg
+				top = self.frame.icon[1].bar
 				bottom = self.frame.icon[#self.frame.icon]
 			elseif self.ui.bar.location == DB.BAR_LOCATION_B then
 				top = self.frame.icon[1]
-				bottom = self.frame.icon[#self.frame.icon].bar.bg
+				bottom = self.frame.icon[#self.frame.icon].bar
 			else
 				if self.ui.icon.size > self.ui.bar.height then
 					top = self.frame.icon[1]
 					bottom = self.frame.icon[#self.frame.icon]
 				else
-					top = self.frame.icon[1].bar.bg
-					bottom = self.frame.icon[#self.frame.icon].bar.bg
+					top = self.frame.icon[1].bar
+					bottom = self.frame.icon[#self.frame.icon].bar
 				end
 			end
 		end
 
 		if self.ui.common.reverse_h then
 			if self.ui.bar.location == DB.BAR_LOCATION_L then
-				left = self.frame.icon[col_size].bar.bg
+				left = self.frame.icon[col_size].bar
 				right = self.frame.icon[1]
 			elseif self.ui.bar.location == DB.BAR_LOCATION_R then
 				editingX = editingX - self.ui.bar.width
 				left = self.frame.icon[col_size]
-				right = self.frame.icon[1].bar.bg
+				right = self.frame.icon[1].bar
 			else
 				if self.ui.icon.size > self.ui.bar.width then
 					left = self.frame.icon[col_size]
 					right = self.frame.icon[1]
 				else
-					left = self.frame.icon[col_size].bar.bg
-					right = self.frame.icon[1].bar.bg
+					left = self.frame.icon[col_size].bar
+					right = self.frame.icon[1].bar
 				end
 			end
 		else
 			if self.ui.bar.location == DB.BAR_LOCATION_L then
 				editingX = editingX + self.ui.bar.width
-				left = self.frame.icon[1].bar.bg
+				left = self.frame.icon[1].bar
 				right = self.frame.icon[col_size]
 			elseif self.ui.bar.location == DB.BAR_LOCATION_R then
 				left = self.frame.icon[1]
-				right = self.frame.icon[col_size].bar.bg
+				right = self.frame.icon[col_size].bar
 			else
 				if self.ui.icon.size > self.ui.bar.width then
 					left = self.frame.icon[1]
 					right = self.frame.icon[col_size]
 				else
-					left = self.frame.icon[1].bar.bg
-					right = self.frame.icon[col_size].bar.bg
+					left = self.frame.icon[1].bar
+					right = self.frame.icon[col_size].bar
 				end
 			end
 		end
@@ -1588,9 +1421,6 @@ function HDH_TRACKER:SetGameTooltip(f, show)
 end
 
 local function ChangeFontLocation(f, fontf, location, op_font)
-	-- local location_list = {op_font.count_location, op_font.cd_location, op_font.v2_location, op_font.v1_location}
-	-- local size_list = {op_font.coun_tsize, op_font.cd_size , op_font.v2_size, op_font.v2_size}
-	-- local margin = 0
 	local parent = f.iconframe;
 	fontf:ClearAllPoints();
 	fontf:Show();
@@ -1618,7 +1448,6 @@ local function ChangeFontLocation(f, fontf, location, op_font)
 		fontf:SetPoint('TOPLEFT', parent, 'TOPLEFT', -100, 15)
 		fontf:SetPoint('BOTTOMRIGHT', parent, 'BOTTOMRIGHT', 100, -15)
 		fontf:SetJustifyH('CENTER')
-		-- fontf:SetJustifyV('CENTER')
 		fontf:SetJustifyV('MIDDLE')
 	elseif location == DB.FONT_LOCATION_OB then
 		fontf:SetPoint('TOPLEFT', parent, 'BOTTOMLEFT', -100, -1)
@@ -1635,7 +1464,6 @@ local function ChangeFontLocation(f, fontf, location, op_font)
 		fontf:SetPoint('BOTTOMRIGHT', parent, 'BOTTOMLEFT', -1, 0)
 		fontf:SetWidth(parent:GetWidth()+200);
 		fontf:SetJustifyH('RIGHT')
-		-- fontf:SetJustifyV('CENTER')
 		fontf:SetJustifyV('MIDDLE')
 	elseif location == DB.FONT_LOCATION_OR then
 		fontf:SetPoint('TOPLEFT', parent, 'TOPRIGHT', 1, 0)
@@ -1647,19 +1475,16 @@ local function ChangeFontLocation(f, fontf, location, op_font)
 		fontf:SetPoint('LEFT', f.bar or parent, 'LEFT', 2, 0)
 		fontf:SetWidth(parent:GetWidth()+200);
 		fontf:SetJustifyH('LEFT')
-		-- fontf:SetJustifyV('CENTER')
 		fontf:SetJustifyV('MIDDLE')
 	elseif location == DB.FONT_LOCATION_BAR_C then
 		fontf:SetPoint('CENTER', f.bar or parent, 'CENTER', 0, 0)
 		fontf:SetWidth(parent:GetWidth()+200);
 		fontf:SetJustifyH('CENTER')
-		-- fontf:SetJustifyV('CENTER')
 		fontf:SetJustifyV('MIDDLE')
 	elseif location == DB.FONT_LOCATION_BAR_R then
 		fontf:SetPoint('RIGHT', f.bar or parent, 'RIGHT', -2, 0)
 		fontf:SetWidth(parent:GetWidth()+200);
 		fontf:SetJustifyH('RIGHT')
-		-- fontf:SetJustifyV('CENTER')
 		fontf:SetJustifyV('MIDDLE')
 	else
 		fontf:Hide()
@@ -1670,28 +1495,24 @@ local function ChangeFontLocation(f, fontf, location, op_font)
 end
 
 -- bar 세부 속성 세팅하는 함수 (나중에 option 을 통해 바 값을 변경할수 있기에 따로 함수로 지정해둠)
-
-ICON_BORDER_VALUE = {0.120, 0.15, 0.18, 0.21, 0.24, 0.27, 0.30, 0.33, 0.36, 0.39}
-ICON_SIZE_VALUE =   {0.075, 0.10, 0.14, 0.21, 0.23, 0.30, 0.34, 0.37, 0.40, 0.42}
+local ICON_BORDER_VALUE = {0.120, 0.15, 0.18, 0.21, 0.24, 0.27, 0.30, 0.33, 0.36, 0.39}
+local ICON_SIZE_VALUE =   {0.075, 0.10, 0.14, 0.21, 0.23, 0.30, 0.34, 0.37, 0.40, 0.42}
 function HDH_TRACKER:UpdateIconSettings(f)
-	local icon = f.icon
 	local op_icon = self.ui.icon
 	local op_font = self.ui.font
-	local op_bar = self.ui.bar
 	local op_common = self.ui.common
 	local border = 0.2355 * (1 - (ICON_BORDER_VALUE[op_icon.border_size] or 0))
 	local size = 1 - (0.455 * (ICON_SIZE_VALUE[op_icon.border_size] or 0))
-	f:SetSize(op_icon.size, op_icon.size)
-	f.iconframe:SetSize(op_icon.size * size, op_icon.size * size);
-	self:SetGameTooltip(f, op_common.show_tooltip or false)
 
+	f:SetSize(op_icon.size, op_icon.size)
+	f.iconframe:SetSize(op_icon.size * size, op_icon.size * size)
 	f.border:SetWidth(op_icon.size)
 	f.border:SetHeight(op_icon.size)
-	f.border:SetTexCoord(border, 1 - border, border, 1 - border)
+	f.border:SetTexCoord(border, 1 - border, border, 1 - border)	
 	f.border:SetPoint('CENTER', f.iconframe, 'CENTER', 0, 0)
 
-	f.border.spark.spot:SetSize(op_icon.size, op_icon.size)
 	local spot_border = math.min(0.2355 * (1 - (ICON_BORDER_VALUE[5] or 0)), 0.2355 * (1 - (ICON_BORDER_VALUE[op_icon.border_size] or 0)))
+	f.border.spark.spot:SetSize(op_icon.size, op_icon.size)
 	f.border.spark.spot:SetTexCoord(spot_border, 1 - spot_border, spot_border, 1 - spot_border)
 	f.border.spark.color:SetSize(op_icon.size*4, op_icon.size*4)
 
@@ -1702,15 +1523,17 @@ function HDH_TRACKER:UpdateIconSettings(f)
 		f.cooldown2:SetSwipeColor(0,0,0,0)
 	end
 	
-	if 4 > op_icon.size*0.08 then
+	if 4 > op_icon.size * 0.08 then
 		op_icon.margin = 4
 	else
-		op_icon.margin = op_icon.size*0.08
+		op_icon.margin = op_icon.size * 0.08
 	end
-	self:UpdateArtBar(f);
+	
+	-- font location 보다 먼저 호출되어서 BAR 가 생성되어있어야 BAR 위에 폰트가 올바르게 위치할 수 있음
+	self:UpdateBarSettings(f)
+
 	local counttext = f.counttext
 	counttext:SetFont(HDH_TRACKER.FONT_STYLE, op_font.count_size, "OUTLINE")
-	--counttext:SetTextHeight(op_font.countsize)
 	counttext:SetTextColor(unpack(op_font.count_color))
 	ChangeFontLocation(f, counttext, op_font.count_location, op_font)
 	
@@ -1731,29 +1554,18 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	
 	f.timetext:Show()
 
+	self:SetGameTooltip(f, op_common.show_tooltip or false)
 	self:ChangeCooldownType(f, self.ui.icon.cooldown)
 
 	-- 아이콘 숨기기는 바와 연관되어 있기 때문에 바 설정쪽에 위치함.
 	if op_common.display_mode == DB.DISPLAY_ICON then
 		f.iconframe:Show()
-		if f.bar then 
-			f.bar:SetScript("OnUpdate",nil); 
-			f.bar:Hide()
-		end
 	elseif op_common.display_mode == DB.DISPLAY_BAR then
 		f.iconframe:Hide();
-		if f.bar then
-			f.bar:SetScript("OnUpdate", self.OnUpdateBarValue); 
-			f.bar:Show()
-		end
 	else -- DISPLAY_ICON_AND_BAR
 		f.iconframe:Show();
-		if f.bar then
-			f.bar:SetScript("OnUpdate", self.OnUpdateBarValue); 
-			f.bar:Show()
-		end
 	end
-	
+
 	if not HDH_TRACKER.ENABLE_MOVE then
 		if self:GetClassName() == "HDH_AURA_TRACKER" and self.ui.icon.able_buff_cancel then
 			f:SetMouseClickEnabled(true);
@@ -1771,6 +1583,10 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	end
 end
 
+-- function HDH_TRACKER:InitIcons()
+	
+-- end
+
 -------------------------------------------
 -- 애니메이션 관련
 -------------------------------------------
@@ -1779,7 +1595,14 @@ end
 if select(4, GetBuildInfo()) <= 49999 then -- 대격변 코드
 
 	function HDH_TRACKER:ActionButton_SetupOverlayGlow(f)
-		--interface
+		f.overlay = ActionButton_GetOverlayGlow();
+		local frameWidth, frameHeight = f:GetSize();
+		f.overlay:SetParent(f);
+		f.overlay:ClearAllPoints();
+		-- Make the height/width available before the next frame:
+		f.overlay:SetSize(frameWidth * 1.3, frameHeight * 1.3);
+		f.overlay:SetPoint("TOPLEFT", f, "TOPLEFT", -frameWidth * 0.3, frameHeight * 0.3);
+		f.overlay:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", frameWidth * 0.3, -frameHeight * 0.3);
 	end
 
 	function HDH_TRACKER:ActionButton_ResizeOverlayGlow(f)
@@ -1792,19 +1615,11 @@ if select(4, GetBuildInfo()) <= 49999 then -- 대격변 코드
 
 	function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
 		f = f.iconframe;
-		if ( f.overlay ) then
-			if ( f.overlay.animOut:IsPlaying() ) then f.overlay.animOut:Stop(); f.overlay.animIn:Play(); end
-		else
-			f.overlay = ActionButton_GetOverlayGlow();
-			local frameWidth, frameHeight = f:GetSize();
-			f.overlay:SetParent(f);
-			f.overlay:ClearAllPoints();
-			-- Make the height/width available before the next frame:
-			f.overlay:SetSize(frameWidth * 1.3, frameHeight * 1.3);
-			f.overlay:SetPoint("TOPLEFT", f, "TOPLEFT", -frameWidth * 0.3, frameHeight * 0.3);
-			f.overlay:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", frameWidth * 0.3, -frameHeight * 0.3);
-			f.overlay.animIn:Play();
+		if not f.overlay then
+			self:ActionButton_SetupOverlayGlow(f)
 		end
+		if ( f.overlay.animOut:IsPlaying() ) then f.overlay.animOut:Stop(); end
+		f.overlay.animIn:Play()
 	end
 	
 	function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
@@ -1857,7 +1672,9 @@ else -- 용군단 코드
 	function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
 		local border = f.border
 		f = f.iconframe
-		self:ActionButton_SetupOverlayGlow(f)
+		if not f.SpellActivationAlert then
+			self:ActionButton_SetupOverlayGlow(f)
+		end
 		if not f.SpellActivationAlert:IsShown() or (not f.SpellActivationAlert.ProcStartAnim:IsPlaying() and not f.SpellActivationAlert.ProcLoop:IsPlaying()) then
 			f.SpellActivationAlert:Show()
 			f.SpellActivationAlert.ProcStartAnim:Play()
@@ -1997,12 +1814,6 @@ function HDH_TRACKER:GetAni(f, ani_type) -- row 이동 애니
 			end)
 		end
 		return f.aniShow;
-	elseif ani_type== HDH_TRACKER.ANI_GLOW_COLOR_BORDER then
-		if not f.aniShow then
-			local ag = f:CreateAnimationGroup()
-			f.aniShow = ag
-
-		end
 	end
 end
 
@@ -2029,380 +1840,13 @@ function HDH_TRACKER:StartAni(f, ani_type) -- row 이동 실행
 			f:Show();
 			self:GetAni(f, ani_type):Play();
 		end
-	elseif ani_type== HDH_TRACKER.ANI_GLOW_COLOR_BORDER then
-		
 	end
-end
-
-function HDH_TRACKER:NoneDisplayIcon(f)
-
 end
 
 ------------------------------------------
 -- end -- TRACKER interface function
 ------------------------------------------
 
-
-------------------------------------------
--- TRACKER Event
-------------------------------------------
-
-local function VersionUpdateDB()
-	if DB:GetVersion() == 2.0 then
-		local id, name, type, unit, aura_filter, aura_caster, trait
-		for _, id in ipairs(DB:GetTrackerIds()) do
-			id, name, type, unit, aura_filter, aura_caster, trait = DB:GetTrackerInfo(id)
-			if unit == 1 then
-				unit = 'player'
-			elseif unit == 2 then
-				unit = 'target'
-			elseif unit == 3 then
-				unit = 'focus'
-			end
-			DB:UpdateTracker(id, name, type, unit, aura_filter, aura_caster, trait)
-		end
-		DB:SetVersion(2.1)
-	end
-	-- reverse_fill -> reverse_fill
-	if DB:GetVersion() == 2.1 then
-		local ui = DB:GetTrackerUI()
-		ui.bar.reverse_fill = ui.bar.reverse_fill
-		ui.bar.reverse_fill = nil
-		local ui
-		for _, id in ipairs(DB:GetTrackerIds()) do
-			if DB:hasTrackerUI(id) then
-				ui = DB:GetTrackerUI(id)
-				ui.bar.reverse_fill = ui.bar.reverse_fill
-				ui.bar.reverse_fill = nil
-			end
-		end
-		DB:SetVersion(2.2)
-	end
-
-	-- ADD defaultTexture
-	if DB:GetVersion() == 2.2 then
-		local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem
-		for _, trackerId in ipairs(DB:GetTrackerIds()) do
-			for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
-				elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, elemIdx)
-				DB:SetTrackerElement(trackerId, elemIdx, elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem)
-			end
-		end
-		DB:SetVersion(2.3)
-	end
-
-	if DB:GetVersion() == 2.3 then
-		local id, name, type, unit, aura_filter, aura_caster, trait
-		for _, id in ipairs(DB:GetTrackerIds()) do
-			HDH_AT_DB.tracker[id].trait = HDH_AT_DB.tracker[id].transit
-			HDH_AT_DB.tracker[id].transit = nil
-		end
-		DB:SetVersion(2.4)
-	end
-
-	if DB:GetVersion() == 2.4 then
-		local ui = DB:GetTrackerUI()
-		if ui.cooldown == nil then ui.cooldown = {} end
-		ui.cooldown.not_enough_mana_color = {0.35, 0.35, 0.78, 1}
-		ui.cooldown.out_range_color =  {0.53, 0.1, 0.1, 1}
-		ui.cooldown.use_not_enough_mana_color = true
-		ui.cooldown.use_out_range_color = true
-		local ui
-		for _, id in ipairs(DB:GetTrackerIds()) do
-			if DB:hasTrackerUI(id) then
-				ui = DB:GetTrackerUI(id)
-				if ui.cooldown == nil then ui.cooldown = {} end
-				ui.cooldown.not_enough_mana_color = {0.35, 0.35, 0.78, 1}
-				ui.cooldown.out_range_color =  {0.53, 0.1, 0.1, 1}
-				ui.cooldown.use_not_enough_mana_color = true
-				ui.cooldown.use_out_range_color = true
-			end
-		end
-		DB:SetVersion(2.5)
-	end
-
-	if DB:GetVersion() == 2.5 then
-		local ui = DB:GetTrackerUI()
-		
-		if ui.bar.location == DB.BAR_LOCATION_R and ui.bar.reverse_progress == false then
-			ui.bar.cooldown_progress = DB.COOLDOWN_LEFT
-		elseif ui.bar.location == DB.BAR_LOCATION_R and ui.bar.reverse_progress == true then
-			ui.bar.cooldown_progress = DB.COOLDOWN_RIGHT
-		elseif ui.bar.location == DB.BAR_LOCATION_BOTTOM and ui.bar.reverse_progress == false then
-			ui.bar.cooldown_progress = DB.COOLDOWN_DOWN
-		else
-			ui.bar.cooldown_progress = DB.COOLDOWN_UP
-		end
-		ui.bar.reverse_progress = nil
-		ui.bar.to_fill = ui.bar.reverse_fill
-		ui.bar.reverse_fill = nil
-
-		if ui.font.show_name then
-			if ui.font.name_align == "LEFT" then
-				ui.text.name_location = DB.FONT_LOCATION_BAR_L
-			elseif ui.font.name_align == "RIGHT" then
-				ui.font.name_location = DB.FONT_LOCATION_BAR_R
-			elseif ui.font.name_align == "CENTER" then
-				ui.font.name_location = DB.FONT_LOCATION_BAR_C
-			elseif ui.font.name_align == "TOP" then
-				ui.font.name_location = DB.FONT_LOCATION_BAR_T
-			else -- BOTTOM
-				ui.font.name_location = DB.FONT_LOCATION_BAR_B
-			end
-		else
-			ui.font.name_location = DB.FONT_LOCATION_HIDE
-		end
-
-		local ui
-		for _, id in ipairs(DB:GetTrackerIds()) do
-			if DB:hasTrackerUI(id) then
-				ui = DB:GetTrackerUI(id)
-				if ui.bar.location == DB.BAR_LOCATION_R and ui.bar.reverse_progress == false then
-					ui.bar.cooldown_progress = DB.COOLDOWN_LEFT
-				elseif ui.bar.location == DB.BAR_LOCATION_R and ui.bar.reverse_progress == true then
-					ui.bar.cooldown_progress = DB.COOLDOWN_RIGHT
-				elseif ui.bar.location == DB.BAR_LOCATION_BOTTOM and ui.bar.reverse_progress == false then
-					ui.bar.cooldown_progress = DB.COOLDOWN_DOWN
-				else
-					ui.bar.cooldown_progress = DB.COOLDOWN_UP
-				end
-				ui.bar.reverse_progress = nil
-				ui.bar.to_fill = ui.bar.reverse_fill
-				ui.bar.reverse_fill = nil
-
-				if ui.font.show_name then
-					if ui.font.name_align == "LEFT" then
-						ui.text.name_location = DB.FONT_LOCATION_BAR_L
-					elseif ui.font.name_align == "RIGHT" then
-						ui.font.name_location = DB.FONT_LOCATION_BAR_R
-					elseif ui.font.name_align == "CENTER" then
-						ui.font.name_location = DB.FONT_LOCATION_BAR_C
-					elseif ui.font.name_align == "TOP" then
-						ui.font.name_location = DB.FONT_LOCATION_BAR_T
-					else -- BOTTOM
-						ui.font.name_location = DB.FONT_LOCATION_BAR_B
-					end
-				else
-					ui.font.name_location = DB.FONT_LOCATION_HIDE
-				end
-			end
-		end
-		DB:SetVersion(2.6)
-	end
-
-	if DB:GetVersion() == 2.6 then
-		local ui = DB:GetTrackerUI()
-		local location
-		local x, y 
-
-		ui.common.hide_in_raid = false
-		for _, id in ipairs(DB:GetTrackerIds()) do
-			location = DB:GetLocation(id)
-			ui = DB:GetTrackerUI(id) or DB:GetTrackerUI()
-
-			ui.common.hide_in_raid = false
-			
-			location.x = location.x + (ui.icon.size /2)
-			location.y = location.y + (ui.icon.size /2)
-			x, y = UTIL.AdjustLocation(location.x, location.y)
-			location.x = x
-			location.y = y
-		end
-		DB:SetVersion(2.7)
-	end
-
-	if DB:GetVersion() == 2.7 then
-		local ui = DB:GetTrackerUI()
-		ui.icon.border_size = 2
-		local element
-		for _, trackerId in ipairs(DB:GetTrackerIds()) do
-			if DB:hasTrackerUI(trackerId) then
-				ui = DB:GetTrackerUI(trackerId)
-				ui.icon.border_size = 2
-			end
-
-			for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
-				if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
-					element = HDH_AT_DB.tracker[trackerId].element[elemIdx]
-					if element.isAlways then
-						element.display = DB.SPELL_ALWAYS_DISPLAY
-					else
-						element.display = DB.SPELL_HIDE
-					end
-				end
-			end
-		end
-		HDH_AT_DB.show_latest_spell = true
-		DB:SetVersion(2.8)
-	end
-
-	if DB:GetVersion() == 2.8 then
-		local ui = DB:GetTrackerUI()
-		ui.cooldown.show_global_cooldown = true
-		for _, id in ipairs(DB:GetTrackerIds()) do
-			if DB:hasTrackerUI(id) then
-				ui = DB:GetTrackerUI(id)
-				ui.cooldown.show_global_cooldown = true
-			end
-		end
-		DB:SetVersion(2.9)
-	end
-
-	if DB:GetVersion() == 2.9 then
-		local element
-		local reg = false
-		for _, trackerId in ipairs(DB:GetTrackerIds()) do
-			for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
-				if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
-					element = HDH_AT_DB.tracker[trackerId].element[elemIdx]
-					if HDH_AT_DB.tracker[trackerId].type == HDH_TRACKER.TYPE.COOLDOWN or HDH_AT_DB.tracker[trackerId].type == HDH_TRACKER.TYPE.TOTEM then
-						if element.isItem then
-							if C_Item.IsEquippableItem(element.id) then 
-								reg = true
-							else
-								reg = false
-							end
-						end
-						if reg then
-							element.connectedSpellId = element.id
-							element.unlearnedHideMode = DB.SPELL_HIDE
-							element.connectedSpellIsItem = element.isItem
-						end
-					end
-					
-				end
-			end
-		end
-		DB:SetVersion(3.0)
-	end
-
-	if DB:GetVersion() == 3.0 then
-		for _, trackerId in ipairs(DB:GetTrackerIds()) do
-			local id, name, type, unit, aura_filter, aura_caster, trait = DB:GetTrackerInfo(id)
-			if HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM == type then
-				for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
-					if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
-						local values = DB:GetTrackerElementSplitValues(trackerId, elemIdx)
-						local newValues = {}
-						if values and #values > 0 then
-							for _, v in ipairs(values) do 
-								v = math.floor(v / 10)
-								table.insert(newValues, v)
-							end
-							DB:SetTrackerElementSplitValues(trackerId, elemIdx, values)
-						end
-					end
-				end
-			end
-		end
-		DB:SetVersion(3.1)
-	end
+function HDH_TRACKER:PLAYER_ENTERING_WORLD()
+-- interface
 end
-
-local function ACTIVE_TALENT_GROUP_CHANGED()
-	-- HDH_AT_UTIL.IsTalentSpell(nil,nil,nil,true)
-	HDH_TRACKER.InitVaribles()
-	HDH_TRACKER.Updates()
-	if HDH_AT_ConfigFrame and HDH_AT_ConfigFrame:IsShown() then 
-		HDH_AT_ConfigFrame:UpdateFrame()
-	end
-end
-
-local function PLAYER_ENTERING_WORLD()
-	if not HDH_TRACKER.IsLoaded then 
-		print('|cffffff00Loaded : AuraTracker |cffffffff(Settings: /at, /auratracker, /ㅁㅅ)')
-		HDH_TRACKER.startTime = GetTime();
-		HDH_AT_ADDON_FRAME:RegisterEvent('VARIABLES_LOADED')
-		HDH_AT_ADDON_FRAME:RegisterEvent('PLAYER_REGEN_DISABLED')
-		HDH_AT_ADDON_FRAME:RegisterEvent('PLAYER_REGEN_ENABLED')
-		HDH_AT_ADDON_FRAME:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')
-		HDH_AT_ADDON_FRAME:RegisterEvent('PLAYER_SPECIALIZATION_CHANGED')
-		HDH_AT_ADDON_FRAME:RegisterEvent('GROUP_ROSTER_UPDATE')
-		HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_CONFIG_UPDATED') -- 특성 빌드 설정 변경 완료 됐을때
-		HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_CONFIG_DELETED') -- 특성 빌드 설정 변경 완료 됐을때
-		-- HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_CONFIG_LIST_UPDATED') -- 특성 빌드 설정 변경 완료 됐을때
-		-- HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_COND_INFO_CHANGED') -- 특성 빌드 설정 변경 완료 됐을때
-		-- HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_CONFIG_CREATED') -- 특성 빌드 설정 변경 완료 됐을때
-		HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_TREE_CURRENCY_INFO_UPDATED') -- 특성 빌드 설정 변경 완료 됐을때
-	end
-
-	VersionUpdateDB()
-
-	HDH_TRACKER.InitVaribles()
-	local trackerList = HDH_TRACKER.GetList()
-	for _, t in pairs(trackerList) do
-		t:PLAYER_ENTERING_WORLD()
-	end
-	HDH_TRACKER.IsLoaded = true
-
-	c = CreateFrame("Frame", "HHHHHHHHHH", UIParent, "HDH_AT_MultiStatusBarTemplate")
-	c:Init(
-		{2, 16},
-		{},
-		DB.BAR_SPLIT_FIXED_VALUE,
-		DB.COOLDOWN_LEFT,
-		false,
-		"Interface/AddOns/HDH_AuraTracker/Texture/BantoBar",
-		"Interface/AddOns/HDH_AuraTracker/Texture/BantoBar_r"
-	)
-	c:SetSize(500, 100)
-	c:SetPoint("CENTER")
-	c:SetStatusBarColor(1,0,0,1)
-	c:SetStatusBarFullColor(1,0,1,1)
-	c:SetBackgroundColor(0,0,0,0.3)
-	c:ShowSpark(true)
-	c:SetValue(16, true)
-end
-
--- 이벤트 콜백 함수
-local function OnEvent(self, event, ...)
-	if event =='ACTIVE_TALENT_GROUP_CHANGED' or event =='PET_SPECIALIZATION_CHANGED' or (event =='PLAYER_SPECIALIZATION_CHANGED' and 'player' == select(1, ...)) then
-		HDH_AT_UTIL.RunTimer(self, "ACTIVE_TALENT_GROUP_CHANGED", 1, ACTIVE_TALENT_GROUP_CHANGED)
-	elseif event == 'PLAYER_REGEN_ENABLED' then	
-		if not HDH_TRACKER.ENABLE_MOVE then
-			HDH_TRACKER.Updates()
-		end
-	
-	elseif event == 'PLAYER_REGEN_DISABLED' then
-		if not HDH_TRACKER.ENABLE_MOVE then
-			HDH_TRACKER.Updates()
-		end
-
-	elseif event == 'GROUP_ROSTER_UPDATE' then
-		if not HDH_TRACKER.ENABLE_MOVE then
-			HDH_TRACKER.Updates()
-		end
-	
-	elseif event == "PLAYER_ENTERING_WORLD" then
-		-- self:UnregisterEvent('PLAYER_ENTERING_WORLD')
-		PLAY_SOUND = false
-		C_Timer.After(3, PLAYER_ENTERING_WORLD)
-		C_Timer.After(6, function() PLAY_SOUND = true end)
-	elseif event =="GET_ITEM_INFO_RECEIVED" then
-	elseif event == "TRAIT_CONFIG_UPDATED" then
-		HDH_AT_UTIL.RunTimer(self, "ACTIVE_TALENT_GROUP_CHANGED", 1, ACTIVE_TALENT_GROUP_CHANGED)
-	elseif event == "TRAIT_CONFIG_DELETED" then
-		DB:CheckTraitsDB()
-		HDH_TRACKER.InitVaribles()
-		if HDH_AT_ConfigFrame:IsShown() then
-			HDH_AT_ConfigFrame:UpdateFrame()
-		end
-	elseif event == "TRAIT_CONFIG_CREATED" then -- 현재 사용 안함
-		HDH_TRACKER.InitVaribles()
-		if HDH_AT_ConfigFrame:IsShown() then
-			HDH_AT_ConfigFrame:UpdateFrame()
-		end
-	end
-end
-
--- 애드온 로드 시 가장 먼저 실행되는 함수
-local function OnLoad(self)
-	self:RegisterEvent('PLAYER_ENTERING_WORLD')
-end
-	
-HDH_AT_ADDON_FRAME = CreateFrame("Frame", "HDH_AT_iconframe", UIParent) -- 애드온 최상위 프레임
-HDH_AT_ADDON_FRAME:SetScript("OnEvent", OnEvent)
-HDH_AT_ADDON_FRAME:SetScript("OnUpdate", MainOnUpdate)
-OnLoad(HDH_AT_ADDON_FRAME)
-
-

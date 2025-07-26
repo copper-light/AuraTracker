@@ -61,94 +61,61 @@ end
 HDH_POWER_TRACKER.POWER_INFO = POWER_INFO;
 
 local function HDH_POWER_OnUpdate(f, elapsed)
-	self = f:GetParent().parent
+	local self = f:GetParent().parent
 	f.spell.curTime = GetTime()
-	
 	if f.spell.curTime - (f.spell.delay or 0) < 0.02  then return end 
 	f.spell.delay = f.spell.curTime
-	local curValue = self:GetPower()
-	local maxValue = self:GetPowerMax()
-	f.spell.v1 = curValue;
-	f.spell.count = math.ceil(f.spell.v1 / maxValue * 100);
-	if f.spell.count == 100 and f.spell.v1 ~= maxValue then f.spell.count = 99 end
-	f.counttext:SetText(f.spell.count .. "%"); 
-	-- else self.counttext:SetText(nil) end
-	if f.spell.showValue then 
-		f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate)); 
-	else 
-		f.v1:SetText(nil) 
+	f.spell.powerMax = self:GetPowerMax()
+	f.spell.v1 = self:GetPower()
+	f.spell.count = math.ceil(f.spell.v1 / f.spell.powerMax  * 100);
+	if f.spell.count == 100 and f.spell.v1 ~= f.spell.powerMax  then f.spell.count = 99 end
+	f.counttext:SetText(f.spell.count .. "%")
+	if f.spell.showValue then
+		f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate))
+	else
+		f.v1:SetText(nil)
 	end
 
 	if self.power_info.regen then
-		if f.spell.v1 < maxValue then
+		if f.spell.v1 < f.spell.powerMax  then
 			if f.spell.isOn ~= true then
-				self:Update();
+				self:Update()
 				f.spell.isOn = true;
 			end
 		else 
 			if f.spell.isOn ~= false then
-				self:Update();
+				self:Update()
 				f.spell.isOn = false;
 			end
-			self:Update();
+			self:Update()
 		end
 	else
 		if f.spell.v1 > 0 then
 			if f.spell.isOn ~= true then
-				self:Update();
+				self:Update()
 				f.spell.isOn = true;
 			end
 		else
 			if f.spell.isOn ~= false then
-				self:Update();
+				self:Update()
 				f.spell.isOn = false;
 			end
 		end
 	end
 
-	if self.max == maxValue then -- UpdateBar 함수안에 UpdateAbsorb 를 포함한다.
-		self:UpdateGlow(f, true);
-		self:UpdateBarValue(f, elapsed);
-	else
-		self:UpdateBar(f, maxValue);
-		self:UpdateGlow(f, true);
-		self:UpdateBarValue(f, elapsed, true);
-	end
-end
-
-function HDH_POWER_TRACKER:UpdateBarValue(f, elapsed, non_animate)
-	if f.bar and f.bar.bar and #f.bar.bar > 0 then
-		local bar;
-		for i = 1, #f.bar.bar do 
-			bar = f.bar.bar[i];
-			-- bar:SetMinMaxValues(bar.mpMin, bar.mpMax);
-			if bar then
-				if self.ui.bar.to_fill then
-					bar.v1 = f.spell.v1
-				else
-					bar.v1 = bar.mpMax - f.spell.v1 + bar.mpMin
-				end
-				if non_animate then
-					bar:SetValue(bar.v1); 
-				else
-					bar:SetValue(self:GetAnimatedValue(bar, bar.v1, i));
-				end
-				-- bar:SetValue(f.spell.v1); 
-				if f:GetParent().parent.ui.bar.use_full_color then
-					if f.spell.v1 >= (bar.mpMax) then
-						bar:SetStatusBarColor(unpack(f:GetParent().parent.ui.bar.full_color));
-					else
-						bar:SetStatusBarColor(unpack(f:GetParent().parent.ui.bar.color));
-					end
-				end
-				self:MoveSpark(bar)
-			end
+	self:UpdateGlow(f, true)
+	if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
+		if f.bar:GetMaxValue() == f.spell.powerMax then -- UpdateBar 함수안에 UpdateAbsorb 를 포함한다.
+			f.bar:SetValue(f.spell.v1, true)
+		else
+			f.bar:SetMinMaxValues(0, f.spell.powerMax)
+			f.bar:SetValue(f.spell.v1, false)
 		end
 	end
 end
 
 function HDH_POWER_TRACKER:GetPower()
-	return UnitPower('player', self.power_info.power_index);
+	return UnitPower('player', self.power_info.power_index)
 end
 
 function HDH_POWER_TRACKER:GetPowerMax()
@@ -216,7 +183,6 @@ end
 function HDH_POWER_TRACKER:CreateDummySpell(count)
 	local icons =  self.frame.icon
 	local ui = self.ui
-	local curTime = GetTime()
 	local f, spell
 	local power_max = self:GetPowerMax()
 	f = icons[1];
@@ -242,23 +208,14 @@ function HDH_POWER_TRACKER:CreateDummySpell(count)
 	spell.splitValues = f.spell.splitValues
 	f.cd:Hide();
 	if ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-		f:SetScript("OnUpdate",nil);
-		-- f.bar:SetMinMaxValues(0, power_max);
-		-- f.bar:SetValue(spell.v1);
 		if spell.showValue then
 			f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(spell.v1, self.ui.font.v1_abbreviate))
 		else
 			f.v1:SetText('')
 		end
-		-- f.bar:Show();
-		local bar
-		for i = 1, #f.bar.bar do
-			bar = f.bar.bar[i];
-			if bar then
-				bar:SetMinMaxValues(0,1);
-				bar:SetValue(1);
-			end
-		end
+		f.bar:Show()
+		f.bar:SetMinMaxValues(0,1)
+		f.bar:SetValue(1)
 	end
 	f.spell = spell
 	f.counttext:SetText("100%")
@@ -287,10 +244,6 @@ function HDH_POWER_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
 	self.frame.icon[idx] = nil
 end
 
--- function HDH_POWER_TRACKER:UpdateSetting() -- HDH_TRACKER override
--- 	super.UpdateSetting(self)
--- end
-
 function HDH_POWER_TRACKER:Update() -- HDH_TRACKER override
 	if not self.frame or not self.frame.icon or HDH_TRACKER.ENABLE_MOVE then return end
 	local f = self.frame.icon[1]
@@ -314,216 +267,6 @@ function HDH_POWER_TRACKER:Update() -- HDH_TRACKER override
 	end
 end
 
-function HDH_POWER_TRACKER:UpdateArtBar(f) -- HDH_TRACKER override
-	local ui = self.ui
-	local hide_icon = ui.common.display_mode == DB.DISPLAY_BAR
-	if ui.common.display_mode ~= DB.DISPLAY_ICON then
-		if (f.bar and f.bar:GetObjectType() ~= "Frame") then
-			f.bar:Hide();
-			f.bar:SetParent(nil);
-			f.bar = nil;
-		end
-		if not f.bar then
-			f.bar = CreateFrame("Frame", nil, f);
-			f.bar.bg = f.bar
-			f.bar.margin = POWRE_BAR_SPLIT_MARGIN;--------------------------------------------- margin
-		end
-		if hide_icon then f.iconframe:Hide();
-		else f.iconframe:Show(); end
-		self:UpdateBar(f);
-	else
-		if f.bar then f.bar:Hide(); end
-		f.iconframe:Show();
-	end
-end
-
--- barMax: 다른 클래스에서 호환성을 위해서 추가 파워트래킹에서는 사용안함
-function HDH_POWER_TRACKER:UpdateBar(f, barMax, value)
-	local bar_op = self.ui.bar;
-	local hide_icon = self.ui.common.display_mode == DB.DISPLAY_BAR
-	if not self:IsHaveData() or not f.bar then return end
-	local bf = f.bar;
-	local split = (f.spell and f.spell.splitValues) or {}
-	local nextIsNill = false;
-	bf.max = barMax or self:GetPowerMax()
-	self.max = bf.max;
-	-- 무결성 체크
-	for i = 1, #split do
-		if nextIsNill then 
-			split[i] = nil 
-		else
-			if not split[i] or  split[i] > bf.max then
-				split[i] = nil;
-				nextIsNill = true;
-			end
-			if split[i] and (split[i] > (split[i+1] or bf.max)) then
-				split[i+1] = nil;
-				nextIsNill = true;
-			end
-		end
-	end
-	
-	if bf.bar == nil then bf.bar = {} end
-	bf:ClearAllPoints();
-	if bar_op.location == DB.BAR_LOCATION_T then
-		bf:SetPoint("BOTTOM",f, hide_icon and "BOTTOM" or "TOP",0, 0); 
-	elseif bar_op.location == DB.BAR_LOCATION_B then 
-		bf:SetPoint("TOP",f, hide_icon and "TOP" or "BOTTOM",0, 0); 
-	elseif bar_op.location == DB.BAR_LOCATION_L then 
-		bf:SetPoint("RIGHT",f, hide_icon and "RIGHT" or "LEFT", 0, 0); 
-	else
-		bf:SetPoint("LEFT",f, hide_icon and "LEFT" or "RIGHT", 0, 0); 
-	end
-	bf:SetSize(bar_op.width, bar_op.height);
-	
-	local cnt = (#split == 0) and 1 or (#split +1);
-	local bar
-	for i = 1, cnt do
-		if bf.bar[i] == nil then
-			local newBar = CreateFrame("StatusBar", nil, bf);
-			newBar.background = newBar:CreateTexture(nil,"BACKGROUND");
-			newBar.background:SetPoint('TOPLEFT', newBar, 'TOPLEFT', -1, 1)
-			newBar.background:SetPoint('BOTTOMRIGHT', newBar, 'BOTTOMRIGHT', 1, -1)
-			newBar.background:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg");
-			newBar.spark = newBar:CreateTexture(nil, "OVERLAY");
-			newBar.spark:SetBlendMode("ADD");
-			bf.bar[i] = newBar;
-			if i== 1 and not f.name then f.name = newBar:CreateFontString(nil,"OVERLAY"); end
-		end 
-		bar = bf.bar[i]
-		
-		local powerMax = bf.max
-		bar.mpMax = split[i] or powerMax;
-		bar.mpMin = split[i-1] or 0;
-		
-		local gap = bar.mpMax - bar.mpMin;
-		-- bar:SetValue(value or 0)
-		bar:SetMinMaxValues(bar.mpMin, bar.mpMax);
-		bar.spark:SetVertexColor(unpack(bar_op.spark_color or {1,1,1,1}))
-		bar.background:SetVertexColor(unpack(bar_op.bg_color));
-		
-		bar:ClearAllPoints();
-		if bar_op.cooldown_progress == DB.COOLDOWN_LEFT then
-			local w = ( bf:GetWidth() - (self.ui.common.margin_h * #split) ) * (gap/powerMax);
-			bar:SetSize(w - 2, bf:GetHeight() - 2);
-			if i == 1 then 
-				bar:SetPoint("RIGHT", -1, 0)
-			elseif i == cnt then
-				bar:SetPoint("LEFT", 1, 0)
-				bar:SetPoint("RIGHT", bf.bar[i-1], "LEFT", -self.ui.common.margin_h - 2, 0)
-			else
-				bar:SetPoint("RIGHT", bf.bar[i-1], "LEFT", -self.ui.common.margin_h - 2, 0)
-			end
-			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture); 
-			bar:SetOrientation("Horizontal"); 
-			bar:SetRotatesTexture(false);
-			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-			bar.spark:SetSize(9, bar_op.height);
-			
-			if bar_op.to_fill then
-				bar:SetReverseFill(true)
-				bar.adjust = 0
-			else
-				bar:SetReverseFill(false)
-				bar.adjust = -0.5
-			end
-			
-		elseif bar_op.cooldown_progress == DB.COOLDOWN_RIGHT then
-			local w = ( bf:GetWidth() - (self.ui.common.margin_h * #split) ) * (gap/powerMax);
-			bar:SetSize(w - 2, bf:GetHeight() - 2);
-
-			if i == 1 then 
-				bar:SetPoint("LEFT", 1, 0)
-			elseif i == cnt then
-				bar:SetPoint("RIGHT", -1, 0)
-				bar:SetPoint("LEFT", bf.bar[i-1], "RIGHT", self.ui.common.margin_h + 2, 0)
-			else
-				bar:SetPoint("LEFT", bf.bar[i-1], "RIGHT", self.ui.common.margin_h + 2, 0)
-			end
-			
-			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture_r); 
-			bar:SetOrientation("Horizontal"); 
-			bar:SetRotatesTexture(false);
-			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-			bar.spark:SetSize(9, bar_op.height);
-			
-			if bar_op.to_fill then
-				bar.adjust = -0.5
-				bar:SetReverseFill(false)
-			else
-				bar.adjust = 0
-				bar:SetReverseFill(true)
-			end
-
-		elseif bar_op.cooldown_progress == DB.COOLDOWN_UP then
-			local h = ( bf:GetHeight() - (self.ui.common.margin_v * #split) ) * (gap/powerMax);
-			bar:SetSize(bf:GetWidth() - 2, h - 2);
-			if i == 1 then 
-				bar:SetPoint("BOTTOM", 0, 1)
-			elseif i == cnt then
-				bar:SetPoint("TOP", 0, -1)
-				bar:SetPoint("BOTTOM", bf.bar[i-1], "TOP", 0, self.ui.common.margin_v + 2)
-			else
-				bar:SetPoint("BOTTOM", bf.bar[i-1], "TOP", 0, self.ui.common.margin_v + 2)
-			end
-			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture); 
-			bar:SetOrientation("Vertical"); 
-			bar:SetRotatesTexture(true);
-			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-			bar.spark:SetSize(bar_op.width, 9);
-			if bar_op.to_fill then
-				bar.adjust = 0
-				bar:SetReverseFill(false)
-			else
-				bar.adjust = 0.5
-				bar:SetReverseFill(true)
-			end
-			
-
-		else -- bottom
-			local h = ( bf:GetHeight() - (self.ui.common.margin_v * #split) ) * (gap/powerMax);
-			bar:SetSize(bf:GetWidth() - 2, h - 2);
-			if i == 1 then 
-				bar:SetPoint("TOP", 0, -1)
-			elseif i == cnt then
-				bar:SetPoint("BOTTOM", 0, 1)
-				bar:SetPoint("TOP", bf.bar[i-1], "BOTTOM", 0, -self.ui.common.margin_v - 2)
-			else
-				bar:SetPoint("TOP", bf.bar[i-1], "BOTTOM", 0, -self.ui.common.margin_v - 2)
-			end
-			bar:SetStatusBarTexture(DB.BAR_TEXTURE[bar_op.texture].texture_r); 
-			bar:SetOrientation("Vertical"); 
-			bar:SetRotatesTexture(true);
-			bar.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-			bar.spark:SetSize(bar_op.width, 9);
-			if bar_op.to_fill then
-				bar.adjust = 0.5
-				bar:SetReverseFill(true)
-			else
-				bar.adjust = 0
-				bar:SetReverseFill(false)
-			end
-		end
-
-		if bar_op.show_spark then
-			bar.spark:Show();
-		else
-			bar.spark:Hide();
-		end
-		
-		bar:Show();
-		bar:SetStatusBarColor(unpack(bar_op.color));
-	end
-	
-	for i = cnt+1, #bf.bar do
-		bf.bar[i]:Hide();
-		bf.bar[i]:SetParent(nil);
-		bf.bar[i] = nil;
-	end
-	bf.cnt = cnt;
-	bf:Show();
-end
-
 function HDH_POWER_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 	local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
 	local f = self.frame.icon[1]
@@ -532,15 +275,10 @@ function HDH_POWER_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 		f.icon:SetDesaturated(nil)
 		f.icon:SetAlpha(self.ui.icon.on_alpha)
 		f.border:SetAlpha(self.ui.icon.on_alpha)
-		f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
+		f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
 		ret = 1;
 		self:UpdateGlow(f, true)
 		f:Show();
-		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-			self:UpdateBarValue(f);
-			f.bar:Show();
-			-- f.name:SetText(f.spell.name);
-		end
 	else
 		if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then
 			f.icon:SetDesaturated(1)
@@ -569,7 +307,7 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 	
  	self.power_info = self.POWER_INFO[self.type]
 
-	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitValues, glowEffectType, glowEffectColor, glowEffectPerSec
+	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitPoints, splitPointType, glowEffectType, glowEffectColor, glowEffectPerSec
 	local elemSize = DB:GetTrackerElementSize(trackerId)
 	local spell 
 	local f
@@ -578,7 +316,6 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 
 	self.frame.pointer = {}
 	self.frame:UnregisterAllEvents()
-	
 	self.talentId = HDH_AT_UTIL.GetSpecialization()
 
 	if not self:IsHaveData() then
@@ -588,7 +325,7 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 		for i = 1 , elemSize do
 			elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 			glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
-			splitValues = DB:GetTrackerElementSplitValues(trackerId, i)
+			splitPoints, splitPointType = DB:GetTrackerElementSplitValues(trackerId, i)
 			
 			iconIdx = iconIdx + 1
 			f = self.frame.icon[iconIdx]
@@ -608,8 +345,6 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.name = elemName
 			spell.icon = texture
 			spell.power_index = self.power_info.power_index
-			-- if not auraList[i].defaultImg then auraList[i].defaultImg = texture; 
-			-- elseif auraList[i].defaultImg ~= auraList[i].texture then spell.fix_icon = true end
 			spell.id = tonumber(elemId)
 			spell.count = 0
 			spell.duration = 0
@@ -620,18 +355,20 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.is_buff = isBuff;
 			spell.isUpdate = false
 			spell.isItem =  isItem
-			spell.splitValues = splitValues or {}
+			spell.splitPoints = splitPoints or {}
+			spell.splitPointType = splitPointType or DB.BAR_SPLIT_RATIO
 			f.spell = spell
 			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-			f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-			f.iconSatCooldown:SetDesaturated(nil)
+			-- f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+			-- f.iconSatCooldown:SetDesaturated(nil)
+			-- f.iconSatCooldown:Hide()
 			self:ChangeCooldownType(f, self.ui.icon.cooldown)
 			self:UpdateGlow(f, false)
 			
 			f:SetScript("OnUpdate", HDH_POWER_OnUpdate);
 			f:Hide();
 			self:ActionButton_HideOverlayGlow(f)
-			self:UpdateArtBar(f)
+			self:UpdateBarSettings(f)
 		end
 		self.frame:SetScript("OnEvent", self.OnEvent)
 		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE',"player")

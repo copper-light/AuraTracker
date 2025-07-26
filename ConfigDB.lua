@@ -217,6 +217,259 @@ local EFFECT_DEFUALT_PER_SEC = 2
     trait 
 ]]--
 
+function HDH_AT_ConfigDB:VersionUpdateDB()
+    local DB = self
+	if DB:GetVersion() == 2.0 then
+		local id, name, type, unit, aura_filter, aura_caster, trait
+		for _, id in ipairs(DB:GetTrackerIds()) do
+			id, name, type, unit, aura_filter, aura_caster, trait = DB:GetTrackerInfo(id)
+			if unit == 1 then
+				unit = 'player'
+			elseif unit == 2 then
+				unit = 'target'
+			elseif unit == 3 then
+				unit = 'focus'
+			end
+			DB:UpdateTracker(id, name, type, unit, aura_filter, aura_caster, trait)
+		end
+		DB:SetVersion(2.1)
+	end
+	-- reverse_fill -> reverse_fill
+	if DB:GetVersion() == 2.1 then
+		local ui = DB:GetTrackerUI()
+		ui.bar.reverse_fill = ui.bar.reverse_fill
+		ui.bar.reverse_fill = nil
+		local ui
+		for _, id in ipairs(DB:GetTrackerIds()) do
+			if DB:hasTrackerUI(id) then
+				ui = DB:GetTrackerUI(id)
+				ui.bar.reverse_fill = ui.bar.reverse_fill
+				ui.bar.reverse_fill = nil
+			end
+		end
+		DB:SetVersion(2.2)
+	end
+
+	-- ADD defaultTexture
+	if DB:GetVersion() == 2.2 then
+		local elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem
+		for _, trackerId in ipairs(DB:GetTrackerIds()) do
+			for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
+				elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, elemIdx)
+				DB:SetTrackerElement(trackerId, elemIdx, elemKey, elemId, elemName, texture, isAlways, glowType, isValue, isItem)
+			end
+		end
+		DB:SetVersion(2.3)
+	end
+
+	if DB:GetVersion() == 2.3 then
+		local id, name, type, unit, aura_filter, aura_caster, trait
+		for _, id in ipairs(DB:GetTrackerIds()) do
+			HDH_AT_DB.tracker[id].trait = HDH_AT_DB.tracker[id].transit
+			HDH_AT_DB.tracker[id].transit = nil
+		end
+		DB:SetVersion(2.4)
+	end
+
+	if DB:GetVersion() == 2.4 then
+		local ui = DB:GetTrackerUI()
+		if ui.cooldown == nil then ui.cooldown = {} end
+		ui.cooldown.not_enough_mana_color = {0.35, 0.35, 0.78, 1}
+		ui.cooldown.out_range_color =  {0.53, 0.1, 0.1, 1}
+		ui.cooldown.use_not_enough_mana_color = true
+		ui.cooldown.use_out_range_color = true
+		local ui
+		for _, id in ipairs(DB:GetTrackerIds()) do
+			if DB:hasTrackerUI(id) then
+				ui = DB:GetTrackerUI(id)
+				if ui.cooldown == nil then ui.cooldown = {} end
+				ui.cooldown.not_enough_mana_color = {0.35, 0.35, 0.78, 1}
+				ui.cooldown.out_range_color =  {0.53, 0.1, 0.1, 1}
+				ui.cooldown.use_not_enough_mana_color = true
+				ui.cooldown.use_out_range_color = true
+			end
+		end
+		DB:SetVersion(2.5)
+	end
+
+	if DB:GetVersion() == 2.5 then
+		local ui = DB:GetTrackerUI()
+		
+		if ui.bar.location == DB.BAR_LOCATION_R and ui.bar.reverse_progress == false then
+			ui.bar.cooldown_progress = DB.COOLDOWN_LEFT
+		elseif ui.bar.location == DB.BAR_LOCATION_R and ui.bar.reverse_progress == true then
+			ui.bar.cooldown_progress = DB.COOLDOWN_RIGHT
+		elseif ui.bar.location == DB.BAR_LOCATION_BOTTOM and ui.bar.reverse_progress == false then
+			ui.bar.cooldown_progress = DB.COOLDOWN_DOWN
+		else
+			ui.bar.cooldown_progress = DB.COOLDOWN_UP
+		end
+		ui.bar.reverse_progress = nil
+		ui.bar.to_fill = ui.bar.reverse_fill
+		ui.bar.reverse_fill = nil
+
+		if ui.font.show_name then
+			if ui.font.name_align == "LEFT" then
+				ui.text.name_location = DB.FONT_LOCATION_BAR_L
+			elseif ui.font.name_align == "RIGHT" then
+				ui.font.name_location = DB.FONT_LOCATION_BAR_R
+			elseif ui.font.name_align == "CENTER" then
+				ui.font.name_location = DB.FONT_LOCATION_BAR_C
+			elseif ui.font.name_align == "TOP" then
+				ui.font.name_location = DB.FONT_LOCATION_BAR_T
+			else -- BOTTOM
+				ui.font.name_location = DB.FONT_LOCATION_BAR_B
+			end
+		else
+			ui.font.name_location = DB.FONT_LOCATION_HIDE
+		end
+
+		local ui
+		for _, id in ipairs(DB:GetTrackerIds()) do
+			if DB:hasTrackerUI(id) then
+				ui = DB:GetTrackerUI(id)
+				if ui.bar.location == DB.BAR_LOCATION_R and ui.bar.reverse_progress == false then
+					ui.bar.cooldown_progress = DB.COOLDOWN_LEFT
+				elseif ui.bar.location == DB.BAR_LOCATION_R and ui.bar.reverse_progress == true then
+					ui.bar.cooldown_progress = DB.COOLDOWN_RIGHT
+				elseif ui.bar.location == DB.BAR_LOCATION_BOTTOM and ui.bar.reverse_progress == false then
+					ui.bar.cooldown_progress = DB.COOLDOWN_DOWN
+				else
+					ui.bar.cooldown_progress = DB.COOLDOWN_UP
+				end
+				ui.bar.reverse_progress = nil
+				ui.bar.to_fill = ui.bar.reverse_fill
+				ui.bar.reverse_fill = nil
+
+				if ui.font.show_name then
+					if ui.font.name_align == "LEFT" then
+						ui.text.name_location = DB.FONT_LOCATION_BAR_L
+					elseif ui.font.name_align == "RIGHT" then
+						ui.font.name_location = DB.FONT_LOCATION_BAR_R
+					elseif ui.font.name_align == "CENTER" then
+						ui.font.name_location = DB.FONT_LOCATION_BAR_C
+					elseif ui.font.name_align == "TOP" then
+						ui.font.name_location = DB.FONT_LOCATION_BAR_T
+					else -- BOTTOM
+						ui.font.name_location = DB.FONT_LOCATION_BAR_B
+					end
+				else
+					ui.font.name_location = DB.FONT_LOCATION_HIDE
+				end
+			end
+		end
+		DB:SetVersion(2.6)
+	end
+
+	if DB:GetVersion() == 2.6 then
+		local ui = DB:GetTrackerUI()
+		local location
+		local x, y 
+
+		ui.common.hide_in_raid = false
+		for _, id in ipairs(DB:GetTrackerIds()) do
+			location = DB:GetLocation(id)
+			ui = DB:GetTrackerUI(id) or DB:GetTrackerUI()
+
+			ui.common.hide_in_raid = false
+			
+			location.x = location.x + (ui.icon.size /2)
+			location.y = location.y + (ui.icon.size /2)
+			x, y = UTIL.AdjustLocation(location.x, location.y)
+			location.x = x
+			location.y = y
+		end
+		DB:SetVersion(2.7)
+	end
+
+	if DB:GetVersion() == 2.7 then
+		local ui = DB:GetTrackerUI()
+		ui.icon.border_size = 2
+		local element
+		for _, trackerId in ipairs(DB:GetTrackerIds()) do
+			if DB:hasTrackerUI(trackerId) then
+				ui = DB:GetTrackerUI(trackerId)
+				ui.icon.border_size = 2
+			end
+
+			for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
+				if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
+					element = HDH_AT_DB.tracker[trackerId].element[elemIdx]
+					if element.isAlways then
+						element.display = DB.SPELL_ALWAYS_DISPLAY
+					else
+						element.display = DB.SPELL_HIDE
+					end
+				end
+			end
+		end
+		HDH_AT_DB.show_latest_spell = true
+		DB:SetVersion(2.8)
+	end
+
+	if DB:GetVersion() == 2.8 then
+		local ui = DB:GetTrackerUI()
+		ui.cooldown.show_global_cooldown = true
+		for _, id in ipairs(DB:GetTrackerIds()) do
+			if DB:hasTrackerUI(id) then
+				ui = DB:GetTrackerUI(id)
+				ui.cooldown.show_global_cooldown = true
+			end
+		end
+		DB:SetVersion(2.9)
+	end
+
+	if DB:GetVersion() == 2.9 then
+		local element
+		local reg = false
+		for _, trackerId in ipairs(DB:GetTrackerIds()) do
+			for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
+				if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
+					element = HDH_AT_DB.tracker[trackerId].element[elemIdx]
+					if HDH_AT_DB.tracker[trackerId].type == HDH_TRACKER.TYPE.COOLDOWN or HDH_AT_DB.tracker[trackerId].type == HDH_TRACKER.TYPE.TOTEM then
+						if element.isItem then
+							if C_Item.IsEquippableItem(element.id) then 
+								reg = true
+							else
+								reg = false
+							end
+						end
+						if reg then
+							element.connectedSpellId = element.id
+							element.unlearnedHideMode = DB.SPELL_HIDE
+							element.connectedSpellIsItem = element.isItem
+						end
+					end
+					
+				end
+			end
+		end
+		DB:SetVersion(3.0)
+	end
+
+	if DB:GetVersion() == 3.0 then
+		for _, trackerId in ipairs(DB:GetTrackerIds()) do
+			local id, name, type, unit, aura_filter, aura_caster, trait = DB:GetTrackerInfo(id)
+			if HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM == type then
+				for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
+					if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
+						local values = DB:GetTrackerElementSplitValues(trackerId, elemIdx)
+						local newValues = {}
+						if values and #values > 0 then
+							for _, v in ipairs(values) do 
+								v = math.floor(v / 10)
+								table.insert(newValues, v)
+							end
+							DB:SetTrackerElementSplitValues(trackerId, elemIdx, values)
+						end
+					end
+				end
+			end
+		end
+		DB:SetVersion(3.1)
+	end
+end
+
 function HDH_AT_ConfigDB:GetVersion()
     return HDH_AT_DB.version
 end
@@ -511,15 +764,16 @@ function HDH_AT_ConfigDB:UpdateTrackerElementValue(trackerId, elementIndex, bool
     element.isValue = bool
 end
 
-function HDH_AT_ConfigDB:SetTrackerElementSplitValues(trackerId, elementIndex, splitValues)
+function HDH_AT_ConfigDB:SetTrackerElementSplitValues(trackerId, elementIndex, splitValues, splitType)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
     element.splitValues = splitValues
+    element.splitType = splitType or CONFIG.BAR_SPLIT_RATIO
 end
 
 function HDH_AT_ConfigDB:GetTrackerElementSplitValues(trackerId, elementIndex)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
     if element then
-        return UTIL.Deepcopy(element.splitValues)
+        return UTIL.Deepcopy(element.splitValues), element.splitType or CONFIG.BAR_SPLIT_RATIO
     else
         return nil
     end

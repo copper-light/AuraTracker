@@ -122,8 +122,7 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 	if f.spell.remaining > 0.1 then
 		HDH_AT_UTIL.CT_StartTimer(f)
 		if not f.icon:IsDesaturated() then f.icon:SetDesaturated(1) end
-		if f.spell.count == 0 then f.counttext:SetText(nil)
-								else f.counttext:SetText(f.spell.count) end
+		f.counttext:SetText((f.spell.count ~= 0) and f.spell.count or nil)
 		f.cd:Show()
 		f.icon:SetAlpha(self.ui.icon.off_alpha)
 		f.border:SetAlpha(self.ui.icon.off_alpha)
@@ -138,10 +137,14 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 		self:UpdateGlow(f, false)
 		f:Show()
 		if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then
-			self:UpdateBarValue(f, HDH_TRACKER.ENABLE_MOVE)
+			self:UpdateBarValue(f, f.spell.startTime, f.spell.endTime, GetTime())
 		end
 	else
-		if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then self:UpdateBarValue(f, true); end
+		if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then 
+			self:UpdateBarValue(f, 0, 1, 1)
+			r,g,b,a = adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color)
+			f.bar:SetStatusBarColor(r,g,b,a);
+		end
 		f.icon:SetDesaturated(nil)
 		f.timetext:SetText("");
 		if self.ui.display_mode ~= DB.DISPLAY_BAR and (f.spell.display == DB.SPELL_ALWAYS_DISPLAY)then 
@@ -169,62 +172,24 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 end
 
 if select(4, GetBuildInfo()) < 100000 then
+	
+end
 
-	function HDH_DK_RUNE_TRACKER:UpdateBarValue(f, isEnding)
-		if f.bar and f.name then
-			local r,g,b,a 
-			if self.ui.bar.to_fill then
-				if isEnding then
-					f.bar:SetMinMaxValues(0,1); 
-					f.bar:SetValue(1); 
-					f.name:SetTextColor(unpack(self.ui.font.name_color_off));
-					f.bar.spark:Hide();
+function HDH_DK_RUNE_TRACKER:UpdateBarSettings(f)
+	super.UpdateBarSettings(self, f)
+	if self.ui.common.display_mode == DB.DISPLAY_ICON then return end
 
-					if self.ui.bar.use_full_color then
-						r,g,b,a = adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color)
-					else
-						r,g,b,a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
-					end
-					f.bar:SetStatusBarColor(r,g,b,a);
+	local op = self.ui.bar
+	local r, g, b, a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
+	local normalColor = {r, g, b, a}
+	local fr, fg, fb, fa = adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color)
+	local fullColor = {fr, fg, fb, fa}
 
-				else
-					r,g,b,a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
-					f.bar:SetStatusBarColor(r,g,b,a);
-					local maxV = f.spell.endTime - f.spell.startTime;
-					f.bar:SetMinMaxValues(0, maxV); 
-					f.bar:SetValue(maxV-f.spell.remaining);
-					f.name:SetTextColor(unpack(self.ui.font.name_color));
-					if self.ui.bar.show_spark and f.spell.duration > 0 then f.bar.spark:Show(); 
-					else f.bar.spark:Hide(); end
-				end
-			else
-				if isEnding then
-					r,g,b,a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
-
-					f.bar:SetMinMaxValues(0,1); 
-					f.bar:SetValue(0); 
-					f.name:SetTextColor(unpack(self.ui.font.name_color_off));
-					f.bar:SetStatusBarColor(r,g,b,a);
-					f.bar.spark:Hide();
-				else
-					local maxV = f.spell.endTime - f.spell.startTime;
-					f.bar:SetMinMaxValues(0, maxV); 
-					-- f.bar:SetMinMaxValues(f.spell.startTime, f.spell.endTime); 
-					f.bar:SetValue(f.spell.remaining); 
-					
-					if self.ui.bar.use_full_color and maxV == f.spell.remaining  then
-						r,g,b,a = adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color)
-					else
-						r,g,b,a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
-					end
-					f.bar:SetStatusBarColor(r,g,b,a);
-					
-					f.name:SetTextColor(unpack(self.ui.font.name_color));
-					if self.ui.bar.show_spark and f.spell.duration > 0 then f.bar.spark:Show(); 
-					else f.bar.spark:Hide(); end
-				end
-			end
-		end
+	if op.use_full_color and not self.ui.common.default_color then
+		f.bar:UseChangedStatusColor(normalColor, fullColor)
+	else
+		f.bar:UseChangedStatusColor(nil)
+		f.bar:SetStatusBarColor(unpack(normalColor))
 	end
 end
 
