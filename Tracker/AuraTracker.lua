@@ -235,6 +235,9 @@ do
 					end
 					if not self.ui.common.default_color or f.spell.dispelType == nil then 
 						f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
+						if f.bar then
+							f.bar:SetStatusBarColor(unpack(self.ui.icon.active_border_color))
+						end
 					else 
 						f.border:SetVertexColor(
 							DebuffTypeColor[f.spell.dispelType or ""].r, 

@@ -1382,6 +1382,20 @@ function HDH_AT_OnClick_Button(self, button)
 			else
 				effectType = F.BODY.CONFIG_DETAIL.GLOW.CB_EFFECT_TYPE2.value
 			end
+
+			local strRGBA = F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR.EditBox:GetText()
+			local len = string.len(UTIL.Trim(strRGBA) or "")
+			if len == 8 or len == 6 then -- 컬러 픽커에 컬러 입력하고 엔터 안쳤을 경우 대비
+				local r,g,b,a = UTIL.StringToColor(strRGBA)
+				if r then
+					F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR:SetColorRGBA(r,g,b,a)
+				else
+					F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR:Cancel()
+				end
+			else
+				F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR:Cancel()
+			end
+
 			effectColor = {F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR:GetColorRGBA()}
 			effectPerSec = F.BODY.CONFIG_DETAIL.GLOW.SL_EFFECT_PER_SEC:GetValue()
 			if checkedIdx then
@@ -1573,7 +1587,7 @@ function HDH_AT_OnClick_Button(self, button)
 		local elemIdx = F.BODY.CONFIG_DETAIL.elemIdx
 		local values = DB:GetTrackerElementSplitValues(trackerId, elemIdx) or {}
 		local minValue, maxValue = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR:GetMinMaxValues()
-
+		local pointType = DB.BAR_SPLIT_FIXED_VALUE
 		-- if maxValue < 10 then
 		-- 	main.Dialog:AlertShow(L.NEED_TO_MAXIMUM_VALUE)
 		-- 	return 
@@ -1581,40 +1595,47 @@ function HDH_AT_OnClick_Button(self, button)
 
 		if self:GetParent().ButtonAdd == self then
 			local v = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR.ED_LIST[index]:GetValue()
-			local pointType = DB.BAR_SPLIT_RATIO
 			if v == 0 then
 				main.Dialog:AlertShow(L.PLEASE_INPUT_VALUE)
 				return
 			end
-			if minValue < v and maxValue > v then
-				if pointType == DB.BAR_SPLIT_RATIO then
+			if pointType == DB.BAR_SPLIT_RATIO then
+				if 0 < v and 100 > v then
 					values[index] = v / 100
-				else
-
 				end
-				table.sort(values)
-
-				-- local tick_value = math.max((maxValue - minValue) / 20, 1)
-
-				-- if (maxValue - v) < tick_value or (v - minValue) < tick_value then
-				-- 	main.Dialog:AlertShow(L.NEED_TO_INTER_VALUE)
-				-- 	return 
-				-- end
-				-- for i = 1, #values-1 do
-				-- 	if (values[i+1] - values[i] < tick_value) then
-				-- 		main.Dialog:AlertShow(L.NEED_TO_INTER_VALUE)
-				-- 		return 
-				-- 	end
-				-- end
 			else
-				main.Dialog:AlertShow(L.PLEASE_INPUT_MINMAX_VALUE)
-				return
+				if minValue < v and maxValue > v then
+					values[index] = v 
+				end
 			end
+			table.sort(values)
+			-- if minValue < v and maxValue > v then
+			-- 	if pointType == DB.BAR_SPLIT_RATIO then
+			-- 		values[index] = v / 100
+			-- 	end
+				
+
+			-- 	-- local tick_value = math.max((maxValue - minValue) / 20, 1)
+
+			-- 	-- if (maxValue - v) < tick_value or (v - minValue) < tick_value then
+			-- 	-- 	main.Dialog:AlertShow(L.NEED_TO_INTER_VALUE)
+			-- 	-- 	return 
+			-- 	-- end
+			-- 	-- for i = 1, #values-1 do
+			-- 	-- 	if (values[i+1] - values[i] < tick_value) then
+			-- 	-- 		main.Dialog:AlertShow(L.NEED_TO_INTER_VALUE)
+			-- 	-- 		return 
+			-- 	-- 	end
+			-- 	-- end
+			-- else
+			-- 	main.Dialog:AlertShow(L.PLEASE_INPUT_MINMAX_VALUE)
+			-- 	return
+			-- end
 		elseif self:GetParent().ButtonDel == self then
 			table.remove(values, index)
 		end
 
-		DB:SetTrackerElementSplitValues(trackerId, elemIdx, values)
+		DB:SetTrackerElementSplitValues(trackerId, elemIdx, values, pointType)
 		main:LoadDetailFrame(BODY_DETAIL_ETC, trackerId, elemIdx)
 		HDH_TRACKER.InitVaribles(trackerId)
 
@@ -3628,11 +3649,15 @@ function HDH_AT_ConfigFrameMixin:SetupCommend()
     SLASH_AURATRACKER2 = '/auratracker'
     SLASH_AURATRACKER3 = '/ㅁㅅ'
     SlashCmdList["AURATRACKER"] = function (msg, editbox)
-        if self:IsShown() then 
-            self:Hide()
-        else
-            self:Show()
-        end
+		if HDH_AT_MinimumFrame:IsShown() then
+			HDH_AT_MinimumFrame:Hide()
+		else
+			if self:IsShown() then
+				self:Hide()
+			else
+				self:Show()
+			end
+		end
     end
 end
 

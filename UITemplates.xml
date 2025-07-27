@@ -1050,7 +1050,7 @@
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentIcon" relativePoint="RIGHT" x="8" y="0" />
 				</Anchors>
-				<Scripts>dfasdf
+				<Scripts>
 					<OnLoad>
 						self.BG1:Hide()
 						self.BG2:Hide()
@@ -2342,12 +2342,22 @@
 		<Frames>
 			<EditBox name="$parentEdit" parentKey="EditBox" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false"  >
 				<Size x="1" y="20" />
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="Font_White_S" justifyH="LEFT" text="#">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="LEFT" x="4" y="0" />
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentOff" relativePoint="RIGHT" x="2" y="0"/>
 					<Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT" x="0" y="0"/>
 				</Anchors>
+				<TextInsets left="14" right="5" bottom="0" top="0"/>
 				<Scripts>
-					<OnLoad>self:SetFontObject("Font_White_S")</OnLoad>
+					<OnLoad>self:SetFontObject("Font_White_S") self.Desc:SetText("   "..self.Desc:GetText())</OnLoad>
 					<OnEnterPressed>
 						local r, g, b, a = HDH_AT_UTIL.StringToColor(self:GetText())
 						if r ~= nil then

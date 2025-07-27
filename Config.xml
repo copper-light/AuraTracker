@@ -1250,9 +1250,10 @@
 				</Layers>
 				<Scripts>
 					<OnClick>
-						HDH_AT_MinimumFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
-						HDH_AT_MinimumFrame:SetPoint("RIGHT", self, "LEFT", -4, 0);
-						HDH_AT_MinimumFrame:Show(); self:GetParent():Hide();
+						HDH_AT_MinimumFrame:ClearAllPoints()
+						HDH_AT_MinimumFrame:SetPoint("BOTTOMRIGHT", HDH_AT_ConfigFrame, "TOPRIGHT", -58, 4)
+						HDH_AT_MinimumFrame:Show();
+						HDH_AT_ConfigFrame:Hide();
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -1261,7 +1262,6 @@
 				<Size><AbsDimension x="20" y="20"/></Size>
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnMinMaxFrame" x="-4" y="0" />
-					<!-- <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="4" /> -->
 				</Anchors>
 				<Layers>
 					<Layer level="BACKGROUND">
@@ -1281,13 +1281,6 @@
 							</Anchors>
 							<TexCoords left="0.05" right="0.95" top="0.05" bottom="0.95"/> 
 						</Texture>
-
-						<!-- <FontString name="$parentText" inherits="GAMEFONTNORMAL" justifyH ="LEFT" justifyV="MIDDLE" text="Auratracker">
-							<Anchors>
-								<Anchor point="LEFT" relativePoint="RIGHT" x="4" y="0" relativeTo="$parentIcon"/>
-								<Anchor point="RIGHT" relativePoint="RIGHT" x="-2" y="0" relativeTo="$parent"/>
-							</Anchors>
-						</FontString> -->
 					</Layer>
 				</Layers>
 			</Frame>
@@ -1419,10 +1412,7 @@
     </Frame>
 
 	<Frame name="HDH_AT_MinimumFrame" movable="true" toplevel="true" parent="UIParent" frameStrata="HIGH" hidden="true" enableMouse="true" inherits="HDH_AT_ConfigFrameTemplate">
-		<Size><AbsDimension x="155" y="20"/></Size>
-		<Anchors>
-			<Anchor point="CENTER" x="0" y="0"/>
-		</Anchors>
+		<Size><AbsDimension x="170" y="20"/></Size>
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture name="$parentBG">
@@ -1434,7 +1424,6 @@
 				</Texture>
 			</Layer>
 			<Layer level="OVERLAY">
-
 				<Texture name="$parentIcon" file="Interface\Addons\HDH_AuraTracker\Texture\logo">
 					<Size><AbsDimension x="18" y="18"/></Size>
 					<Anchors>
@@ -1452,7 +1441,6 @@
 			</Layer>
 		</Layers>
 		<Frames>
-		
 			<Button name="$parentBtnMinMaxFrame" inherits="HDH_AT_TextureButtonTemplate, HDH_AT_ConfigFrameTemplate">
 				<Size><AbsDimension x="25" y="20"/></Size>
 				<Anchors>
@@ -1481,8 +1469,6 @@
 				</Layers>
 				<Scripts>
 					<OnClick>
-						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
-						HDH_AT_ConfigFrame:SetPoint("TOPRIGHT", self:GetParent().Close,"BOTTOMRIGHT", 0, -4);
 						HDH_AT_ConfigFrame:Show(); self:GetParent():Hide();
 					</OnClick>
 				</Scripts>
@@ -1495,8 +1481,6 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
-						HDH_AT_ConfigFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
 						self:GetParent():Hide(); 
 					</OnClick>
 				</Scripts>
@@ -1505,15 +1489,25 @@
 		</Frames>
 		<Scripts>
 			<OnShow>
-				_G[self:GetName().."Text"]:SetText("AuraTracker v"..C_AddOns.GetAddOnMetadata("HDH_AuraTracker", "Version"))
+				_G[self:GetName().."Text"]:SetText("AuraTracker |cffffffff"..C_AddOns.GetAddOnMetadata("HDH_AuraTracker", "Version"))
 			</OnShow>
 			<OnHide>
 				if not HDH_AT_ConfigFrame:IsShown() then
 					HDH_AT_ConfigFrame_OnHide(HDH_AT_ConfigFrame)
 				end
 			</OnHide>
-			<OnMouseDown>self:StartMoving()</OnMouseDown>
-			<OnMouseUp>self:StopMovingOrSizing()</OnMouseUp>
+			<OnMouseDown>
+				self:StartMoving()
+				self.x = self:GetLeft()
+				self.y = self:GetBottom()
+			</OnMouseDown>
+			<OnMouseUp>
+				self:StopMovingOrSizing()
+				local newX = HDH_AT_ConfigFrame:GetLeft() + self:GetLeft() - self.x
+				local newY = HDH_AT_ConfigFrame:GetBottom() + self:GetBottom() - self.y
+				HDH_AT_ConfigFrame:ClearAllPoints()
+				HDH_AT_ConfigFrame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", newX, newY)
+			</OnMouseUp>
 		</Scripts>
 	</Frame>
 

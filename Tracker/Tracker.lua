@@ -131,15 +131,18 @@ local function UpdateCooldown(f, elapsed)
 end
 
 local function OnUpdateGlowColor(self, elapsed)
-	self.sparkElapsed = self.sparkElapsed and self.sparkElapsed + elapsed or elapsed
+	self.sparkElapsed = (self.sparkElapsed or 0) + elapsed
 	if self.sparkElapsed < (HDH_TRACKER.ONUPDATE_FRAME_TERM/2) then return end
-	self.playing = self.playing and (self.playing + self.sparkElapsed) or self.sparkElapsed
+	self.playing = (self.playing or 0) + self.sparkElapsed
 	self.sparkElapsed = 0
 	self.p = HDH_AT_UTIL.LogScale(math.max(math.min((1.25 - (GetTime() % (1/self:GetParent().spell.glowEffectPerSec) + .001) / (1/self:GetParent().spell.glowEffectPerSec*0.8)), 1.), 0.3))
-	self.p_c =  math.max(self.p, 0.5)
-
+	self.p_c = math.max(self.p, 0.5)
+	
 	self.icon_size = self:GetParent():GetParent().parent.ui.icon.size
-	if (math.min(1.4, self.playing/0.25)) == 1.4 then
+	
+	
+	
+	if (math.min(1.4, self.playing / 0.25)) == 1.4 then
 		self.color:SetSize(self.icon_size * 1.31, self.icon_size * 1.31)
 		self.spot:SetVertexColor(self.p, self.p, self.p, 0.74)
 		self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1] * self.p_c, 
@@ -149,10 +152,10 @@ local function OnUpdateGlowColor(self, elapsed)
 		self.spot:SetSize(self.icon_size, self.icon_size)
 	else -- starting animation
 		self.color:SetSize(
-			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.5)), 
-			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.5)))
-		self.spot:SetSize(self.icon_size * (0.9 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)),  
-						  self.icon_size * (0.9 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)))
+			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.4)), 
+			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.4)))
+		self.spot:SetSize(self.icon_size * (0.8 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)),  
+						  self.icon_size * (0.8 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)))
 		self.spot:SetVertexColor(1, 1, 1, 1)
 		self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1], 
 								  self:GetParent().spell.glowEffectColor[2], 
@@ -877,7 +880,7 @@ function HDH_TRACKER:CreateDummySpell(count)
 		spell.glow = false
 		spell.endTime = curTime + spell.duration
 		spell.startTime = curTime
-		spell.remaining = spell.startTime + spell.duration
+		spell.remaining = spell.duration
 		f.icon:Hide()
 		if spell.showValue then
 			if spell.showV1 then
@@ -1514,7 +1517,7 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	local spot_border = math.min(0.2355 * (1 - (ICON_BORDER_VALUE[5] or 0)), 0.2355 * (1 - (ICON_BORDER_VALUE[op_icon.border_size] or 0)))
 	f.border.spark.spot:SetSize(op_icon.size, op_icon.size)
 	f.border.spark.spot:SetTexCoord(spot_border, 1 - spot_border, spot_border, 1 - spot_border)
-	f.border.spark.color:SetSize(op_icon.size*4, op_icon.size*4)
+	f.border.spark.color:SetSize(op_icon.size, op_icon.size)
 
 	if op_icon.cooldown == DB.COOLDOWN_CIRCLE then
 		f.cooldown2:SetSwipeColor(unpack(op_icon.cooldown_bg_color))
@@ -1788,10 +1791,10 @@ function HDH_TRACKER:GetAni(f, ani_type) -- row 이동 애니
 			local ag = f:CreateAnimationGroup()
 			f.aniHide = ag
 			ag.a1 = ag:CreateAnimation("ALPHA")
-			ag.a1:SetOrder(1)
-			ag.a1:SetDuration(0.5) 
-			ag.a1:SetFromAlpha(1);
-			ag.a1:SetToAlpha(0.0);
+			ag.a1:SetOrder(0.5)
+			ag.a1:SetDuration(1)
+			ag.a1:SetFromAlpha(1)
+			ag.a1:SetToAlpha(0.0)
 			ag:SetScript("OnFinished", function(self) 
 				self:GetParent():Hide(); 
 			end)
@@ -1804,8 +1807,8 @@ function HDH_TRACKER:GetAni(f, ani_type) -- row 이동 애니
 			ag.a1 = ag:CreateAnimation("ALPHA")
 			ag.a1:SetOrder(1)
 			ag.a1:SetDuration(0.2)
-			ag.a1:SetFromAlpha(0);
-			ag.a1:SetToAlpha(1);
+			ag.a1:SetFromAlpha(0)
+			ag.a1:SetToAlpha(1)
 			ag.tracker = f.parent
 			ag:SetScript("OnFinished",function(self)
 				if ag.tracker then
@@ -1823,6 +1826,10 @@ end
 
 function HDH_TRACKER:HideTracker()
 	self:StartAni(self.frame, HDH_TRACKER.ANI_HIDE);
+end
+
+function HDH_TRACKER:IsShown()
+	return self.frame:IsShown()
 end
 
 function HDH_TRACKER:StartAni(f, ani_type) -- row 이동 실행

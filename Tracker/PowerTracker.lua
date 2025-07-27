@@ -368,7 +368,9 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 			f:SetScript("OnUpdate", HDH_POWER_OnUpdate);
 			f:Hide();
 			self:ActionButton_HideOverlayGlow(f)
-			self:UpdateBarSettings(f)
+			if f.bar then
+				f.bar:SetSplitPoints(spell.splitPoints, spell.splitPointType)
+			end
 		end
 		self.frame:SetScript("OnEvent", self.OnEvent)
 		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE',"player")

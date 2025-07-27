@@ -184,7 +184,7 @@ local DEFAULT_DISPLAY = {
         v2_color = {1,1,1,1}, -- 2차
         
         show_name = true, 
-        name_location = CONFIG.NAME_ALIGN_CENTER,
+        name_location = CONFIG.FONT_LOCATION_BAR_C,
         name_size=15, 
         name_margin_left=5, 
         name_margin_right=5, 

@@ -732,6 +732,11 @@ function HDH_AT_ColorPickerMixin:SetEnableAlpha(enable)
     self.enableAlpha = enable
 end
 
+function HDH_AT_ColorPickerMixin:Cancel()
+    local r, g, b, a = unpack(self.rgba)
+    self:SetColorRGBA(r, g, b, a)
+end
+
 function HDH_AT_ColorPickerMixin:SetHandler(handler, errorHandler)
     self.handler = handler
     self.errorHandler = errorHandler
@@ -745,7 +750,6 @@ local function OnSelectedColorPicker()
     self.handler(self, r, g, b, ColorPickerFrame:GetColorAlpha())
     ColorPickerFrame.buttonFrame = nil
     ColorPickerFrame:Hide()
-
 end
 
 local function OnOKColorPicker()
@@ -756,7 +760,7 @@ local function OnOKColorPicker()
 end
 
 local function OnCancelColorPicker()
-    self = ColorPickerFrame.buttonFrame
+    local self = ColorPickerFrame.buttonFrame
     local r, g, b, a  = ColorPickerFrame:GetPreviousValues()
     self:SetColorRGBA(r, g, b, a)
     self.handler(self, r, g, b, a)
@@ -1549,7 +1553,7 @@ local DB = HDH_AT_ConfigDB
 local BAR_INNER_MAX = 1000
 local BAR_ANIMATE_DURATION = .15 --.15
 
-local function HDH_AT_MultiStatusBar_OnUpdate(self, elapsed)
+function HDH_AT_MultiStatusBarTemplateMixin:OnUpdate(elapsed)
     self.elapsed = (self.elapsed or 0) + elapsed
     if self.elapsed < 0.015 then return end
     self.elapsed = 0
@@ -1560,27 +1564,29 @@ local function HDH_AT_MultiStatusBar_OnUpdate(self, elapsed)
 end
 
 function HDH_AT_MultiStatusBarTemplateMixin:Setup(minMaxValues, points, pointType, direction, toFill, texture, texture_r)
-    self.points = self.points or {}
+    self.points = points or self.points or {}
     self.list = self.list or {}
     self.margin_x = 2
     self.margin_y = 2
     self.minValue = self.minValue or 0
     self.maxValue = self.maxValue or 1
     self.range = self.range or 1
-    self.direction = direction or DB.COOLDOWN_RIGHT
+    self.direction = direction or self.direction or DB.COOLDOWN_RIGHT
     self.toFill = toFill
     self.texture = texture or "Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg"
     self.texture_r = texture_r or "Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg"
-    self.pointType = pointType or DB.BAR_SPLIT_RATIO
+    self.pointType = pointType or self.pointType or DB.BAR_SPLIT_RATIO
     self.backgroundColor = {0, 0, 0, 0.3}
     self.fullColor = {1, 0, 0, 1}
-    self.normalColor = {0 , 1, 0, 1}
+    self.normalColor = {0, 1, 0, 1}
     self.sparkColor = {1,1,1,1}
     self.innerValue = self.innerValue or 0
     self.value = self.value or 0
-    self.innerPoints = self.innerPoints or {}
+    self.innerPoints = self:UpdateSplitPoints(self.points, self.pointType, self.range)
     self.fullTextColor = {1,1,1,1}
     self.normalTextColor= {1,1,1,1}
+    self.enbaleSpark = self.enbaleSpark or true
+    self.sparkColor = self.sparkColor or {1,1,1,1}
 
     setmetatable(self.list, {
         __index = function(list, index)
@@ -1596,47 +1602,51 @@ function HDH_AT_MultiStatusBarTemplateMixin:Setup(minMaxValues, points, pointTyp
 			newBar.Background:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg")
             -- newBar.StatusBar.Spark = newBar:CreateTexture(nil, "OVERLAY")
             list[index] = newBar
+
+            if self.direction == DB.COOLDOWN_LEFT or  self.direction == DB.COOLDOWN_DOWN then
+                newBar.StatusBar:SetDirection(self.direction, self.toFill, self.texture)
+            else
+                newBar.StatusBar:SetDirection(self.direction, self.toFill, self.texture_r)
+            end
+
+            newBar.Background:SetVertexColor(unpack(self.backgroundColor))
+            newBar.StatusBar:EnableSpark(self.enbaleSpark, self.sparkColor)
+
+            if self.fullColor then
+                newBar.StatusBar:UseChangedStatusColor(self.normalColor, self.fullColor)
+            elseif self.normalColor then
+                newBar.StatusBar:SetStatusBarColor(unpack(self.normalColor))
+            end
+
             return newBar
         end
     })
     if not self.Text then
-        self.Text = self:CreateFontString(nil, "OVERLAY")
+        self.Text = self:CreateFontString(GetTime(), "ARTWORK")
+        self.Text:SetTextColor(0,1,0,0.1)
     end
-
-    if points and #points > 0 then
-        self.points = points
-        if pointType == DB.BAR_SPLIT_RATIO then
-            for i, v in ipairs(points) do
-                self.innerPoints[i] = v * BAR_INNER_MAX
-            end
-        else
-            for i, v in ipairs(points) do
-                self.innerPoints[i] = v / self.range * BAR_INNER_MAX
-            end
-        end
+   
+    self:UpdateLayout()
+    if minMaxValues and #minMaxValues == 2 then
+        self:SetMinMaxValues(minMaxValues[1], minMaxValues[2])
     end
-
-    self:UpdateAllPoints()
     for _, bar in ipairs(self.list) do
         if self.direction == DB.COOLDOWN_LEFT or  self.direction == DB.COOLDOWN_DOWN then
             bar.StatusBar:SetDirection(self.direction, self.toFill, self.texture)
         else
             bar.StatusBar:SetDirection(self.direction, self.toFill, self.texture_r)
         end
-        
-    end
-    if minMaxValues and #minMaxValues == 2 then
-        self:SetMinMaxValues(minMaxValues[1], minMaxValues[2])
     end
     self:SetInnerValue(self.innerValue)
 end
 
 function HDH_AT_MultiStatusBarTemplateMixin:UseChangedStatusColor(normalColor, fullColor)
+    self.normalColor = normalColor
+    self.fullColor = fullColor
     for _, bar in ipairs(self.list) do
         bar.StatusBar:UseChangedStatusColor(normalColor, fullColor)
     end
 end
-
 
 function HDH_AT_MultiStatusBarTemplateMixin:ToInnerValue(value)
     if self.range == 0 then return 0 end
@@ -1699,7 +1709,7 @@ function HDH_AT_MultiStatusBarTemplateMixin:SetTextColor(normalTextColor, fullTe
     self:SetInnerValue(self.innerValue)
 end
 
-function HDH_AT_MultiStatusBarTemplateMixin:UpdateAllPoints()
+function HDH_AT_MultiStatusBarTemplateMixin:UpdateLayout()
     local w, h = self:GetSize()
     local margin_x = self.margin_x
     local margin_y = self.margin_y
@@ -1773,7 +1783,7 @@ end
 function HDH_AT_MultiStatusBarTemplateMixin:SetSize(w, h)
     self:SetWidth(w)
     self:SetHeight(h)
-    self:UpdateAllPoints()
+    self:UpdateLayout()
 end
 
 function HDH_AT_MultiStatusBarTemplateMixin:RelaseBar(index)
@@ -1794,6 +1804,8 @@ function HDH_AT_MultiStatusBarTemplateMixin:SetBackgroundColor(r, g, b, a)
 end
 
 function HDH_AT_MultiStatusBarTemplateMixin:EnableSpark(bool, color)
+    self.enbaleSpark = bool
+    self.sparkColor = color
     for _, bar in ipairs(self.list) do
         bar.StatusBar:EnableSpark(bool, color)
     end
@@ -1807,10 +1819,12 @@ function HDH_AT_MultiStatusBarTemplateMixin:SetValue(value, animate)
         self.animatedStartTime = GetTime()
         self.targetValue = value
         self.startValue = self.innerValue
-        self.gap = self.targetValue - self.innerValue
+        self.gap = self.targetValue - self.startValue
     else
         self.gap = nil
         self.targetValue = nil
+        self.startValue = nil
+        self.animatedStartTime = nil
         self.innerValue = value
     end
     self:SetInnerValue(self.innerValue)
@@ -1823,48 +1837,37 @@ function HDH_AT_MultiStatusBarTemplateMixin:SetInnerValue(value)
         if self.targetValue == self.innerValue then
             self.gap  = nil
             self.targetValue = nil
+            self.startValue = nil
+            self.animatedStartTime = nil
             if self:GetScript("OnUpdate") then
                 self:SetScript("OnUpdate", nil)
             end
         else
             if not self:GetScript("OnUpdate") then
-                self:SetScript("OnUpdate", HDH_AT_MultiStatusBar_OnUpdate)
+                self:SetScript("OnUpdate", self.OnUpdate)
             end
         end
     end
-    
     if self.toFill then
         for _, bar in ipairs(self.list) do
             bar.StatusBar:SetValue(self.innerValue)
-        end
-        if self.Text:IsShown() then
-            if self.innerValue >= BAR_INNER_MAX then
-                if self.Text.full == false or not self.Text.full then
-                    self.Text.full = true
-                    self.Text:SetTextColor(unpack(self.fullTextColor))
-                end
-            else
-                if self.Text.full == true  or not self.Text.full then
-                    self.Text.full = false
-                    self.Text:SetTextColor(unpack(self.normalTextColor))
-                end
-            end
         end
     else
         for _, bar in ipairs(self.list) do
             bar.StatusBar:SetValue(BAR_INNER_MAX - self.innerValue)
         end
-        if self.Text:IsShown() then
-            if (BAR_INNER_MAX - self.innerValue) <= 0 then
-                if self.Text.full == false then
-                    self.Text.full = true
-                    self.Text:SetTextColor(unpack(self.fullTextColor))
-                end
-            else
-                if self.Text.full == true then
-                    self.Text.full = false
-                    self.Text:SetTextColor(unpack(self.normalTextColor))
-                end
+    end
+    
+    if self.Text:IsShown() then
+        if self.innerValue >= BAR_INNER_MAX then
+            if self.Text.full == false or self.Text.full == nil then
+                self.Text.full = true
+                self.Text:SetTextColor(unpack(self.fullTextColor))
+            end
+        else
+            if self.Text.full == true  or self.Text.full == nil then
+                self.Text.full = false
+                self.Text:SetTextColor(unpack(self.normalTextColor))
             end
         end
     end
@@ -1872,21 +1875,48 @@ end
 
 -- 동적
 function HDH_AT_MultiStatusBarTemplateMixin:SetStatusBarColor(r, g, b, a)
+    self.normalColor = {r, g, b, a}
     for _, bar in ipairs(self.list) do
         bar.StatusBar:SetStatusBarColor(r, g, b, a)
     end
 end
 
 -- 동적
-function HDH_AT_MultiStatusBarTemplateMixin:SetMinMaxValues(minValue, maxValue)
-    if self.minValue == minValue and self.maxValue == maxValue then return false end
+function HDH_AT_MultiStatusBarTemplateMixin:SetMinMaxValues(minValue, maxValue, reload)
+    if not reload and self.minValue == minValue and self.maxValue == maxValue then return false end
     if #self.points >= 1 and self.points[#self.points] >= ((maxValue - minValue) / (self.range) * BAR_INNER_MAX) then return false end
     self.minValue = minValue
     self.maxValue = maxValue
     self.range = maxValue - minValue
-    self:UpdateAllPoints()
+    self.innerPoints = self:UpdateSplitPoints(self.points, self.pointType, self.range)
+    self:UpdateLayout()
     self:SetInnerValue(self.innerValue)
     return true
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:UpdateSplitPoints(points, pointType, range)
+    local innerPoints = {}
+    if (points == nil or #points == 0) and range == nil then
+        return
+    end
+    if pointType == DB.BAR_SPLIT_RATIO then
+        for i, v in ipairs(points) do
+            table.insert(innerPoints, v * BAR_INNER_MAX)
+        end
+    else
+        for _, v in ipairs(points) do
+            if v < range then
+                table.insert(innerPoints, v / range * BAR_INNER_MAX)
+            end
+        end
+    end
+    return innerPoints
+end
+
+function HDH_AT_MultiStatusBarTemplateMixin:SetSplitPoints(points, pointType)
+    self.points = points
+    self.pointType = pointType
+    self:SetMinMaxValues(self.minValue, self.maxValue, true)
 end
 
 function HDH_AT_MultiStatusBarTemplateMixin:GetMaxValue()

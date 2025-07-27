@@ -398,8 +398,8 @@ do
 		end
 	end
 
-	local COLOR_RGB_CODE_STR = "#|cffff9999%02x|cff99ff99%02x|cff9999ff%02x"
-	local COLOR_RGBA_CODE_STR = "#|cffff9999%02x|r|cff99ff99%02x|r|cff9999ff%02x|r%02x"
+	local COLOR_RGB_CODE_STR = "|cffff9999%02x|cff99ff99%02x|cff9999ff%02x"
+	local COLOR_RGBA_CODE_STR = "|cffff9999%02x|r|cff99ff99%02x|r|cff9999ff%02x|r%02x"
 	function HDH_AT_UTIL.ColorToString(r, g, b, a)
 		if a then
 			return string.upper(COLOR_RGBA_CODE_STR:format(r * 255, g *255, b*255, a*255))
@@ -608,7 +608,7 @@ do
 		ok, v = pcall(C_EncodingUtil.CompressString, v, 0, 2)
 		if not ok then return nil end
 
-		ok, v = pcall(C_EncodingUtil.EncodeBase64, v)
+		ok, v = pcall(C_EncodingUtil.EncodeBase64, v, 1)
 		if not ok then return nil end
 		
 		return v

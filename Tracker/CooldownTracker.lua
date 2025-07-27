@@ -103,34 +103,45 @@ end
 local function CT_OnUpdateIcon(self, elapsed) -- 거리 체크는 onUpdate 에서 처리해야함
 	if not self.spell then return end
 	self.spell.curTime = GetTime();
-	if self.spell.curTime - (self.spell.delay or 0) < 0.1  then return end -- 10프레임
-	self.spell.delay = self.spell.curTime2;
+	if self.spell.curTime - (self.spell.delay or 0) < 0.03  then return end -- 10프레임
+	self.spell.delay = self.spell.curTime;
 	
 	if self.spell.slot then
 		self.spell.newRange = IsActionInRange(self.spell.slot) 
 	else
-		if not self.spell.isItem then
-			self.spell.newRange = HDH_AT_UTIL.IsSpellInRange(self.spell.name,"target"); -- 1 true, 0 false, nil not target
+		if UnitExists('target') then
+			if not self.spell.isItem then
+				self.spell.newRange = HDH_AT_UTIL.IsSpellInRange(self.spell.name, "target"); -- 1 true, 0 false, nil not target
+			else
+				self.spell.newRange = C_Item.IsItemInRange(self.spell.id, "target")
+			end
+		elseif UnitExists('mouseover') then
+			if not self.spell.isItem then
+				self.spell.newRange = HDH_AT_UTIL.IsSpellInRange(self.spell.name, "mouseover"); -- 1 true, 0 false, nil not target
+			else
+				self.spell.newRange = C_Item.IsItemInRange(self.spell.id, "mouseover")
+			end
 		else
-			self.spell.newRange = C_Item.IsItemInRange(self.spell.id, "target")
+			self.spell.newRange = nil
 		end
 	end
-
-	-- if self.spell.isCharging and self.spell.remaining <= 0 then --and self.spell.charges.duration > HDH_C_TRACKER.GlobalCooldown
-	-- 	self.spell.charges.remaining = self.spell.charges.endTime - self.spell.curTime2;
-	-- 	self:GetParent().parent:UpdateTimeText(self.timetext, self.spell.charges.remaining);
-	-- 	self.spell.per = 1.0 - (self.spell.charges.remaining / self.spell.charges.duration)
-	-- 	if self:GetParent().parent.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE 
-	-- 			and self:GetParent().parent.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
-	-- 		CT_UpdateCooldownSatIcon(self:GetParent().parent, self, self.spell)
-	-- 	end
-	-- end
 
 	if self.spell.preInRage ~= self.spell.newRange then
 		self:GetParent().parent:UpdateIcon(self);
 		self.spell.preInRage = self.spell.newRange;
 	end
 	CT_UpdateCooldown(self:GetParent().parent, self, elapsed)
+end
+
+local function OnUpdateCheckRange(frame, elapsed)
+	frame.curTime = GetTime()
+	if frame.curTime - (frame.delay or 0) < 0.1 then return end -- 10프레임
+	frame.delay = frame.curTime
+	-- print("check")
+
+	if not UnitExists('target') and not UnitExists('mouseover') then
+		frame:SetScript('OnUpdate', nil)
+	end
 end
 
 -- 매 프레임마다 bar frame 그려줌, 콜백 함수
@@ -273,6 +284,10 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		spell.isNotEnoughMana = isNotEnoughMana
 	end
 
+	if display_mode ~= DB.DISPLAY_ICON then
+		f.bar:SetText(spell.name)
+	end
+	
 	if spell.remaining <= HDH_C_TRACKER.EndCooldown then
 		f.cd:Hide()
 		if display_mode ~= DB.DISPLAY_ICON and f.bar then
@@ -445,10 +460,6 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		f.counttext:SetText(nil)
 	end
 
-	if display_mode ~= DB.DISPLAY_ICON then 
-		f.bar:SetText(spell.name)
-	end
-
 	if self.OrderFunc then self:OrderFunc(self) end
 	self:UpdateLayout()
 	return isUpdate
@@ -610,7 +621,8 @@ function HDH_C_TRACKER:GetSlot(id)
 	return self.frame.pointer[id].slot;
 end
 
-function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_SHOW(f, id)
+function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_SHOW(id)
+	local f = self.frame.pointer[id]
 	if not f or not f.spell then return end
 
 	if f.spell.id == id then
@@ -640,7 +652,8 @@ function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_SHOW(f, id)
 	end
 end
 
-function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_HIDE(f, id)
+function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_HIDE(id)
+	local f = self.frame.pointer[id]
 	if not f or not f.spell then return end
 
 	if f.spell.id == id then
@@ -781,7 +794,7 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 		end
 		f:ClearAllPoints()
 		local spell = {}
-		spell.name = ""
+		spell.name = f.spell.name
 		spell.icon = nil
 		spell.display = DB.SPELL_ALWAYS_DISPLAY
 		spell.id = 0
@@ -848,6 +861,12 @@ end
 
 function HDH_C_TRACKER:Update() -- HDH_TRACKER override
 	if not self.ui then return end
+	if (UnitExists('target') or UnitExists('mouseover')) and self:IsShown() then
+		if not self.frame:GetScript("OnUpdate") then
+			self.frame:SetScript("OnUpdate", OnUpdateCheckRange)
+		end
+	end
+
 	self:UpdateAllIcons();
 end
 
@@ -904,6 +923,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	local hasInnerCDItem = false
 	local needEquipmentEvent = false;
 	local isLearned = false
+	local hasItem = false
 
 	self.frame.pointer = {};
 	self.frame:UnregisterAllEvents()
@@ -1013,25 +1033,15 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 			f.iconSatCooldown:SetDesaturated(nil)
 			f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
+
 			self:ChangeCooldownType(f, self.ui.icon.cooldown)
 			self:UpdateGlow(f, false)
 			
 			if not spell.blankDisplay then
 				f:SetScript("OnUpdate", CT_OnUpdateIcon)
-				if f:GetScript("OnEvent") ~= CT_OnEventIcon then
-					f:SetScript("OnEvent", CT_OnEventIcon)
-				end
-
 				if not spell.isInnerCDItem then
 					if spell.isItem then
-						f:RegisterEvent("BAG_UPDATE");
-						f:RegisterEvent("BAG_UPDATE_COOLDOWN");
-					else
-						f:RegisterEvent("ACTIONBAR_UPDATE_USABLE");
-						f:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN");
-						f:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW");
-						f:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE");
-						
+						hasItem = true
 					end
 				end
 			else
@@ -1040,24 +1050,38 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 		end
 	end
 
-	self:LoadOrderFunc();
-	self.frame:SetScript("OnEvent", CT_OnEvent_Frame)
-	self.frame:RegisterEvent('PLAYER_TALENT_UPDATE')
-	self.frame:RegisterEvent('ACTIONBAR_SLOT_CHANGED')
-	self.frame:RegisterEvent('ACTIONBAR_UPDATE_STATE')
-	self.frame:RegisterEvent('CURSOR_CHANGED')
-	self.frame:RegisterEvent('COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED')
-	
-	if needEquipmentEvent then
-		self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
-	end
+	if iconIdx > 0 then
+		self:LoadOrderFunc();
+		self.frame:SetScript("OnEvent", CT_OnEvent_Frame)
+		self.frame:RegisterEvent('PLAYER_TALENT_UPDATE')
+		self.frame:RegisterEvent('ACTIONBAR_SLOT_CHANGED')
+		self.frame:RegisterEvent('ACTIONBAR_UPDATE_STATE')
+		self.frame:RegisterEvent('CURSOR_CHANGED')
+		self.frame:RegisterEvent('COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED')
+		self.frame:RegisterEvent("ACTIONBAR_UPDATE_USABLE")
+		self.frame:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
+		self.frame:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW")
+		self.frame:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE")
+		self.frame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
+		self.frame:RegisterEvent("PLAYER_TARGET_CHANGED")
+		
+		
+		if needEquipmentEvent then
+			self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
+		end
 
-	if #(self.frame.icon) > 0 then
-		self.frame:RegisterEvent('UNIT_PET');
-	end
+		if #(self.frame.icon) > 0 then
+			self.frame:RegisterEvent('UNIT_PET');
+		end
 
-	if hasInnerCDItem then
-		self.frame:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
+		if hasItem then
+			self.frame:RegisterEvent("BAG_UPDATE")
+			self.frame:RegisterEvent("BAG_UPDATE_COOLDOWN")
+		end
+
+		if hasInnerCDItem then
+			self.frame:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
+		end
 	end
 
 	for i = #self.frame.icon, iconIdx+1 , -1 do
@@ -1161,7 +1185,13 @@ function HDH_C_TRACKER:ACTIVE_TALENT_GROUP_CHANGED()
 end
 
 function HDH_C_TRACKER:PLAYER_ENTERING_WORLD()
-	
+	-- 항상 표시 옵션일때, 시작하자마자 ShowTracker 애니메이션(alpha 0 -> 1)이 동작하는데,
+	-- 이 때, 바 이름 알파값 관련 초기화가 동시에 이뤄지면서 애니메이션의 알파값에 영향을 받아서 제대로 설정이 적용되지 않는 문제 발생
+	-- 그래서 애니메이션이 끝나는 지점에서 다시한번 세팅값을 로딩함
+	-- 다른 추적에서는 발생하지 않는데, 쿨다운 추적이 무거워서 그런듯
+	if self.ui.common.always_show then
+		HDH_AT_UTIL.RunTimer(self, "UpdateSetting", 0.5, HDH_C_TRACKER.UpdateSetting, self) 
+	end	
 end
 
 function HDH_C_TRACKER:COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED(base, override)
@@ -1223,50 +1253,86 @@ end
 function CT_OnEvent_Frame(self, event, ...)
 	local tracker = self.parent 
 	if not tracker then return end
-	if event =="PLAYER_TARGET_CHANGED" then
+
+	if event == "ACTIONBAR_UPDATE_COOLDOWN" or event =="BAG_UPDATE_COOLDOWN" or event =="BAG_UPDATE" then
+		if not HDH_TRACKER.ENABLE_MOVE then 
+			-- tracker:Update() 
+			HDH_AT_UTIL.RunTimer(tracker, "ACTIONBAR_UPDATE_COOLDOWN", 0.05, HDH_C_TRACKER.Update, tracker)	
+		end
+
+	elseif event == "ACTIONBAR_UPDATE_USABLE" then
+		if not HDH_TRACKER.ENABLE_MOVE then 
+			HDH_AT_UTIL.RunTimer(tracker, "ACTIONBAR_UPDATE_COOLDOWN", 0.05, HDH_C_TRACKER.Update, tracker)	
+		end
+
+	elseif event == "SPELL_ACTIVATION_OVERLAY_GLOW_SHOW" then
+		tracker:ACTIVATION_OVERLAY_GLOW_SHOW(...)
+
+	elseif event == "SPELL_ACTIVATION_OVERLAY_GLOW_HIDE" then
+		tracker:ACTIVATION_OVERLAY_GLOW_HIDE(...)
+
+	elseif event =="PLAYER_TARGET_CHANGED" then
+		if  tracker:IsShown() then
+			if UnitExists('target') then
+				if not tracker.frame:GetScript("OnUpdate") then
+					tracker.frame:SetScript("OnUpdate", OnUpdateCheckRange)
+				end
+			else
+				tracker.frame:SetScript("OnUpdate", nil)
+			end
+			tracker:Update()
+		end
+		
+	elseif event =="UPDATE_MOUSEOVER_UNIT" then
+		if not tracker:IsShown() then return end
+		if not UnitExists('target') and UnitExists('mouseover') then
+			if not tracker.frame:GetScript("OnUpdate") then
+				tracker.frame:SetScript("OnUpdate", OnUpdateCheckRange)
+			end
+		end
 		tracker:Update()
+
 	elseif event == 'PLAYER_FOCUS_CHANGED' then
 		tracker:Update()
+
 	elseif event == 'INSTANCE_ENCOUNTER_ENGAGE_UNIT' then
 		tracker:Update()
+
 	elseif event == 'GROUP_ROSTER_UPDATE' then
 		tracker:Update()
+
 	elseif event == 'UNIT_PET' then
 		HDH_AT_UTIL.RunTimer(tracker, "UNIT_PET", 0.5, HDH_C_TRACKER.Update, tracker) 
+
 	elseif event == 'ARENA_OPPONENT_UPDATE' then
-		HDH_AT_UTIL.RunTimer(tracker, "ARENA_OPPONENT_UPDATE", 0.5, HDH_C_TRACKER.Update, tracker) 
+		HDH_AT_UTIL.RunTimer(tracker, "ARENA_OPPONENT_UPDATE", 0.5, HDH_C_TRACKER.Update, tracker)
+
 	elseif event == 'PLAYER_TALENT_UPDATE' then
 		HDH_AT_UTIL.RunTimer(tracker, "PLAYER_TALENT_UPDATE", 0.5, HDH_C_TRACKER.InitIcons, tracker)
+
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
 		HDH_AT_UTIL.RunTimer(tracker, "PLAYER_EQUIPMENT_CHANGED", 0.5, HDH_C_TRACKER.InitIcons, tracker)
+
 	elseif event == "ACTIONBAR_SLOT_CHANGED" then
 		tracker:ACTIONBAR_SLOT_CHANGED(...)
+
 	elseif event == 'UNIT_AURA' then
-		if select(1, ...) == "player" then tracker:Update() end
+		if select(1, ...) == "player" then 
+			HDH_AT_UTIL.RunTimer(tracker, "ACTIONBAR_UPDATE_COOLDOWN", 0.05, HDH_C_TRACKER.Update, tracker)	
+		end
+
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
 		local _, subEvent, _, srcGUID, _, _, _, _, _, _, _, spellID = CombatLogGetCurrentEventInfo()
 		tracker:COMBAT_LOG_EVENT_UNFILTERED(subEvent, srcGUID, spellID)
+
 	elseif event == 'COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED' then
 		tracker:COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED(...)
+
 	elseif event == 'CURSOR_CHANGED' then
 		tracker:CURSOR_CHANGED(...)
 	end
-	tracker.prevEvent = event
-end
 
-function CT_OnEventIcon(self, event, ...)
-	local tracker = self:GetParent().parent
-	if event == "ACTIONBAR_UPDATE_USABLE" then
-		if not HDH_TRACKER.ENABLE_MOVE then tracker:UpdateIcon(self) end
-	elseif event == "ACTIONBAR_UPDATE_COOLDOWN" or event =="BAG_UPDATE_COOLDOWN" or event =="BAG_UPDATE" then
-		if not HDH_TRACKER.ENABLE_MOVE and (tracker:UpdateIcon(self) or (not tracker.ui.common.always_show and not UnitAffectingCombat("player"))) then
-			tracker:UpdateLayout(self)
-		end
-	elseif event == "SPELL_ACTIVATION_OVERLAY_GLOW_SHOW" then
-		tracker:ACTIVATION_OVERLAY_GLOW_SHOW(self, ...)
-	elseif event == "SPELL_ACTIVATION_OVERLAY_GLOW_HIDE" then
-		tracker:ACTIVATION_OVERLAY_GLOW_HIDE(self, ...)
-	end
+	tracker.prevEvent = event
 end
 
 -------------------------------------------
