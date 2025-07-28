@@ -442,9 +442,12 @@ do
 	function HDH_AT_UTIL.RunTimer(obj, timerName, time, func, ...)
 		if not obj.timer then obj.timer = {} end
 		if obj.timer[timerName] then
-			obj.timer[timerName]:Cancel()
+			obj.timer[timerName].args = ...
+			if (GetTime() - obj.timer[timerName].startTime) <= time then
+				return
+			end
 		end
-		obj.timer[timerName] = C_Timer.NewTimer(time, function(timer) 
+		obj.timer[timerName] = C_Timer.NewTimer(time, function(timer)
 			if timer.parent then 
 				timer.func(timer.args) 
 				timer.parent[timer.timerName] = nil
@@ -452,6 +455,7 @@ do
 				timer.args = nil
 			end 
 		end)
+		obj.timer[timerName].startTime = GetTime()
 		obj.timer[timerName].tracker = obj
 		obj.timer[timerName].parent = obj.timer
 		obj.timer[timerName].timerName = timerName

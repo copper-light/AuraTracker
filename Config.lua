@@ -3889,3 +3889,12 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 
 	return component
 end
+
+t = CreateFrame("Frame", nil, UIParent, 'HDH_AT_CircleCooldownTemplate')
+t:SetPoint("CENTER")
+t:SetSize(200, 200)
+
+t:Setup(DB.COOLDOWN_CIRCLE, false,  {0,0,0,1}, 1, 0.5)
+t:SetCooldown(GetTime(), 10, true)
+-- t:SetValue(11)
+t:SetIcon('Interface/Addons/HDH_AuraTracker/Texture/logo')

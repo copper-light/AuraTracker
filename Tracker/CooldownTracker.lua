@@ -7,14 +7,12 @@ HDH_C_TRACKER.EndCooldown = 0.09;
 ------------------------------------
 -- HDH_C_TRACKER class
 ------------------------------------
-
-setmetatable(HDH_C_TRACKER, HDH_AURA_TRACKER) -- 상속
+local super = HDH_AURA_TRACKER
+setmetatable(HDH_C_TRACKER, super) -- 상속
 HDH_C_TRACKER.__index = HDH_C_TRACKER
 HDH_C_TRACKER.className = "HDH_C_TRACKER"
 HDH_TRACKER.TYPE.COOLDOWN = 3
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.COOLDOWN, HDH_C_TRACKER)
-
-local super = HDH_AURA_TRACKER
 
 -----------------------------------
 -- OnUpdate icon
@@ -103,7 +101,7 @@ end
 local function CT_OnUpdateIcon(self, elapsed) -- 거리 체크는 onUpdate 에서 처리해야함
 	if not self.spell then return end
 	self.spell.curTime = GetTime();
-	if self.spell.curTime - (self.spell.delay or 0) < 0.03  then return end -- 10프레임
+	if self.spell.curTime - (self.spell.delay or 0) < 0.05  then return end -- 10프레임
 	self.spell.delay = self.spell.curTime;
 	
 	if self.spell.slot then
@@ -206,7 +204,18 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 		chargeRemaining = math.max(chargeRemaining, 0)
 	end
 
-	return startTime or 0, duration or 0, remaining or 0, count or 0, chargeStartTime or 0, chargeDuration or 0, chargeRemaining or 0, chargeCount or 0, chargeCountMax or 0, inRange or false, isAble or false, isNotEnoughMana or false
+	return startTime or 0, 
+			duration or 0, 
+			remaining or 0, 
+			count or 0, 
+			chargeStartTime or 0, 
+			chargeDuration or 0, 
+			chargeRemaining or 0, 
+			chargeCount or 0, 
+			chargeCountMax or 0, 
+			inRange or false, 
+			isAble or false, 
+			isNotEnoughMana or false
 end
 
 function HDH_C_TRACKER:UpdateCombatSpellInfo(f, id)
@@ -238,16 +247,23 @@ end
 
 
 function HDH_C_TRACKER:UpdateIcon(f)
+	f.t = f.t or GetTime()
+	f.c = (f.c or 0) + 1
+	if (GetTime() - f.t) >= 1 then
+		f.c = 0
+		f.t = nil
+		return
+	end
+
 	if not f or not f.spell or not self or not self.ui or f.spell.blankDisplay then return false end
-	local ui = self.ui
-	local spell = f.spell
-	local isUpdate = false
-	local maxtime = ui.icon.max_time or -1
 	local startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana 
+	local isUpdate = false
+	local spell = f.spell
+	local ui = self.ui
+	local maxtime = ui.icon.max_time or -1
 	local show_global_cooldown = ui.cooldown.show_global_cooldown
 	local cooldown_type = ui.icon.cooldown
 	local display_mode = ui.common.display_mode
-
 	local not_enough_mana_color = (self.ui.cooldown.not_enough_mana_color or {0.35, 0.35, 0.78})
 	local out_range_color = (self.ui.cooldown.out_range_color or {0.53, 0.1, 0.1})
 	local use_not_enough_mana_color = self.ui.cooldown.use_not_enough_mana_color
@@ -255,21 +271,19 @@ function HDH_C_TRACKER:UpdateIcon(f)
 
 	if not HDH_TRACKER.ENABLE_MOVE and not spell.isInnerCDItem then
 		startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana = self:UpdateSpellInfo(f.spell.id, f.spell.name, f.spell.isItem, f.spell.isToy)
+		
 		spell.isGlobalCooldown = (duration < HDH_C_TRACKER.GlobalCooldown)
-		if show_global_cooldown then
+		if show_global_cooldown or not spell.isGlobalCooldown then
 			spell.startTime = startTime
 			spell.endTime = startTime + duration
 			spell.remaining = remaining
 			spell.duration = duration
-		else
-			if not spell.isGlobalCooldown then
-				spell.startTime = startTime
-				spell.endTime = startTime + duration
-				spell.remaining = remaining
-				spell.duration = duration
-			end
+		end
+
+		if not show_global_cooldown then
 			spell.isGlobalCooldown = false
 		end
+
 		if count >= 2 and f.spell.isItem then
 			spell.stackable = true
 		end
@@ -1241,7 +1255,7 @@ function HDH_C_TRACKER:ACTIONBAR_SLOT_CHANGED(slot)
 	end
 end
 
-function HDH_C_TRACKER:CURSOR_CHANGED(isDefault, curType , preType)
+function HDH_C_TRACKER:CURSOR_CHANGED(isDefault, curType, preType)
 	self.isManualChange = false
 	if preType == 1 or preType == 3 or preType == 6 then
 		if isDefault then
@@ -1254,15 +1268,9 @@ function CT_OnEvent_Frame(self, event, ...)
 	local tracker = self.parent 
 	if not tracker then return end
 
-	if event == "ACTIONBAR_UPDATE_COOLDOWN" or event =="BAG_UPDATE_COOLDOWN" or event =="BAG_UPDATE" then
-		if not HDH_TRACKER.ENABLE_MOVE then 
-			-- tracker:Update() 
-			HDH_AT_UTIL.RunTimer(tracker, "ACTIONBAR_UPDATE_COOLDOWN", 0.05, HDH_C_TRACKER.Update, tracker)	
-		end
-
-	elseif event == "ACTIONBAR_UPDATE_USABLE" then
-		if not HDH_TRACKER.ENABLE_MOVE then 
-			HDH_AT_UTIL.RunTimer(tracker, "ACTIONBAR_UPDATE_COOLDOWN", 0.05, HDH_C_TRACKER.Update, tracker)	
+	if event == "ACTIONBAR_UPDATE_COOLDOWN" or event =="BAG_UPDATE_COOLDOWN" or event =="BAG_UPDATE" or event == "ACTIONBAR_UPDATE_USABLE"  then
+		if not HDH_TRACKER.ENABLE_MOVE then
+			HDH_AT_UTIL.RunTimer(tracker, "ACTIONBAR_UPDATE_COOLDOWN", 0.05, HDH_C_TRACKER.Update, tracker)
 		end
 
 	elseif event == "SPELL_ACTIVATION_OVERLAY_GLOW_SHOW" then
@@ -1282,7 +1290,7 @@ function CT_OnEvent_Frame(self, event, ...)
 			end
 			tracker:Update()
 		end
-		
+
 	elseif event =="UPDATE_MOUSEOVER_UNIT" then
 		if not tracker:IsShown() then return end
 		if not UnitExists('target') and UnitExists('mouseover') then

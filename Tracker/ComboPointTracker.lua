@@ -233,8 +233,8 @@ function HDH_COMBO_POINT_TRACKER:ChangeCooldownType(f, cooldown_type)
 	end
 end
 
-function HDH_COMBO_POINT_TRACKER:UpdateBarLayout(f) -- HDH_TRACKER override
-	super.UpdateBarLayout(self,f)
+function HDH_COMBO_POINT_TRACKER:UpdateBarSettings(f) -- HDH_TRACKER override
+	super.UpdateBarSettings(self,f)
 	if f.bar then
 		f.bar:SetScript("OnUpdate",nil);
 	end

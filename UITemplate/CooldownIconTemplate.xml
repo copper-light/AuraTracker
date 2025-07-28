@@ -1,0 +1,154 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Blizzard_SharedXML/UI.xsd">
+	<Script file="CooldownIconTemplate.lua"/>
+
+	<!-- <Frame name="HDH_AT_LinearCooldownTemplate" parent="UIParent">
+		<Size x="100" y="100" />
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+		<Frames>
+			<Frame clipChildren="true">
+				<Size x="50" y="50" />
+				<Anchors>
+					<Anchor point="CENTER" />
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture file="Interface/AddOns/HDH_AuraTracker/Texture/spark_rect.blp">
+							<Size x="100" y="100" />
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+	</Frame> -->
+
+
+	<Frame name="HDH_AT_LinearCooldownTemplate" mixin="HDH_AT_LinearCooldownTemplateMixin" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Icon" setAllPoints="true">
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame parentKey="Progress" clipChildren="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon">
+							<Anchors>
+								<Anchor point="CENTER" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Frame parentKey="Spark">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Texture" alphaMode="ADD" setAllPoints="true">
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+
+		<Scripts>
+			<OnSizeChanged function="HDH_AT_LinearCooldownTemplate_OnSizeChanged"/>
+		</Scripts>
+	</Frame>
+
+	<Frame name="HDH_AT_CircleCooldownTemplate" mixin="HDH_AT_CircleCooldownTemplateMixin" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Icon" setAllPoints="true">
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Cooldown parentKey="Cooldown" inherits="CooldownFrameTemplate" setAllPoints="true" hideCountdownNumbers ="true" drawEdge="false" drawSwipe="true" drawBling="false">
+			</Cooldown>
+
+			<Cooldown parentKey="Charge" inherits="CooldownFrameTemplate" setAllPoints="true" hideCountdownNumbers ="true" drawEdge="true" drawSwipe="false" drawBling="false">
+			</Cooldown>
+		</Frames>
+	</Frame>
+
+	<Frame name="HDH_AT_CooldownIconTemplate" mixin="HDH_AT_CooldownIconTemplateMixin" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Icon">
+					<Anchors>
+						<Anchor point="CENTER" />
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="BORDER">
+				<Texture parentKey="Border" file="Interface/AddOns/HDH_AuraTracker/Texture/border2" setAllPoints="true">
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Cooldown parentKey="CircleCooldown" setAllPoints="true">
+
+			</Cooldown>
+			
+			<Frame parentKey="LinearCooldown" setAllPoints="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Icon">
+						</Texture>
+					</Layer>
+
+					<Layer level="OVERLAY">
+						<Texture parentKey="Spark" alphaMode="ADD">
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Frame parentKey="ColorGlow" setAllPoints="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="Color" file="Interface/AddOns/HDH_AuraTracker/Texture/spark_rect">
+						</Texture>
+					</Layer>
+
+					<Layer level="BORDER">
+						<Texture parentKey="Border" file="Interface/AddOns/HDH_AuraTracker/Texture/border2">
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+
+		</Frames>
+		<Scripts>
+			<OnSizeChanged function="HDH_AT_CooldownIconTemplate_OnSizeChanged"/>
+		</Scripts>
+	</Frame>
+    
+	<!-- <Frame>
+		<Frames>
+			<Frame parentKey="Text" setAllPoints="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString parentKey="Count">
+						</FontString>
+
+						<FontString parentKey="Time">
+						</FontString>
+
+						<FontString parentKey="Value">
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frame>
+	</Frame> -->
+</Ui>

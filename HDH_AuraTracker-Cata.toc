@@ -13,7 +13,8 @@ Locale\locale_ruRU.lua
 Utils.lua
 ConfigDB.lua
 
-UITemplates.xml
+UITemplate\UITemplates.xml
+UITemplate\CooldownIconTemplate.xml
 Tooltip.lua
 
 Tracker\Tracker.xml

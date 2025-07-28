@@ -267,7 +267,7 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 			self:UpdateGlow(f, false)
 
 			if self.ui.common.display_mode ~= DB.DISPLAY_ICON then
-				self:UpdateBarLayout(f)
+				self:UpdateBarSettings(f)
 			end
 		end
 	else

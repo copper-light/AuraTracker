@@ -42,8 +42,6 @@ function HDH_AT_UpdateCooldownSatIcon(f, per, direction, reverse)
 		if f.iconSatCooldown.spark:IsShown() then
 			f.iconSatCooldown:Hide()
 		end
-		-- per = 0.01
-		-- f.iconSatCooldown.curSize = 1
 	end
 	f.spell.per = per
 
@@ -234,11 +232,10 @@ local function frameBaseSettings(f)
 	f.v2:SetJustifyH('RIGHT')
 	f.v2:SetJustifyV('TOP')
 	
-	tempf:SetFrameLevel(f.cooldown2:GetFrameLevel()+1)
+	tempf:SetFrameLevel(f.cooldown2:GetFrameLevel() + 1)
 
 	f.iconSatCooldown = f.iconframe:CreateTexture(nil, 'OVERLAY')
 	f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, 0.93)
-	-- f.icon:SetTexCoord(0.08, 0.92, 0.92,0.08)
 	f.iconSatCooldown:SetPoint('TOPLEFT', f.iconframe, 'TOPLEFT', 0, 0)
 	f.iconSatCooldown:SetPoint('BOTTOMRIGHT', f.iconframe, 'BOTTOMRIGHT', 0, 0)
 	f.iconSatCooldown.preHeight = 0
@@ -251,14 +248,14 @@ local function frameBaseSettings(f)
 	f.border:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/border2.blp]])
 	
 	tempf = CreateFrame("Frame", nil, f)
-	tempf:SetFrameLevel(f.border:GetParent():GetFrameLevel()+1)
+	tempf:SetFrameLevel(f.border:GetParent():GetFrameLevel() + 1)
 	tempf:SetPoint('TOPLEFT', f.iconframe, 'TOPLEFT', 0, 0)
 	tempf:SetPoint('BOTTOMRIGHT', f.iconframe, 'BOTTOMRIGHT', 0, 0)
 	tempf:SetScript("Onupdate", OnUpdateGlowColor)
+
 	f.border.spark = tempf
 	f.border.spark.color = tempf:CreateTexture(nil, 'BORDER')
 	f.border.spark.color:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/spark_rect.blp]])
-	-- f.border.spark.color:SetBlendMode("ADD")
 	f.border.spark.color:SetPoint('CENTER', tempf, 'CENTER', 0, 0)
 	f.border.spark.spot = tempf:CreateTexture(nil, 'OVERLAY')
 	f.border.spark.spot:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/border2.blp]])
@@ -1511,7 +1508,7 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	f.iconframe:SetSize(op_icon.size * size, op_icon.size * size)
 	f.border:SetWidth(op_icon.size)
 	f.border:SetHeight(op_icon.size)
-	f.border:SetTexCoord(border, 1 - border, border, 1 - border)	
+	f.border:SetTexCoord(border, 1 - border, border, 1 - border)
 	f.border:SetPoint('CENTER', f.iconframe, 'CENTER', 0, 0)
 
 	local spot_border = math.min(0.2355 * (1 - (ICON_BORDER_VALUE[5] or 0)), 0.2355 * (1 - (ICON_BORDER_VALUE[op_icon.border_size] or 0)))

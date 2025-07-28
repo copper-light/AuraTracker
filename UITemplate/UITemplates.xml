@@ -1,5 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
-..\FrameXML\UI.xsd">
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Blizzard_SharedXML/UI.xsd">
 	<Script file="UITemplates.lua"/>
 
 	<Texture name="HDH_AT_Texture_White_A" virtual="true"> 
@@ -116,7 +116,7 @@
 		</Shadow>
 	</Font>
 
-	<Frame name="HDH_AT_DialogFrame" frameStrata="Dialog" virtual="true" enableMouse="true" hidden = "true" >
+	<Frame name="HDH_AT_DialogFrame" frameStrata="DIALOG" virtual="true" enableMouse="true" hidden = "true" >
 		<Anchors>
 			<Anchor point="TOPLEFT" />
 			<Anchor point="BOTTOMRIGHT" />
@@ -159,14 +159,14 @@
 				<FontString name ="$parentText" parentKey="DescIconText" inherits="Font_Yellow_S" justifyV="TOP" text="※ 아이콘 이미지는 '추적 설정 > 주문별 상세설정 > 아이콘 변경' 메뉴에서 변경 가능합니다.">
 					<Size x="160"  />
 					<Anchors>
-						<Anchor point="LEFTTOP" relativePoint="CENTER" relativeTo="$parent" x="-180" y="20"/>
+						<Anchor point="TOPLEFT" relativePoint="CENTER" relativeTo="$parent" x="-180" y="20"/>
 					</Anchors>
 				</FontString>
 
 				<FontString name ="$parentText" parentKey="DescBarText" inherits="Font_Yellow_S" justifyV="TOP" text="※ 바 텍스처와 색상은 'UI 설정 > 바' 메뉴에서 변경 가능합니다.">
 					<Size x="160"  />
 					<Anchors>
-						<Anchor point="LEFTTOP" relativePoint="CENTER" relativeTo="$parent" x="20" y="20"/>
+						<Anchor point="TOPLEFT" relativePoint="CENTER" relativeTo="$parent" x="20" y="20"/>
 					</Anchors>
 				</FontString>
 
@@ -218,7 +218,7 @@
 					</Anchors>
 				</Texture>
 
-				<Texture name="$parentTexture1" file="Interface/ICONS/INV_Misc_Gem_Pearl_04" desaturated="True" parentKey="Icon1">
+				<Texture name="$parentTexture1" file="Interface/ICONS/INV_Misc_Gem_Pearl_04" desaturated="true" parentKey="Icon1">
 					<Size x="25" y="25" />
 					<Color  r="1" g="1" b="1" a="0.5" />
 					<Anchors>
@@ -227,7 +227,7 @@
 					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
 				</Texture>
 
-				<Texture name="$parentTexture2" file="Interface/ICONS/INV_Misc_Gem_Pearl_04" desaturated="True" parentKey="Icon2">
+				<Texture name="$parentTexture2" file="Interface/ICONS/INV_Misc_Gem_Pearl_04" desaturated="true" parentKey="Icon2">
 					<Size x="25" y="25" />
 					<Color  r="1" g="1" b="1" a="0.5"/>
 					<Anchors>
@@ -710,7 +710,7 @@
 
 			<Layer level="ARTWORK">
 
-				<FontString name="$parentTextNum" inherits="Font_Yellow_S"  justifyV="Middle">
+				<FontString name="$parentTextNum" inherits="Font_Yellow_S"  justifyV="MIDDLE">
 					<Size x="20" y="20" />
 					<Color r="1" g="1" b="1"/>
 					<Anchors>
@@ -726,7 +726,7 @@
 					</Anchors>
 				</Texture>
 				
-				<FontString name="$parentTextName" inherits="Font_Yellow_S" justifyH="LEFT" justifyV="Middle">
+				<FontString name="$parentTextName" inherits="Font_Yellow_S" justifyH="LEFT" justifyV="MIDDLE">
 					<Size x="150" y="20"/>
 					<Color r="1" g="1" b="1"/>
 					<Anchors>
@@ -734,7 +734,7 @@
 					</Anchors>
 				</FontString>
 				
-				<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT"  justifyV="Middle" text="(추가하려면 행을 클릭하세요)">
+				<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT"  justifyV="MIDDLE" text="(추가하려면 행을 클릭하세요)">
 					<Color r="0.5" g="0.5" b="0.5" />
 					<Size x="250" y="20"/>
 					<Anchors>
@@ -790,7 +790,7 @@
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentIcon" relativePoint="RIGHT" x="8" y="0" />
 				</Anchors>
-				<Scripts>dfasdf
+				<Scripts>
 					<OnLoad>
 						self.BG1:Hide()
 						self.BG2:Hide()
@@ -969,7 +969,7 @@
 
 			<Layer level="ARTWORK">
 
-				<FontString name="$parentTextNum" inherits="Font_Yellow_S"  justifyV="Middle">
+				<FontString name="$parentTextNum" inherits="Font_Yellow_S"  justifyV="MIDDLE">
 					<Size x="20" y="20" />
 					<Color r="1" g="1" b="1"/>
 					<Anchors>
@@ -985,14 +985,14 @@
 					</Anchors>
 				</Texture>
 				
-				<FontString name="$parentTextName" inherits="Font_Yellow_M" justifyH="LEFT" justifyV="Middle">
+				<FontString name="$parentTextName" inherits="Font_Yellow_M" justifyH="LEFT" justifyV="MIDDLE">
 					<Size x="150" y="16"/>
 					<Anchors>
 						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentIcon" x="5" y="3" />
 					</Anchors>
 				</FontString>
 				
-				<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT"  justifyV="Middle" text="(추가하려면 행을 클릭하세요)">
+				<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT"  justifyV="MIDDLE" text="(추가하려면 행을 클릭하세요)">
 					<Color r="0.5" g="0.5" b="0.5" />
 					<Size x="250" y="20"/>
 					<Anchors>
@@ -1624,7 +1624,7 @@
 		</Layers>
 
 		<Scripts>
-			<OnClick inherits="prepend">HDH_AT_TalentCheckButton_OnClick(self)</OnClick>
+			<OnClick inherit="prepend">HDH_AT_TalentCheckButton_OnClick(self)</OnClick>
 		</Scripts>
 	</CheckButton>
 
@@ -1666,7 +1666,7 @@
 					</Anchors>
 				</Texture>
 			</Layer>
-			<Layer level="OVERAY">
+			<Layer level="OVERLAY">
 				<FontString name="$parentDesc" parentKey="Desc" inherits="Font_Yellow_S" text="텍스트 입력" justifyH="LEFT" hidden="false">
 					<Size x="1" y="1" />
 					<Color r="0.3" g="0.3" b="0.3" a="1"/>
@@ -1692,9 +1692,9 @@
 					self.Desc:Show()
 				end
 			</OnTextSet>
-			<OnLeave inherits="prepend">self.Active:Hide()</OnLeave>
-			<OnEnter inherits="prepend">self.Active:Show()</OnEnter>
-			<OnEditFocusLost inherits="prepend">
+			<OnLeave inherit="prepend">self.Active:Hide()</OnLeave>
+			<OnEnter inherit="prepend">self.Active:Show()</OnEnter>
+			<OnEditFocusLost inherit="prepend">
 				local value = HDH_AT_UTIL.Trim(self:GetText()) or ""
 				if string.len(value) > 0 then
 					self.Desc:Hide()
@@ -1704,7 +1704,7 @@
 				end
 			</OnEditFocusLost>
 			<OnTextChanged>HDH_AT_OnTextChanged(self)</OnTextChanged>
-			<OnEditFocusGained inherits="prepend">self.Desc:Hide(); EditBox_HighlightText(self);</OnEditFocusGained>
+			<OnEditFocusGained inherit="prepend">self.Desc:Hide(); EditBox_HighlightText(self);</OnEditFocusGained>
 		</Scripts>
 	</EditBox>
 
@@ -1747,7 +1747,7 @@
 				</Texture>
 			</Layer>
 
-			<Layer level="OVERAY">
+			<Layer level="OVERLAY">
 				<FontString name="$parentDesc" parentKey="Desc" inherits="Font_Yellow_S" text="텍스트 입력" justifyH="LEFT" hidden="false">
 					<Size x="1" y="1" />
 					<Color r="0.3" g="0.3" b="0.3" a="1"/>
@@ -1781,7 +1781,7 @@
 							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$parent" x="-10" y="0" />
 						</Anchors>
 						<Layers>
-							<Layer level="OVERAY">
+							<Layer level="OVERLAY">
 								<FontString name="$parentDesc" parentKey="Desc" inherits="Font_Yellow_S" text="텍스트 입력" justifyH="LEFT" hidden="false">
 									<Size x="1" y="1" />
 									<Color r="0.3" g="0.3" b="0.3" a="1"/>
@@ -1807,9 +1807,9 @@
 									self.Desc:Show()
 								end
 							</OnTextSet>
-							<OnLeave inherits="prepend">self:GetParent():GetParent().Active:Hide()</OnLeave>
-							<OnEnter inherits="prepend">self:GetParent():GetParent().Active:Show()</OnEnter>
-							<OnEditFocusLost inherits="prepend">
+							<OnLeave inherit="prepend">self:GetParent():GetParent().Active:Hide()</OnLeave>
+							<OnEnter inherit="prepend">self:GetParent():GetParent().Active:Show()</OnEnter>
+							<OnEditFocusLost inherit="prepend">
 								local value = HDH_AT_UTIL.Trim(self:GetText()) or ""
 								if string.len(value) > 0 then
 									self.Desc:Hide()
@@ -1826,15 +1826,15 @@
 							<OnUpdate>
 								ScrollingEdit_OnUpdate(self, elapsed, self:GetParent());
 							</OnUpdate>
-							<OnEditFocusGained inherits="prepend">self.Desc:Hide(); EditBox_HighlightText(self);</OnEditFocusGained>
+							<OnEditFocusGained inherit="prepend">self.Desc:Hide(); EditBox_HighlightText(self);</OnEditFocusGained>
 							<OnShow>self:SetFocus(true)</OnShow>
 							<!-- <OnMouseDown>EditBox_HighlightText(self);</OnMouseDown> -->
 						</Scripts>
 					</EditBox>
 				</ScrollChild>
 				<Scripts>
-					<OnLeave inherits="prepend">self:GetParent().Active:Hide()</OnLeave>
-					<OnEnter inherits="prepend">self:GetParent().Active:Show()</OnEnter>
+					<OnLeave inherit="prepend">self:GetParent().Active:Hide()</OnLeave>
+					<OnEnter inherit="prepend">self:GetParent().Active:Show()</OnEnter>
 					<OnMouseDown>
 						self.EditBox:SetFocus(true)
 					</OnMouseDown>
@@ -2017,10 +2017,10 @@
 			<OnLoad function="HDH_AT_DropDown_OnLoad" />
             <OnLeave function="HDH_AT_DropDown_OnLeave" />
             <OnClick function="HDH_AT_DropDown_OnClick" />
-			<OnEnable inherits="append">
+			<OnEnable inherit="append">
 				self.Text:SetFontObject("Font_Yellow_S")
 			</OnEnable>
-			<OnDisable inherits="append">
+			<OnDisable inherit="append">
 				self.Text:SetFontObject("Font_Gray_S")
 			</OnDisable>
 		</Scripts>
@@ -2040,7 +2040,7 @@
 
 	<Button  name="HDH_AT_DropDownMultiSeletorAlwayShowTemplate" inherits="HDH_AT_DropDownTemplate" virtual="true">
 		<Scripts>
-			<OnLoad inherits="append">
+			<OnLoad inherit="append">
 				self.always_show_list = true
 				self.Text:Hide()
 				self.List:Show()
@@ -2064,7 +2064,7 @@
                     </Anchors>
                 </Texture>
             </Layer>
-            <Layer level="artwork" textureSubLevel="1">
+            <Layer level="ARTWORK" textureSubLevel="1">
 				<Texture parentKey="DownEnableTexture" file="Interface/AddOns/HDH_AuraTracker/Texture/Up">
 					<TexCoords left="0" right="1" top="1" bottom="0" />
 					<Color r="1" g="0.8" b="0"/>
@@ -2145,7 +2145,7 @@
                 </Texture>
             </Layer>
 
-            <Layer level="artwork">
+            <Layer level="ARTWORK">
 				<Texture parentKey="DownEnableTexture" file="Interface/AddOns/HDH_AuraTracker/Texture/Up">
 					<TexCoords left="0" right="1" top="1" bottom="0" />
 					<Color r="1" g="0.8" b="0"/>
@@ -2166,7 +2166,7 @@
         </Layers>
 
 		<Scripts>
-			<OnLoad inherits="append">
+			<OnLoad inherit="append">
 				self.Texture:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 0))
 			</OnLoad>
 			<OnShow>
@@ -2926,8 +2926,8 @@
 				</Layers>
 				<Size x="17" y="20"/>
 				<Anchors>
-					<Anchor point="Right" x="0" y="0"/>
-					<Anchor point="Right" x="0" y="0"/>
+					<Anchor point="RIGHT" x="0" y="0"/>
+					<Anchor point="RIGHT" x="0" y="0"/>
 				</Anchors>
 				<Scripts>
 					<OnClick function="HDH_AT_SliderTemplateMixin_OnClick"/>
@@ -3206,7 +3206,7 @@
 			<Frame parentKey="Base">
 				<Layers>
 					<Layer level="OVERLAY">
-						<FontString parentKey="Text" inherits="Font_White_S" text="" justifyH="LEFT"  justifyV="CENTER">
+						<FontString parentKey="Text" inherits="Font_White_S" text="" justifyH="LEFT"  justifyV="MIDDLE">
 							<Size  y="20" />
 							<Anchors>
 								<Anchor point="LEFT" relativePoint="LEFT" x="24" y="0"/>
@@ -3329,7 +3329,7 @@
 			<Frame parentKey="Base">
 				<Layers>
 					<Layer level="OVERLAY">
-						<FontString parentKey="Text" inherits="Font_White_S" text="" justifyH="LEFT"  justifyV="CENTER">
+						<FontString parentKey="Text" inherits="Font_White_S" text="" justifyH="LEFT"  justifyV="MIDDLE">
 							<Size  y="20" />
 							<Anchors>
 								<Anchor point="LEFT" relativePoint="LEFT" x="24" y="0"/>
@@ -3399,7 +3399,7 @@
 
 						<Texture parentKey="CheckMarker" file="Interface/AddOns/HDH_AuraTracker/Texture/check" >
 							<Size x="8" y="8" />
-							<Color r="8" g="0.8" b="0" a="0.7"/>
+							<Color r="0.8" g="0.8" b="0" a="0.7"/>
 							<Anchors>
 								<Anchor point="LEFT" relativePoint="LEFT" x="4" y="0"/>
 							</Anchors>
@@ -3420,7 +3420,7 @@
 				</Anchors>
 				<Layers>
 					<Layer level="OVERLAY">
-						<FontString parentKey="Text" inherits="Font_White_XS" text="" justifyH="LEFT"  justifyV="CENTER">
+						<FontString parentKey="Text" inherits="Font_White_XS" text="" justifyH="LEFT"  justifyV="MIDDLE">
 							<Size  y="20" />
 							<Anchors>
 								<Anchor point="LEFT" relativePoint="LEFT" x="18" y="0"/>
@@ -3587,7 +3587,7 @@
 					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
 				</Texture>
 
-				<FontString parentKey="Name" inherits="Font_White_S" text="" justifyH="LEFT" justifyV="CENTER">
+				<FontString parentKey="Name" inherits="Font_White_S" text="" justifyH="LEFT" justifyV="MIDDLE">
 					<Size x="100" y="20" />
 					<Anchors>
 						<Anchor point="LEFT" relativeTo="$parentIconBackground" relativePoint="RIGHT" x="6" y="0" />
@@ -3595,7 +3595,7 @@
 					</Anchors>
 				</FontString>
 
-				<FontString parentKey="Desc" inherits="Font_Gray_S" text="" justifyH="LEFT" justifyV="CENTER">
+				<FontString parentKey="Desc" inherits="Font_Gray_S" text="" justifyH="LEFT" justifyV="MIDDLE">
 					<Size x="100" y="20" />
 					<Anchors>
 						<Anchor point="LEFT" relativeTo="$parentIconBackground" relativePoint="RIGHT" x="6" y="0" />
