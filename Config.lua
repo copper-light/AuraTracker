@@ -1889,12 +1889,12 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 		id, name, icon = unpack(item)
 		if name == nil then break end
 		itemValues[#itemValues+1] = {-1, name, icon}
-		itemTemplates[#itemTemplates+1] = "HDH_AT_SplitItemTemplate"
+		itemTemplates[#itemTemplates+1] = "HDH_AT_DropDownOptionSplitItemTemplate"
 		itemValues[#itemValues+1] = {id, L.COMMON_SPEC , nil}
-		itemTemplates[#itemTemplates+1] = "HDH_AT_CheckButtonItemTemplate"
+		itemTemplates[#itemTemplates+1] = "HDH_AT_DropDownOptionCheckButtonItemTemplate"
 		for _, trait in ipairs(self:GetTraits(id)) do
 			itemValues[#itemValues+1] = trait
-			itemTemplates[#itemTemplates+1] = "HDH_AT_CheckButtonItemTemplate"
+			itemTemplates[#itemTemplates+1] = "HDH_AT_DropDownOptionCheckButtonItemTemplate"
 		end
 	end
 	ddm:UseAtlasSize(useAtlas)
@@ -3889,12 +3889,3 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 
 	return component
 end
-
-t = CreateFrame("Frame", nil, UIParent, 'HDH_AT_CircleCooldownTemplate')
-t:SetPoint("CENTER")
-t:SetSize(200, 200)
-
-t:Setup(DB.COOLDOWN_CIRCLE, false,  {0,0,0,1}, 1, 0.5)
-t:SetCooldown(GetTime(), 10, true)
--- t:SetValue(11)
-t:SetIcon('Interface/Addons/HDH_AuraTracker/Texture/logo')

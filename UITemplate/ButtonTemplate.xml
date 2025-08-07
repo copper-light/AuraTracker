@@ -1,0 +1,579 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Blizzard_SharedXML/UI.xsd">
+	<Script file="ButtonTemplate.lua"/>
+
+    <Button name="HDH_AT_ButtonTemplate" virtual="true">
+		<Size><AbsDimension x="90" y="22" /></Size>
+		<Layers>
+			<Layer level="BORDER">
+				<Texture name="$parentBgLine1" hidden="true">
+					<Color r="0" g="0" b="0" a="0.5"/>
+					<Size><AbsDimension x="3" y="35" /></Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="-2" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="-2" y="0"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentBgLine2" hidden="true" inherits="HDH_AT_Texture_Yellow">
+					<Size><AbsDimension x="5" y="33" /></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="2" y="-2"/>
+						<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<ButtonText name="$parentText"/>
+		<NormalFont style="Font_White_S"/>
+		<DisabledFont style="Font_Disable_S"/>
+		<NormalTexture inherits="HDH_AT_Texture_Yellow">
+			<Anchors>
+				<Anchor point="TOPLEFT" x="2" y="-2"/>
+				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+			</Anchors>					
+		</NormalTexture>
+		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_White_A">
+			<Anchors>
+				<Anchor point="TOPLEFT" x="2" y="-2"/>
+				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+			</Anchors>
+		</HighlightTexture>
+		<DisabledTexture>
+			<Color r="0.2" g="0.2" b="0.2" a="0.5"/>
+			<Anchors>
+				<Anchor point="TOPLEFT" x="2" y="-2"/>
+				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+			</Anchors>
+		</DisabledTexture>
+	</Button>
+
+	<!-- 배경 없는 버튼 -->
+	<Button name="HDH_AT_ButtonTemplate2" virtual="true">
+		<Size><AbsDimension x="90" y="22" /></Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBgLine1" hidden="true">
+					<Color r="0" g="0" b="0" a="0.5"/>
+					<Size><AbsDimension x="3" y="35" /></Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="-2" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="-2" y="0"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentBgLine2" hidden="true" inherits="HDH_AT_Texture_Yellow">
+					<Size><AbsDimension x="5" y="33" /></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="2" y="-2"/>
+						<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<ButtonText name="$parentText"/>
+		<NormalFont style="Font_White_S"/>
+		<DisabledFont style="Font_Gray_S"/>
+		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_White_A">
+			<Anchors>
+				<Anchor point="TOPLEFT" x="1" y="-1"/>
+				<Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
+			</Anchors>
+		</HighlightTexture>
+		<DisabledTexture>
+			<Color r="0.4" g="0.4" b="0.4" a="0.8"/>
+			<Anchors>
+				<Anchor point="TOPLEFT" x="2" y="-2"/>
+				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+			</Anchors>
+		</DisabledTexture>
+	</Button>
+
+	<Button name="HDH_AT_ButtonWhiteTemplate" inherits="HDH_AT_ButtonTemplate" virtual="true">
+		<NormalTexture>
+			<Color r="0.3" g="0.3" b="0.3" a="0.8"/>
+			<Anchors>
+				<Anchor point="TOPLEFT" x="2" y="-2"/>
+				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
+			</Anchors>					
+		</NormalTexture>
+	</Button>
+
+	<Button name="HDH_AT_BottomTapTemplate" mixin="HDH_AT_BottomTapMixin" virtual="true">
+		<Size x="142" y="35"/>
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" x="0" y="0" />
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+
+				<Texture name="$parentLeftDisabled" parentKey="LeftActive" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+					<Size>
+						<AbsDimension x="20" y="35"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.15625" top="0.05" bottom="0.546875"/>
+				</Texture>
+
+				<Texture name="$parentRightDisabled" parentKey="RightActive" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+					<Size>
+						<AbsDimension x="20" y="35"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" />
+					</Anchors>
+					<TexCoords left="0.84375" right="1.0" top="0.05" bottom="0.546875"/>
+				</Texture>
+
+				<Texture name="$parentMiddleDisabled" parentKey="MiddleActive" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
+					<Size>
+						<AbsDimension x="88" y="35"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeftDisabled" relativePoint="RIGHT"/>
+						<Anchor point="RIGHT" relativeTo="$parentRightDisabled" relativePoint="LEFT"/>
+					</Anchors>
+					<TexCoords left="0.15625" right="0.84375" top="0.05" bottom="0.546875"/>
+				</Texture>
+
+				<Texture name="$parentLeft" parentKey="Left" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+					<Size>
+						<AbsDimension x="20" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+					</Anchors>
+					<TexCoords left="0" right="0.15625" top="0.05" bottom="1.0"/>
+				</Texture>
+
+				<Texture name="$parentRight" parentKey="Right" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+					<Size>
+						<AbsDimension x="20" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="0" y="0"/>
+					</Anchors>
+					<TexCoords left="0.84375" right="1.0" top="0.05" bottom="1.0"/>
+				</Texture>
+
+				<Texture name="$parentMiddle" parentKey="Middle" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
+					<Size>
+						<AbsDimension x="88" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+						<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+					</Anchors>
+					<TexCoords left="0.15625" right="0.84375" top="0.05" bottom="1.0"/>
+				</Texture>
+
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnShow>
+				self.Text:SetWidth(self.Text:GetStringWidth())
+				self:SetWidth(math.max(94, self.Text:GetStringWidth() + 44))
+			</OnShow>
+		</Scripts>
+		<NormalFont style="Font_Yellow_S"/>
+		<HighlightFont style="Font_White_S"/>
+		<DisabledFont style="Font_White_S"/>
+		<ButtonText name="$parentText" parentKey="Text" >
+			<Size x="50" y="10"/>
+			<Anchors>
+				<Anchor point="CENTER" x="0" y="0"/>
+				<Anchor point="LEFT" x="0" y="0"/>
+				<Anchor point="RIGHT" x="0" y="0"/>
+			</Anchors>
+		</ButtonText>
+	</Button>
+
+	<Button name="HDH_AT_UITabBtnTemplate" mixin="HDH_AT_UITabBtnMixin" virtual="true">
+		<Size><AbsDimension x="90" y="30" /></Size>
+		<Layers>
+			<Layer level="BORDER" textureSubLevel="0">
+				<Texture name="$parentBgLine1" hidden="true">
+					<Color r="0" g="0" b="0" a="0.5"/>
+					<Size><AbsDimension x="3" y="35" /></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="-2" y="0"/>
+						<Anchor point="BOTTOMLEFT" x="-2" y="0"/>
+					</Anchors>
+				</Texture>
+				<Texture alphaMode="ADD" parentKey="Active2"  hidden="true"  file="Interface\HELPFRAME\HelpFrameButton-Highlight">
+					<TexCoords left="0.5" right="0.9" top="0.1" bottom="0.5" />
+					<Anchors>
+						<Anchor point="TOPLEFT" x="1" y="-1"/>
+						<Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="BORDER" textureSubLevel="1">
+				<Texture name="$parentLine2" parentKey="Active1" hidden="true" inherits="HDH_AT_Texture_Yellow">
+					<Size><AbsDimension x="2" y="33" /></Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="-1" y="-1"/>
+						<Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<ButtonText name="$parentText" justifyH="LEFT">
+			<Anchors>
+				<Anchor point="TOPLEFT" x="8" y="0"/>
+				<Anchor point="BOTTOMRIGHT" x="-8" y="0"/>
+			</Anchors>
+		</ButtonText>
+		<NormalFont style="Font_White_S"/>
+		<HighlightFont style="Font_White_S"/>
+		<DisabledFont style="Font_Gray_S"/>
+		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_White_A" >
+			<Anchors>
+				<Anchor point="TOPLEFT" x="1" y="-1"/>
+				<Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
+
+	<Button name="HDH_AT_UITabBtnTemplate2" mixin="HDH_AT_BottomTapMixin" virtual="true">
+		<Size><AbsDimension x="90" y="30" /></Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="BG" >
+					<Color r="0" g="0" b="0" a="0.8"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0" />
+						<Anchor point="BOTTOMRIGHT" x="0" y="0" />
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="BORDER">
+				<Texture parentKey="Left" >
+					<Size x="4"/>
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0" />
+						<Anchor point="BOTTOMLEFT" x="0" y="0" />
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Right" >
+					<Size x="4"/>
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="0" y="0" />
+						<Anchor point="BOTTOMRIGHT" x="0" y="0" />
+					</Anchors>
+				</Texture>
+				<Texture parentKey="Middle" >
+					<Size y="4"/>
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" x="0" y="0" />
+						<Anchor point="BOTTOMRIGHT" x="0" y="0" />
+					</Anchors>
+				</Texture>
+
+				<Texture parentKey="LeftActive" inherits="HDH_AT_Texture_Yellow">
+					<Size x="4"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0" />
+						<Anchor point="BOTTOMLEFT" x="0" y="-4" />
+					</Anchors>
+				</Texture>
+				<Texture parentKey="RightActive"  inherits="HDH_AT_Texture_Yellow">
+					<Size x="4"/>
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="0" y="0" />
+						<Anchor point="BOTTOMRIGHT" x="0" y="-4" />
+					</Anchors>
+				</Texture>
+				<Texture parentKey="MiddleActive"  inherits="HDH_AT_Texture_Yellow">
+					<Size y="4"/>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" x="0" y="-4" />
+						<Anchor point="BOTTOMRIGHT" x="0" y="-4" />
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="OVERLAY">
+				<Texture name="$parentBgLine1" hidden="true">
+					<Color r="0" g="0" b="0" a="0.5"/>
+					<Size><AbsDimension x="3" y="35" /></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="-2" y="0"/>
+						<Anchor point="BOTTOMLEFT" x="-2" y="0"/>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentLine2" parentKey="Active1" hidden="true" inherits="HDH_AT_Texture_Yellow">
+					<Size><AbsDimension x="5" y="5" /></Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="TOPRIGHT" x="0" y="0"/>
+					</Anchors>
+				</Texture>
+				<Texture alphaMode="ADD" parentKey="Active2"  hidden="true" file="Interface\HELPFRAME\HelpFrameButton-Highlight" >
+					<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
+					<Anchors>
+						<Anchor point="TOPLEFT" x="0" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="-1" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<ButtonText name="$parentText" parentKey="Text" justifyH="CENTER">
+			<Anchors>
+				<Anchor point="TOPLEFT" x="8" y="0"/>
+				<Anchor point="BOTTOMRIGHT" x="-8" y="0"/>
+			</Anchors>
+		</ButtonText>
+
+		<NormalFont style="Font_Yellow_S"/>
+		<HighlightFont style="Font_Yellow_S"/>
+		<DisabledFont style="Font_White_S"/>
+
+		<NormalTexture>
+			<Color r="0" g="0" b="0" a="0.5"/>
+			<Anchors>
+				<Anchor point="TOPLEFT" x="4" y="0"/>
+				<Anchor point="BOTTOMRIGHT" x="-4" y="0"/>
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_Yellow">
+		</HighlightTexture>
+		<DisabledTexture>
+			<Color r="1" g="0.8" b="0" a="0.3"/>
+			<Anchors>
+				<Anchor point="TOPLEFT" x="0" y="-2"/>
+				<Anchor point="BOTTOMRIGHT" x="-1" y="2"/>
+			</Anchors>
+		</DisabledTexture>
+	</Button>
+
+	<Button name="HDH_AT_UITabBtnLabelTemplate" inherits="HDH_AT_UITabBtnTemplate" virtual="true">
+		<Layers>
+			<Layer  level="OVERLAY">
+				<Texture parentKey="Texture" hidden="true" file="Interface\Addons\HDH_AuraTracker\Texture\icon">
+					<Color r="0.8" g="0.6" b="0"/>
+					<Size x="12" y="12"/>
+					<Anchors>
+						<Anchor point="LEFT" x="6" y="0"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<NormalFont style="Font_White_S"/>
+		<HighlightFont style="Font_Yellow_S"/>
+		<DisabledFont style="Font_Yellow_S"/>
+		<NormalTexture>
+			<Color r="0" g="0" b="0" a="0.5"/>
+			<Anchors>
+				<Anchor point="TOPLEFT" x="0" y="0"/>
+				<Anchor point="BOTTOMRIGHT" x="-1" y="0"/>
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_Yellow_A">
+		</HighlightTexture>
+		<DisabledTexture>
+			<Color r="0.2" g="0.2" b="0.2" a="0.5"/>
+			<Anchors>
+				<Anchor point="TOPLEFT" x="0" y="-2"/>
+				<Anchor point="BOTTOMRIGHT" x="-1" y="2"/>
+			</Anchors>
+		</DisabledTexture>
+	</Button>
+
+	<Button name="HDH_AT_PrevNextButtonTemplate" virtual="true" enableMouse="false">	
+		<Size><AbsDimension x="90" y="22" /></Size>
+		<Layers> 
+			<Layer level="ARTWORK">
+				<FontString name="$parentTextValue" parentKey="Value" inherits="Font_Yellow_S" justifyH="CENTER" text="1">
+					<Anchors>
+						<Anchor point="CENTER" relativePoint="CENTER" x="0" y="0" />
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button parentKey="BtnPrev" inherits="HDH_AT_TextureButtonTemplate">
+				<Size><AbsDimension x="22" y="22" /></Size>
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="2">
+						<Texture parentKey="Texture" file="Interface/AddOns/HDH_AuraTracker/Texture/Left">
+							<TexCoords left="0" right="1" top="0" bottom="1" />
+							<Size x="8" y="10" />
+							<Anchors>
+								<Anchor point="CENTER" x="0" y="0"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="ARTWORK" textureSubLevel="1">
+						<Texture file="Interface/AddOns/HDH_AuraTracker/Texture/Left">
+							<TexCoords left="0" right="1" top="0" bottom="1" />
+							<Size x="8" y="10" />
+							<Color r="0" g="0" b="0" a="0.5"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.Texture" relativePoint="CENTER" x="1" y="-1"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="LEFT" x="0" y="0"/>
+				</Anchors>
+			</Button>
+
+			<Button parentKey="BtnNext" inherits="HDH_AT_TextureButtonTemplate">
+				<Size><AbsDimension x="22" y="22" /></Size>
+				<Layers>
+					<Layer level="ARTWORK" textureSubLevel="2">
+						<Texture parentKey="Texture" file="Interface/AddOns/HDH_AuraTracker/Texture/Left">
+							<TexCoords left="1" right="0" top="0" bottom="1" />
+							<Size x="8" y="10" />
+							<Anchors>
+								<Anchor point="CENTER" x="0" y="0"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+					<Layer level="ARTWORK" textureSubLevel="1">
+						<Texture file="Interface/AddOns/HDH_AuraTracker/Texture/Left">
+							<TexCoords left="1" right="0" top="0" bottom="1" />
+							<Size x="8" y="10" />
+							<Color r="0" g="0" b="0" a="0.5"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeKey="$parent.Texture" relativePoint="CENTER" x="1" y="-1"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0"/>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnEnable>
+				self.BtnPrev:Show()
+				self.BtnNext:Show()
+			</OnEnable>
+			<OnDisable>
+				self.BtnPrev:Hide()
+				self.BtnNext:Hide()
+			</OnDisable>
+		</Scripts>
+	</Button>
+
+	<Button name="HDH_AT_TextureButtonTemplate" inherits="HDH_AT_ButtonTemplate" virtual="true" >
+		<Size><AbsDimension x="22" y="22" /></Size>
+		<Scripts>
+			<OnMouseDown>
+				if self.Texture then
+					self.Texture:SetPoint("CENTER", 1, -1)
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if self.Texture then
+					self.Texture:SetPoint("CENTER", 0, 0)
+				end
+			</OnMouseUp>
+		</Scripts>
+	</Button>
+
+	<Button name="HDH_AT_TrackerTapBtnTemplate" mixin="HDH_AT_TrackerTapBtnTemplateMixin" virtual="true" >
+		<Size><AbsDimension x="100" y="40" /></Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBg" parentKey="BG">
+					<Color r="0" g="0" b="0" a=".3"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="1" y="-1" />
+						<Anchor point="BOTTOMRIGHT" x="-5" y="1" />
+					</Anchors>
+				</Texture>
+				
+				<Texture name="$parentOn" parentKey="Active" alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight"  hidden="true">
+					<TexCoords left="0.5" right="0" top="0.1" bottom="0.5" />
+					<Anchors>
+						<Anchor point="TOPLEFT" x="2" y="-2"/>
+						<Anchor point="BOTTOMRIGHT" x="2" y="2"/>
+					</Anchors>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<Texture name="$parentBgLine2" hidden="true" inherits="HDH_AT_Texture_Yellow">
+					<Size><AbsDimension x="2" y="33" /></Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" x="-2" y="-2" relativePoint="TOPRIGHT" />
+						<Anchor point="BOTTOMRIGHT" x="-2" y="2" relativePoint="BOTTOMRIGHT" />
+
+						<!-- <Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT" />
+						<Anchor point="BOTTOMLEFT" x="2" y="2" relativePoint="BOTTOMLEFT" /> -->
+					</Anchors>
+				</Texture>
+
+				<FontString parentKey="Tracker" inherits="Font_Gray_XS" maxLines="1" justifyH="RIGHT" text="">
+					<Anchors>
+						<Anchor point="TOPLEFT" x="5" y="-12"/>
+						<Anchor point="BOTTOMRIGHT" x="-10" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentConfig" parentKey="ConfigBtn" hidden="true">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="LEFT" x="5" y="0" />
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\HDH_AuraTracker\Texture\config" alphaMode="ADD">
+					<Color r="0.25" g="0.25" b="0.25" a="0.65"/>
+				</NormalTexture>
+				<HighlightTexture file="Interface\AddOns\HDH_AuraTracker\Texture\config" alphaMode="ADD">
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
+				</HighlightTexture>
+
+				<PushedTexture file="Interface\AddOns\HDH_AuraTracker\Texture\config">
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
+					<TexCoords left="-0.1" right="1.1" top="-0.1" bottom="1.1" />
+				</PushedTexture>
+				
+				<Scripts>
+					<OnLeave>
+						if not self:GetParent():IsMouseOver() then
+							self:Hide()
+						end
+					</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+
+		<Scripts>
+			<OnEnter>
+				if not self.isAddBtn then
+					self.ConfigBtn:Show()
+				end
+			</OnEnter>
+			<OnLeave>
+				if not self.ConfigBtn:IsMouseOver() then
+					self.ConfigBtn:Hide()
+				end
+			</OnLeave>
+		</Scripts>
+
+		<ButtonText name="$parentText" parentKey="Text" maxLines="1" justifyH="CENTER">
+			<Anchors>
+				<Anchor point="TOPLEFT" x="5" y="0"/>
+				<Anchor point="BOTTOMRIGHT" x="-5" y="0"/>
+			</Anchors>
+		</ButtonText>
+		<NormalFont style="Font_White_S"/>
+		<HighlightFont style="Font_Yellow_S"/>
+		<DisabledFont style="Font_Gray_S"/>
+	</Button>
+
+</Ui>

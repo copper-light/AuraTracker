@@ -16,6 +16,8 @@ HDH_TRACKER.TYPE.DEBUFF = 2
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.BUFF, HDH_AURA_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.DEBUFF, HDH_AURA_TRACKER)
 
+
+-- HDH_TRACKER.startTime, spell.duration - (spell.startTime - HDH_TRACKER.startTime)
 do
 	local StaggerID = { }
 	StaggerID[124275] = true
@@ -43,22 +45,21 @@ do
 				f = self.frame.pointer[tostring(aura.spellId)] or self.frame.pointer[aura.name]
 			end
 			if f and f.spell then
-
 				spell = f.spell
-				
+
 				if not StaggerID[aura.spellId] then -- 시간차가 아니면
 					spell.v1 = (aura.points[1] ~= 0) and aura.points[1] or nil
 				else -- 시간차
-					spell.v1 = aura.points[2]; 
+					spell.v1 = aura.points[2]
 				end
-				
+
 				if not spell.isUpdate then
 					spell.count = aura.applications
 				else
 					spell.count = (spell.count or 0) + aura.applications
 				end
 				spell.id = aura.spellId
-				spell.dispelType = aura.dispelName
+				spell.dispelType = aura.dispelName or ""
 
 				if spell.isUpdate then
 					spell.overlay = (spell.overlay or 0) + 1
@@ -70,37 +71,43 @@ do
 				if aura.expirationTime  > 0 then spell.remaining = spell.endTime - curTime
 				else spell.remaining = 0; end
 				spell.duration = aura.duration
-				spell.startTime = aura.expirationTime  - aura.duration
-				spell.index = i; -- 툴팁을 위해, 순서
-				ret = ret + 1;
+				spell.startTime = aura.expirationTime - aura.duration
+
+				if HDH_TRACKER.startTime > spell.startTime then
+					spell.startTime = HDH_TRACKER.startTime
+					spell.duration = spell.duration - (HDH_TRACKER.startTime - spell.startTime)
+				end
+
+				spell.index = i -- 툴팁을 위해, 순서
+				ret = ret + 1
 				spell.isUpdate = true
 			end
 		end
 		return ret;
 	end
-	
+
 	function HDH_AURA_TRACKER.GetAurasAll(self)
 		local aura, spell
 		local curTime = GetTime()
-		local ret = 1;
+		local ret = 1
 		local f
 		for i = 1, 40 do 
 			aura = C_UnitAuras.GetAuraDataByIndex(self.unit, i, self.filter)
 			if not aura then break end
 			if self.aura_filter == DB.AURA_FILTER_ONLY_BOSS then
 				if not aura.isFromPlayerOrPlayerPet and (self.isRaiding or (aura.isBossAura)) then
-					f = self.frame.icon[ret];
+					f = self.frame.icon[ret]
 				else
-					f = nil;
+					f = nil
 				end
 			elseif self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
 				if aura.sourceUnit == 'player' then
-					f = self.frame.icon[ret];
+					f = self.frame.icon[ret]
 				else
-					f = nil;
+					f = nil
 				end
 			else
-				f = self.frame.icon[ret];
+				f = self.frame.icon[ret]
 			end
 			
 			if f then
@@ -119,9 +126,15 @@ do
 				spell.startTime = aura.expirationTime - aura.duration
 				spell.icon = aura.icon
 				spell.index = i; -- 툴팁을 위해, 순서
-				spell.happenTime = GetTime();
+				spell.happenTime = GetTime()
+
+				if HDH_TRACKER.startTime > spell.startTime then
+					spell.startTime = HDH_TRACKER.startTime
+					spell.duration = spell.duration - (HDH_TRACKER.startTime - spell.startTime)
+				end
+
 				f.icon:SetTexture(aura.icon)
-				f.iconSatCooldown:SetTexture(aura.icon)
+				-- f.iconSatCooldown:SetTexture(aura.icon)
 				ret = ret + 1;
 			end
 		end
@@ -170,10 +183,10 @@ do
 		elseif self.ui.common.display_mode == DB.DISPLAY_ICON_AND_BAR then
 			if self.ui.bar.location == DB.BAR_LOCATION_R or self.ui.bar.location == DB.BAR_LOCATION_L then
 				size_w = self.ui.bar.width + self.ui.icon.size
-				size_h = max(self.ui.bar.height, self.ui.icon.size)
+				size_h = math.max(self.ui.bar.height, self.ui.icon.size)
 			else
 				size_h = self.ui.bar.height + self.ui.icon.size
-				size_w = max(self.ui.bar.width, self.ui.icon.size)
+				size_w = math.max(self.ui.bar.width, self.ui.icon.size)
 			end
 
 		else
@@ -181,7 +194,7 @@ do
 			size_h = self.ui.icon.size
 		end
 
-		for k,f in ipairs(icons) do
+		for _, f in ipairs(icons) do
 			if not f.spell then break end
 			if f.spell.isUpdate then
 				if not HDH_TRACKER.ENABLE_MOVE then
@@ -189,79 +202,43 @@ do
 				end
 				
 				if aura_filter == DB.AURA_FILTER_ALL 
-						or aura_filter == DB.AURA_FILTER_ONLY_BOSS 
-						or f.spell.display == DB.SPELL_ALWAYS_DISPLAY 
-						or f.spell.display == DB.SPELL_HIDE_TIME_OFF 
-						or f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE 
+						or aura_filter == DB.AURA_FILTER_ONLY_BOSS
+						or f.spell.display == DB.SPELL_ALWAYS_DISPLAY
+						or f.spell.display == DB.SPELL_HIDE_TIME_OFF
+						or f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE
 						or HDH_TRACKER.ENABLE_MOVE then
 					if aura_caster == DB.AURA_CASTER_ONLY_MINE then
-						if f.spell.count < 2 then f.counttext:SetText(nil)
-											else f.counttext:SetText(f.spell.count) end
+						f.counttext:SetText(f.spell.count >= 2 and f.spell.count or "")
 					else
-						if f.spell.count < 2 then if f.spell.overlay <= 1 then f.counttext:SetText(nil)
-																		else f.counttext:SetText(f.spell.overlay) end
-											else f.counttext:SetText(f.spell.count)  end
+						if f.spell.count < 2 then f.counttext:SetText(f.spell.overlay >= 2 and f.spell.overlay or "")
+											 else f.counttext:SetText(f.spell.count) end
 					end
 					
-					if f.spell.showValue and f.spell.v1 then 
-						f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate)) 
+					f.icon:UpdateCooldowning()
+					f.v1:SetText((f.spell.showValue and f.spell.v1) and HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate) or nil)
+					if f.spell.duration == 0 then
+						f.timetext:SetText("")
+						f.icon:SetCooldown(0, 1, false)
+						f.icon:SetValue(0)
 					else 
-						f.v1:SetText(nil) 
-					end
-					
-					if f.spell.duration == 0 then 
-						f.cd:Hide() f.timetext:SetText("");
-						f.icon:SetDesaturated(nil)
-						f.icon:SetAlpha(self.ui.icon.on_alpha)
-						f.border:SetAlpha(self.ui.icon.on_alpha)
-						f.iconSatCooldown:Hide()
-						f.iconSatCooldown.spark:Hide()
-					else 
-						f.cd:Show()
-						
 						self:UpdateTimeText(f.timetext, f.spell.remaining)
-						
-						if cooldown_type ~= DB.COOLDOWN_CIRCLE and  cooldown_type ~= DB.COOLDOWN_NONE then
-							f.icon:SetAlpha(self.ui.icon.off_alpha)
-							f.border:SetAlpha(self.ui.icon.off_alpha)
-							f.icon:SetDesaturated(1)
-							f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
-							f.iconSatCooldown:Show()
+						f.icon:SetCooldown(f.spell.startTime, f.spell.duration)
+					end
+					
+					if self.ui.common.default_color then
+						if f.spell.dispelType == nil then
+							f.icon:SetBorderColor(unpack(self.ui.icon.active_border_color))
+							if f.bar then
+								f.bar:SetStatusBarColor(unpack(self.ui.icon.active_border_color))
+							end
 						else
-							f.icon:SetAlpha(self.ui.icon.on_alpha)
-							f.border:SetAlpha(self.ui.icon.on_alpha)
-							f.icon:SetDesaturated(nil)
+							f.icon:SetBorderColor(DebuffTypeColor[f.spell.dispelType].r, DebuffTypeColor[f.spell.dispelType].g, DebuffTypeColor[f.spell.dispelType].b, 1)
+							if f.bar then
+								f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType].r, DebuffTypeColor[f.spell.dispelType].g, DebuffTypeColor[f.spell.dispelType].b, 1)
+							end
 						end
 					end
-					if not self.ui.common.default_color or f.spell.dispelType == nil then 
-						f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
-						if f.bar then
-							f.bar:SetStatusBarColor(unpack(self.ui.icon.active_border_color))
-						end
-					else 
-						f.border:SetVertexColor(
-							DebuffTypeColor[f.spell.dispelType or ""].r, 
-							DebuffTypeColor[f.spell.dispelType or ""].g, 
-							DebuffTypeColor[f.spell.dispelType or ""].b,
-							1)
-						if f.bar then
-							f.bar:SetStatusBarColor(
-								DebuffTypeColor[f.spell.dispelType or ""].r,
-								DebuffTypeColor[f.spell.dispelType or ""].g,
-								DebuffTypeColor[f.spell.dispelType or ""].b, 
-								1)
-						end
-					end
-					if cooldown_type == DB.COOLDOWN_CIRCLE or cooldown_type == DB.COOLDOWN_NONE then
-						if HDH_TRACKER.startTime < f.spell.startTime or (f.spell.duration == 0) then
-							f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
-						else
-							f.cd:SetCooldown(HDH_TRACKER.startTime, f.spell.duration - (f.spell.startTime - HDH_TRACKER.startTime));
-						end
-					else
-						f.cd:SetMinMaxValues(f.spell.startTime, f.spell.endTime);
-						f.cd:SetValue(GetTime());
-					end
+
 					if display_mode ~= DB.DISPLAY_ICON and f.bar then
 						f.bar:SetText(f.spell.name)
 						if f.spell.duration == 0 then
@@ -294,26 +271,20 @@ do
 				end
 			else
 				f.timetext:SetText(nil)
+				f.icon:Stop()
+				
 				if not f.spell.blankDisplay then
 					if f.spell.display == DB.SPELL_HIDE_TIME_ON or f.spell.display == DB.SPELL_ALWAYS_DISPLAY or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then
-						f.icon:SetDesaturated(1)
-						f.icon:SetAlpha(self.ui.icon.off_alpha)
-						f.border:SetAlpha(self.ui.icon.off_alpha)
-						f.border:SetVertexColor(0,0,0) 
+						f.icon:SetActivate(false)
 						f.v1:SetText(nil)
 						f.counttext:SetText(nil)
-						f.cd:Hide()
-						f.iconSatCooldown.spark:Hide() 
-						f.iconSatCooldown:Hide() 
 						if display_mode ~= DB.DISPLAY_ICON and f.bar then 
 							f.bar:SetText(f.spell.name);
 							f.spell.remaining = 0
 							f.spell.endTime = 1
 							f.spell.startTime = 0
 							if self.ui.common.default_color and f.spell.dispelType then
-								f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r,
-														DebuffTypeColor[f.spell.dispelType or ""].g,
-														DebuffTypeColor[f.spell.dispelType or ""].b)
+								f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r, DebuffTypeColor[f.spell.dispelType or ""].g, DebuffTypeColor[f.spell.dispelType or ""].b, 1)
 							end
 							self:UpdateBarValue(f, 0, 1, 1);
 						end--f.bar:Hide();)
@@ -381,8 +352,6 @@ do
 	function HDH_AURA_TRACKER:InitIcons()
 		local trackerId = self.id
 		local id, name, type, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
-		self.aura_filter = aura_filter
-		self.aura_caster = aura_caster
 		if not id then return end
 		local elemKey, elemId, elemName, texture, glowType, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
 		local display, connectedId, connectedIsItem, unlearnedHideMode
@@ -392,13 +361,11 @@ do
 		local isLearned = true
 		local iconIdx = 0;
 		local needEquipmentEvent = false
-		self.frame.pointer = {}
 
-		if self.type == HDH_TRACKER.TYPE.BUFF then
-			self.filter = "HELPFUL"
-		else 
-			self.filter = "HARMFUL"
-		end
+		self.frame.pointer = {}
+		self.aura_filter = aura_filter
+		self.aura_caster = aura_caster
+		self.filter = (self.type == HDH_TRACKER.TYPE.BUFF) and "HELPFUL" or "HARMFUL"
 
 		if aura_filter == DB.AURA_FILTER_ALL or aura_filter == DB.AURA_FILTER_ONLY_BOSS then
 			self.GetAurasFunc = HDH_AURA_TRACKER.GetAurasAll
@@ -421,15 +388,13 @@ do
 					iconIdx = iconIdx + 1
 					f = self.frame.icon[iconIdx]
 					if f:GetParent() == nil then f:SetParent(self.frame) end
-
-					spell = {}
-
 					if isLearned then
 						self.frame.pointer[elemKey] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
 					else
 						spell.blankDisplay = true
 						f:Hide()
 					end
+					spell = {}
 					spell.glow = glowType
 					spell.glowCondtion = glowCondition
 					spell.glowValue = (glowValue and tonumber(glowValue)) or 0
@@ -452,9 +417,6 @@ do
 					spell.isItem =  isItem
 					f.spell = spell
 					f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-					f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-					f.iconSatCooldown:SetDesaturated(nil)
-					self:ChangeCooldownType(f, self.ui.icon.cooldown)
 					self:UpdateGlow(f, false)
 				end
 			end

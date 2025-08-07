@@ -155,6 +155,31 @@ end
 
 ------- HDH_C_TRACKER member function -----------	
 
+function HDH_C_TRACKER:UpdateState(id, name, isItem, isToy)
+	local inRange, isAble, isNotEnoughMana
+	if isItem then
+		inRange = C_Item.IsItemInRange(id, "target")
+		if not isToy then
+			isAble = C_Item.IsUsableItem(id)
+		else
+			isAble = true
+		end
+		isNotEnoughMana = false
+	else
+		inRange = HDH_AT_UTIL.IsSpellInRange(name, "target")
+		isAble, isNotEnoughMana = HDH_AT_UTIL.IsSpellUsable(id)
+		isAble = isAble or isNotEnoughManas
+	end
+end
+
+function HDH_C_TRACKER:UpdateCount(id, name, isItem, isToy)
+
+end
+
+function HDH_C_TRACKER:UpdateCooldown(id, name, isItem, isToy)
+
+end
+
 function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 	local startTime, duration, count, remaining
 	local chargeCount, chargeCountMax, chargeStartTime, chargeDuration, chargeRemaining, castCount
@@ -202,6 +227,15 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 	if chargeStartTime and chargeDuration then
 		chargeRemaining = chargeStartTime + chargeDuration - curTime
 		chargeRemaining = math.max(chargeRemaining, 0)
+	end
+
+	if (HDH_TRACKER.startTime > startTime) then
+		startTime = HDH_TRACKER.startTime
+		duration = duration - (HDH_TRACKER.startTime - startTime)
+	end
+	if chargeStartTime ~= nil and (HDH_TRACKER.startTime > chargeStartTime) then
+		chargeStartTime = HDH_TRACKER.startTime
+		chargeDuration = chargeDuration - (HDH_TRACKER.startTime - chargeStartTime)
 	end
 
 	return startTime or 0, 
@@ -294,185 +328,241 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		spell.charges.duration = chargeDuration
 		spell.isCharging = (chargeRemaining > 0 and chargeCount >= 1) and true or false
 		spell.isAble = isAble
-		spell.inRange = inRange
-		spell.isNotEnoughMana = isNotEnoughMana
+		spell.inRange = not use_out_range_color and true or inRange
+		spell.isNotEnoughMana = use_not_enough_mana_color and isNotEnoughMana or false
 	end
 
-	if display_mode ~= DB.DISPLAY_ICON then
-		f.bar:SetText(spell.name)
+	-- 상태 업데이트
+	if not spell.isAble then
+		f.icon:SetDesaturated()
+
+	elseif not spell.inRange then
+		f.icon:SetOverlayColor(out_range_color[1], out_range_color[2], out_range_color[3], out_range_color[4])
+		
+	elseif spell.isNotEnoughMana then
+		f.icon:SetOverlayColor(not_enough_mana_color[1], not_enough_mana_color[2], not_enough_mana_color[3], not_enough_mana_color[4])
+
+	elseif spell.isGlobalCooldown then
+		f.icon:SetOverlayColor(nil)
+		f.icon:UpdateCooldowning()
+
+	elseif spell.remaining > 0 then
+		f.icon:SetOverlayColor(nil)
+		f.icon:UpdateCooldowning()
+		
+	elseif spell.isCharging then
+		f.icon:SetOverlayColor(nil)
+		f.icon:UpdateCooldowning()
+
+	else -- 쿨 아닌 상태
+		f.icon:UpdateCooldowning(false)
+		print("hi")
 	end
+
+	-- 쿨다운 업데이트
+	if spell.remaining > 0 then
+		f.icon:SetCooldown(spell.startTime, spell.duration)
+
+	elseif spell.isCharging then
+		f.icon:SetCharge(spell.startTime, spell.duration)
+
+	else -- 쿨 아닌 상태
+		-- f.icon:
 	
-	if spell.remaining <= HDH_C_TRACKER.EndCooldown then
-		f.cd:Hide()
-		if display_mode ~= DB.DISPLAY_ICON and f.bar then
-			self:UpdateBarValue(f, 0, 1, 1)
-		end--f.bar:Hide() 
-	else
-		if not f.cd:IsShown() then f.cd:Show() end
-		if (cooldown_type == DB.COOLDOWN_CIRCLE) or (cooldown_type == DB.COOLDOWN_NONE)  then
-			if HDH_TRACKER.startTime < f.spell.startTime or (spell.duration == 0) then
-				f.cd:SetCooldown(spell.startTime, spell.duration or 0)
-			else
-				f.cd:SetCooldown(HDH_TRACKER.startTime, f.spell.duration - (HDH_TRACKER.startTime-f.spell.startTime))
-			end
-		else
-			f.cd:SetMinMaxValues(spell.startTime, spell.endTime)
-			f.cd:SetValue(GetTime())
-		end
-
-		if display_mode ~= DB.DISPLAY_ICON and f.spell.duration > HDH_C_TRACKER.GlobalCooldown and f.bar then
-			self:UpdateBarValue(f, f.spell.startTime, f.spell.endTime, GetTime())
-		else
-			self:UpdateBarValue(f, 0, 1, 1)
-		end
 	end
 
-	if (spell.remaining > HDH_C_TRACKER.EndCooldown) or (spell.charges.remaining > 0) then -- 글로버 쿨다운 2초 포함
-		if spell.isGlobalCooldown and (not spell.isCharging) then -- 글로벌 쿨다운
-			if f:IsShown() then HDH_AT_UTIL.CT_StartTimer(f, maxtime) end
-			if spell.isAble then
-				self:UpdateGlow(f,  true)
-				f.icon:SetDesaturated(nil)
-				f.iconSatCooldown:SetDesaturated(nil)
-				f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
-				if spell.inRange then
-					if spell.isNotEnoughMana and use_not_enough_mana_color then
-						f.icon:SetVertexColor(unpack(not_enough_mana_color))
-						f.iconSatCooldown:SetVertexColor(unpack(not_enough_mana_color))
-					else
-						f.iconSatCooldown:SetVertexColor(1,1,1)
-					end
-				elseif use_out_range_color then
-					f.iconSatCooldown:SetVertexColor(unpack(out_range_color))
-					f.icon:SetVertexColor(unpack(out_range_color))
-				end
-			else
-				f.icon:SetDesaturated(1)
-				f.iconSatCooldown:SetAlpha(0)
-			end
-			f.timetext:SetText(nil)
-		else
-			if spell.display == DB.SPELL_ALWAYS_DISPLAY or spell.display == DB.SPELL_HIDE_TIME_OFF or spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE or spell.isCharging or HDH_TRACKER.ENABLE_MOVE then 	
-				if HDH_TRACKER.ENABLE_MOVE or (maxtime == -1) or (maxtime > spell.remaining) then -- 쿨다운 중
-					HDH_AT_UTIL.CT_StartTimer(f, -1)
-					if not f:IsShown() then f:Show() isUpdate = true end
-					self:UpdateGlow(f, true)
-				else
-					self:UpdateGlow(f, false)
-					HDH_AT_UTIL.CT_StartTimer(f, -1)
-					if f:IsShown() then f:Hide() isUpdate = true end
-				end
 
-				if spell.isAble then
-					f.iconSatCooldown:SetDesaturated(nil)
-					f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
-					if spell.inRange then
-						if spell.isNotEnoughMana and use_not_enough_mana_color then
-							f.icon:SetVertexColor(unpack(not_enough_mana_color))
-							f.iconSatCooldown:SetVertexColor(unpack(not_enough_mana_color))
-							f.icon:SetDesaturated(nil)
-						else
-							f.icon:SetDesaturated((not spell.isCharging or spell.remaining > 0) and 1 or nil)
-							f.iconSatCooldown:SetVertexColor(1,1,1)
-						end
-					elseif use_out_range_color then
-						f.iconSatCooldown:SetVertexColor(unpack(out_range_color))
-						f.icon:SetVertexColor(unpack(out_range_color))
-						f.icon:SetDesaturated(nil)
-					else
-						f.icon:SetDesaturated((not spell.isCharging or spell.remaining > 0) and 1 or nil)
-					end
-				else
-					f.icon:SetDesaturated(1)
-					f.iconSatCooldown:SetAlpha(0)
-					f.iconSatCooldown:SetDesaturated(1)
-				end
-			else
-				if f:IsShown() then f:Hide() self:UpdateGlow(f, false); isUpdate = true end
-				HDH_AT_UTIL.CT_StartTimer(f, -1)
-			end
-		end
 
-		if (cooldown_type == DB.COOLDOWN_CIRCLE) or (cooldown_type == DB.COOLDOWN_NONE)  then
-			if f.iconSatCooldown:GetAlpha() ~= 0 then
-				f.iconSatCooldown:SetAlpha(0)
-			end
-			if HDH_TRACKER.startTime < spell.startTime or (spell.duration == 0) then
-				f.cd:SetCooldown(spell.startTime, spell.duration)
-			else
-				f.cd:SetCooldown(HDH_TRACKER.startTime, spell.duration - (HDH_TRACKER.startTime-spell.startTime))
-			end
-		else 
-			f.cd:SetMinMaxValues(spell.startTime, spell.startTime + spell.duration)
-			f.cd:SetValue(GetTime())
-		end
 
-		if not f.iconSatCooldown:IsShown() then
-			f.iconSatCooldown:Show()
-		end
 
-	else  -- 쿨다운 아닐때
-		f.timetext:SetText(nil)
-		if f.cd:IsShown() then f.cd:Hide() end
-		if spell.display == DB.SPELL_ALWAYS_DISPLAY or f.spell.display == DB.SPELL_HIDE_TIME_ON or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then 	
-			if not f:IsShown() then f:Show() isUpdate = true end
-			self:UpdateGlow(f, true)
-		else
-			if f:IsShown() then f:Hide() self:UpdateGlow(f, false); isUpdate = true end
-		end
-		f.iconSatCooldown:Hide()
-		f.iconSatCooldown.spark:Hide()
 
-		if spell.isAble then
-			if spell.inRange then
-				if spell.isNotEnoughMana and use_not_enough_mana_color then
-					f.icon:SetVertexColor(unpack(not_enough_mana_color))
-					f.iconSatCooldown:SetVertexColor(unpack(not_enough_mana_color))
-					f.icon:SetDesaturated(nil)
-				else
-					f.icon:SetDesaturated(nil)
-					f.iconSatCooldown:SetVertexColor(1,1,1)
-					f.icon:SetVertexColor(1,1,1)
-				end
-			elseif use_out_range_color then
-				f.iconSatCooldown:SetVertexColor(unpack(out_range_color))
-				f.icon:SetVertexColor(unpack(out_range_color))
-				f.icon:SetDesaturated(nil)
-			else
-				f.icon:SetDesaturated(1)
-			end
-		else
-			f.icon:SetDesaturated(1)
-		end
-	end
 
-	if f.icon:IsDesaturated() then
-		f.icon:SetVertexColor(1,1,1)
-		f.icon:SetAlpha(self.ui.icon.off_alpha)
-		f.border:SetAlpha(self.ui.icon.off_alpha)
-		f.border:SetVertexColor(0,0,0)
-	else
-		if spell.duration < HDH_C_TRACKER.GlobalCooldown or (spell.inRange and not spell.isNotEnoughMana)  then
-			f.icon:SetAlpha(self.ui.icon.on_alpha)
-			f.border:SetAlpha(self.ui.icon.on_alpha)
-			f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
-		else
-			f.icon:SetAlpha(self.ui.icon.off_alpha)
-			f.border:SetAlpha(self.ui.icon.off_alpha)
-		end
-	end
 
-	if (chargeCountMax and (chargeCountMax >= 2)) or (f.charges:GetCooldownDuration() > 0) then 
-		spell.isCharging = chargeCount ~= chargeCountMax
-		f.counttext:SetText(chargeCount);
-		if (cooldown_type == DB.COOLDOWN_CIRCLE) or (cooldown_type == DB.COOLDOWN_NONE) then
-			f.charges:SetCooldown(chargeStartTime, chargeDuration or 0);
-		end
-	elseif spell.stackable or spell.count > 0 then
-		f.counttext:SetText(spell.count)
-	else
-		f.counttext:SetText(nil)
-	end
+	-- if display_mode ~= DB.DISPLAY_ICON then
+	-- 	f.bar:SetText(spell.name)
+	-- end
+	
+	-- if spell.remaining <= HDH_C_TRACKER.EndCooldown then
+	-- 	-- f.cd:Hide()
+	-- 	if display_mode ~= DB.DISPLAY_ICON and f.bar then
+	-- 		self:UpdateBarValue(f, 0, 1, 1)
+	-- 	end--f.bar:Hide() 
+	-- else
+	-- 	if (HDH_TRACKER.startTime < spell.startTime) or (spell.duration == 0) then
+	-- 		f.icon:SetCooldown(spell.startTime, spell.duration or 0)
+	-- 	else
+	-- 		f.icon:SetCooldown(HDH_TRACKER.startTime, spell.duration - (spell.startTime - HDH_TRACKER.startTime))
+	-- 	end
+	-- 	-- if not f.cd:IsShown() then f.cd:Show() end
+	-- 	-- if (cooldown_type == DB.COOLDOWN_CIRCLE) or (cooldown_type == DB.COOLDOWN_NONE)  then
+	-- 	-- 	if HDH_TRACKER.startTime < f.spell.startTime or (spell.duration == 0) then
+	-- 	-- 		f.cd:SetCooldown(spell.startTime, spell.duration or 0)
+	-- 	-- 	else
+	-- 	-- 		f.cd:SetCooldown(HDH_TRACKER.startTime, f.spell.duration - (HDH_TRACKER.startTime-f.spell.startTime))
+	-- 	-- 	end
+	-- 	-- else
+	-- 	-- 	f.cd:SetMinMaxValues(spell.startTime, spell.endTime)
+	-- 	-- 	f.cd:SetValue(GetTime())
+	-- 	-- end
+	-- 	f.icon:UpdateCooldowning()
+
+	-- 	if display_mode ~= DB.DISPLAY_ICON and f.spell.duration > HDH_C_TRACKER.GlobalCooldown and f.bar then
+	-- 		self:UpdateBarValue(f, f.spell.startTime, f.spell.endTime, GetTime())
+	-- 	else
+	-- 		self:UpdateBarValue(f, 0, 1, 1)
+	-- 	end
+	-- end
+
+	-- if (spell.remaining > HDH_C_TRACKER.EndCooldown) or (spell.charges.remaining > 0) then -- 글로버 쿨다운 2초 포함
+	-- 	if spell.isGlobalCooldown and (not spell.isCharging) then -- 글로벌 쿨다운
+	-- 		-- if f:IsShown() then HDH_AT_UTIL.CT_StartTimer(f, maxtime) end
+	-- 		if spell.isAble then
+	-- 			self:UpdateGlow(f,  true)
+	-- 			-- f.icon:SetDesaturated(nil)
+	-- 			-- f.iconSatCooldown:SetDesaturated(nil)
+	-- 			-- f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
+	-- 			if spell.inRange then
+	-- 				if spell.isNotEnoughMana and use_not_enough_mana_color then
+	-- 					-- f.icon:SetVertexColor(unpack(not_enough_mana_color))
+	-- 					-- f.iconSatCooldown:SetVertexColor(unpack(not_enough_mana_color))
+	-- 				else
+	-- 					-- f.iconSatCooldown:SetVertexColor(1,1,1)
+	-- 				end
+	-- 			elseif use_out_range_color then
+	-- 				-- f.iconSatCooldown:SetVertexColor(unpack(out_range_color))
+	-- 				-- f.icon:SetVertexColor(unpack(out_range_color))
+	-- 			end
+	-- 		else
+	-- 			-- f.icon:SetDesaturated(1)
+	-- 			-- f.iconSatCooldown:SetAlpha(0)
+	-- 		end
+	-- 		f.timetext:SetText(nil)
+
+	-- 		f.icon:SetGlobal(spell.startTime, spell.duration)
+	-- 	else
+	-- 		if spell.display == DB.SPELL_ALWAYS_DISPLAY or spell.display == DB.SPELL_HIDE_TIME_OFF or spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE or spell.isCharging or HDH_TRACKER.ENABLE_MOVE then 	
+	-- 			if HDH_TRACKER.ENABLE_MOVE or (maxtime == -1) or (maxtime > spell.remaining) then -- 쿨다운 중
+	-- 				-- HDH_AT_UTIL.CT_StartTimer(f, -1)
+	-- 				if not f:IsShown() then f:Show() isUpdate = true end
+	-- 				self:UpdateGlow(f, true)
+	-- 			else
+	-- 				self:UpdateGlow(f, false)
+	-- 				-- HDH_AT_UTIL.CT_StartTimer(f, -1)
+	-- 				if f:IsShown() then f:Hide() isUpdate = true end
+	-- 			end
+
+	-- 			if spell.isAble then
+	-- 				-- f.iconSatCooldown:SetDesaturated(nil)
+	-- 				-- f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
+	-- 				if spell.inRange then
+	-- 					if spell.isNotEnoughMana and use_not_enough_mana_color then
+	-- 						-- f.icon:SetVertexColor(unpack(not_enough_mana_color))
+	-- 						-- f.iconSatCooldown:SetVertexColor(unpack(not_enough_mana_color))
+	-- 						-- f.icon:SetDesaturated(nil)
+	-- 					else
+	-- 						-- f.icon:SetDesaturated((not spell.isCharging or spell.remaining > 0) and 1 or nil)
+	-- 						-- f.iconSatCooldown:SetVertexColor(1,1,1)
+	-- 					end
+	-- 				elseif use_out_range_color then
+	-- 					-- f.iconSatCooldown:SetVertexColor(unpack(out_range_color))
+	-- 					-- f.icon:SetVertexColor(unpack(out_range_color))
+	-- 					-- f.icon:SetDesaturated(nil)
+	-- 				else
+	-- 					-- f.icon:SetDesaturated((not spell.isCharging or spell.remaining > 0) and 1 or nil)
+	-- 				end
+	-- 			else
+	-- 				-- f.icon:SetDesaturated(1)
+	-- 				-- f.iconSatCooldown:SetAlpha(0)
+	-- 				-- f.iconSatCooldown:SetDesaturated(1)
+	-- 			end
+	-- 		else
+	-- 			if f:IsShown() then f:Hide() self:UpdateGlow(f, false); isUpdate = true end
+	-- 			-- HDH_AT_UTIL.CT_StartTimer(f, -1)
+	-- 		end
+	-- 	end
+
+	-- 	-- if (cooldown_type == DB.COOLDOWN_CIRCLE) or (cooldown_type == DB.COOLDOWN_NONE)  then
+	-- 	-- 	if f.iconSatCooldown:GetAlpha() ~= 0 then
+	-- 	-- 		f.iconSatCooldown:SetAlpha(0)
+	-- 	-- 	end
+	-- 	-- 	if HDH_TRACKER.startTime < spell.startTime or (spell.duration == 0) then
+	-- 	-- 		f.cd:SetCooldown(spell.startTime, spell.duration)
+	-- 	-- 	else
+	-- 	-- 		f.cd:SetCooldown(HDH_TRACKER.startTime, spell.duration - (HDH_TRACKER.startTime-spell.startTime))
+	-- 	-- 	end
+	-- 	-- else 
+	-- 	-- 	f.cd:SetMinMaxValues(spell.startTime, spell.startTime + spell.duration)
+	-- 	-- 	f.cd:SetValue(GetTime())
+	-- 	-- end
+
+	-- 	-- if not f.iconSatCooldown:IsShown() then
+	-- 	-- 	f.iconSatCooldown:Show()
+	-- 	-- end
+
+		
+
+	-- else  -- 쿨다운 아닐때
+	-- 	f.timetext:SetText(nil)
+	-- 	-- if f.cd:IsShown() then f.cd:Hide() end
+	-- 	if spell.display == DB.SPELL_ALWAYS_DISPLAY or f.spell.display == DB.SPELL_HIDE_TIME_ON or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then 	
+	-- 		if not f:IsShown() then f:Show() isUpdate = true end
+	-- 		self:UpdateGlow(f, true)
+	-- 	else
+	-- 		if f:IsShown() then f:Hide() self:UpdateGlow(f, false); isUpdate = true end
+	-- 	end
+	-- 	-- f.iconSatCooldown:Hide()
+	-- 	-- f.iconSatCooldown.spark:Hide()
+
+	-- 	if spell.isAble then
+	-- 		if spell.inRange then
+	-- 			if spell.isNotEnoughMana and use_not_enough_mana_color then
+	-- 				-- f.icon:SetVertexColor(unpack(not_enough_mana_color))
+	-- 				-- f.iconSatCooldown:SetVertexColor(unpack(not_enough_mana_color))
+	-- 				-- f.icon:SetDesaturated(nil)
+	-- 			else
+	-- 				-- f.icon:SetDesaturated(nil)
+	-- 				-- f.iconSatCooldown:SetVertexColor(1,1,1)
+	-- 				-- f.icon:SetVertexColor(1,1,1)
+	-- 			end
+	-- 		elseif use_out_range_color then
+	-- 			-- f.iconSatCooldown:SetVertexColor(unpack(out_range_color))
+	-- 			-- f.icon:SetVertexColor(unpack(out_range_color))
+	-- 			-- f.icon:SetDesaturated(nil)
+	-- 		else
+	-- 			-- f.icon:SetDesaturated(1)
+	-- 		end
+	-- 	else
+	-- 		-- f.icon:SetDesaturated(1)
+	-- 	end
+	-- end
+
+	-- if f.icon:IsDesaturated() then
+	-- 	f.icon:SetVertexColor(1,1,1)
+	-- 	f.icon:SetAlpha(self.ui.icon.off_alpha)
+	-- 	f.border:SetAlpha(self.ui.icon.off_alpha)
+	-- 	f.border:SetVertexColor(0,0,0)
+	-- else
+	-- 	if spell.duration < HDH_C_TRACKER.GlobalCooldown or (spell.inRange and not spell.isNotEnoughMana)  then
+	-- 		f.icon:SetAlpha(self.ui.icon.on_alpha)
+	-- 		f.border:SetAlpha(self.ui.icon.on_alpha)
+	-- 		f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
+	-- 	else
+	-- 		f.icon:SetAlpha(self.ui.icon.off_alpha)
+	-- 		f.border:SetAlpha(self.ui.icon.off_alpha)
+	-- 	end
+	-- end
+
+	-- if (chargeCountMax and (chargeCountMax >= 2))  then  -- or (f.charges:GetCooldownDuration() > 0)
+	-- 	spell.isCharging = chargeCount ~= chargeCountMax
+	-- 	f.counttext:SetText(chargeCount);
+	-- 	-- if (cooldown_type == DB.COOLDOWN_CIRCLE) or (cooldown_type == DB.COOLDOWN_NONE) then
+	-- 	-- 	f.charges:SetCooldown(chargeStartTime, chargeDuration or 0);
+	-- 	-- end
+	-- elseif spell.stackable or spell.count > 0 then
+	-- 	f.counttext:SetText(spell.count)
+	-- else
+	-- 	f.counttext:SetText(nil)
+	-- end
 
 	if self.OrderFunc then self:OrderFunc(self) end
 	self:UpdateLayout()
@@ -590,7 +680,7 @@ function HDH_C_TRACKER:UpdateAllSlot(onlyNotMappingSpell)
 						f.spell.id = f.spell.id_original
 						f.spell.slot = nil 
 						f.icon:SetTexture(f.spell.icon)
-						f.iconSatCooldown:SetTexture(f.spell.icon)
+						-- f.iconSatCooldown:SetTexture(f.spell.icon)
 						self:UpdateIcon(f)
 					end
 					self.slot_pointer[i] = nil
@@ -618,15 +708,15 @@ function HDH_C_TRACKER:UpdateSlotIcon(slot)
 			if f.icon:GetTexture() ~= texture then
 				if f.spell.defaultImg == texture then
 					f.icon:SetTexture(f.spell.icon)
-					f.iconSatCooldown:SetTexture(f.spell.icon)
+					-- f.iconSatCooldown:SetTexture(f.spell.icon)
 				else
 					f.icon:SetTexture(texture)
-					f.iconSatCooldown:SetTexture(texture)
+					-- f.iconSatCooldown:SetTexture(texture)
 				end
 			end
 		else
 			f.icon:SetTexture(f.spell.icon)
-			f.iconSatCooldown:SetTexture(f.spell.icon)
+			-- f.iconSatCooldown:SetTexture(f.spell.icon)
 		end
 	end
 end
@@ -648,14 +738,14 @@ function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_SHOW(id)
 		else
 			if f.spell.glowEffectType == DB.GLOW_EFFECT_DEFAULT then
 				self:ActionButton_ShowOverlayGlow(f)
-				if f.border.spark:IsShown() then
-					f.border.spark:Hide() 
+				if f.icon.spark:IsShown() then
+					f.icon.spark:Hide() 
 					f.spell.glowColorOn = false
 				end
 			else
-				if not f.border.spark:IsShown() then
-					f.border.spark.playing = 0
-					f.border.spark:Show() 
+				if not f.icon.spark:IsShown() then
+					f.icon.spark.playing = 0
+					f.icon.spark:Show() 
 					f.spell.glowColorOn = true
 				end
 			end
@@ -702,91 +792,10 @@ function HDH_C_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
 	self.frame.icon[idx] = nil
 end
 
-function HDH_C_TRACKER:ChangeCooldownType(f, cooldown_type)
-	local spark_size = f.iconframe:GetWidth() 
-	if not f.charges then
-		f.charges = CreateFrame("Cooldown", nil, f.iconframe, "CooldownFrameTemplate");
-		f.charges:SetDrawEdge(true);
-		f.charges:SetDrawSwipe(false);
-		f.charges:SetDrawBling(false);
-		f.charges:SetHideCountdownNumbers(true);
-		f.charges:SetAllPoints();
-	end
-
-	if cooldown_type == DB.COOLDOWN_UP then 
-		f.cd = f.cooldown1
-		f.cd:SetOrientation("Vertical")
-		f.cd:SetReverseFill(true)
-		f.cooldown2:Hide()
-		f.charges:Hide()
-
-		f.iconSatCooldown:ClearAllPoints()
-		f.iconSatCooldown:SetPoint("BOTTOMLEFT", f.iconframe,"BOTTOMLEFT",0,0)
-		f.iconSatCooldown:SetPoint("BOTTOMRIGHT", f.iconframe,"BOTTOMRIGHT",0,0)
-		f.iconSatCooldown:SetHeight(self.ui.icon.size)
-		f.iconSatCooldown.spark:SetSize(spark_size, 7);
-		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"TOP",0,0)
-		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
-
-	elseif cooldown_type == DB.COOLDOWN_DOWN  then 
-		f.cd = f.cooldown1
-		f.cd:SetOrientation("Vertical")
-		f.cd:SetReverseFill(false)
-		f.cooldown2:Hide()
-		f.charges:Hide()
-
-		f.iconSatCooldown:ClearAllPoints()
-		f.iconSatCooldown:SetPoint("TOPLEFT", f.iconframe,"TOPLEFT",0,0)
-		f.iconSatCooldown:SetPoint("TOPRIGHT", f.iconframe,"TOPRIGHT",0,0)
-		f.iconSatCooldown:SetHeight(self.ui.icon.size)
-		f.iconSatCooldown.spark:SetSize(spark_size, 7);
-		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"BOTTOM",0,0)
-		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
-
-	elseif cooldown_type == DB.COOLDOWN_LEFT  then 
-		f.cd = f.cooldown1
-		f.cd:SetOrientation("Horizontal"); 
-		f.cd:SetReverseFill(false)
-		f.cooldown2:Hide()
-		f.charges:Hide()
-
-		f.iconSatCooldown:ClearAllPoints()
-		f.iconSatCooldown:SetPoint("TOPRIGHT", f.iconframe,"TOPRIGHT",0,0)
-		f.iconSatCooldown:SetPoint("BOTTOMRIGHT", f.iconframe,"BOTTOMRIGHT",0,0)
-		f.iconSatCooldown:SetWidth(self.ui.icon.size)
-		f.iconSatCooldown.spark:SetSize(7, spark_size);
-		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"LEFT",0,0)
-		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
-
-	elseif cooldown_type == DB.COOLDOWN_RIGHT then 
-		f.cd = f.cooldown1
-		f.cd:SetOrientation("Horizontal"); 
-		f.cd:SetReverseFill(true)
-		f.cooldown2:Hide()
-		f.charges:Hide()
-
-		f.iconSatCooldown:ClearAllPoints()
-		f.iconSatCooldown:SetPoint("TOPLEFT", f.iconframe,"TOPLEFT",0,0)
-		f.iconSatCooldown:SetPoint("BOTTOMLEFT", f.iconframe,"BOTTOMLEFT",0,0)
-		f.iconSatCooldown:SetWidth(self.ui.icon.size)
-		f.iconSatCooldown.spark:SetSize(7, spark_size);
-		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"RIGHT",0,0)
-		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
-
-	else 
-		f.cd = f.cooldown2
-		f.cd:SetReverse(false)
-		f.cooldown1:Hide()
-		f.iconSatCooldown:Hide()
-		f.iconSatCooldown.spark:Hide()
-		f.iconSatCooldown:SetSize(f.icon:GetSize())
-		f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, 0.93)
-		f.charges:Show()
-	end
+function HDH_C_TRACKER:UpdateIconSettings(f)
+	super.UpdateIconSettings(self, f)
+	local op_icon = self.ui.icon
+	f.icon:Setup(op_icon.size, op_icon.size, op_icon.cooldown, true, true, op_icon.spark_color, op_icon.cooldown_bg_color, op_icon.on_alpha, op_icon.off_alpha, op_icon.border_size)
 end
 
 function HDH_C_TRACKER:CreateDummySpell(count)
@@ -830,18 +839,18 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 		spell.isNotEnoughMana = false
 
 		self:SetGameTooltip(f,  false)
-		self:ChangeCooldownType(f, ui.icon.cooldown)
+		-- self:ChangeCooldownType(f, ui.icon.cooldown)
 		f.spell = spell
 		f.counttext:SetText(i)
 		f.timetext:Show();
 		f.icon:SetVertexColor(1,1,1);
 		spell.isCharging = false;
 		spell.isAble = true
-		if not f.cd:IsShown() then f.cd:Show(); end	
-		if (ui.icon.cooldown == DB.COOLDOWN_CIRCLE) or (ui.icon.cooldown == DB.COOLDOWN_NONE) then 
-			f.cd:SetCooldown(spell.startTime, spell.duration or 0); 
-			f.cd:SetDrawSwipe(spell.isCharging == false); 
-		end
+		-- if not f.cd:IsShown() then f.cd:Show(); end	
+		-- if (ui.icon.cooldown == DB.COOLDOWN_CIRCLE) or (ui.icon.cooldown == DB.COOLDOWN_NONE) then 
+		-- 	f.cd:SetCooldown(spell.startTime, spell.duration or 0); 
+		-- 	f.cd:SetDrawSwipe(spell.isCharging == false); 
+		-- end
 		
 		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 			f.bar:SetMinMaxValues(spell.startTime, spell.endTime);
@@ -875,11 +884,6 @@ end
 
 function HDH_C_TRACKER:Update() -- HDH_TRACKER override
 	if not self.ui then return end
-	if (UnitExists('target') or UnitExists('mouseover')) and self:IsShown() then
-		if not self.frame:GetScript("OnUpdate") then
-			self.frame:SetScript("OnUpdate", OnUpdateCheckRange)
-		end
-	end
 
 	self:UpdateAllIcons();
 end
@@ -1044,15 +1048,15 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 
 			f.spell = spell
 			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-			f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-			f.iconSatCooldown:SetDesaturated(nil)
-			f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
+			-- f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+			-- f.iconSatCooldown:SetDesaturated(nil)
+			-- f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
 
-			self:ChangeCooldownType(f, self.ui.icon.cooldown)
+			-- self:ChangeCooldownType(f, self.ui.icon.cooldown)
 			self:UpdateGlow(f, false)
 			
 			if not spell.blankDisplay then
-				f:SetScript("OnUpdate", CT_OnUpdateIcon)
+				-- f:SetScript("OnUpdate", CT_OnUpdateIcon)
 				if not spell.isInnerCDItem then
 					if spell.isItem then
 						hasItem = true
@@ -1078,7 +1082,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 		self.frame:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE")
 		self.frame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 		self.frame:RegisterEvent("PLAYER_TARGET_CHANGED")
-		
+		self.frame:RegisterEvent("ACTION_RANGE_CHECK_UPDATE")
 		
 		if needEquipmentEvent then
 			self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
@@ -1114,14 +1118,14 @@ function HDH_C_TRACKER:UpdateGlow(f, bool)
 	if f.spell.ableGlow then -- 블리자드 기본 반짝임 효과면 무조건 적용
 		if f.spell.glowEffectType == DB.GLOW_EFFECT_DEFAULT then
 			self:ActionButton_ShowOverlayGlow(f)
-			if f.border.spark:IsShown() then
-				f.border.spark:Hide() 
+			if f.icon.spark:IsShown() then
+				f.icon.spark:Hide() 
 				f.spell.glowColorOn = false
 			end
 		else
-			if not f.border.spark:IsShown() then
-				f.border.spark.playing = 0
-				f.border.spark:Show() 
+			if not f.icon.spark:IsShown() then
+				f.icon.spark.playing = 0
+				f.icon.spark:Show() 
 				f.spell.glowColorOn = true
 			end
 		end
@@ -1167,28 +1171,28 @@ function HDH_C_TRACKER:UpdateGlow(f, bool)
 		if active then
 			if f.spell.glowEffectType == DB.GLOW_EFFECT_DEFAULT then
 				self:ActionButton_ShowOverlayGlow(f)
-				if f.border.spark:IsShown() then
-					f.border.spark:Hide() 
+				if f.icon.spark:IsShown() then
+					f.icon.spark:Hide() 
 					f.spell.glowColorOn = false
 				end
 			else
-				if not f.border.spark:IsShown() then
-					f.border.spark.playing = 0
-					f.border.spark:Show() 
+				if not f.icon.spark:IsShown() then
+					f.icon.spark.playing = 0
+					f.icon.spark:Show() 
 					f.spell.glowColorOn = true
 				end
 			end
 		else
 			self:ActionButton_HideOverlayGlow(f)
-			if f.border.spark:IsShown() then
-				f.border.spark:Hide() 
+			if f.icon.spark:IsShown() then
+				f.icon.spark:Hide() 
 				f.spell.glowColorOn = false
 			end
 		end
 	else
 		self:ActionButton_HideOverlayGlow(f)
-		if f.border.spark:IsShown() then
-			f.border.spark:Hide() 
+		if f.icon.spark:IsShown() then
+			f.icon.spark:Hide() 
 			f.spell.glowColorOn = false
 		end
 	end
@@ -1208,6 +1212,14 @@ function HDH_C_TRACKER:PLAYER_ENTERING_WORLD()
 	end	
 end
 
+function HDH_C_TRACKER:ACTION_RANGE_CHECK_UPDATE(slot, isInRange, checksRange)
+
+end
+
+function HDH_C_TRACKER:ACTIONBAR_UPDATE_STATE()
+
+end
+
 function HDH_C_TRACKER:COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED(base, override)
 	if override ~= base and self.frame.pointer[base] then
 		local f = self.frame.pointer[base]
@@ -1216,10 +1228,10 @@ function HDH_C_TRACKER:COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED(base, override)
 		if info and info.iconID and info.iconID ~= f.icon:GetTexture() then
 			if f.spell.defaultImg == info.iconID then
 				f.icon:SetTexture(f.spell.icon)
-				f.iconSatCooldown:SetTexture(f.spell.icon)
+				-- f.iconSatCooldown:SetTexture(f.spell.icon)
 			else
 				f.icon:SetTexture(info.iconID)
-				f.iconSatCooldown:SetTexture(info.iconID)
+				-- f.iconSatCooldown:SetTexture(info.iconID)
 			end
 		end
 		if base and not override then
@@ -1236,7 +1248,7 @@ function HDH_C_TRACKER:COMBAT_LOG_EVENT_UNFILTERED(subEvent, srcGUID, spellID)
 			for i = 1, #self.frame.icon do
 				if self.frame.icon[i].spell.isInnerCDItem then
 					self:UpdateCombatSpellInfo(self.frame.icon[i], spellID);
-					self:UpdateIcon(self.frame.icon[i]);
+					self:UpdateIcon(self.frame.icon[i])
 				end
 			end
 		end
@@ -1264,6 +1276,14 @@ function HDH_C_TRACKER:CURSOR_CHANGED(isDefault, curType, preType)
 	end
 end
 
+-- SPELL_UPDATE_CHARGES - charge count 
+-- SPELL_UPDATE_USES - count id, id
+-- ITEM_COUNT_CHANGED - id 
+
+-- ACTION_USABLE_CHANGED - changes {slot, usable, noMana}
+
+-- BAG_UPDATE -- 
+
 function CT_OnEvent_Frame(self, event, ...)
 	local tracker = self.parent 
 	if not tracker then return end
@@ -1273,6 +1293,16 @@ function CT_OnEvent_Frame(self, event, ...)
 			HDH_AT_UTIL.RunTimer(tracker, "ACTIONBAR_UPDATE_COOLDOWN", 0.05, HDH_C_TRACKER.Update, tracker)
 		end
 
+	elseif event == "ACTION_RANGE_CHECK_UPDATE" then
+		tracker:ACTION_RANGE_CHECK_UPDATE(...)
+		if not HDH_TRACKER.ENABLE_MOVE then
+			-- HDH_AT_UTIL.RunTimer(tracker, "ACTIONBAR_UPDATE_COOLDOWN", 0.05, HDH_C_TRACKER.Update, tracker)
+			HDH_C_TRACKER.Update(tracker)
+		end
+
+	elseif event == "ACTIONBAR_UPDATE_STATE" then
+		tracker:ACTIONBAR_UPDATE_STATE()
+
 	elseif event == "SPELL_ACTIVATION_OVERLAY_GLOW_SHOW" then
 		tracker:ACTIVATION_OVERLAY_GLOW_SHOW(...)
 
@@ -1281,23 +1311,11 @@ function CT_OnEvent_Frame(self, event, ...)
 
 	elseif event =="PLAYER_TARGET_CHANGED" then
 		if  tracker:IsShown() then
-			if UnitExists('target') then
-				if not tracker.frame:GetScript("OnUpdate") then
-					tracker.frame:SetScript("OnUpdate", OnUpdateCheckRange)
-				end
-			else
-				tracker.frame:SetScript("OnUpdate", nil)
-			end
 			tracker:Update()
 		end
 
 	elseif event =="UPDATE_MOUSEOVER_UNIT" then
 		if not tracker:IsShown() then return end
-		if not UnitExists('target') and UnitExists('mouseover') then
-			if not tracker.frame:GetScript("OnUpdate") then
-				tracker.frame:SetScript("OnUpdate", OnUpdateCheckRange)
-			end
-		end
 		tracker:Update()
 
 	elseif event == 'PLAYER_FOCUS_CHANGED' then

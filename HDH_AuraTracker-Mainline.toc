@@ -13,6 +13,9 @@ Locale\locale_ruRU.lua
 Utils.lua
 ConfigDB.lua
 
+UITemplate\CommonTemplate.xml
+UITemplate\CheckButtonTemplate.xml
+UITemplate\ButtonTemplate.xml
 UITemplate\UITemplates.xml
 UITemplate\CooldownIconTemplate.xml
 Tooltip.lua

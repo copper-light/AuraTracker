@@ -1,0 +1,209 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Blizzard_SharedXML/UI.xsd">
+	<Script file="CooldownIconTemplate.lua"/>
+    
+    <Texture name="HDH_AT_Texture_White_A" virtual="true"> 
+		<Color r="1" g="1" b="1" a="0.15"/>
+	</Texture>
+
+	<Texture name="HDH_AT_Texture_Gray_A" virtual="true"> 
+		<Color r="0.3" g="0.3" b="0.3" a="0.35"/>
+	</Texture>
+
+	<Texture name="HDH_AT_Texture_Gray" virtual="true"> 
+		<Color r="0.3" g="0.3" b="0.3"/>
+	</Texture>
+
+	<Texture name="HDH_AT_Texture_Yellow" virtual="true"> 
+		<Color r="0.9" g="0.7" b="0" a="0.8"/>
+	</Texture>
+
+	<Texture name="HDH_AT_Texture_Yellow_A" virtual="true"> 
+		<Color r="0.9" g="0.7" b="0" a="0.35"/>
+	</Texture>
+
+    <Font name="Font_Yellow_L" inherits="GameFontNormalLarge" virtual="true">
+		<Color r="0.9" g="0.7" b="0"/>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+	
+	<Font name="Font_Yellow_M" inherits="GameFontNormal"  virtual="true">
+		<Color r="0.9" g="0.7" b="0"/>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+
+	<Font name="Font_Yellow_S_B" inherits="GameFontNormalSmall" outline="NORMAL" virtual="true">
+		<Color r="0.9" g="0.7" b="0"/>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+
+    <Font name="Font_Yellow_S" inherits="GameFontNormalSmall" virtual="true">
+		<Color r="0.9" g="0.7" b="0"/>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+
+	<Font name="Font_Gray_S" inherits="GameFontNormalSmall" virtual="true">
+		<Color r="0.4" g="0.4" b="0.4"/>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+
+	<Font name="Font_Gray_XS" inherits="GameFontNormalTiny2" virtual="true">
+		<Color r="0.6" g="0.6" b="0.6"/>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+
+	<Font name="Font_Disable_S" inherits="GameFontNormalSmall" virtual="true">
+		<Color r="0.2" g="0.2" b="0.2"/>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+
+	<Font name="Font_Red_S" inherits="GameFontNormalSmall" virtual="true">
+		<Color r="0.9" g="0.1" b="0.1"/>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+	
+	<Font name="Font_White_M" inherits="GameFontNormal" virtual="true">
+		<Color r="0.85" g="0.85" b="0.85"/>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+	
+	<Font name="Font_White_S" inherits="GameFontNormalSmall"  virtual="true">
+		<Color r="0.85" g="0.85" b="0.85"/>
+		<Shadow x="1" y="-1">
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+
+	<Font name="Font_White_XS" inherits="GameFontNormalTiny2" virtual="true">
+		<Color r="0.85" g="0.85" b="0.85"/>
+		<Shadow x="1" y="-1">
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+	
+	<Font name="Font_Black_S" inherits="GameFontNormalSmall" virtual="true">
+		<Color r="0" g="0" b="0"/>
+		<Shadow>
+			<Offset x="1" y="-1"/>
+			<Color r="0" g="0" b="0"/>
+		</Shadow>
+	</Font>
+
+	<Frame name="HDH_AT_BackgroundTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture>
+					<Color r="0.0" g="0.0" b="0.0" a="0.9"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="1" y="-1" />
+						<Anchor point="BOTTOMRIGHT" x="-1" y="1" />
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+
+    <Frame name="HDH_AT_ConfigFrameTemplate" virtual="true">
+		<Layers>
+            <Layer level="BORDER" textureSubLevel="1">
+                <Texture parentKey="Top" >
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Size x="1" y="2" />
+                    <Anchors>
+						<Anchor point="TOPLEFT" x="-1" y="1"/>
+						<Anchor point="TOPRIGHT" x="1" y="1"/>
+                    </Anchors>
+                </Texture>
+				<Texture parentKey="Left">
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Size x="2" y="1" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="-1" y="0"/>
+						<Anchor point="BOTTOMLEFT" x="-1" y="0"/>
+                    </Anchors>
+                </Texture>
+				<Texture parentKey="Right">
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Size x="2" y="1" />
+                    <Anchors>
+                        <Anchor point="TOPRIGHT" x="1" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="1" y="0"/>
+                    </Anchors>
+                </Texture>
+				<Texture parentKey="Bottom" >
+					<Color r="0.2" g="0.2" b="0.2" a="1" />
+					<Size x="1" y="2" />
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" x="-1" y="-1"/>
+						<Anchor point="BOTTOMRIGHT" x="1" y="-1"/>
+                    </Anchors>
+                </Texture>
+			</Layer>
+
+			<Layer level="BORDER" textureSubLevel="0">
+				<Texture parentKey="Top2" >
+					<Color r="0" g="0" b="0" a="0.3" />
+					<Size x="1" y="2" />
+                    <Anchors>
+						<Anchor point="TOPLEFT" x="-2" y="2"/>
+						<Anchor point="TOPRIGHT" x="2" y="2"/>
+                    </Anchors>
+                </Texture>
+
+				<Texture parentKey="Left2">
+					<Color r="0" g="0" b="0" a="0.3" />
+					<Size x="2" y="1" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" x="-2" y="0"/>
+						<Anchor point="BOTTOMLEFT" x="-2" y="0"/>
+                    </Anchors>
+                </Texture>
+
+				<Texture parentKey="Right2">
+					<Color r="0" g="0" b="0" a="0.3" />
+					<Size x="2" y="1" />
+                    <Anchors>
+                        <Anchor point="TOPRIGHT" x="2" y="0"/>
+						<Anchor point="BOTTOMRIGHT" x="2" y="0"/>
+                    </Anchors>
+                </Texture>
+
+				<Texture parentKey="Bottom2">
+					<Color r="0" g="0" b="0" a="0.3" />
+					<Size x="1" y="2" />
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" x="-2" y="-2"/>
+						<Anchor point="BOTTOMRIGHT" x="2" y="-2"/>
+                    </Anchors>
+                </Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+</Ui>

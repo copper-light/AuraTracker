@@ -11,45 +11,6 @@ local function hasValue (tab, val)
     return false
 end
 
-
----------------------------
----------------------------
-
-HDH_AT_UITabBtnMixin = {}
-function HDH_AT_UITabBtnMixin:SetActivate(bool)
-    if bool then
-        self.Active1:Show()
-        self.Active2:Show()
-    else
-        self.Active1:Hide()
-        self.Active2:Hide()
-    end
-end
-
-HDH_AT_BottomTapMixin = {}
-
-function HDH_AT_BottomTapMixin:SetActivate(bool)
-    if bool then
-        self:Disable()
-        self.Left:Hide()
-        self.Middle:Hide()
-        self.Right:Hide()
-        self.LeftActive:Show()
-        self.MiddleActive:Show()
-        self.RightActive:Show()
-        self.Text:SetPoint("TOP",0, -11)
-    else
-        self:Enable()
-        self.Left:Show()
-        self.Middle:Show()
-        self.Right:Show()
-        self.LeftActive:Hide()
-        self.MiddleActive:Hide()
-        self.RightActive:Hide()
-        self.Text:SetPoint("TOP",0, -7)
-    end
-end
-
 -------------------------------------------------------------
 -- Aura List
 -------------------------------------------------------------
@@ -805,27 +766,6 @@ function HDH_AT_OnClickColorPicker(self)
 	ColorPickerFrame:SetupColorPickerAndShow(info);
 end
 
-------------------------------------------------------------------------
---
-------------------------------------------------------------------------
-
-HDH_AT_TrackerTapBtnTemplateMixin = {}
-
-function HDH_AT_TrackerTapBtnTemplateMixin:SetActivate(bool)
-    if bool then
-        _G[self:GetName().."BgLine2"]:Show()
-        _G[self:GetName().."On"]:Show()
-        self.BG:SetColorTexture(0,0,0,0.5)
-        self.Text:SetTextColor(1,0.8,0)
-    else
-        _G[self:GetName().."BgLine2"]:Hide()
-        _G[self:GetName().."On"]:Hide()
-        self.BG:SetColorTexture(0,0,0,0.3)
-        self.Text:SetTextColor(0.8,0.8,0.8)
-    end
-end
-
-
 -----------------------------------
 -- dlalog
 -----------------------------------
@@ -1071,7 +1011,6 @@ function HDH_AT_SplitBar_OnMouseUp(self)
 
 end
 
-
 -----------------------------------
 -- HDH_AT_AddDelEdtiboxTemplateMixin
 -----------------------------------
@@ -1305,69 +1244,6 @@ function HDH_AT_LatestSpellItemTemplateMixin:SetActive(bool)
     end
 end
 
-
--------------------------------------
---  HDH_AT_CheckButtonTemplateMixin
--------------------------------------
-
-HDH_AT_CheckButtonTemplateMixin = {}
-
-function HDH_AT_CheckButton_OnClick(self)
-    self:SetChecked(not (self.isChecked or false))
-    if self.OnClickfunc then
-        self.OnClickfunc(self)
-    end
-end
-
-function HDH_AT_CheckButton_OnEnter(self)
-    local visibleWidth = self:GetFontString():GetWidth()
-    local fullWidth = self:GetFontString():GetUnboundedStringWidth()
-    if fullWidth > visibleWidth then
-        GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-        GameTooltip:AddLine(self:GetText());
-        GameTooltip:Show();
-    end
-end
-
-function HDH_AT_CheckButton_OnLeave(self)
-    if GameTooltip:IsShown() then
-        GameTooltip:Hide()
-    end
-end
-
-function HDH_AT_CheckButtonTemplateMixin:SetChecked(bool)
-    self.Active:SetShown(bool)
-    self.isChecked = bool
-end
-
-function HDH_AT_CheckButtonTemplateMixin:GetChecked()
-    return self.isChecked or false
-end
-
-function HDH_AT_CheckButtonTemplateMixin:SetScript(scriptTypeName, func)
-    if scriptTypeName == "OnClick" then
-        self.OnClickfunc = func
-    end
-end
-
-function HDH_AT_CheckButtonTemplateMixin:SetText(text)
-    self.Base.Text:SetText(text)
-end
-
-function HDH_AT_CheckButtonTemplateMixin:SetFontObject(object)
-    if self.Base then
-        self.Base.Text:SetFontObject(object)
-    end
-end
-
-function HDH_AT_CheckButtonTemplateMixin:GetFontString()
-    return self.Base.Text
-end
-
-function HDH_AT_CheckButtonTemplateMixin:GetText()
-    return self.Base.Text:GetText()
-end
-
 -------------------------------------
 --  HDH_AT_SpellSearchEditBoxTemplateMixin
 -------------------------------------
@@ -1457,61 +1333,6 @@ function HDH_AT_SpellSearchEditBoxTemplateMixin:SetOnClickHandler(handler)
     self.OnClickSearchHandler = handler
 end
 
----------------------------------
--- HDH_AT_TalentCheckButtonMixin
----------------------------------
-HDH_AT_TalentCheckButtonMixin = {}
-
-function HDH_AT_TalentCheckButton_OnClick(self)
-    self:SetChecked(not (self.isChecked or false))
-    if self.OnClickfunc then
-        self.OnClickfunc(self)
-    end
-end
-
-function HDH_AT_TalentCheckButtonMixin:SetChecked(bool)
-    self.isChecked = bool
-    if bool then
-        self:SetSize(100, 30)
-        self.Icon:SetDesaturated(false)
-        self.Icon:SetAlpha(1)
-        self.Name:Show()
-        self.Active:Show()
-    else
-        self:SetSize(50, 30)
-        self.Icon:SetDesaturated(true)
-        self.Icon:SetAlpha(0.4)
-        self.Name:Hide()
-        self.Active:Hide()
-    end
-end
-
-function HDH_AT_TalentCheckButtonMixin:SetActivate(bool)
-    self:SetChecked(bool)
-end
-
-function HDH_AT_TalentCheckButtonMixin:SetText(text)
-    self.Name:SetText(text)
-end
-
-function HDH_AT_TalentCheckButtonMixin:GetText()
-    return self.Name:GetText()
-end
-
-function HDH_AT_TalentCheckButtonMixin:SetValue(id)
-    self.id = id
-end
-
-function HDH_AT_TalentCheckButtonMixin:GetValue()
-    return self.id 
-end
-
-function HDH_AT_TalentCheckButtonMixin:SetUnassigned()
-    self.Icon:SetTexture([[Interface\ICONS\INV_Misc_QuestionMark]])
-    self.Name:SetText(L.UNASSIGNED)
-end
-
-
 ----------------------------------------
 -- HDH_AT_MultiLineEditBoxTemplateMixin
 ----------------------------------------
@@ -1544,14 +1365,13 @@ function HDH_AT_MultiLineEditBoxTemplateMixin:SetAutoFocus(bool)
     self.SF.EditBox:SetAutoFocus(bool)
 end
 
-
 ------------------------------------------
 --- HDH_AT_MultiStatusBarTemplateMixin
 ------------------------------------------
 HDH_AT_MultiStatusBarTemplateMixin = {}
 local DB = HDH_AT_ConfigDB
 local BAR_INNER_MAX = 1000
-local BAR_ANIMATE_DURATION = .15 --.15
+local BAR_ANIMATE_DURATION = .10 --.15
 
 function HDH_AT_MultiStatusBarTemplateMixin:OnUpdate(elapsed)
     self.elapsed = (self.elapsed or 0) + elapsed
@@ -1873,7 +1693,6 @@ function HDH_AT_MultiStatusBarTemplateMixin:SetInnerValue(value)
     end
 end
 
--- 동적
 function HDH_AT_MultiStatusBarTemplateMixin:SetStatusBarColor(r, g, b, a)
     self.normalColor = {r, g, b, a}
     for _, bar in ipairs(self.list) do
@@ -1881,7 +1700,6 @@ function HDH_AT_MultiStatusBarTemplateMixin:SetStatusBarColor(r, g, b, a)
     end
 end
 
--- 동적
 function HDH_AT_MultiStatusBarTemplateMixin:SetMinMaxValues(minValue, maxValue, reload)
     if not reload and self.minValue == minValue and self.maxValue == maxValue then return false end
     if #self.points >= 1 and self.points[#self.points] >= ((maxValue - minValue) / (self.range) * BAR_INNER_MAX) then return false end
@@ -2006,8 +1824,3 @@ function HDH_AT_StatusBarTemplateMixin:EnableSpark(bool, color)
         self.Spark:SetVertexColor(color[1], color[2], color[3], color[4])
     end
 end
-
-----------------------------------
---- HDH_AT_SpellIconTemplateeMixin
-----------------------------------
-HDH_AT_SpellIconTemplateeMixin = {}
