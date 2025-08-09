@@ -16,13 +16,15 @@ HDH_TRACKER.TYPE = {}
 -- Properties
 --------------------------------------------
 HDH_TRACKER.ENABLE_MOVE = false
-HDH_TRACKER.ONUPDATE_FRAME_TERM = 0.05;
+HDH_TRACKER.ONUPDATE_FRAME_TERM = 0.1;
 HDH_TRACKER.ANI_SHOW = 1
 HDH_TRACKER.ANI_HIDE = 2
 HDH_TRACKER.FONT_STYLE = "fonts/2002.ttf";
 HDH_TRACKER.MAX_ICONS_COUNT = 10
 HDH_TRACKER.BAR_UP_ANI_TERM = .15 -- second
 HDH_TRACKER.BAR_DOWN_ANI_TERM = .15
+HDH_TRACKER.GlobalCooldown = 1.9; -- default GC: 1.332
+HDH_TRACKER.EndCooldown = 0.09;
 
 HDH_TRACKER.startTime = 0
 
@@ -30,81 +32,86 @@ HDH_TRACKER.startTime = 0
 -- EVENT SCRIPT
 -------------------------------------------
 
-function HDH_AT_UpdateCooldownSatIcon(f, per, direction, reverse)
-	if per > 0 then
-		f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * per * 10) /10
-		f.iconSatCooldown.curSize = f.iconSatCooldown.curSize - (f.iconSatCooldown.curSize % 0.5)
-		f.iconSatCooldown.curSize = math.min(math.max(f.iconSatCooldown.curSize, 0.1), f.icon:GetHeight())
-		if not f.iconSatCooldown.spark:IsShown() then
-			f.iconSatCooldown.spark:Show()
-		end
-	else
-		if f.iconSatCooldown.spark:IsShown() then
-			f.iconSatCooldown:Hide()
-		end
-	end
-	f.spell.per = per
+-- function HDH_AT_UpdateCooldownSatIcon(f, per, direction, reverse)
+-- 	if per > 0 then
+-- 		f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * per * 10) /10
+-- 		f.iconSatCooldown.curSize = f.iconSatCooldown.curSize - (f.iconSatCooldown.curSize % 0.5)
+-- 		f.iconSatCooldown.curSize = math.min(math.max(f.iconSatCooldown.curSize, 0.1), f.icon:GetHeight())
+-- 		if not f.iconSatCooldown.spark:IsShown() then
+-- 			f.iconSatCooldown.spark:Show()
+-- 		end
+-- 	else
+-- 		if f.iconSatCooldown.spark:IsShown() then
+-- 			f.iconSatCooldown:Hide()
+-- 		end
+-- 	end
+-- 	f.spell.per = per
 
-	if reverse then
-		if (f.iconSatCooldown.curSize ~= f.iconSatCooldown.preSize) then
-			if (f.iconSatCooldown.curSize == 0) then f.iconSatCooldown:Hide() end
-			if direction == DB.COOLDOWN_LEFT then
-				f.spell.texcoord = 0.93 - (0.86 * per)
-				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
-				f.iconSatCooldown:SetTexCoord(f.spell.texcoord, 0.93, 0.07, 0.93)
+-- 	if reverse then
+-- 		if (f.iconSatCooldown.curSize ~= f.iconSatCooldown.preSize) then
+-- 			if (f.iconSatCooldown.curSize == 0) then f.iconSatCooldown:Hide() end
+-- 			if direction == DB.COOLDOWN_LEFT then
+-- 				f.spell.texcoord = 0.93 - (0.86 * per)
+-- 				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
+-- 				f.iconSatCooldown:SetTexCoord(f.spell.texcoord, 0.93, 0.07, 0.93)
 
-			elseif direction == DB.COOLDOWN_RIGHT then
-				f.spell.texcoord = 0.07 + (0.86 * per)
-				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
-				f.iconSatCooldown:SetTexCoord(0.07, f.spell.texcoord, 0.07, 0.93)
+-- 			elseif direction == DB.COOLDOWN_RIGHT then
+-- 				f.spell.texcoord = 0.07 + (0.86 * per)
+-- 				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
+-- 				f.iconSatCooldown:SetTexCoord(0.07, f.spell.texcoord, 0.07, 0.93)
 
-			elseif direction == DB.COOLDOWN_UP then
-				f.spell.texcoord = 0.93 - (0.86 * per)
-				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
-				f.iconSatCooldown:SetTexCoord(0.07, 0.93, f.spell.texcoord, 0.93)
-			else
-				f.spell.texcoord = 0.07 + (0.86 * per)
-				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
-				f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, f.spell.texcoord)
-			end
-			f.iconSatCooldown.preSize = f.iconSatCooldown.curSize
-		end
-	else
-		if (f.iconSatCooldown.curSize ~= f.iconSatCooldown.preSize) then
-			f.tex = 0.86 * per
-			if (f.iconSatCooldown.curSize == 0) then f.iconSatCooldown:Hide() end
-			if direction == DB.COOLDOWN_LEFT then
-				f.spell.texcoord = 0.07 + (f.tex)
-				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
-				f.iconSatCooldown:SetTexCoord(0.07, f.spell.texcoord, 0.07, 0.93)
-			elseif direction == DB.COOLDOWN_RIGHT then
-				f.spell.texcoord = (0.93 - f.tex)
-				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
-				f.iconSatCooldown:SetTexCoord(f.spell.texcoord, 0.93, 0.07, 0.93)
-			elseif direction == DB.COOLDOWN_UP then
-				f.spell.texcoord = (0.07 + f.tex)
-				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
-				f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, f.spell.texcoord)
-			else
-				f.spell.texcoord = (0.93 - f.tex)
-				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
-				f.iconSatCooldown:SetTexCoord(0.07, 0.93, f.spell.texcoord, 0.93)
-			end
-			f.iconSatCooldown.preSize = f.iconSatCooldown.curSize
-		end
-	end
-end
+-- 			elseif direction == DB.COOLDOWN_UP then
+-- 				f.spell.texcoord = 0.93 - (0.86 * per)
+-- 				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
+-- 				f.iconSatCooldown:SetTexCoord(0.07, 0.93, f.spell.texcoord, 0.93)
+-- 			else
+-- 				f.spell.texcoord = 0.07 + (0.86 * per)
+-- 				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
+-- 				f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, f.spell.texcoord)
+-- 			end
+-- 			f.iconSatCooldown.preSize = f.iconSatCooldown.curSize
+-- 		end
+-- 	else
+-- 		if (f.iconSatCooldown.curSize ~= f.iconSatCooldown.preSize) then
+-- 			f.tex = 0.86 * per
+-- 			if (f.iconSatCooldown.curSize == 0) then f.iconSatCooldown:Hide() end
+-- 			if direction == DB.COOLDOWN_LEFT then
+-- 				f.spell.texcoord = 0.07 + (f.tex)
+-- 				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
+-- 				f.iconSatCooldown:SetTexCoord(0.07, f.spell.texcoord, 0.07, 0.93)
+-- 			elseif direction == DB.COOLDOWN_RIGHT then
+-- 				f.spell.texcoord = (0.93 - f.tex)
+-- 				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
+-- 				f.iconSatCooldown:SetTexCoord(f.spell.texcoord, 0.93, 0.07, 0.93)
+-- 			elseif direction == DB.COOLDOWN_UP then
+-- 				f.spell.texcoord = (0.07 + f.tex)
+-- 				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
+-- 				f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, f.spell.texcoord)
+-- 			else
+-- 				f.spell.texcoord = (0.93 - f.tex)
+-- 				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
+-- 				f.iconSatCooldown:SetTexCoord(0.07, 0.93, f.spell.texcoord, 0.93)
+-- 			end
+-- 			f.iconSatCooldown.preSize = f.iconSatCooldown.curSize
+-- 		end
+-- 	end
+-- end
 
 local function UpdateCooldown(f, elapsed)
 	local spell = f.spell;
 	local tracker = f:GetParent().parent;
 	if not spell and not tracker then return end
 	
-	f.elapsed = (f.elapsed or 0) + elapsed;
-	if f.elapsed < HDH_TRACKER.ONUPDATE_FRAME_TERM then  return end  -- 30프레임
+	-- f.elapsed = (f.elapsed or 0) + elapsed;
+	-- if f.elapsed < HDH_TRACKER.ONUPDATE_FRAME_TERM then  return end  -- 30프레임
+
+	f.skip = (f.skip or 0) + 1
+	if f.skip % 3 ~= 0 and elapsed < 0.03 then return end
+	f.skip = 0
+
 	spell.curTime = GetTime();
 	spell.remaining = (spell.endTime or 0) - spell.curTime
-	if spell.remaining > 0.0 and spell.duration > 0 then
+	if spell.remaining > 0.0 and spell.duration > HDH_TRACKER.GlobalCooldown then
 		tracker:UpdateTimeText(f.timetext, spell.remaining)
 		-- if tracker.ui.common.cooldown ~= DB.COOLDOWN_CIRCLE and tracker.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
 		-- 	if f.cd:GetObjectType() == "StatusBar" then 
@@ -124,8 +131,10 @@ local function UpdateCooldown(f, elapsed)
 		if f.spell.glow == DB.GLOW_CONDITION_TIME then
 			tracker:UpdateGlow(f, true)
 		end
+	else
+		f.timetext:SetText("")
 	end
-	f.elapsed = 0
+	-- f.elapsed = 0
 end
 
 local function OnUpdateGlowColor(self, elapsed)
@@ -330,7 +339,7 @@ function HDH_TRACKER.InitVaribles(trackerId)
 	end
 end
 
-function HDH_TRACKER.Initicon(trackerId)
+function HDH_TRACKER.InitIcon(trackerId)
 	if trackerId then
 		local t = HDH_TRACKER.Get(trackerId)
 		if t then
@@ -1560,14 +1569,14 @@ end
 if select(4, GetBuildInfo()) <= 49999 then -- 대격변 코드
 
 	function HDH_TRACKER:ActionButton_SetupOverlayGlow(f)
-		f.overlay = ActionButton_GetOverlayGlow();
-		local frameWidth, frameHeight = f:GetSize();
-		f.overlay:SetParent(f);
-		f.overlay:ClearAllPoints();
+		f.icon.overlay = ActionButton_GetOverlayGlow();
+		local frameWidth, frameHeight = f.icon:GetSize();
+		f.icon.overlay:SetParent(f.icon);
+		f.icon.overlay:ClearAllPoints();
 		-- Make the height/width available before the next frame:
-		f.overlay:SetSize(frameWidth * 1.3, frameHeight * 1.3);
-		f.overlay:SetPoint("TOPLEFT", f, "TOPLEFT", -frameWidth * 0.3, frameHeight * 0.3);
-		f.overlay:SetPoint("BOTTOMRIGHT", f, "BOTTOMRIGHT", frameWidth * 0.3, -frameHeight * 0.3);
+		f.icon.overlay:SetSize(frameWidth * 1.3, frameHeight * 1.3);
+		f.icon.overlay:SetPoint("TOPLEFT", f.icon, "TOPLEFT", -frameWidth * 0.3, frameHeight * 0.3);
+		f.icon.overlay:SetPoint("BOTTOMRIGHT", f.icon, "BOTTOMRIGHT", frameWidth * 0.3, -frameHeight * 0.3);
 	end
 
 	function HDH_TRACKER:ActionButton_ResizeOverlayGlow(f)
@@ -1579,12 +1588,11 @@ if select(4, GetBuildInfo()) <= 49999 then -- 대격변 코드
 	end
 
 	function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
-		f = f.icon;
-		if not f.overlay then
-			self:ActionButton_SetupOverlayGlow(f)
+		if not f.icon.overlay then
+			self:ActionButton_SetupOverlayGlow(f.icon)
 		end
-		if ( f.overlay.animOut:IsPlaying() ) then f.overlay.animOut:Stop(); end
-		f.overlay.animIn:Play()
+		if ( f.icon.overlay.animOut:IsPlaying() ) then f.icon.overlay.animOut:Stop(); end
+		f.icon.overlay.animIn:Play()
 	end
 	
 	function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
@@ -1594,74 +1602,76 @@ if select(4, GetBuildInfo()) <= 49999 then -- 대격변 코드
 	end
 	
 	function HDH_TRACKER:IsGlowing(f)
-		return f.overlay and true or false
+		return f.icon.overlay and true or false
 	end
 
 else -- 용군단 코드
 
 	function HDH_TRACKER:ActionButton_SetupOverlayGlow(f)
-		if f.SpellActivationAlert then
+		if f.icon.SpellActivationAlert then
 			return
 		end
-		local name = f:GetParent():GetName()..'g'..time()
-		local frameWidth, frameHeight = f:GetSize()
-		f.SpellActivationAlert = CreateFrame("Frame", name, f, "ActionButtonSpellAlertTemplate")
-		f.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6)
-		f.SpellActivationAlert:SetPoint("CENTER", f, "CENTER", 0, 0)
-		f.SpellActivationAlert:Hide()
-		f.SpellActivationAlert.ProcStartFlipbook:SetSize(frameWidth * 4.05, frameWidth * 4.05)
+		local name = f.icon:GetParent():GetName()..'g'..math.random()
+		local frameWidth, frameHeight = f.icon:GetSize()
+		f.icon.SpellActivationAlert = CreateFrame("Frame", name, f, "ActionButtonSpellAlertTemplate")
+		f.icon.SpellActivationAlert:SetFrameLevel(f.icon:GetFrameLevel() + 3)
+		-- f.icon.SpellActivationAlert:
+		f.icon.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6)
+		f.icon.SpellActivationAlert:SetPoint("CENTER", f, "CENTER", 0, 0)
+		f.icon.SpellActivationAlert:Hide()
+		f.icon.SpellActivationAlert.ProcStartFlipbook:SetSize(frameWidth * 4.05, frameWidth * 4.05)
 	end
 	
 	function HDH_TRACKER:ActionButton_ResizeOverlayGlow(f)
-		f = f.icon
-		if not f.SpellActivationAlert then
+		-- f = f.icon
+		if not f.icon.SpellActivationAlert then
 			return
 		end
-		f.SpellActivationAlert:Hide()
-		local frameWidth, frameHeight = f:GetSize()
-		f.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6)
+		f.icon.SpellActivationAlert:Hide()
+		local frameWidth, frameHeight = f.icon:GetSize()
+		f.icon.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6)
 	end
 	
 	function HDH_TRACKER:ActionButton_ReleaseOverlayGlow(f)
 		-- local border = f.border
-		f = f.icon
-		if not f.SpellActivationAlert then
+		-- f = f.icon
+		if not f.icon.SpellActivationAlert then
 			return
 		end
-		f.SpellActivationAlert:Hide()
-		f.SpellActivationAlert:SetParent(nil)
-		f.SpellActivationAlert = nil
+		f.icon.SpellActivationAlert:Hide()
+		f.icon.SpellActivationAlert:SetParent(nil)
+		f.icon.SpellActivationAlert = nil
 		-- border:Show()
 	end
 	
 	function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
 		-- local border = f.border
-		f = f.icon
-		if not f.SpellActivationAlert then
+		-- f = f.icon
+		if not  f.icon.SpellActivationAlert then
 			self:ActionButton_SetupOverlayGlow(f)
 		end
-		if not f.SpellActivationAlert:IsShown() or (not f.SpellActivationAlert.ProcStartAnim:IsPlaying() and not f.SpellActivationAlert.ProcLoop:IsPlaying()) then
-			f.SpellActivationAlert:Show()
-			f.SpellActivationAlert.ProcStartAnim:Play()
+		if not f.icon.SpellActivationAlert:IsShown() or (not  f.icon.SpellActivationAlert.ProcStartAnim:IsPlaying() and not  f.icon.SpellActivationAlert.ProcLoop:IsPlaying()) then
+			f.icon.SpellActivationAlert:Show()
+			f.icon.SpellActivationAlert.ProcStartAnim:Play()
 			-- border:Hide()
 		end
 	end
 	
 	function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
 		-- local border = f.border
-		f = f.icon
-		if not f.SpellActivationAlert then
+		-- f = f.icon
+		if not  f.icon.SpellActivationAlert then
 			return
 		end
 	
-		if f:IsVisible() then
-			f.SpellActivationAlert:Hide()
+		if  f.icon:IsVisible() then
+			f.icon.SpellActivationAlert:Hide()
 			-- border:Show()
 		end
 	end
 	
 	function HDH_TRACKER:IsGlowing(f)
-		if f.SpellActivationAlert and (f.SpellActivationAlert:IsShown()) then
+		if  f.icon.SpellActivationAlert and ( f.icon.SpellActivationAlert:IsShown()) then
 			return true
 		else
 			return false

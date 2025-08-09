@@ -795,6 +795,7 @@ function HDH_AT_OnCheck(self)
 			end
 		end
 		F.BODY.CONFIG_DETAIL.GLOW.CB1:SetChecked(false)
+		
 	elseif self == F.BODY.CONFIG_DETAIL.GLOW.CB1 then
 		for idx , cd in ipairs(F.BODY.CONFIG_DETAIL.GLOW.CB_LIST) do
 			cd[1]:SetChecked(false)
@@ -817,29 +818,34 @@ function HDH_AT_OnCheck(self)
 			F.BODY.CONFIG_DETAIL.GLOW.CP_EFFECT_COLOR:Hide()
 			F.BODY.CONFIG_DETAIL.GLOW.SL_EFFECT_PER_SEC:Hide()
 		end
+
 	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB1 then
 		self:SetChecked(true)
 		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Hide()
 		F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(false)
 		F.BODY.CONFIG_DETAIL.DISPLAY.CB3:SetChecked(false)
+
 	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB2 then
 		self:SetChecked(true)
 		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Show()
 		F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
 		F.BODY.CONFIG_DETAIL.DISPLAY.CB3:SetChecked(false)
 		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetPoint("LEFT", self,"RIGHT", 2,0)
+
 	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB3 then
 		self:SetChecked(true)
 		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Show()
 		F.BODY.CONFIG_DETAIL.DISPLAY.CB1:SetChecked(false)
 		F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(false)
 		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetPoint("LEFT", self,"RIGHT", 2,0)
+
 	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT1 then
 		self:SetChecked(true)
 		F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2:SetChecked(false)
 		F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:Hide()
 		F.BODY.CONFIG_DETAIL.DISPLAY.LABEL_SW_HIDE_MODE_UNLEARNED_TRAIT:Hide()
 		F.BODY.CONFIG_DETAIL.DISPLAY.EB_CONNECT_TRAIT:Hide()
+
 	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2 then
 		local tracker = HDH_TRACKER.Get(trackerId)
 		local className = (tracker and tracker:GetClassName()) or nil
@@ -852,6 +858,7 @@ function HDH_AT_OnCheck(self)
 		else
 			main.Dialog:AlertShow(L.ONLY_FOR_AURA_CD_TOTEM);
 		end
+
 	elseif self == main.TalentButtonList[1] or self == main.TalentButtonList[2] or self == main.TalentButtonList[3] or self == main.TalentButtonList[4] or self == main.TalentButtonList[5] then
 		for _, cb in ipairs(main.TalentButtonList) do
 			cb:SetChecked(cb == self)
@@ -935,7 +942,7 @@ local function HDH_AT_OP_OnDragStopRow(self)
 			and self.mode 
 			and self.mode ~= HDH_AT_AuraRowMixin.MODE.EMPTY then 
 		main:LoadTrackerElementConfig(trackerId)
-		HDH_TRACKER.InitIconFrame(trackerId)
+		HDH_TRACKER.InitIcon(trackerId)
 	else
 		main:LoadTrackerList(main:GetCurTraits())
 		main:ChangeBody(nil, self.index)
@@ -970,7 +977,7 @@ local function HDH_AT_OnEventTrackerElement(self, elemIdx)
 	elseif string.find(name, "CheckButtonValue") then
 		local value = self:GetChecked()
 		DB:UpdateTrackerElementValue(trackerId, elemIdx, value)
-		HDH_TRACKER.InitIconFrame(trackerId)
+		HDH_TRACKER.InitIcon(trackerId)
 
 	elseif string.find(name, "ButtonDel") then
 		main:DeleteTrackerElement(self:GetParent(), trackerId, elemIdx)
@@ -1407,7 +1414,7 @@ function HDH_AT_OnClick_Button(self, button)
 			else
 				DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_NONE, nil, nil,  effectType, effectColor, effectPerSec)
 			end
-			HDH_TRACKER.InitIconFrame(trackerId)
+			HDH_TRACKER.InitIcon(trackerId)
 			if main:GetCurTrackerId() == trackerId then
 				main:LoadTrackerElementConfig(trackerId, elemIdx, elemIdx)
 			end
@@ -1438,7 +1445,7 @@ function HDH_AT_OnClick_Button(self, button)
 			end
 
 			DB:UpdateTrackerElementDisplay(trackerId, elemIdx, value, spellId, isItem, traitIconHideMode)
-			HDH_TRACKER.InitIconFrame(trackerId)
+			HDH_TRACKER.InitIcon(trackerId)
 
 			local ui = DB:GetTrackerUI((DB:hasTrackerUI(trackerId) and trackerId) or nil)
 			if ui.common.order_by ~= DB.ORDERBY_REG and value == DB.SPELL_HIDE_AS_SPACE then

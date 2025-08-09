@@ -275,7 +275,7 @@ do
 				
 				if not f.spell.blankDisplay then
 					if f.spell.display == DB.SPELL_HIDE_TIME_ON or f.spell.display == DB.SPELL_ALWAYS_DISPLAY or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then
-						f.icon:SetActivate(false)
+						f.icon:UpdateCooldowning(false)
 						f.v1:SetText(nil)
 						f.counttext:SetText(nil)
 						if display_mode ~= DB.DISPLAY_ICON and f.bar then 

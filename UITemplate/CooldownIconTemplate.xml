@@ -24,6 +24,16 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 				</Layers>
 			</Frame>
 
+			<Frame parentKey="Overlay" setAllPoints="true" hidden="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Texture" setAllPoints="true">
+							<TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93" />
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+
 			<Frame parentKey="Spark" hidden="true">
 				<Layers>
 					<Layer level="ARTWORK">
@@ -41,6 +51,16 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 
 	<Frame name="HDH_AT_CircleCooldownTemplate" inherits="HDH_AT_BaseCooldownTemplate" mixin="HDH_AT_CircleCooldownTemplateMixin" virtual="true">
 		<Frames>
+			<Frame parentKey="Overlay" setAllPoints="true" hidden="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Texture" setAllPoints="true">
+							<TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93" />
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			
 			<Cooldown parentKey="Progress" inherits="CooldownFrameTemplate" setAllPoints="true" hideCountdownNumbers ="true" drawEdge="false" drawSwipe="true" drawBling="false">
 				<Layers>
 					<Layer level="BACKGROUND">
@@ -84,7 +104,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 				</Frames> -->
 			</Frame>
 			
-			<Frame parentKey="ColorGlow" setAllPoints="true" hidden="true">
+			<Frame parentKey="Glow" setAllPoints="true" hidden="true">
 				<Layers>
 					<Layer level="BACKGROUND">
 						<Texture parentKey="Color" file="Interface/AddOns/HDH_AuraTracker/Texture/spark_rect">

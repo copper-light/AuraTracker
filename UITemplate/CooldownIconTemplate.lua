@@ -5,28 +5,24 @@ local DB = HDH_AT_ConfigDB
 -----------------------------------------------
 HDH_AT_BaseCooldownTemplateMixin = {}
 
-function HDH_AT_BaseCooldownTemplateMixin:SetIconActive(bool)
-	-- if bool then
-	-- 	self.Icon:SetDesaturated(nil)
-	-- 	self.Icon:SetAlpha(self.onAlpha)
-	-- else
-	-- 	self.Icon:SetDesaturated(true)
-	-- 	self.Icon:SetAlpha(self.offAlpha)
-	-- end
-	if self.OnActivedFunc then
-		self.OnActivedFunc(self, bool)
-	end
-end
+-- function HDH_AT_BaseCooldownTemplateMixin:SetIconActive(bool)
+-- 	-- if bool then
+-- 	-- 	self.Icon:SetDesaturated(nil)
+-- 	-- 	self.Icon:SetAlpha(self.onAlpha)
+-- 	-- else
+-- 	-- 	self.Icon:SetDesaturated(true)
+-- 	-- 	self.Icon:SetAlpha(self.offAlpha)
+-- 	-- end
+-- 	if self.OnActivedFunc then
+-- 		self.OnActivedFunc(self, bool)
+-- 	end
+-- end
 
 function HDH_AT_BaseCooldownTemplateMixin:SetTexture(texture)
 	if self.Progress then
 		self.Progress.Texture:SetTexture(texture)
+		self.Overlay.Texture:SetTexture(texture)
 	end
-end
-
-function HDH_AT_BaseCooldownTemplateMixin:SetIconVertexColor(r, g, b, a)
-	self.Progress.Texture:SetVertexColor(r, g, b, a)
-	self.Progress.Texture:SetDesaturated(nil)
 end
 
 function HDH_AT_BaseCooldownTemplateMixin:SetHandler(startFunc, finishFunc, activedFunc)
@@ -35,17 +31,12 @@ function HDH_AT_BaseCooldownTemplateMixin:SetHandler(startFunc, finishFunc, acti
 	self.OnActivedFunc = activedFunc
 end
 
-function HDH_AT_BaseCooldownTemplateMixin:IsCooldowning()
-	return self.isRunning or false
-end
-
 -----------------------------------------------
 --- HDH_AT_CircleCooldownTemplateMixin
 -----------------------------------------------
 HDH_AT_CircleCooldownTemplateMixin = {}
 
 function HDH_AT_CircleCooldownTemplate_OnStarted(self)
-	self:SetIconActive(not self.toFill)
 	if self.OnStartedFunc then
 		self.OnStartedFunc(self)
 	end
@@ -53,7 +44,6 @@ function HDH_AT_CircleCooldownTemplate_OnStarted(self)
 end
 
 function HDH_AT_CircleCooldownTemplate_OnFinished(self)
-	self:SetIconActive(self.toFill)
 	if self.isRunning and self.OnFinishedFunc then
 		self.OnFinishedFunc(self)
 	end
@@ -65,10 +55,34 @@ function HDH_AT_CircleCooldownTemplateMixin:SetTexture(texture)
 	-- 	self.Texture:SetTexture(texture)
 	-- end
 	self.Progress.Texture:SetTexture(texture)
+	self.Overlay.Texture:SetTexture(texture)
 
-	local w, h = self:GetSize()
-	local size = math.max(w, h)
-	self.Progress.Texture:SetSize(size, size)
+	-- local w, h = self:GetSize()
+	-- local size = math.max(w, h)
+	-- self.Progress.Texture:SetSize(size, size)
+end
+
+function HDH_AT_CircleCooldownTemplateMixin:SetOverlayColor(r, g, b, a)
+	if r ~= nil then
+		self.Overlay.Texture:SetVertexColor(r, g, b, a)
+		if not self.Overlay:IsShown() then
+			self.Overlay:Show()
+		end
+		if self.Progress.Texture:IsShown() then
+			self.Progress.Texture:SetShown(false)
+		end
+	else
+		if self.Overlay:IsShown() then
+			self.Overlay:Hide()
+			self.Progress.Texture:SetShown(self.cooldownType == DB.COOLDOWN_CIRCLE and not self.toFill)
+		end
+	end
+end
+
+function HDH_AT_CircleCooldownTemplateMixin:SetShownProgressTexture(bool)
+	if bool and not self.toFill then
+		self.Progress.Texture:SetShown(bool)
+	end
 end
 
 -- toFill은 컬러 아이콘이 더 잘보이는 쪽으로 컬러가 채워지는 관점으로 의미로 사용 (swipColor 관점이 아님)
@@ -93,25 +107,23 @@ function HDH_AT_CircleCooldownTemplateMixin:Setup(cooldownType, toFill, color, t
 	self.textureAlpha = textureAlpha
 	self.toFill = toFill
 	self.Progress.Texture:SetAlpha(textureAlpha)
-end
-
-function HDH_AT_CircleCooldownTemplateMixin:SetAble(bool)
-	if not self.toFill then
-		self.Progress.Texture:SetShown(bool)
-	end
+	self.cooldownType = cooldownType
 end
 
 function HDH_AT_CircleCooldownTemplateMixin:SetCooldown(startValue, duration, isTimer, isCharging)
+	-- if self.startValue == startValue and self.duration == duration then return end
 	if isCharging then
 		if isTimer then
-			self.Charge:Clear()
+			-- self.Charge:Clear()
 			self.Charge:SetCooldown(startValue, duration)
 		else
 			self.Charge:Pause()
 		end
+		self.startValue = startValue
+		self.duration = duration
 	else
 		if isTimer then
-			self.Progress:Clear()
+			-- self.Progress:Clear()
 			self.Progress:SetCooldown(startValue, duration)
 		else
 			self.Progress:Pause()
@@ -119,6 +131,9 @@ function HDH_AT_CircleCooldownTemplateMixin:SetCooldown(startValue, duration, is
 		self.startValue = startValue
 		self.duration = duration
 	end
+	
+	
+
 	self.isTimer = isTimer
 	self.isCharging = isCharging
 end
@@ -143,7 +158,7 @@ end
 function HDH_AT_CircleCooldownTemplateMixin:Stop()
 	if self.Progress:IsShown() then
 		self.Progress:Clear()
-		self.Progress:Hide()
+		-- self.Progress:Hide()
 	end
 end
 
@@ -153,11 +168,6 @@ end
 HDH_AT_LinearCooldownTemplateMixin = {}
 
 function HDH_AT_LinearCooldownTemplate_OnStarted(self)
-	-- self.Progress.Texture:SetShown(not self.isGlobal and not self.isCharging)
-	
-	-- if not self.isGlobal then
-	-- 	self:SetIconActive(self.isCharging)
-	-- end
 	self.isRunning = true
 	if self.OnStartedFunc then
 		self.OnStartedFunc(self)
@@ -167,11 +177,6 @@ end
 function HDH_AT_LinearCooldownTemplate_OnFinished(self)
 	self.startValue = nil
 	self.duration = nil
-	-- self.Progress.Texture:SetShown(true)
-
-	-- if not self.isGlobal then
-	-- 	self:SetIconActive(self.isCharging or self.toFill)
-	-- end
 	if self.isRunning and self.OnFinishedFunc then
 		self.OnFinishedFunc(self)
 	end
@@ -180,9 +185,14 @@ end
 
 function HDH_AT_LinearCooldownTemplate_OnUpdateLinearCooldown(self, elapsed)
 	if not self.isTimer then return end
-	self.delay = self.delay or GetTime()
-	-- if GetTime() - self.delay < 0.016 then return end
-	self.delay = nil
+	-- self.delay = self.delay or GetTime()
+	-- if GetTime() - self.delay < 0.001 then return end
+	-- self.delay = nil
+
+	self.skip = (self.skip or 0) + 1
+	if self.skip % 2 ~= 0 and elapsed < 0.03 then return end
+	self.skip = 0
+
 	self:SetValue(GetTime())
 end
 
@@ -298,12 +308,29 @@ function HDH_AT_LinearCooldownTemplateMixin:Setup(w, h, cooldownType, toFill, en
 			-- self.Progress.Texture:SetTexCoord(0.07 + (0.86 * per), 0.93, 0.07, 0.93)
 		end
 	end
-
+	self.startValue = nil
+	self.duration = nil
+	self.isTimer = nil
+	self.per = nil
+	self.prevPer = nil
 	-- self.Spark:SetShown(enableSpark)
 end
 
-function HDH_AT_LinearCooldownTemplateMixin:SetAble(bool)
+function HDH_AT_LinearCooldownTemplateMixin:SetShownProgressTexture(bool)
 	self.Progress.Texture:SetShown(bool)
+end
+
+function HDH_AT_LinearCooldownTemplateMixin:SetOverlayColor(r, g, b, a)
+	if r ~= nil then
+		self.Overlay.Texture:SetVertexColor(r, g, b, a)
+		if not self.Overlay:IsShown() then
+			self.Overlay:Show()
+		end
+	else
+		if self.Overlay:IsShown() then
+			self.Overlay:Hide()
+		end
+	end
 end
 
 function HDH_AT_LinearCooldownTemplateMixin:SetCooldown(startValue, duration, isTimer, isCharging, isGlobal)
@@ -333,7 +360,7 @@ function HDH_AT_LinearCooldownTemplateMixin:SetValue(value)
 	end	
 	
 	self.per = math.floor(self.per * 100 + 0.1) / 100
-	-- if self.prevPer == self.per then return end
+	if self.prevPer == self.per then return end
 	-- print(GetTime(), self.per)
 	if self.isTimer then
 		if self.toFill then
@@ -388,7 +415,7 @@ end
 function HDH_AT_LinearCooldownTemplateMixin:Stop()
 	if self.Progress:IsShown() then
 		self.Progress:Hide()
-		HDH_AT_LinearCooldownTemplate_OnFinished(self)
+		-- HDH_AT_LinearCooldownTemplate_OnFinished(self)
 	end
 
 	if self.Spark:IsShown() then
@@ -407,26 +434,24 @@ HDH_AT_CooldownIconTemplateMixin = {}
 local ICON_BORDER_VALUE = {0.120, 0.15, 0.18, 0.21, 0.24, 0.27, 0.30, 0.33, 0.36, 0.39}
 local ICON_SIZE_VALUE =   {0.075, 0.10, 0.14, 0.21, 0.23, 0.30, 0.34, 0.37, 0.40, 0.42}
 
-function HDH_AT_CooldownIconTemplate_OnUpdateLinearCooldown(elapsed)
-end
-
 function HDH_AT_CooldownIconTemplate_OnSizeChanged(self)
 	self:SetBorderSize(self.borderSize)
 end
 
-function HDH_AT_CooldownIconTemplate_OnActivatedIcon(cooldown, bool)
-	-- local self = cooldown:GetParent():GetParent()
-	-- if self.isAble then
-	-- 	self:SetActivate(bool)
-	-- end
-end
-
 function HDH_AT_CooldownIconTemplate_OnCooldownStarted(cooldownFrame)
-	print(GetTime(), "HDH_AT_CooldownIconTemplate_OnCooldownStarted")
+	local self = cooldownFrame:GetParent():GetParent()
+	-- print(GetTime(), "HDH_AT_CooldownIconTemplate_OnCooldownStarted")
+	if self.OnCooldownStarted then
+		self.OnCooldownStarted(self)
+	end
 end
 
 function HDH_AT_CooldownIconTemplate_OnCooldownFinished(cooldownFrame)
-	print(GetTime(), "HDH_AT_CooldownIconTemplate_OnCooldownFinished")
+	local self = cooldownFrame:GetParent():GetParent()
+	-- print(GetTime(), "HDH_AT_CooldownIconTemplate_OnCooldownFinished")
+	if self.OnCooldownFinished then
+		self.OnCooldownFinished(self)
+	end
 end
 
 function HDH_AT_CooldownIconTemplateMixin:Setup(w, h, cooldownType, toFill, enableSpark, sparkColor, circleColor, onAlpha, offAlpha, borderSize)
@@ -437,7 +462,7 @@ function HDH_AT_CooldownIconTemplateMixin:Setup(w, h, cooldownType, toFill, enab
 	if cooldownType == DB.COOLDOWN_CIRCLE or cooldownType == DB.COOLDOWN_NONE then
 		if not self.tmpCircle then
 			self.tmpCircle = CreateFrame('Frame', nil, self.Icon, 'HDH_AT_CircleCooldownTemplate')
-			self.tmpCircle:SetHandler(HDH_AT_CooldownIconTemplate_OnCooldownStarted, HDH_AT_CooldownIconTemplate_OnCooldownFinished, HDH_AT_CooldownIconTemplate_OnActivatedIcon)
+			self.tmpCircle:SetHandler(HDH_AT_CooldownIconTemplate_OnCooldownStarted, HDH_AT_CooldownIconTemplate_OnCooldownFinished)
 			self.tmpCircle:SetAllPoints(true)
 		end
 		self.Cooldown = self.tmpCircle
@@ -446,7 +471,7 @@ function HDH_AT_CooldownIconTemplateMixin:Setup(w, h, cooldownType, toFill, enab
 	else
 		if not self.tmpLinear then
 			self.tmpLinear = CreateFrame('Frame', nil, self.Icon, 'HDH_AT_LinearCooldownTemplate')
-			self.tmpLinear:SetHandler(HDH_AT_CooldownIconTemplate_OnCooldownStarted, HDH_AT_CooldownIconTemplate_OnCooldownFinished, HDH_AT_CooldownIconTemplate_OnActivatedIcon)
+			self.tmpLinear:SetHandler(HDH_AT_CooldownIconTemplate_OnCooldownStarted, HDH_AT_CooldownIconTemplate_OnCooldownFinished)
 			self.tmpLinear:SetAllPoints(true)
 		end
 		self.Cooldown = self.tmpLinear
@@ -462,11 +487,16 @@ function HDH_AT_CooldownIconTemplateMixin:Setup(w, h, cooldownType, toFill, enab
 		self:SetTexture(tmpTexutre)
 	end
 	self.onAlpha = onAlpha
-	self.offAlpha= offAlpha
+	self.offAlpha = offAlpha
 	self.isAble = true
 	self.toFill = toFill
 	self.Icon.Texture:SetAlpha(offAlpha)
 	self.borderColor = self.borderColor or {1, 1, 1, 1}
+end
+
+function HDH_AT_CooldownIconTemplateMixin:SetHandler(OnCooldownStarted, OnCooldownFinished)
+	self.OnCooldownStarted = OnCooldownStarted
+	self.OnCooldownFinished = OnCooldownFinished
 end
 
 function HDH_AT_CooldownIconTemplateMixin:GetAble()
@@ -521,52 +551,32 @@ function HDH_AT_CooldownIconTemplateMixin:SetValue(value)
 	self.Cooldown:SetValue(value)
 end
 
--- function HDH_AT_CooldownIconTemplateMixin:Set(bool)
--- 	self.Cooldown:SetIconActive(bool)
--- end
-
-function HDH_AT_CooldownIconTemplateMixin:IsCooldowning()
-	return self.Cooldown:IsCooldowning()
-end
-
 function HDH_AT_CooldownIconTemplateMixin:Stop()
 	self.Cooldown:Stop()
-end
-
-function HDH_AT_CooldownIconTemplateMixin:SetActivate(bool)
-	if bool then
-		self.Border:SetVertexColor(self.borderColor[1], self.borderColor[2], self.borderColor[3], self.borderColor[4])
-		if self.Cooldown:IsCooldowning() then
-			self.Icon.Texture:SetAlpha(self.offAlpha)
-			self.Icon.Texture:SetDesaturated(true)
-		else
-			self.Icon.Texture:SetAlpha(self.onAlpha)
-			self.Icon.Texture:SetDesaturated(false)
-		end
-	else
-		self.Border:SetVertexColor(0, 0, 0, self.offAlpha)
-		self.Icon.Texture:SetAlpha(self.offAlpha)
-		self.Icon.Texture:SetDesaturated(true)
-	end
 end
 
 function HDH_AT_CooldownIconTemplateMixin:UpdateCooldowning(bool)
 	bool = (bool == nil) and true or false
 	if bool then
 		if self.toFill then
-			self.Icon.Texture:SetAlpha(self.offAlpha)
-			self.Icon.Texture:SetDesaturated(true)
 			self.Border:SetVertexColor(0, 0, 0, self.offAlpha)
 		else
-			self.Icon.Texture:SetAlpha(self.offAlpha)
-			self.Icon.Texture:SetDesaturated(true)
 			self.Border:SetVertexColor(self.borderColor[1], self.borderColor[2], self.borderColor[3], self.borderColor[4])
 		end
-	else
-		if self.Cooldown.Progress:IsShown() then
-			self.Cooldown.Progress:Hide()
-			self.Cooldown.Progress.Spark:Hide()
+		self.Icon.Texture:SetAlpha(self.offAlpha)
+		self.Icon.Texture:SetDesaturated(true)
+		if not self.Cooldown.Progress.Texture:IsShown() then
+			self.Cooldown:SetShownProgressTexture(true)
 		end
+	else
+		-- if self.Cooldown.Progress:IsShown() then
+		-- 	self.Cooldown.Progress:Hide()
+		-- 	if self.Cooldown.Spark then
+		-- 		self.Cooldown.Spark:Hide()
+		-- 	end
+		-- end
+		-- self.Cooldown:Stop()
+
 		if self.toFill then
 			self.Icon.Texture:SetAlpha(self.onAlpha)
 			self.Icon.Texture:SetDesaturated(false)
@@ -576,25 +586,6 @@ function HDH_AT_CooldownIconTemplateMixin:UpdateCooldowning(bool)
 			self.Icon.Texture:SetDesaturated(true)
 			self.Border:SetVertexColor(0, 0, 0, self.offAlpha)
 		end
-	end
-end
-
-function HDH_AT_CooldownIconTemplateMixin:SetAble(bool)
-	if bool then
-		if self.Cooldown:IsCooldowning() then
-			self:SetActivate(not self.toFill)
-		else
-			self:SetActivate(true)
-		end
-	else
-		self:SetActivate(false)
-	end
-	
-	self.Cooldown:SetAble(bool)
-	self.isAble = bool
-	if self.isUsingColor then
-		self:SetVertexColor(nil)
-		self.isUsingColor = false
 	end
 end
 
@@ -604,17 +595,9 @@ function HDH_AT_CooldownIconTemplateMixin:SetDesaturated()
 end
 
 function HDH_AT_CooldownIconTemplateMixin:SetOverlayColor(r, g, b, a)
-	if r ~= nil then
-		self.Icon.Texture:SetVertexColor(r, g, b, a)
-		self.Icon.Texture:SetDesaturated(false)
-		self.Cooldown.Progress.Texture:Hide()
-	else
-		self.Icon.Texture:SetVertexColor(1, 1, 1, 1)
-		self.Icon.Texture:SetDesaturated(false)
-		self.Cooldown.Progress.Texture:Show()
-	end
+	self.Cooldown:SetOverlayColor(r, g, b, a)
 end
 
-function HDH_AT_CooldownIconTemplateMixin:SetGlobalCooldownState()
+function HDH_AT_CooldownIconTemplateMixin:ShowOnlyEdgeSpark()
 	self.Cooldown.Progress.Texture:Hide()
 end

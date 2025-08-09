@@ -1374,9 +1374,14 @@ local BAR_INNER_MAX = 1000
 local BAR_ANIMATE_DURATION = .10 --.15
 
 function HDH_AT_MultiStatusBarTemplateMixin:OnUpdate(elapsed)
-    self.elapsed = (self.elapsed or 0) + elapsed
-    if self.elapsed < 0.015 then return end
-    self.elapsed = 0
+    -- self.elapsed = (self.elapsed or 0) + elapsed
+    -- if self.elapsed < 0.015 then return end
+    -- self.elapsed = 0
+
+    self.skip = (self.skip or 0) + 1
+	if self.skip % 2 ~= 0 and elapsed < 0.03 then return end
+	self.skip = 0
+
     if self.gap and self.gap ~= 0 then
         local gapRatio = math.min(1., HDH_AT_UTIL.LogScale((GetTime() - self.animatedStartTime) / BAR_ANIMATE_DURATION))
         self:SetInnerValue(self.startValue + (self.gap * gapRatio))
@@ -1819,7 +1824,7 @@ end
 function HDH_AT_StatusBarTemplateMixin:EnableSpark(bool, color)
     self.enbleSpark = bool
     self.prevFull = nil
-    -- self.Spark:SetShown(bool)
+    self.Spark:SetShown(false)
     if color then
         self.Spark:SetVertexColor(color[1], color[2], color[3], color[4])
     end
