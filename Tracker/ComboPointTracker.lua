@@ -1,7 +1,5 @@
 ﻿HDH_COMBO_POINT_TRACKER = {}
 local DB = HDH_AT_ConfigDB
-local MyClassKor, MyClass = UnitClass("player");
-
 local POWER_INFO = {}
 
 ------------------------------------
@@ -17,13 +15,10 @@ HDH_TRACKER.TYPE.POWER_SOUL_SHARDS = 16
 HDH_TRACKER.TYPE.POWER_HOLY_POWER = 17
 HDH_TRACKER.TYPE.POWER_CHI = 18
 
-
-
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_COMBO_POINTS,   HDH_COMBO_POINT_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_SOUL_SHARDS,    HDH_COMBO_POINT_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_HOLY_POWER,     HDH_COMBO_POINT_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_CHI,      		HDH_COMBO_POINT_TRACKER)
-
 
 POWER_INFO[HDH_TRACKER.TYPE.POWER_COMBO_POINTS] 	= {power_type="COMBO_POINTS", 	power_index = 4,	color={0.77, 0.12, 0.23, 1}, texture = "Interface/Icons/INV_Misc_Gem_Pearl_05"}; -- INV_Misc_Gem_Pearl_04 INV_chaos_orb INV_Misc_Gem_Pearl_04 Spell_AnimaRevendreth_Orb
 POWER_INFO[HDH_TRACKER.TYPE.POWER_SOUL_SHARDS]		= {power_type="SOUL_SHARDS",	power_index = 7, 	color={201/255, 34/255, 1, 	 1}, texture = "Interface/Icons/inv_misc_enchantedpearlE"};
@@ -40,12 +35,6 @@ end
 
 HDH_COMBO_POINT_TRACKER.POWER_INFO = POWER_INFO;
 
--- local function OnUpdateBar(self)
--- 	if self.bar then
--- 		self.bar:SetValue(self.spell.v1)
--- 	end
--- end
-
 function HDH_COMBO_POINT_TRACKER:CreateData()
 	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
 	local trackerId = self.id
@@ -58,7 +47,7 @@ function HDH_COMBO_POINT_TRACKER:CreateData()
 	local isItem = false
 	local isFirstCreated = false
 	for elemIdx = 1, power_max do
-		if not self:IsHaveData(elemIdx) then
+		if self:GetElementCount(elemIdx) == 0 then
 			key = self.POWER_INFO[self.type].power_type .. elemIdx
 			name = self.POWER_INFO[self.type].power_type .. elemIdx
 			DB:SetTrackerElement(trackerId, elemIdx, key, id, name, texture, display, isValue, isItem)
@@ -102,22 +91,22 @@ function HDH_COMBO_POINT_TRACKER:CreateData()
 	end
 end
 
-function HDH_COMBO_POINT_TRACKER:IsHaveData(index)
+function HDH_COMBO_POINT_TRACKER:GetElementCount(index)
 	if index then
 		local key = DB:GetTrackerElement(self.id, index)
 		if (self.POWER_INFO[self.type].power_type .. index) ~= key then
-			return false
+			return 0
 		end
+		return 1
 	else
 		for i = 1 , UnitPowerMax('player', self.POWER_INFO[self.type].power_index) do
 			local key = DB:GetTrackerElement(self.id, i)
 			if (self.POWER_INFO[self.type].power_type .. i) ~= key then
-				return false
+				return 0
 			end
 		end 
+		return DB:GetTrackerElementSize(self.id)
 	end
-	
-	return true
 end
 
 function HDH_COMBO_POINT_TRACKER:Release() -- HDH_TRACKER override
@@ -146,7 +135,7 @@ function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 			end
 			iconf:SetParent(self.frame) 
 			iconf.spell.duration = 0
-			iconf.spell.count = power_max
+			iconf.spell.count = 1
 			iconf.spell.remaining = 0
 			iconf.spell.startTime = 0
 			iconf.spell.endTime = 0
@@ -160,77 +149,23 @@ function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 			iconf.spell.glowCount = 0
 			iconf.spell.glowV1= 0
 			iconf.spell.display = DB.SPELL_ALWAYS_DISPLAY
-			iconf.spell.showValue = true;
 			iconf.icon:SetTexture(self.POWER_INFO[self.type].texture);
 			
-			iconf.spell.v1 = 1;	
+			iconf.spell.v1 = power_max - 1
 			if (power_max) == i then
-				iconf.icon:SetAlpha(self.ui.icon.off_alpha);
-				iconf.spell.isUpdate = false;
+				if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS ~= self.type and HDH_TRACKER.TYPE.POWER_ESSENCE ~= self.type then
+					iconf.spell.isUpdate = false
+				else
+					iconf.spell.isUpdate = true
+					iconf.spell.count = 0.5
+				end
+				iconf.spell.v1 = 0
 			else
 				iconf.spell.isUpdate = true;
-				iconf.icon:SetAlpha(self.ui.icon.on_alpha);
 			end
 		end
 	end
 	return power_max;
-end
-
-function HDH_COMBO_POINT_TRACKER:ChangeCooldownType(f, cooldown_type)
-	local spark_size = f.iconframe:GetWidth() 
-	if cooldown_type == DB.COOLDOWN_UP then 
-		f.cooldown2:Hide()
-		f.iconSatCooldown:ClearAllPoints()
-		f.iconSatCooldown:SetPoint("BOTTOMLEFT", f.iconframe,"BOTTOMLEFT",0,0)
-		f.iconSatCooldown:SetPoint("BOTTOMRIGHT", f.iconframe,"BOTTOMRIGHT",0,0)
-		f.iconSatCooldown:SetHeight(self.ui.icon.size)
-		f.iconSatCooldown.spark:SetSize(spark_size, 7);
-		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"TOP",0,0)
-		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
-
-	elseif cooldown_type == DB.COOLDOWN_DOWN  then 
-		f.cooldown2:Hide()
-		f.iconSatCooldown:ClearAllPoints()
-		f.iconSatCooldown:SetPoint("TOPLEFT", f.iconframe,"TOPLEFT",0,0)
-		f.iconSatCooldown:SetPoint("TOPRIGHT", f.iconframe,"TOPRIGHT",0,0)
-		f.iconSatCooldown:SetHeight(self.ui.icon.size)
-		f.iconSatCooldown.spark:SetSize(spark_size, 7);
-		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
-		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"BOTTOM",0,0)
-		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
-
-	elseif cooldown_type == DB.COOLDOWN_LEFT  then 
-		f.cooldown2:Hide()
-		f.iconSatCooldown:ClearAllPoints()
-		f.iconSatCooldown:SetPoint("TOPRIGHT", f.iconframe,"TOPRIGHT",0,0)
-		f.iconSatCooldown:SetPoint("BOTTOMRIGHT", f.iconframe,"BOTTOMRIGHT",0,0)
-		f.iconSatCooldown:SetWidth(self.ui.icon.size)
-		f.iconSatCooldown.spark:SetSize(7, spark_size);
-		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"LEFT",0,0)
-		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
-
-	elseif cooldown_type == DB.COOLDOWN_RIGHT then 
-		f.cooldown2:Hide()
-		f.iconSatCooldown:ClearAllPoints()
-		f.iconSatCooldown:SetPoint("TOPLEFT", f.iconframe,"TOPLEFT",0,0)
-		f.iconSatCooldown:SetPoint("BOTTOMLEFT", f.iconframe,"BOTTOMLEFT",0,0)
-		f.iconSatCooldown:SetWidth(self.ui.icon.size)
-		f.iconSatCooldown.spark:SetSize(7, spark_size);
-		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
-		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"RIGHT",0,0)
-		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
-
-	else 
-		f.cd = f.cooldown2
-		f.cd:SetReverse(false)
-		f.cooldown1:Hide()
-		f.iconSatCooldown:Hide()
-		f.iconSatCooldown.spark:Hide()
-		f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, 0.93)
-		f.iconSatCooldown:SetSize(f.icon:GetSize())
-	end
 end
 
 function HDH_COMBO_POINT_TRACKER:UpdateBarSettings(f) -- HDH_TRACKER override
@@ -238,6 +173,15 @@ function HDH_COMBO_POINT_TRACKER:UpdateBarSettings(f) -- HDH_TRACKER override
 	if f.bar then
 		f.bar:SetScript("OnUpdate",nil);
 	end
+end
+
+function HDH_COMBO_POINT_TRACKER:UpdateIconSettings(f)
+	super.UpdateIconSettings(self, f)
+	local op_icon = self.ui.icon
+	f.icon:Setup(op_icon.size, op_icon.size, op_icon.cooldown, true, true, op_icon.spark_color, op_icon.cooldown_bg_color, op_icon.on_alpha, op_icon.off_alpha, op_icon.border_size)
+	f.icon:SetHandler(nil, nil)
+	f.icon:SetCooldown(0, 1, false)
+	f.icon:SetValue(0)
 end
 
 function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
@@ -277,26 +221,14 @@ function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 			f.spell.isUpdate = false
 
 			if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS ~= self.type and HDH_TRACKER.TYPE.POWER_ESSENCE ~= self.type then
-				f.icon:SetDesaturated(nil)
-				f.icon:SetAlpha(self.ui.icon.on_alpha)
-				f.border:SetAlpha(self.ui.icon.on_alpha)
-				f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
-
-				if f.counttext:IsShown() and f.spell.count < 1 then
-					f.counttext:SetText(string.format('%.1f', f.spell.count))
-				else
-					f.counttext:SetText("")
-				end
-
+				f.icon:UpdateCooldowning(false)
+				f.v1:SetText((f.spell.showValue and f.spell.v1 >= 1) and f.spell.v1 or "")
 				if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 					f.bar:SetValue(1)
 				end
-
-				f.v1:SetText((f.spell.showValue and f.spell.v1 >= 1) and f.spell.v1 or "")
-				f.cd:Hide()
 				self:UpdateGlow(f, true)
 			else
-				if f.spell.count < 1.0 then
+				if f.spell.count < 1.0  then
 					if f.counttext:IsShown() and f.spell.count < 1 then
 						f.counttext:SetText(string.format('%.1f', f.spell.count))
 					else
@@ -304,59 +236,13 @@ function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 					end
 
 					if self.ui.common.display_mode ~= DB.DISPLAY_BAR then
-						f.icon:SetDesaturated(1)
-						f.icon:SetAlpha(self.ui.icon.off_alpha)
-						f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
-						f.border:SetAlpha(self.ui.icon.off_alpha)
-						f.border:SetVertexColor(0,0,0) 
-						
-						if f.spell.count > 0 then
-							f.iconSatCooldown:Show()
-							f.iconSatCooldown.spark:Show()
-
-							f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * f.spell.count * 1000) /1000
-							if self.ui.icon.cooldown == DB.COOLDOWN_LEFT then
-								f.spell.texcoord = 0.93 - (0.86 * f.spell.count)
-								f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
-								f.iconSatCooldown:SetTexCoord(f.spell.texcoord, 0.93, 0.07, 0.93)
-					
-							elseif self.ui.icon.cooldown == DB.COOLDOWN_RIGHT then
-								f.spell.texcoord = 0.07 + (0.86 * f.spell.count)
-								f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
-								f.iconSatCooldown:SetTexCoord(0.07, f.spell.texcoord, 0.07, 0.93)
-					
-							elseif self.ui.icon.cooldown == DB.COOLDOWN_UP then
-								f.spell.texcoord = 0.93 - (0.86 * f.spell.count)
-								f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
-								f.iconSatCooldown:SetTexCoord(0.07, 0.93, f.spell.texcoord, 0.93)
-
-							elseif self.ui.icon.cooldown == DB.COOLDOWN_DOWN then
-								f.spell.texcoord = 0.07 + (0.86 * f.spell.count)
-								f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
-								f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, f.spell.texcoord)
-							else
-								if self.type == HDH_TRACKER.TYPE.POWER_ESSENCE then
-									f.iconSatCooldown:Hide()
-									f.iconSatCooldown.spark:Hide()
-									f.icon:SetDesaturated(nil)
-
-									if not f.cd:IsShown() then
-										f.cd:Show()
-									end
-									
-									f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
-								else
-									f.iconSatCooldown:SetHeight(f.icon:GetHeight())
-									f.iconSatCooldown:SetWidth(f.icon:GetWidth())
-									f.iconSatCooldown:Hide()
-									f.iconSatCooldown.spark:Hide()
-								end
-							end
-						else
-							f.iconSatCooldown:Hide()
-							f.iconSatCooldown.spark:Hide()
-							f.cd:Hide()
-						end
+						f.icon:SetValue(f.spell.count)
+						-- if f.spell.count > 0 then
+						-- 	f.icon:UpdateCooldowning()
+						-- else
+						-- 	f.icon:UpdateCooldowning(false)
+						-- end
+						f.icon:UpdateCooldowning()
 					end
 
 					if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
@@ -369,26 +255,19 @@ function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 					else
 						f.counttext:SetText("")
 					end
-
-					f.icon:SetDesaturated(nil)
-					f.icon:SetAlpha(self.ui.icon.on_alpha)
-					f.iconSatCooldown:Hide()
-					f.iconSatCooldown.spark:Hide()
-					f.border:SetAlpha(self.ui.icon.on_alpha)
-					f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
+					f.icon:UpdateCooldowning(false)
+					f.icon:Stop()
 					self:UpdateGlow(f, true)
 
 					if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 						f.bar:SetValue(1)
 					end
-					f.cd:Hide()
 				end
 
 				f.v1:SetText((f.spell.showValue and f.spell.v1 >= 1) and f.spell.v1 or "")
 			end
 			
 			f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-			
 			f:Show()
 
 			i = i + 1
@@ -398,25 +277,17 @@ function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 			else 
 				col = col + size_w + margin_h 
 			end
-
 			ret = ret + 1
 
 		else
 			if k <= UnitPowerMax('player', self.POWER_INFO[self.type].power_index) then 
 				if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then 
-					if not f.icon:IsDesaturated() then f.icon:SetDesaturated(1) end
-					f.icon:SetAlpha(self.ui.icon.off_alpha)
-					f.iconSatCooldown:Hide()
-					f.iconSatCooldown.spark:Hide()
-					f.border:SetAlpha(self.ui.icon.off_alpha)
-					f.border:SetVertexColor(0,0,0)
+					f.icon:UpdateCooldowning()
+					f.icon:Stop()
 					f.v1:SetText("")
 					f.counttext:SetText("")
 					self:UpdateGlow(f, false)
 					f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-					if f.cd:IsShown() then
-						f.cd:Hide()
-					end
 					f:Show()
 					if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 						f.bar:SetValue(0)
@@ -450,44 +321,60 @@ function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 end
 
 function HDH_COMBO_POINT_TRACKER:Update() -- HDH_TRACKER override
-	if not self.frame or not self.frame.icon or HDH_TRACKER.ENABLE_MOVE then return end
+	if not self.frame or not self.frame.icon then return end
 	local iconf;
 	local spell;
 	local ret = 0;
-	
 	local power = UnitPower('player', self.POWER_INFO[self.type].power_index, true);
 	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index);
 
-	if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type then
-		power = power / 10
-	end
-		
-	for i = 1, power_max do
-		iconf = self.frame.icon[i]
-		if iconf then 
-			if not iconf.spell then
-				iconf.spell = {}
-			end
-			if math.ceil(power) >= i then
-				iconf.spell.isUpdate = true
-				if (power + 1 - i) < 1 then
-					iconf.spell.count = power + 1 - i 
-				else
-					iconf.spell.count = 1
-					iconf.spell.v1 = power
+	if not HDH_TRACKER.ENABLE_MOVE then
+		if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type then
+			power = power / 10
+		end
+			
+		for i = 1, power_max do
+			iconf = self.frame.icon[i]
+			if iconf then 
+				if not iconf.spell then
+					iconf.spell = {}
 				end
-			else
-				iconf.spell.isUpdate = false
-				iconf.spell.v1 = 0
-				iconf.spell.count = 0
+				if math.ceil(power) >= i then
+					iconf.spell.isUpdate = true
+					if (power + 1 - i) < 1 then
+						iconf.spell.count = power + 1 - i 
+					else
+						iconf.spell.count = 1
+						iconf.spell.v1 = power
+					end
+				else
+					iconf.spell.isUpdate = false
+					iconf.spell.v1 = 0
+					iconf.spell.count = 0
+				end
+				ret = ret + 1
 			end
-			ret = ret + 1
+		end
+	else
+		power = power_max - 1
+		for i = 1, power_max do
+			iconf = self.frame.icon[i]
+			if iconf then 
+				if not iconf.spell then
+					iconf.spell = {}
+				end
+				if math.ceil(power) >= i then
+					iconf.spell.isUpdate = true
+				else
+					iconf.spell.isUpdate = false
+				end
+			end
 		end
 	end
 	self:UpdateAllIcons();
 
 	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
-			and (UnitAffectingCombat("player") or power > 0 or self.ui.common.always_show) then
+			and (UnitAffectingCombat("player") or self.ui.common.always_show) then
 		self:ShowTracker();
 	else
 		self:HideTracker();
@@ -501,7 +388,7 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 	local trackerId = self.id
 	local spell, f
 	
-	if not self:IsHaveData() then
+	if self:GetElementCount() == 0 then
 		self:CreateData()
 	end
 	for i = 1, power_max do
@@ -538,7 +425,6 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 		spell.isItem =  isItem
 		f.spell = spell
 		f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-		f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 		if f.bar then
 			f.bar:SetMinMaxValues(0, 1)
 		end

@@ -14,7 +14,7 @@ end
 ------------------------------------------
  -- AURA TRACKER Class
 --------------------------------------------
-local super = HDH_POWER_TRACKER
+local super = HDH_AURA_TRACKER
 setmetatable(HDH_ENH_MAELSTROM_TRACKER, super) -- 상속
 HDH_ENH_MAELSTROM_TRACKER.__index = HDH_ENH_MAELSTROM_TRACKER
 HDH_ENH_MAELSTROM_TRACKER.className = "HDH_ENH_MAELSTROM_TRACKER"
@@ -23,16 +23,8 @@ HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM = 23
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM, HDH_ENH_MAELSTROM_TRACKER)
 
 do
-
-	local function HDH_ENH_MAELSTROM_OnUpdate(self)
-		self.spell.curTime = GetTime()
-		
-		if self.spell.curTime - (self.spell.delay or 0) < 0.02  then return end 
-		self.spell.delay = self.spell.curTime
-		local tracker = self:GetParent().parent
-		
-		tracker:UpdateBarValue(self);
-		tracker:UpdateGlow(self, true);
+	function HDH_ENH_MAELSTROM_TRACKER:UpdateBarValue(f, value)
+		f.bar:SetValue(f.spell.v1, true)
 	end
 
     function HDH_ENH_MAELSTROM_TRACKER:GetPower()
@@ -111,9 +103,9 @@ do
         local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
 
 		if select(4, GetBuildInfo()) <= 59999 then -- 대격변
-			DB:SetTrackerElementSplitValues(trackerId, elemIdx, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES)
+			DB:SetTrackerElementSplitValues(trackerId, elemIdx, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_FIXED_VALUE)
 		else
-			DB:SetTrackerElementSplitValues(trackerId, elemIdx, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES)
+			DB:SetTrackerElementSplitValues(trackerId, elemIdx, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_FIXED_VALUE)
 		end
         
 		DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_VALUE, DB.CONDITION_GT_OR_EQ, 5)
@@ -147,47 +139,74 @@ do
         DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', {0.25, 0.5, 1, 1})
         self:UpdateSetting();
     end
+
+
+	function HDH_ENH_MAELSTROM_TRACKER:CreateDummySpell(count)
+		local icons =  self.frame.icon
+		local ui = self.ui
+		local f, spell
+		local power_max = self:GetPowerMax()
+		f = icons[1];
+		f:SetMouseClickEnabled(false);
+		if not f:GetParent() then f:SetParent(self.frame) end
+		if f.icon:GetTexture() == nil then
+			f.icon:SetTexture(self.power_info.texture);
+		end
+		f:ClearAllPoints()
+		spell = {}
+		spell.display = DB.SPELL_ALWAYS_DISPLAY
+		spell.id = 0
+		spell.count = 100
+		spell.duration = 50
+		spell.happenTime = 0;
+		spell.glow = false
+		spell.endTime = 0
+		spell.startTime = GetTime()
+		spell.remaining = 0
+		spell.showValue = f.spell.showValue
+		spell.v1 = power_max
+		spell.max = power_max;
+		spell.splitValues = f.spell.splitValues
+
+		f.icon:SetCooldown(spell.startTime, spell.duration)
+		f.icon:UpdateCooldowning()
+
+		if ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
+			if spell.showValue then
+				f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(spell.v1, self.ui.font.v1_abbreviate))
+			else
+				f.v1:SetText('')
+			end
+			f.bar:Show()
+			self:UpdateBarMinMaxValue(f, 0, 1, 1)
+		end
+		f.spell = spell
+		f.counttext:SetText("100%")
+		self:SetGameTooltip(f, false)
+		f:Show()
+		return 1;
+	end
     
-    function HDH_ENH_MAELSTROM_TRACKER:IsHaveData()
+    function HDH_ENH_MAELSTROM_TRACKER:GetElementCount()
         local key = DB:GetTrackerElement(self.id, 1)
         if HDH_ENH_MAELSTROM_TRACKER.TRACKING_SPELL_ID == key then
-            return true
+            return 1
         else
-            return false
+            return 0
         end
     end
 
 	function HDH_ENH_MAELSTROM_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
-		local cooldown_type = self.ui.icon.cooldown
+		-- local cooldown_type = self.ui.icon.cooldown
 		local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
 		local f = self.frame.icon[1]
-		if f == nil or f.spell == nil then return end;
-		if f.spell.v1 > 0 then 
-			f.icon:SetDesaturated(nil)
-			f.icon:SetAlpha(self.ui.icon.on_alpha)
-			f.border:SetAlpha(self.ui.icon.on_alpha)
-			f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
-			ret = 1;
+		if f == nil or f.spell == nil then return end
+		if f.spell.v1 > 0 then
+			ret = 1
 			self:UpdateGlow(f, true)
-			f:Show();
-			if cooldown_type ~= DB.COOLDOWN_CIRCLE and  cooldown_type ~= DB.COOLDOWN_NONE then
-				f.icon:SetAlpha(self.ui.icon.off_alpha)
-				f.border:SetAlpha(self.ui.icon.off_alpha)
-				f.icon:SetDesaturated(1)
-				f.iconSatCooldown:SetAlpha(self.ui.icon.on_alpha)
-				f.iconSatCooldown:Show()
-				f.cd:Hide()
-			else
-				f.iconSatCooldown:Hide()
-				f.icon:SetAlpha(self.ui.icon.on_alpha)
-				f.border:SetAlpha(self.ui.icon.on_alpha)
-				f.icon:SetDesaturated(nil)
-				f.cd:Show()
-				
-				if HDH_TRACKER.startTime < f.spell.startTime or (f.spell.duration > 0) then
-					f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
-				end
-			end
+			f:Show()
+			f.icon:UpdateCooldowning()
+			f.icon:SetCooldown(f.spell.startTime, f.spell.duration)
 			if f.spell.count == 100 and f.spell.v1 ~= f.spell.maxValue then f.spell.count = 99 end
 			f.counttext:SetText(f.spell.count .. "%")
 			f.v1:SetText(f.spell.v1)
@@ -195,16 +214,16 @@ do
 			if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then
 				f.v1:SetText("")
 				f.counttext:SetText("")
-				f.icon:SetDesaturated(1)
-				f.icon:SetAlpha(self.ui.icon.off_alpha)
-				f.border:SetAlpha(self.ui.icon.off_alpha)
-				f.border:SetVertexColor(0,0,0)
+				f.icon:Stop()
+				f.icon:UpdateCooldowning(false)
 				self:UpdateGlow(f, false)
 				f:Show();
-				f.cd:Hide();
 			else
 				f:Hide();
 			end
+		end
+		if f.bar then
+			self:UpdateBarMinMaxValue(f, 0, f.spell.max, f.spell.v1)
 		end
 		f.spell.isUpdate = false
 		f:SetPoint('RIGHT');
@@ -248,7 +267,7 @@ do
 		else
 			self.powerMax = ((263 == select(1,  HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))) and 10) or 5
 		end
-		local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitValues, glowEffectType, glowEffectColor, glowEffectPerSec
+		local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitValues, glowEffectType, glowEffectColor, glowEffectPerSec, splitType
 		local elemSize = DB:GetTrackerElementSize(trackerId)
 		local spell 
 		local f
@@ -260,14 +279,14 @@ do
 		
 		self.talentId = HDH_AT_UTIL.GetSpecialization()
 
-		if not self:IsHaveData() then
+		if self:GetElementCount() == 0 then
 			self:CreateData()
 		end
-		if self:IsHaveData() then
+		if self:GetElementCount() > 0 then
 			for i = 1 , elemSize do
 				elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 				glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
-				splitValues = DB:GetTrackerElementSplitValues(trackerId, i)
+				splitValues, splitType = DB:GetTrackerElementSplitValues(trackerId, i)
 				
 				iconIdx = iconIdx + 1
 				f = self.frame.icon[iconIdx]
@@ -297,15 +316,13 @@ do
 				spell.is_buff = isBuff;
 				spell.isUpdate = false
 				spell.isItem =  isItem
-				spell.splitValues = splitValues or {}
+				spell.splitPoints = splitValues or {}
+				spell.splitPointType = splitType
 				f.spell = spell
 				f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-				f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-				f.iconSatCooldown:SetDesaturated(nil)
-				self:ChangeCooldownType(f, self.ui.icon.cooldown)
 				self:UpdateGlow(f, false)
 				self:UpdateBarSettings(f)
-				f:SetScript("OnUpdate", HDH_ENH_MAELSTROM_OnUpdate);
+				-- f:SetScript("OnUpdate", HDH_ENH_MAELSTROM_OnUpdate)
 				f:Hide();
 				self:ActionButton_HideOverlayGlow(f)
 			end

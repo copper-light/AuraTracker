@@ -567,7 +567,7 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		local CLASS = HDH_TRACKER.GetClass(trackerType)
 		if trackerType == HDH_TRACKER.TYPE.STAGGER then
 			self.DETAIL_ETC_TAB[1]:Disable()
-			self.DETAIL_ETC_TAB[2]:Disable()
+			-- self.DETAIL_ETC_TAB[2]:Disable()
 			self.DETAIL_ETC_TAB[3]:Disable()
 			ChangeTab(self.DETAIL_ETC_TAB, -1)
 		elseif CLASS:GetClassName() == "HDH_POWER_TRACKER" or CLASS:GetClassName() == "HDH_ENH_MAELSTROM_TRACKER" then
@@ -581,18 +581,23 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 			end
 		elseif trackerType == HDH_TRACKER.TYPE.COOLDOWN then
 			self.DETAIL_ETC_TAB[1]:Enable()
-			self.DETAIL_ETC_TAB[2]:Disable()
+			self.DETAIL_ETC_TAB[2]:Enable()
 			self.DETAIL_ETC_TAB[3]:Enable()
-			if self.subType ~= 2 then 
+			-- if self.subType ~= 2 then 
+			-- 	ChangeTab(self.DETAIL_ETC_TAB, self.subType)
+			-- else
+			-- 	ChangeTab(self.DETAIL_ETC_TAB, 1)
+			-- end
+			ChangeTab(self.DETAIL_ETC_TAB, self.subType)
+		else
+			self.DETAIL_ETC_TAB[1]:Enable()
+			self.DETAIL_ETC_TAB[2]:Enable()
+			self.DETAIL_ETC_TAB[3]:Disable()
+			if #self.DETAIL_ETC_TAB >= self.subType then
 				ChangeTab(self.DETAIL_ETC_TAB, self.subType)
 			else
 				ChangeTab(self.DETAIL_ETC_TAB, 1)
 			end
-		else
-			self.DETAIL_ETC_TAB[1]:Enable()
-			self.DETAIL_ETC_TAB[2]:Disable()
-			self.DETAIL_ETC_TAB[3]:Disable()
-			ChangeTab(self.DETAIL_ETC_TAB, 1)
 		end
 	end
 

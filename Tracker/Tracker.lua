@@ -32,71 +32,6 @@ HDH_TRACKER.startTime = 0
 -- EVENT SCRIPT
 -------------------------------------------
 
--- function HDH_AT_UpdateCooldownSatIcon(f, per, direction, reverse)
--- 	if per > 0 then
--- 		f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * per * 10) /10
--- 		f.iconSatCooldown.curSize = f.iconSatCooldown.curSize - (f.iconSatCooldown.curSize % 0.5)
--- 		f.iconSatCooldown.curSize = math.min(math.max(f.iconSatCooldown.curSize, 0.1), f.icon:GetHeight())
--- 		if not f.iconSatCooldown.spark:IsShown() then
--- 			f.iconSatCooldown.spark:Show()
--- 		end
--- 	else
--- 		if f.iconSatCooldown.spark:IsShown() then
--- 			f.iconSatCooldown:Hide()
--- 		end
--- 	end
--- 	f.spell.per = per
-
--- 	if reverse then
--- 		if (f.iconSatCooldown.curSize ~= f.iconSatCooldown.preSize) then
--- 			if (f.iconSatCooldown.curSize == 0) then f.iconSatCooldown:Hide() end
--- 			if direction == DB.COOLDOWN_LEFT then
--- 				f.spell.texcoord = 0.93 - (0.86 * per)
--- 				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
--- 				f.iconSatCooldown:SetTexCoord(f.spell.texcoord, 0.93, 0.07, 0.93)
-
--- 			elseif direction == DB.COOLDOWN_RIGHT then
--- 				f.spell.texcoord = 0.07 + (0.86 * per)
--- 				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
--- 				f.iconSatCooldown:SetTexCoord(0.07, f.spell.texcoord, 0.07, 0.93)
-
--- 			elseif direction == DB.COOLDOWN_UP then
--- 				f.spell.texcoord = 0.93 - (0.86 * per)
--- 				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
--- 				f.iconSatCooldown:SetTexCoord(0.07, 0.93, f.spell.texcoord, 0.93)
--- 			else
--- 				f.spell.texcoord = 0.07 + (0.86 * per)
--- 				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
--- 				f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, f.spell.texcoord)
--- 			end
--- 			f.iconSatCooldown.preSize = f.iconSatCooldown.curSize
--- 		end
--- 	else
--- 		if (f.iconSatCooldown.curSize ~= f.iconSatCooldown.preSize) then
--- 			f.tex = 0.86 * per
--- 			if (f.iconSatCooldown.curSize == 0) then f.iconSatCooldown:Hide() end
--- 			if direction == DB.COOLDOWN_LEFT then
--- 				f.spell.texcoord = 0.07 + (f.tex)
--- 				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
--- 				f.iconSatCooldown:SetTexCoord(0.07, f.spell.texcoord, 0.07, 0.93)
--- 			elseif direction == DB.COOLDOWN_RIGHT then
--- 				f.spell.texcoord = (0.93 - f.tex)
--- 				f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
--- 				f.iconSatCooldown:SetTexCoord(f.spell.texcoord, 0.93, 0.07, 0.93)
--- 			elseif direction == DB.COOLDOWN_UP then
--- 				f.spell.texcoord = (0.07 + f.tex)
--- 				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
--- 				f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, f.spell.texcoord)
--- 			else
--- 				f.spell.texcoord = (0.93 - f.tex)
--- 				f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
--- 				f.iconSatCooldown:SetTexCoord(0.07, 0.93, f.spell.texcoord, 0.93)
--- 			end
--- 			f.iconSatCooldown.preSize = f.iconSatCooldown.curSize
--- 		end
--- 	end
--- end
-
 local function UpdateCooldown(f, elapsed)
 	local spell = f.spell;
 	local tracker = f:GetParent().parent;
@@ -104,6 +39,7 @@ local function UpdateCooldown(f, elapsed)
 	
 	-- f.elapsed = (f.elapsed or 0) + elapsed;
 	-- if f.elapsed < HDH_TRACKER.ONUPDATE_FRAME_TERM then  return end  -- 30프레임
+	-- f.elapsed = 0
 
 	f.skip = (f.skip or 0) + 1
 	if f.skip % 3 ~= 0 and elapsed < 0.03 then return end
@@ -113,28 +49,16 @@ local function UpdateCooldown(f, elapsed)
 	spell.remaining = (spell.endTime or 0) - spell.curTime
 	if spell.remaining > 0.0 and spell.duration > HDH_TRACKER.GlobalCooldown then
 		tracker:UpdateTimeText(f.timetext, spell.remaining)
-		-- if tracker.ui.common.cooldown ~= DB.COOLDOWN_CIRCLE and tracker.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
-		-- 	if f.cd:GetObjectType() == "StatusBar" then 
-		-- 		f.cd:SetValue(spell.curTime) 
-		-- 	end
-		-- end
-		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-			f.bar:SetValue(GetTime())
-		end
 
-		-- if tracker.ui.common.display_mode ~= DB.DISPLAY_BAR then
-		-- 	if tracker.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE and tracker.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
-		-- 		-- spell.per = spell.remaining / spell.duration
-		-- 		HDH_AT_UpdateCooldownSatIcon(f, (spell.remaining / spell.duration), tracker.ui.icon.cooldown, false)
-		-- 	end
-		-- end
+		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
+			tracker:UpdateBarValue(f, GetTime())
+		end
 		if f.spell.glow == DB.GLOW_CONDITION_TIME then
 			tracker:UpdateGlow(f, true)
 		end
 	else
 		f.timetext:SetText("")
 	end
-	-- f.elapsed = 0
 end
 
 local function OnUpdateGlowColor(self, elapsed)
@@ -144,10 +68,7 @@ local function OnUpdateGlowColor(self, elapsed)
 	self.sparkElapsed = 0
 	self.p = HDH_AT_UTIL.LogScale(math.max(math.min((1.25 - (GetTime() % (1/self:GetParent().spell.glowEffectPerSec) + .001) / (1/self:GetParent().spell.glowEffectPerSec*0.8)), 1.), 0.3))
 	self.p_c = math.max(self.p, 0.5)
-	
 	self.icon_size = self:GetParent():GetParent().parent.ui.icon.size
-	
-	
 	
 	if (math.min(1.4, self.playing / 0.25)) == 1.4 then
 		self.color:SetSize(self.icon_size * 1.31, self.icon_size * 1.31)
@@ -169,7 +90,6 @@ local function OnUpdateGlowColor(self, elapsed)
 								  self:GetParent().spell.glowEffectColor[3], 
 								  self:GetParent().spell.glowEffectColor[4])
 	end
-
 end
 
 -------------------------------------------
@@ -177,16 +97,14 @@ end
 -------------------------------------------
 
 local function frameBaseSettings(f)
-	-- local border = 2
 	f:SetClampedToScreen(true)
 	f:SetMouseClickEnabled(false);
-	f.icon = CreateFrame("Frame", nil, f, "HDH_AT_CooldownIconTemplate");
-	f.icon:SetPoint('CENTER', f, 'CENTER', 0, 0)
-	f.icon:SetPoint('CENTER', f, 'CENTER', 0, 0)
+	f.icon = CreateFrame("Frame", nil, f, "HDH_AT_CooldownIconTemplate")
+	f.icon:SetAllPoints(true)
 	f.icon:Show()
 	
 	local tempf = CreateFrame("Frame", nil, f)
-	tempf:SetFrameLevel(f.icon:GetFrameLevel() + 3)
+	tempf:SetFrameLevel(f.icon:GetFrameLevel() + 5)
 	f.counttext = tempf:CreateFontString(nil, 'OVERLAY')
 	f.counttext:SetPoint('TOPLEFT', f, 'TOPLEFT', -1, 0)
 	f.counttext:SetPoint('BOTTOMRIGHT', f, 'BOTTOMRIGHT', 0, 0)
@@ -198,7 +116,6 @@ local function frameBaseSettings(f)
 	f.timetext:SetPoint('TOPLEFT', f, 'TOPLEFT', -10, -1)
 	f.timetext:SetPoint('BOTTOMRIGHT', f, 'BOTTOMRIGHT', 10, 0)
 	f.timetext:SetJustifyH('CENTER')
-	--f.timetext:SetJustifyV('CENTER')
 	f.timetext:SetJustifyV('MIDDLE')
 	f.timetext:SetNonSpaceWrap(false)
 	
@@ -208,20 +125,12 @@ local function frameBaseSettings(f)
 	f.v1:SetNonSpaceWrap(false)
 	f.v1:SetJustifyH('RIGHT')
 	f.v1:SetJustifyV('TOP')
-	
-	f.v2 = tempf:CreateFontString(nil, 'OVERLAY')
-	f.v2:SetPoint('TOPLEFT', f, 'TOPLEFT', -1, 0)
-	f.v2:SetPoint('BOTTOMRIGHT', f, 'BOTTOMRIGHT', 0, 0)
-	f.v2:SetNonSpaceWrap(false)
-	f.v2:SetJustifyH('RIGHT')
-	f.v2:SetJustifyV('TOP')
 		
 	tempf = CreateFrame("Frame", nil, f)
-	-- tempf:SetFrameLevel(f.border:GetParent():GetFrameLevel() + 1)
 	tempf:SetPoint('TOPLEFT', f.icon, 'TOPLEFT', 0, 0)
 	tempf:SetPoint('BOTTOMRIGHT', f.icon, 'BOTTOMRIGHT', 0, 0)
 	tempf:SetScript("Onupdate", OnUpdateGlowColor)
-
+	tempf:SetFrameLevel(f.icon:GetFrameLevel() + 4)
 	f.icon.spark = tempf
 	f.icon.spark.color = tempf:CreateTexture(nil, 'BORDER')
 	f.icon.spark.color:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/spark_rect.blp]])
@@ -433,8 +342,6 @@ function HDH_TRACKER:Init(id, name, type, unit)
 
 	self.frame:SetFrameLevel(tonumber(id)*10)
 	self.frame:Hide();
-	-- self:InitVariblesOption()
-	-- self:InitVariblesAura()
 	self.frame:ClearAllPoints()
 	self.frame:SetPoint("CENTER", UIParent, "CENTER" , self.location.x, self.location.y)
 	self.frame:SetSize(self.ui.icon.size, self.ui.icon.size)
@@ -442,8 +349,6 @@ function HDH_TRACKER:Init(id, name, type, unit)
 end
 
 function HDH_TRACKER:ReleaseIcon(idx)
-	-- self:StopAni(self.frame.icon[idx]);
-	-- AT_StopTimer(self.frame.icon[idx]);
 	self.frame.icon[idx]:SetScript('OnDragStart', nil)
 	self.frame.icon[idx]:SetScript('OnDragStop', nil)
 	self.frame.icon[idx]:SetScript('OnMouseDown', nil)
@@ -510,7 +415,7 @@ function HDH_TRACKER:CreateData()
 	-- interface
 end
 
-function HDH_TRACKER:IsHaveData()
+function HDH_TRACKER:GetElementCount()
 	local aura_filter
 	local cnt;
 	_, _, _, _, aura_filter = DB:GetTrackerInfo(self.id)
@@ -519,7 +424,7 @@ function HDH_TRACKER:IsHaveData()
 	else
 		cnt = DB:GetTrackerElementSize(self.id) or 0;
 	end
-	return (cnt > 0) and cnt or false;
+	return (cnt > 0) and cnt or 0;
 end
 
 function HDH_TRACKER:GetClassName()
@@ -533,13 +438,6 @@ function HDH_TRACKER:UpdateSetting()
 	for k, f in pairs(self.frame.icon) do
 		self:UpdateIconSettings(f)
 		self:ActionButton_ResizeOverlayGlow(f)
-		-- if not f.icon:IsDesaturated() then
-		-- 	f.icon:SetAlpha(self.ui.icon.on_alpha)
-		-- 	f.border:SetAlpha(self.ui.icon.on_alpha)
-		-- else
-		-- 	f.icon:SetAlpha(self.ui.icon.off_alpha)
-		-- 	f.border:SetAlpha(self.ui.icon.off_alpha)
-		-- end
 	end	
 	self:LoadOrderFunc()
 	local x, y = UTIL.AdjustLocation(self.frame:GetLeft() + (self.ui.icon.size/2), self.frame:GetBottom()+(self.ui.icon.size/2))
@@ -608,81 +506,6 @@ function HDH_TRACKER:UpdateBarSettings(f)
 	end
 end
 
--- function HDH_TRACKER:ChangeCooldownType(f, cooldown_type)
--- 	local spark_size = f.icon:GetWidth() 
--- 	if cooldown_type == DB.COOLDOWN_UP then 
--- 		f.cd = f.cooldown1
--- 		f.cd:SetOrientation("Vertical")
--- 		f.cd:SetReverseFill(false)
--- 		f.cooldown2:Hide()
-
--- 		f.iconSatCooldown:ClearAllPoints()
--- 		f.iconSatCooldown:SetPoint("TOPLEFT", f.icon,"TOPLEFT",0,0)
--- 		f.iconSatCooldown:SetPoint("TOPRIGHT", f.icon,"TOPRIGHT",0,0)
--- 		f.iconSatCooldown:SetHeight(self.ui.icon.size)
--- 		f.iconSatCooldown.spark:SetSize(spark_size, 7);
--- 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
--- 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"BOTTOM",0,0)
--- 		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
-
--- 	elseif cooldown_type == DB.COOLDOWN_DOWN  then 
--- 		f.cd = f.cooldown1
--- 		f.cd:SetOrientation("Vertical")
--- 		f.cd:SetReverseFill(true)
--- 		f.cooldown2:Hide()
-
--- 		f.iconSatCooldown:ClearAllPoints()
--- 		f.iconSatCooldown:SetPoint("BOTTOMLEFT", f.icon,"BOTTOMLEFT",0,0)
--- 		f.iconSatCooldown:SetPoint("BOTTOMRIGHT", f.icon,"BOTTOMRIGHT",0,0)
--- 		f.iconSatCooldown:SetHeight(self.ui.icon.size)
--- 		f.iconSatCooldown.spark:SetSize(spark_size, 7);
--- 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v");
--- 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"TOP",0,0)
--- 		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
-
--- 	elseif cooldown_type == DB.COOLDOWN_LEFT  then 
--- 		f.cd = f.cooldown1
--- 		f.cd:SetOrientation("Horizontal"); 
--- 		f.cd:SetReverseFill(true)
--- 		f.cooldown2:Hide()
-
--- 		f.iconSatCooldown:ClearAllPoints()
--- 		f.iconSatCooldown:SetPoint("TOPLEFT", f.icon,"TOPLEFT",0,0)
--- 		f.iconSatCooldown:SetPoint("BOTTOMLEFT", f.icon,"BOTTOMLEFT",0,0)
--- 		f.iconSatCooldown:SetWidth(self.ui.icon.size)
-
--- 		f.iconSatCooldown.spark:SetSize(7, spark_size);
--- 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
--- 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"RIGHT",0,0)
--- 		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
-
--- 	elseif cooldown_type == DB.COOLDOWN_RIGHT then 
--- 		f.cd = f.cooldown1
--- 		f.cd:SetOrientation("Horizontal"); 
--- 		f.cd:SetReverseFill(false)
--- 		f.cooldown2:Hide()
-
--- 		f.iconSatCooldown:ClearAllPoints()
--- 		f.iconSatCooldown:SetPoint("TOPRIGHT", f.icon,"TOPRIGHT",0,0)
--- 		f.iconSatCooldown:SetPoint("BOTTOMRIGHT", f.icon,"BOTTOMRIGHT",0,0)
--- 		f.iconSatCooldown:SetWidth(self.ui.icon.size)
-
--- 		f.iconSatCooldown.spark:SetSize(7, spark_size);
--- 		f.iconSatCooldown.spark:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark");
--- 		f.iconSatCooldown.spark:SetPoint("CENTER", f.iconSatCooldown,"LEFT",0,0)
--- 		f.iconSatCooldown.spark:SetVertexColor(unpack(self.ui.icon.spark_color or {1,1,1,1}))
-
--- 	else
--- 		f.cd = f.cooldown2
--- 		f.cooldown1:Hide()
-
--- 		f.iconSatCooldown:Hide() 
--- 		f.iconSatCooldown.spark:Hide()
--- 		f.iconSatCooldown:SetSize(f.icon:GetSize())
--- 		f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, 0.93)
--- 	end
--- end
-
 function HDH_TRACKER:Update()
 	-- interface
 end
@@ -698,7 +521,11 @@ function HDH_TRACKER:UpdateTimeText(text, value)
 	end
 end
 
-function HDH_TRACKER:UpdateBarValue(f, minV, maxV, value, r, g, b, a)
+function HDH_TRACKER:UpdateBarValue(f, value)
+	f.bar:SetValue(value)
+end
+
+function HDH_TRACKER:UpdateBarMinMaxValue(f, minV, maxV, value, r, g, b, a)
 	if f.bar then
 		if r then
 			f.bar:SetStatusBarColor(r, g, b, a or 1)
@@ -832,7 +659,6 @@ function HDH_TRACKER:CreateDummySpell(count)
 		if f.icon:GetTexture() == nil then
 			f.icon:SetTexture("Interface/ICONS/TEMP")
 		end
-		-- f:ClearAllPoints()
 		spell = f.spell
 		if not spell then spell = {} f.spell = spell end
 		spell.display = DB.SPELL_ALWAYS_DISPLAY
@@ -853,29 +679,15 @@ function HDH_TRACKER:CreateDummySpell(count)
 		end
 		if self.type == HDH_TRACKER.TYPE.BUFF then spell.isBuff = true
 											  else spell.isBuff = false end
-		-- if ui.icon.cooldown == DB.COOLDOWN_CIRCLE then
-		-- 	f.cd:SetCooldown(spell.startTime,spell.duration)
-		-- elseif ui.icon.cooldown ~= DB.COOLDOWN_NONE then
-		-- 	f.cd:SetMinMaxValues(spell.startTime, spell.remaining)
-		-- 	f.cd:SetValue(spell.startTime+spell.duration);
-		-- end
 		f.icon:SetCooldown(spell.startTime, spell.duration)
-		-- f.icon:SetActivate(true)
 		f.icon:UpdateCooldowning()
 		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 			f:SetScript("OnUpdate",nil);
-			self:UpdateBarValue(f, spell.startTime, spell.endTime, spell.startTime);
+			self:UpdateBarMinMaxValue(f, spell.startTime, spell.endTime, spell.startTime);
 			f.bar:Show();
 			spell.name = spell.name or ("NAME"..i);
 		end
 		f.counttext:SetText(i)
-		-- if (ui.icon.cooldown == DB.COOLDOWN_CIRCLE) or (ui.icon.cooldown == DB.COOLDOWN_NONE) then 
-		-- 	f.icon:SetAlpha(ui.icon.on_alpha)
-		-- 	f.border:SetAlpha(ui.icon.on_alpha)
-		-- else	
-		-- 	f.icon:SetAlpha(ui.icon.off_alpha)
-		-- 	f.border:SetAlpha(ui.icon.on_alpha)
-		-- end
 		self:SetGameTooltip(f, false)
 		spell.isUpdate = true
 		f:Show()
@@ -1320,7 +1132,7 @@ end
 function HDH_TRACKER:SetMove(move)
 	if not self.frame then return end
 	if move then
-		local cnt = self:IsHaveData();
+		local cnt = self:GetElementCount();
 		if cnt then
 			if not self.frame.moveFrame then
 				CreateMoveFrame(self)
@@ -1466,38 +1278,24 @@ end
 
 -- bar 세부 속성 세팅하는 함수 (나중에 option 을 통해 바 값을 변경할수 있기에 따로 함수로 지정해둠)
 local ICON_BORDER_VALUE = {0.120, 0.15, 0.18, 0.21, 0.24, 0.27, 0.30, 0.33, 0.36, 0.39}
-local ICON_SIZE_VALUE =   {0.075, 0.10, 0.14, 0.21, 0.23, 0.30, 0.34, 0.37, 0.40, 0.42}
+-- local ICON_SIZE_VALUE =   {0.075, 0.10, 0.14, 0.21, 0.23, 0.30, 0.34, 0.37, 0.40, 0.42}
 function HDH_TRACKER:UpdateIconSettings(f)
 	local op_icon = self.ui.icon
 	local op_font = self.ui.font
 	local op_common = self.ui.common
-	-- local border = 0.2355 * (1 - (ICON_BORDER_VALUE[op_icon.border_size] or 0))
-	-- local size = 1 - (0.455 * (ICON_SIZE_VALUE[op_icon.border_size] or 0))
 
 	f:SetSize(op_icon.size, op_icon.size)
-	-- f.icon:SetSize(op_icon.size * size, op_icon.size * size)
-	-- f.border:SetWidth(op_icon.size)
-	-- f.border:SetHeight(op_icon.size)
-	-- f.border:SetTexCoord(border, 1 - border, border, 1 - border)
-	-- f.border:SetPoint('CENTER', f.icon, 'CENTER', 0, 0)
-
-	f.icon:SetAllPoints(true)
 	f.icon:Setup(op_icon.size, op_icon.size, op_icon.cooldown, false, true, op_icon.spark_color, op_icon.cooldown_bg_color, op_icon.on_alpha, op_icon.off_alpha, op_icon.border_size)
 	f.icon:SetBorderColor(unpack(op_icon.active_border_color))
+	if f.spell and f.spell.icon then
+		f.icon:SetTexture(f.spell.icon)
+	end
 
-	local spot_border = math.min(0.2355 * (1 - (ICON_BORDER_VALUE[5] or 0)), 0.2355 * (1 - (ICON_BORDER_VALUE[op_icon.border_size] or 0)))
-	-- f.icon.spark.spot:SetSize(op_icon.size, op_icon.size)
-	f.icon.spark.spot:SetAllPoints(true)
+	local spot_border = math.min(0.2355 * (1 - (ICON_BORDER_VALUE[4] or 0)), 0.2355 * (1 - (ICON_BORDER_VALUE[op_icon.border_size] or 0)))
 	f.icon.spark.spot:SetTexCoord(spot_border, 1 - spot_border, spot_border, 1 - spot_border)
-	f.icon.spark.color:SetAllPoints(true)
-	-- f.icon.spark.color:SetSize(op_icon.size, op_icon.size)
-
-	-- if op_icon.cooldown == DB.COOLDOWN_CIRCLE then
-	-- 	f.cooldown2:SetSwipeColor(unpack(op_icon.cooldown_bg_color))
-	-- else
-	-- 	f.cooldown1:SetStatusBarColor(0,0,0,0)
-	-- 	f.cooldown2:SetSwipeColor(0,0,0,0)
-	-- end
+	f.icon.spark:SetSize(op_icon.size, op_icon.size)
+	f.icon.spark.spot:SetSize(op_icon.size, op_icon.size)
+	f.icon.spark.color:SetSize(op_icon.size, op_icon.size)
 	
 	if 4 > op_icon.size * 0.08 then
 		op_icon.margin = 4
@@ -1518,11 +1316,6 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	v1Text:SetTextColor(unpack(op_font.v1_color))
 	ChangeFontLocation(f, v1Text, op_font.v1_location, op_font)
 	
-	local v2Text = f.v2
-	v2Text:SetFont(HDH_TRACKER.FONT_STYLE, op_font.v2_size, "OUTLINE")
-	v2Text:SetTextColor(unpack(op_font.v2_color))
-	ChangeFontLocation(f, v2Text, op_font.v2_location, op_font)
-	
 	local timetext = f.timetext
 	timetext:SetFont(HDH_TRACKER.FONT_STYLE, op_font.cd_size, "OUTLINE")
 	timetext:SetTextColor(unpack(op_font.cd_color))
@@ -1531,7 +1324,6 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	f.timetext:Show()
 
 	self:SetGameTooltip(f, op_common.show_tooltip or false)
-	-- self:ChangeCooldownType(f, self.ui.icon.cooldown)
 
 	-- 아이콘 숨기기는 바와 연관되어 있기 때문에 바 설정쪽에 위치함.
 	if op_common.display_mode == DB.DISPLAY_BAR then
@@ -1573,6 +1365,7 @@ if select(4, GetBuildInfo()) <= 49999 then -- 대격변 코드
 		local frameWidth, frameHeight = f.icon:GetSize();
 		f.icon.overlay:SetParent(f.icon);
 		f.icon.overlay:ClearAllPoints();
+		f.icon.overlay:SetFrameLevel(f.icon:GetFrameLevel() + 4)
 		-- Make the height/width available before the next frame:
 		f.icon.overlay:SetSize(frameWidth * 1.3, frameHeight * 1.3);
 		f.icon.overlay:SetPoint("TOPLEFT", f.icon, "TOPLEFT", -frameWidth * 0.3, frameHeight * 0.3);
@@ -1614,8 +1407,7 @@ else -- 용군단 코드
 		local name = f.icon:GetParent():GetName()..'g'..math.random()
 		local frameWidth, frameHeight = f.icon:GetSize()
 		f.icon.SpellActivationAlert = CreateFrame("Frame", name, f, "ActionButtonSpellAlertTemplate")
-		f.icon.SpellActivationAlert:SetFrameLevel(f.icon:GetFrameLevel() + 3)
-		-- f.icon.SpellActivationAlert:
+		f.icon.SpellActivationAlert:SetFrameLevel(f.icon:GetFrameLevel() + 4)
 		f.icon.SpellActivationAlert:SetSize(frameWidth * 1.6, frameHeight * 1.6)
 		f.icon.SpellActivationAlert:SetPoint("CENTER", f, "CENTER", 0, 0)
 		f.icon.SpellActivationAlert:Hide()
@@ -1623,7 +1415,6 @@ else -- 용군단 코드
 	end
 	
 	function HDH_TRACKER:ActionButton_ResizeOverlayGlow(f)
-		-- f = f.icon
 		if not f.icon.SpellActivationAlert then
 			return
 		end
@@ -1633,40 +1424,31 @@ else -- 용군단 코드
 	end
 	
 	function HDH_TRACKER:ActionButton_ReleaseOverlayGlow(f)
-		-- local border = f.border
-		-- f = f.icon
 		if not f.icon.SpellActivationAlert then
 			return
 		end
 		f.icon.SpellActivationAlert:Hide()
 		f.icon.SpellActivationAlert:SetParent(nil)
 		f.icon.SpellActivationAlert = nil
-		-- border:Show()
 	end
 	
 	function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
-		-- local border = f.border
-		-- f = f.icon
 		if not  f.icon.SpellActivationAlert then
 			self:ActionButton_SetupOverlayGlow(f)
 		end
 		if not f.icon.SpellActivationAlert:IsShown() or (not  f.icon.SpellActivationAlert.ProcStartAnim:IsPlaying() and not  f.icon.SpellActivationAlert.ProcLoop:IsPlaying()) then
 			f.icon.SpellActivationAlert:Show()
 			f.icon.SpellActivationAlert.ProcStartAnim:Play()
-			-- border:Hide()
 		end
 	end
 	
 	function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
-		-- local border = f.border
-		-- f = f.icon
 		if not  f.icon.SpellActivationAlert then
 			return
 		end
 	
 		if  f.icon:IsVisible() then
 			f.icon.SpellActivationAlert:Hide()
-			-- border:Show()
 		end
 	end
 	

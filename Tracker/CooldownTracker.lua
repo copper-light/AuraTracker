@@ -15,144 +15,6 @@ HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.COOLDOWN, HDH_C_TRACKER)
 -- OnUpdate icon
 -----------------------------------
 
--- local function CT_UpdateCooldownSatIcon(tracker, f, spell)
--- 	if spell.per < 0.99 and spell.per >= 0.01  then
--- 		if not f.iconSatCooldown.spark:IsShown() then
--- 			f.iconSatCooldown.spark:Show()
--- 		end
--- 	else
--- 		if f.iconSatCooldown.spark:IsShown() then
--- 			f.iconSatCooldown.spark:Hide()
--- 		end
--- 	end
-
--- 	if spell.per > 0 then 
--- 		f.iconSatCooldown.curSize = math.ceil(f.icon:GetHeight() * spell.per * 10) /10
--- 		f.iconSatCooldown.curSize = f.iconSatCooldown.curSize - (f.iconSatCooldown.curSize % 0.5)
--- 		f.iconSatCooldown.curSize = math.max(f.iconSatCooldown.curSize, 0.1)
--- 		f.iconSatCooldown:Show()
--- 	else
--- 		spell.per = 0.1
--- 		f.iconSatCooldown.curSize = 1
--- 		f.iconSatCooldown:Hide()
--- 	end
-
--- 	if (f.iconSatCooldown.curSize ~= f.iconSatCooldown.preSize) then
--- 		if (f.iconSatCooldown.curSize == 0) then f.iconSatCooldown:Hide() end
--- 		if tracker.ui.icon.cooldown == DB.COOLDOWN_LEFT then
--- 			spell.texcoord = 0.93 - (0.86 * spell.per)
--- 			f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
--- 			f.iconSatCooldown:SetTexCoord(spell.texcoord, 0.93, 0.07, 0.93)
-
--- 		elseif tracker.ui.icon.cooldown == DB.COOLDOWN_RIGHT then
--- 			spell.texcoord = 0.07 + (0.86 * spell.per)
--- 			f.iconSatCooldown:SetWidth(f.iconSatCooldown.curSize)
--- 			f.iconSatCooldown:SetTexCoord(0.07, spell.texcoord, 0.07, 0.93)
-
--- 		elseif tracker.ui.icon.cooldown == DB.COOLDOWN_UP then
--- 			spell.texcoord = 0.93 - (0.86 * spell.per)
--- 			f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
--- 			f.iconSatCooldown:SetTexCoord(0.07, 0.93, spell.texcoord, 0.93)
--- 		else
--- 			spell.texcoord = 0.07 + (0.86 * spell.per)
--- 			f.iconSatCooldown:SetHeight(f.iconSatCooldown.curSize)
--- 			f.iconSatCooldown:SetTexCoord(0.07, 0.93, 0.07, spell.texcoord)
--- 		end
--- 		f.iconSatCooldown.preSize = f.iconSatCooldown.curSize
--- 	end
--- end
-
-local function CT_UpdateCooldown(tracker, f, elapsed)
-	if not f.spell then return end
-	f.spell.remaining = f.spell.endTime - f.spell.curTime
-
-	if f.spell.remaining > HDH_C_TRACKER.EndCooldown and f.spell.duration > 0 then
-		if (not f.spell.isCharging or f.spell.remaining > 0) and f.spell.duration > HDH_C_TRACKER.GlobalCooldown then
-			tracker:UpdateTimeText(f.timetext, f.spell.remaining)
-		end
-		if tracker.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE and tracker.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
-			if not f.spell.isCharging or f.spell.remaining > 0 then
-				HDH_AT_UpdateCooldownSatIcon(f, (1 - (f.spell.remaining / f.spell.duration)), tracker.ui.icon.cooldown, true)
-			end
-		end
-		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar and f.spell.duration > HDH_C_TRACKER.GlobalCooldown then
-			f.bar:SetValue(f.spell.curTime)
-		end
-	elseif f.spell.isCharging and f.spell.remaining <= 0 then
-		f.spell.charges.remaining = f.spell.charges.endTime - f.spell.curTime
-		tracker:UpdateTimeText(f.timetext, f.spell.charges.remaining)
-		if tracker.ui.icon.cooldown ~= DB.COOLDOWN_CIRCLE and tracker.ui.icon.cooldown ~= DB.COOLDOWN_NONE then
-			HDH_AT_UpdateCooldownSatIcon(f, (1 - (f.spell.charges.remaining / f.spell.charges.duration)), tracker.ui.icon.cooldown, true)
-		end
-	elseif tracker.type == HDH_TRACKER.TYPE.COOLDOWN then
-		if( tracker:UpdateIcon(f)) or (not tracker.ui.common.always_show and not UnitAffectingCombat("player")) then
-			tracker:UpdateLayout()
-		end
-	end
-
-	if f.spell.glow == DB.GLOW_CONDITION_TIME and f.spell.duration > HDH_C_TRACKER.GlobalCooldown then
-		tracker:UpdateGlow(f, true)
-	end
-end
-
-local function CT_OnUpdateIcon(self, elapsed) -- 거리 체크는 onUpdate 에서 처리해야함
-	if not self.spell then return end
-	self.spell.curTime = GetTime();
-	if self.spell.curTime - (self.spell.delay or 0) < 0.05  then return end -- 10프레임
-	self.spell.delay = self.spell.curTime;
-	
-	if self.spell.slot then
-		self.spell.newRange = IsActionInRange(self.spell.slot) 
-	else
-		if UnitExists('target') then
-			if not self.spell.isItem then
-				self.spell.newRange = HDH_AT_UTIL.IsSpellInRange(self.spell.name, "target"); -- 1 true, 0 false, nil not target
-			else
-				self.spell.newRange = C_Item.IsItemInRange(self.spell.id, "target")
-			end
-		elseif UnitExists('mouseover') then
-			if not self.spell.isItem then
-				self.spell.newRange = HDH_AT_UTIL.IsSpellInRange(self.spell.name, "mouseover"); -- 1 true, 0 false, nil not target
-			else
-				self.spell.newRange = C_Item.IsItemInRange(self.spell.id, "mouseover")
-			end
-		else
-			self.spell.newRange = nil
-		end
-	end
-
-	if self.spell.preInRage ~= self.spell.newRange then
-		self:GetParent().parent:UpdateIcon(self);
-		self.spell.preInRage = self.spell.newRange;
-	end
-	CT_UpdateCooldown(self:GetParent().parent, self, elapsed)
-end
-
-local function OnUpdateCheckRange(frame, elapsed)
-	frame.curTime = GetTime()
-	if frame.curTime - (frame.delay or 0) < 0.1 then return end -- 10프레임
-	frame.delay = frame.curTime
-	-- print("check")
-
-	if not UnitExists('target') and not UnitExists('mouseover') then
-		frame:SetScript('OnUpdate', nil)
-	end
-end
-
--- 매 프레임마다 bar frame 그려줌, 콜백 함수
--- function CT_OnUpdateCooldown(self, elapsed)
--- 	CT_UpdateCooldown(self:GetParent():GetParent(), elapsed)
--- end 
-
--- 아이콘이 보이지 않도록 설정되면, 바에서 업데이트 처리를 한다
--- function HDH_C_TRACKER:OnUpdateBarValue(elapsed)
--- 	CT_UpdateCooldown(self:GetParent(), elapsed)
--- end
-
-local function HDH_AT_CooldownIconTemplate_OnCooldownStarted(cooldown)
-	local tracker = cooldown:GetParent():GetParent().parent
-	-- tracker:UpdateIcon(cooldown:GetParent())
-end
 
 local function HDH_AT_CooldownIconTemplate_OnCooldownFinished(cooldown)
 	local tracker = cooldown:GetParent():GetParent().parent
@@ -323,7 +185,7 @@ function HDH_C_TRACKER:UpdateIcon(f)
 			-- 이로 인하여, 쿨다운이 끝나고 스킬을 사용가능한것으로 보이나 글쿨로 인해서 스킬을 바로 사용하지 못하는 텀이 발생할 수 있으나
 			-- 글쿨보다 적은 시간이기 때문에 사용성 측면에서 용인 가능한 수준으로 판단됨
 			if isGlobalCooldown then
-				if show_global_cooldown and startTime >= spell.endTime then
+				if show_global_cooldown and (startTime >= spell.endTime or spell.endTime > (startTime + duration)) then
 					spell.startTime = startTime
 					spell.endTime = startTime + duration
 					spell.duration = duration
@@ -360,7 +222,7 @@ function HDH_C_TRACKER:UpdateIcon(f)
 	end
 
 	-- 쿨다운 상태 업데이트
-	if (spell.remaining > HDH_C_TRACKER.EndCooldown and not spell.isGlobalCooldown and spell.charges.count == 0) then
+	if (spell.remaining > HDH_C_TRACKER.EndCooldown and not spell.isGlobalCooldown ) then
 		f.icon:UpdateCooldowning()
 	else -- 스킬 쿨 아닌 상태
 		f.icon:UpdateCooldowning(false)
@@ -371,11 +233,6 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		end
 	end
 
-	-- 사용 가능 상태 업데이트
-	if not spell.isAble then
-		f.icon:SetDesaturated()
-	end
-
 	-- 색상 상태 업데이트
 	if not spell.inRange then
 		f.icon:SetOverlayColor(out_range_color[1], out_range_color[2], out_range_color[3], out_range_color[4])
@@ -383,6 +240,11 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		f.icon:SetOverlayColor(not_enough_mana_color[1], not_enough_mana_color[2], not_enough_mana_color[3], not_enough_mana_color[4])
 	else
 		f.icon:SetOverlayColor(nil)
+	end
+
+	-- 사용 가능 상태 업데이트
+	if not spell.isAble then
+		f.icon:SetDesaturated()
 	end
 
 	-- 쿨다운 업데이트
@@ -408,10 +270,9 @@ function HDH_C_TRACKER:UpdateIcon(f)
 	if f.bar then
 		f.bar:SetText(spell.name)
 		if spell.remaining > HDH_C_TRACKER.EndCooldown and not spell.isGlobalCooldown then
-			f.bar:SetMinMaxValues(spell.startTime, spell.endTime)
+			self:UpdateBarMinMaxValue(f, spell.startTime, spell.endTime, GetTime())
 		else
-			f.bar:SetMinMaxValues(0, 1)
-			f.bar:SetValue(1)
+			self:UpdateBarMinMaxValue(f, 0, 1, 1)
 		end
 	end
 
@@ -650,7 +511,7 @@ function HDH_C_TRACKER:UpdateIconSettings(f)
 	super.UpdateIconSettings(self, f)
 	local op_icon = self.ui.icon
 	f.icon:Setup(op_icon.size, op_icon.size, op_icon.cooldown, true, true, op_icon.spark_color, op_icon.cooldown_bg_color, op_icon.on_alpha, op_icon.off_alpha, op_icon.border_size)
-	f.icon:SetHandler(HDH_AT_CooldownIconTemplate_OnCooldownStarted, HDH_AT_CooldownIconTemplate_OnCooldownFinished)
+	f.icon:SetHandler(nil, HDH_AT_CooldownIconTemplate_OnCooldownFinished)
 end
 
 function HDH_C_TRACKER:CreateDummySpell(count)

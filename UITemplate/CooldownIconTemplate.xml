@@ -77,17 +77,11 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 	</Frame>
 
 	<Frame name="HDH_AT_CooldownIconTemplate" mixin="HDH_AT_CooldownIconTemplateMixin" virtual="true">
-		<Layers>
-			<Layer level="BORDER">
-				<Texture parentKey="Border" file="Interface/AddOns/HDH_AuraTracker/Texture/border2" setAllPoints="true">
-				</Texture>
-			</Layer>
-		</Layers>
 		<Frames>
 			<Frame parentKey="Icon">
 				<Layers>
 					<Layer level="ARTWORK">
-						<Texture parentKey="Texture" file="Interface/ICONS/TEMP"  setAllPoints="true" >
+						<Texture parentKey="Texture" file="Interface/ICONS/TEMP" setAllPoints="true" >
 							<TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93" />
 						</Texture>
 					</Layer>
@@ -102,6 +96,15 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 					<Frame parentKey="CircleCooldown" inherits="HDH_AT_CircleCooldownTemplate" setAllPoints="true">
 					</Frame>
 				</Frames> -->
+			</Frame>
+
+			<Frame parentKey="Border" setAllPoints="true">
+				<Layers>
+					<Layer level="BORDER">
+						<Texture parentKey="Texture" file="Interface/AddOns/HDH_AuraTracker/Texture/border2" setAllPoints="true">
+						</Texture>
+					</Layer>
+				</Layers>
 			</Frame>
 			
 			<Frame parentKey="Glow" setAllPoints="true" hidden="true">

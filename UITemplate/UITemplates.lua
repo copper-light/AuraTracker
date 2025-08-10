@@ -1425,7 +1425,6 @@ function HDH_AT_MultiStatusBarTemplateMixin:Setup(minMaxValues, points, pointTyp
 			newBar.Background:SetPoint('TOPLEFT', newBar, 'TOPLEFT', 0, 0)
 			newBar.Background:SetPoint('BOTTOMRIGHT', newBar, 'BOTTOMRIGHT', 0, 0)
 			newBar.Background:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg")
-            -- newBar.StatusBar.Spark = newBar:CreateTexture(nil, "OVERLAY")
             list[index] = newBar
 
             if self.direction == DB.COOLDOWN_LEFT or  self.direction == DB.COOLDOWN_DOWN then

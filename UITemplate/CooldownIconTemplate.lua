@@ -5,19 +5,6 @@ local DB = HDH_AT_ConfigDB
 -----------------------------------------------
 HDH_AT_BaseCooldownTemplateMixin = {}
 
--- function HDH_AT_BaseCooldownTemplateMixin:SetIconActive(bool)
--- 	-- if bool then
--- 	-- 	self.Icon:SetDesaturated(nil)
--- 	-- 	self.Icon:SetAlpha(self.onAlpha)
--- 	-- else
--- 	-- 	self.Icon:SetDesaturated(true)
--- 	-- 	self.Icon:SetAlpha(self.offAlpha)
--- 	-- end
--- 	if self.OnActivedFunc then
--- 		self.OnActivedFunc(self, bool)
--- 	end
--- end
-
 function HDH_AT_BaseCooldownTemplateMixin:SetTexture(texture)
 	if self.Progress then
 		self.Progress.Texture:SetTexture(texture)
@@ -51,9 +38,6 @@ function HDH_AT_CircleCooldownTemplate_OnFinished(self)
 end
 
 function HDH_AT_CircleCooldownTemplateMixin:SetTexture(texture)
-	-- if self.Progress then
-	-- 	self.Texture:SetTexture(texture)
-	-- end
 	self.Progress.Texture:SetTexture(texture)
 	self.Overlay.Texture:SetTexture(texture)
 
@@ -108,6 +92,8 @@ function HDH_AT_CircleCooldownTemplateMixin:Setup(cooldownType, toFill, color, t
 	self.toFill = toFill
 	self.Progress.Texture:SetAlpha(textureAlpha)
 	self.cooldownType = cooldownType
+	self.startValue = 0
+	self.duration = 0
 end
 
 function HDH_AT_CircleCooldownTemplateMixin:SetCooldown(startValue, duration, isTimer, isCharging)
@@ -209,7 +195,7 @@ function HDH_AT_LinearCooldownTemplateMixin:Setup(w, h, cooldownType, toFill, en
 	self.toFill = toFill
 	self.enableSpark = enableSpark
 	self.textureAlpha = textureAlpha
-	if not toFill then 
+	if toFill then 
 		if cooldownType == DB.COOLDOWN_UP then
 			cooldownType = DB.COOLDOWN_DOWN
 		elseif cooldownType == DB.COOLDOWN_DOWN then
@@ -219,33 +205,14 @@ function HDH_AT_LinearCooldownTemplateMixin:Setup(w, h, cooldownType, toFill, en
 		elseif cooldownType == DB.COOLDOWN_RIGHT then
 			cooldownType = DB.COOLDOWN_LEFT
 		end
+	else
+		
 	end
 	
 	self.Progress.Texture:SetAlpha(textureAlpha)
 
 	self.Spark:ClearAllPoints()
 	if cooldownType == DB.COOLDOWN_UP then
-		self.Progress:ClearAllPoints()
-		self.Progress:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
-		self.Progress:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0)
-		self.Progress:SetHeight(spark_size)
-		self.Progress.Texture:ClearAllPoints()
-		self.Progress.Texture:SetPoint("BOTTOM")
-
-		if enableSpark then
-			self.Spark:SetHeight(7)
-			self.Spark:SetPoint("LEFT", self.Progress, "TOPLEFT", 0, 0)
-			self.Spark:SetPoint("RIGHT", self.Progress, "TOPRIGHT", 0, 0)
-			self.Spark.Texture:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v")
-			self.Spark.Texture:SetVertexColor(unpack(color or {1,1,1,1}))
-		end
-
-		self.UpdateFunc = function(self, per)
-			self.Progress:SetHeight((self:GetHeight() * per))
-			-- self.Progress.Texture:SetTexCoord(0.07, 0.93, 0.07 + (0.86 * per), 0.93)
-		end
-		
-	elseif cooldownType == DB.COOLDOWN_DOWN then
 		self.Progress:ClearAllPoints()
 		self.Progress:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
 		self.Progress:SetPoint("TOPRIGHT", self, "TOPRIGHT", 0, 0)
@@ -257,6 +224,27 @@ function HDH_AT_LinearCooldownTemplateMixin:Setup(w, h, cooldownType, toFill, en
 			self.Spark:SetHeight(7)
 			self.Spark:SetPoint("LEFT", self.Progress, "BOTTOMLEFT", 0, 0)
 			self.Spark:SetPoint("RIGHT", self.Progress, "BOTTOMRIGHT", 0, 0)
+			self.Spark.Texture:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v")
+			self.Spark.Texture:SetVertexColor(unpack(color or {1,1,1,1}))
+		end
+
+		self.UpdateFunc = function(self, per)
+			self.Progress:SetHeight((self:GetHeight() * per))
+			-- self.Progress.Texture:SetTexCoord(0.07, 0.93, 0.07 + (0.86 * per), 0.93)
+		end
+
+	elseif cooldownType == DB.COOLDOWN_DOWN then
+		self.Progress:ClearAllPoints()
+		self.Progress:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", 0, 0)
+		self.Progress:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", 0, 0)
+		self.Progress:SetHeight(spark_size)
+		self.Progress.Texture:ClearAllPoints()
+		self.Progress.Texture:SetPoint("BOTTOM")
+
+		if enableSpark then
+			self.Spark:SetHeight(7)
+			self.Spark:SetPoint("LEFT", self.Progress, "TOPLEFT", 0, 0)
+			self.Spark:SetPoint("RIGHT", self.Progress, "TOPRIGHT", 0, 0)
 			self.Spark.Texture:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/UI-CastingBar-Spark_v")
 			self.Spark.Texture:SetVertexColor(unpack(color or {1,1,1,1}))
 		end
@@ -455,6 +443,7 @@ function HDH_AT_CooldownIconTemplate_OnCooldownFinished(cooldownFrame)
 end
 
 function HDH_AT_CooldownIconTemplateMixin:Setup(w, h, cooldownType, toFill, enableSpark, sparkColor, circleColor, onAlpha, offAlpha, borderSize)
+	self:SetSize(w, h)
 	if self.Cooldown then
 		self.Cooldown:Hide()
 		self.Cooldown = nil
@@ -477,11 +466,10 @@ function HDH_AT_CooldownIconTemplateMixin:Setup(w, h, cooldownType, toFill, enab
 		self.Cooldown = self.tmpLinear
 		self.Cooldown:Setup(w, h, cooldownType, toFill, enableSpark, sparkColor, onAlpha)
 	end
+	self:SetBorderSize(borderSize)
 	if self.Cooldown then
 		self.Cooldown:Show()
 	end
-	self:SetBorderSize(borderSize)
-	
 	local tmpTexutre = self.Icon.Texture:GetTexture()
 	if tmpTexutre then
 		self:SetTexture(tmpTexutre)
@@ -490,8 +478,15 @@ function HDH_AT_CooldownIconTemplateMixin:Setup(w, h, cooldownType, toFill, enab
 	self.offAlpha = offAlpha
 	self.isAble = true
 	self.toFill = toFill
-	self.Icon.Texture:SetAlpha(offAlpha)
+	if self.cooldownType ~= DB.COOLDOWN_NONE then
+		self.Icon.Texture:SetAlpha(offAlpha)
+	else
+		self.Icon.Texture:SetAlpha(onAlpha)
+	end
 	self.borderColor = self.borderColor or {1, 1, 1, 1}
+	
+	self.Border:SetFrameLevel(self.Icon:GetFrameLevel() + 3)
+	self.cooldownType = cooldownType
 end
 
 function HDH_AT_CooldownIconTemplateMixin:SetHandler(OnCooldownStarted, OnCooldownFinished)
@@ -507,15 +502,14 @@ function HDH_AT_CooldownIconTemplateMixin:SetBorderSize(borderSize)
 	local border = 0.2355 * (1 - (ICON_BORDER_VALUE[borderSize] or 0))
 	local size = 1 - (0.455 * (ICON_SIZE_VALUE[borderSize] or 0))
 
-	self.Border:SetTexCoord(border, 1 - border, border, 1 - border)
+	self.Border.Texture:SetTexCoord(border, 1 - border, border, 1 - border)
 	self.Icon:SetSize(self:GetWidth() * size, self:GetHeight() * size)
-	
 	self.borderSize = borderSize
 end
 
 function HDH_AT_CooldownIconTemplateMixin:SetBorderColor(r, g, b, a)
 	self.borderColor = {r, g, b, a}
-	self.Border:SetVertexColor(r, g, b, a)
+	self.Border.Texture:SetVertexColor(r, g, b, a)
 end
 
 function HDH_AT_CooldownIconTemplateMixin:SetTexture(texture)
@@ -527,13 +521,13 @@ function HDH_AT_CooldownIconTemplateMixin:GetTexture()
 	return self.Icon.Texture:GetTexture()
 end
 
-function HDH_AT_CooldownIconTemplateMixin:SetGlowType(t, color, tickPerSec)
+-- function HDH_AT_CooldownIconTemplateMixin:SetGlowType(t, color, tickPerSec)
 
-end
+-- end
 
-function HDH_AT_CooldownIconTemplateMixin:SetGlow(bool)
+-- function HDH_AT_CooldownIconTemplateMixin:SetGlow(bool)
 
-end
+-- end
 
 function HDH_AT_CooldownIconTemplateMixin:SetCooldown(startValue, duration, nonTimer)
 	self.Cooldown:SetCooldown(startValue, duration, (nonTimer == nil) and true or nonTimer)
@@ -559,39 +553,38 @@ function HDH_AT_CooldownIconTemplateMixin:UpdateCooldowning(bool)
 	bool = (bool == nil) and true or false
 	if bool then
 		if self.toFill then
-			self.Border:SetVertexColor(0, 0, 0, self.offAlpha)
+			self.Border.Texture:SetVertexColor(0, 0, 0, self.offAlpha)
 		else
-			self.Border:SetVertexColor(self.borderColor[1], self.borderColor[2], self.borderColor[3], self.borderColor[4])
+			self.Border.Texture:SetVertexColor(self.borderColor[1], self.borderColor[2], self.borderColor[3], self.borderColor[4])
 		end
-		self.Icon.Texture:SetAlpha(self.offAlpha)
-		self.Icon.Texture:SetDesaturated(true)
+		
+		if self.cooldownType ~= DB.COOLDOWN_NONE then
+			self.Icon.Texture:SetAlpha(self.offAlpha)
+			self.Icon.Texture:SetDesaturated(true)
+		end
 		if not self.Cooldown.Progress.Texture:IsShown() then
 			self.Cooldown:SetShownProgressTexture(true)
 		end
 	else
-		-- if self.Cooldown.Progress:IsShown() then
-		-- 	self.Cooldown.Progress:Hide()
-		-- 	if self.Cooldown.Spark then
-		-- 		self.Cooldown.Spark:Hide()
-		-- 	end
-		-- end
-		-- self.Cooldown:Stop()
-
 		if self.toFill then
 			self.Icon.Texture:SetAlpha(self.onAlpha)
 			self.Icon.Texture:SetDesaturated(false)
-			self.Border:SetVertexColor(self.borderColor[1], self.borderColor[2], self.borderColor[3], self.borderColor[4])
+			self.Border.Texture:SetVertexColor(self.borderColor[1], self.borderColor[2], self.borderColor[3], self.borderColor[4])
 		else
-			self.Icon.Texture:SetAlpha(self.offAlpha)
-			self.Icon.Texture:SetDesaturated(true)
-			self.Border:SetVertexColor(0, 0, 0, self.offAlpha)
+			if self.cooldownType ~= DB.COOLDOWN_NONE then
+				self.Icon.Texture:SetAlpha(self.offAlpha)
+				self.Icon.Texture:SetDesaturated(true)
+			end
+			self.Border.Texture:SetVertexColor(0, 0, 0, self.offAlpha)
 		end
 	end
 end
 
 function HDH_AT_CooldownIconTemplateMixin:SetDesaturated()
 	self.Icon.Texture:SetDesaturated(true)
+	self.Icon.Texture:SetAlpha(self.offAlpha)
 	self.Cooldown.Progress.Texture:Hide()
+	self.Border.Texture:SetVertexColor(0, 0, 0, self.offAlpha)
 end
 
 function HDH_AT_CooldownIconTemplateMixin:SetOverlayColor(r, g, b, a)

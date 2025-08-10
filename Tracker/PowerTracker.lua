@@ -1,14 +1,5 @@
-﻿CT_VERSION = 0.1
-HDH_POWER_TRACKER = {}
-
+﻿HDH_POWER_TRACKER = {}
 local DB = HDH_AT_ConfigDB
-
-local POWRE_BAR_SPLIT_MARGIN = 4;
-
-local MyClassKor, MyClass = UnitClass("player");
-
-
-
 ------------------------------------
 -- HDH_POWER_TRACKER class
 ------------------------------------
@@ -40,7 +31,6 @@ POWER_INFO[HDH_TRACKER.TYPE.POWER_RAGE]			= {power_type="RAGE", 			power_index =
 POWER_INFO[HDH_TRACKER.TYPE.POWER_FOCUS] 		= {power_type="FOCUS", 			power_index =2,		color={1.00, 0.50, 0.25, 1}, 	regen=true,  texture = "Interface/Icons/Ability_Fixated_State_Orange"};
 POWER_INFO[HDH_TRACKER.TYPE.POWER_ENERGY]		= {power_type="ENERGY",			power_index =3, 	color={1, 0.96, 0.41, 1}, 	  	regen=true,  texture = "Interface/Icons/Spell_Holy_PowerInfusion"};
 POWER_INFO[HDH_TRACKER.TYPE.POWER_RUNIC]    	= {power_type="RUNIC_POWER", 	power_index =6,		color={0, 0.82, 1, 1}, 			regen=false,  texture = "Interface/Icons/Spell_DeathKnight_FrozenRuneWeapon"};
-
 POWER_INFO[HDH_TRACKER.TYPE.POWER_FURY] 		= {power_type="FURY",			power_index =17, 	color={0.788, 0.259, 0.992, 1},	regen=false,  texture = "Interface/Icons/Spell_Shadow_SummonVoidWalker"};-- 17
 POWER_INFO[HDH_TRACKER.TYPE.POWER_PAIN] 		= {power_type="PAIN",			power_index =18,	color={1, 156/255, 0, 1}, 		regen=false,  texture = "Interface/Icons/Ability_Warlock_FireandBrimstone"}; -- 18
 
@@ -168,12 +158,12 @@ function HDH_POWER_TRACKER:CreateData()
 	self:UpdateSetting();
 end
 
-function HDH_POWER_TRACKER:IsHaveData()
+function HDH_POWER_TRACKER:GetElementCount()
 	local key = DB:GetTrackerElement(self.id, 1)
 	if (self.power_info.power_type .. '1') == key then
-		return true
+		return 1
 	else
-		return false
+		return 0
 	end
 end
 
@@ -189,10 +179,10 @@ function HDH_POWER_TRACKER:CreateDummySpell(count)
 	f:SetMouseClickEnabled(false);
 	if not f:GetParent() then f:SetParent(self.frame) end
 	if f.icon:GetTexture() == nil then
-		f.icon:SetTexture(self.power_info.texture);
+		f.icon:SetTexture(self.power_info.texture)
 	end
 	f:ClearAllPoints()
-	spell = {}
+	spell = f.spell or {}
 	spell.display = DB.SPELL_ALWAYS_DISPLAY
 	spell.id = 0
 	spell.count = 100
@@ -206,7 +196,6 @@ function HDH_POWER_TRACKER:CreateDummySpell(count)
 	spell.v1 = power_max
 	spell.max = power_max;
 	spell.splitValues = f.spell.splitValues
-	f.cd:Hide();
 	if ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 		if spell.showValue then
 			f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(spell.v1, self.ui.font.v1_abbreviate))
@@ -214,13 +203,10 @@ function HDH_POWER_TRACKER:CreateDummySpell(count)
 			f.v1:SetText('')
 		end
 		f.bar:Show()
-		f.bar:SetMinMaxValues(0,1)
-		f.bar:SetValue(1)
+		self:UpdateBarMinMaxValue(f, 0, 1, 1)
 	end
 	f.spell = spell
 	f.counttext:SetText("100%")
-	f.icon:SetAlpha(ui.icon.on_alpha)
-	f.border:SetAlpha(ui.icon.on_alpha)
 	self:SetGameTooltip(f, false)
 	f:Show()
 	return 1;
@@ -254,7 +240,7 @@ function HDH_POWER_TRACKER:Update() -- HDH_TRACKER override
 		f.spell.max = self:GetPowerMax()
 		f.spell.count = (f.spell.v1/f.spell.max * 100);
 		self:UpdateAllIcons()
-		if self.power_info.regen then
+		if self.power_info and self.power_info.regen then
 			if f.spell.max ~= f.spell.v1 and not UnitIsDead("player") then show = true end
 		elseif f.spell.v1 > 0 then show = true end
 	end
@@ -272,27 +258,33 @@ function HDH_POWER_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 	local f = self.frame.icon[1]
 	if f == nil or f.spell == nil then return end;
 	if f.spell.v1 > 0 then 
-		f.icon:SetDesaturated(nil)
-		f.icon:SetAlpha(self.ui.icon.on_alpha)
-		f.border:SetAlpha(self.ui.icon.on_alpha)
-		f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
+		-- f.icon:SetDesaturated(nil)
+		-- f.icon:SetAlpha(self.ui.icon.on_alpha)
+		-- f.border:SetAlpha(self.ui.icon.on_alpha)
+		-- f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
+		f.icon:UpdateCooldowning(false)
 		ret = 1;
 		self:UpdateGlow(f, true)
 		f:Show();
 	else
+		f.icon:UpdateCooldowning(true)
 		if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then
-			f.icon:SetDesaturated(1)
-			f.icon:SetAlpha(self.ui.icon.off_alpha)
-			f.border:SetAlpha(self.ui.icon.off_alpha)
-			f.border:SetVertexColor(0,0,0)
 			self:UpdateGlow(f, false)
 			f:Show();
 		else
 			f:Hide();
 		end
 	end
+	-- f.icon:SetCooldown(0, f.spell.max, false)
 	f:SetPoint('RIGHT');
 	return ret
+end
+
+function HDH_POWER_TRACKER:UpdateIconSettings(f)
+	super.UpdateIconSettings(self, f)
+	local op_icon = self.ui.icon
+	f.icon:Setup(op_icon.size, op_icon.size, op_icon.cooldown, true, true, op_icon.spark_color, op_icon.cooldown_bg_color, op_icon.on_alpha, op_icon.off_alpha, op_icon.border_size)
+	f.icon:SetHandler(nil, nil)
 end
 
 function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
@@ -318,10 +310,10 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 	self.frame:UnregisterAllEvents()
 	self.talentId = HDH_AT_UTIL.GetSpecialization()
 
-	if not self:IsHaveData() then
+	if self:GetElementCount() == 0 then
 		self:CreateData()
 	end
-	if self:IsHaveData() then
+	if self:GetElementCount() > 0 then
 		for i = 1 , elemSize do
 			elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 			glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
@@ -359,10 +351,11 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.splitPointType = splitPointType or DB.BAR_SPLIT_RATIO
 			f.spell = spell
 			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+
+			f.icon:UpdateCooldowning(false)
 			-- f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 			-- f.iconSatCooldown:SetDesaturated(nil)
 			-- f.iconSatCooldown:Hide()
-			self:ChangeCooldownType(f, self.ui.icon.cooldown)
 			self:UpdateGlow(f, false)
 			
 			f:SetScript("OnUpdate", HDH_POWER_OnUpdate);

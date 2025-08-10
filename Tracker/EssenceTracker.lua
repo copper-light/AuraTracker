@@ -106,7 +106,7 @@ function HDH_ESSENCE_TRACKER:CreateData()
 	end
 
 	for i = 1 , max_power do
-		if not self:IsHaveData(i) then
+		if self:GetElementCount(i) == 0 then
 			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, display, isValue, isItem)
 			DB:UpdateTrackerElementGlow(trackerId, i, DB.GLOW_CONDITION_VALUE, DB.CONDITION_GT_OR_EQ, max_power, DB.GLOW_EFFECT_COLOR_SPARK, self.POWER_INFO[self.type].color, 2)
 			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
@@ -144,22 +144,24 @@ function HDH_ESSENCE_TRACKER:CreateData()
 	end
 end
 
-function HDH_ESSENCE_TRACKER:IsHaveData(index)
+function HDH_ESSENCE_TRACKER:GetElementCount(index)
 	if index then
 		local key = DB:GetTrackerElement(self.id, index)
 		if (self.POWER_INFO[self.type].power_type .. index) ~= key then
-			return false
+			return 0
 		end
+		return 1
 	else
 		for i = 1 , UnitPowerMax('player', self.POWER_INFO[self.type].power_index) do
 			local key = DB:GetTrackerElement(self.id, i)
 			if (self.POWER_INFO[self.type].power_type .. i) ~= key then
-				return false
+				return 0
 			end
 		end 
+		return DB:GetTrackerElementSize(self.id)
 	end
 	
-	return true
+	
 end
 
 function HDH_ESSENCE_TRACKER:Update() -- HDH_TRACKER override
@@ -191,6 +193,7 @@ function HDH_ESSENCE_TRACKER:Update() -- HDH_TRACKER override
 			spell.v1 = power
 			spell.remaining = 0
 			spell.startTime = 0
+			spell.endTime = 0
 		else
 			if (power + 1) == i then
 				spell.duration = self.duration
@@ -210,6 +213,7 @@ function HDH_ESSENCE_TRACKER:Update() -- HDH_TRACKER override
 				spell.remaining = 0
 				spell.v1 = 0
 				spell.startTime = 0
+				spell.endTime = 0
 				spell.isUpdate = false
 			end
 		end

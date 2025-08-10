@@ -46,6 +46,11 @@ setmetatable(HDH_DK_RUNE_TRACKER, super) -- 상속
 HDH_DK_RUNE_TRACKER.__index = HDH_DK_RUNE_TRACKER
 HDH_DK_RUNE_TRACKER.className = "HDH_DK_RUNE_TRACKER"
 HDH_DK_RUNE_TRACKER.POWER_INFO = POWER_INFO
+
+
+local function HDH_DK_RUNE_TRACKER_CooldownFinished(self)
+	self:GetParent():GetParent().parent:Update()
+end
 	
 function HDH_DK_RUNE_TRACKER:CreateData()
 	local trackerId = self.id
@@ -103,15 +108,15 @@ function HDH_DK_RUNE_TRACKER:CreateData()
 	self:UpdateSetting();
 end
 
-function HDH_DK_RUNE_TRACKER:IsHaveData()
+function HDH_DK_RUNE_TRACKER:GetElementCount()
 	for i = 1 , MAX_RUNES do
 		local key = DB:GetTrackerElement(self.id, i)
 		if (self.POWER_INFO[self.type].power_type .. i) ~= key then
-			return false
+			return 0
 		end
 	end 
 
-	return true
+	return MAX_RUNES
 end
 
 function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
@@ -120,48 +125,46 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 
 	self:UpdateRune(f.spell.no)
 	if f.spell.remaining > 0.1 then
-		HDH_AT_UTIL.CT_StartTimer(f)
-		if not f.icon:IsDesaturated() then f.icon:SetDesaturated(1) end
 		f.counttext:SetText((f.spell.count ~= 0) and f.spell.count or nil)
-		f.cd:Show()
-		f.icon:SetAlpha(self.ui.icon.off_alpha)
-		f.border:SetAlpha(self.ui.icon.off_alpha)
-		f.border:SetVertexColor(0,0,0)
-		f.iconSatCooldown:Show()
-		if self.ui.icon.cooldown == DB.COOLDOWN_CIRCLE or self.ui.icon.cooldown == DB.COOLDOWN_NONE then
-			f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
-		else
-			f.cd:SetMinMaxValues(f.spell.startTime, f.spell.endTime)
-			f.cd:SetValue(f.spell.endTime - (GetTime() - f.spell.startTime))
-		end
+		f.icon:UpdateCooldowning()
+		-- f.cd:Show()
+		-- f.icon:SetAlpha(self.ui.icon.off_alpha)
+		-- f.border:SetAlpha(self.ui.icon.off_alpha)
+		-- f.border:SetVertexColor(0,0,0)
+		-- f.iconSatCooldown:Show()
+		-- if self.ui.icon.cooldown == DB.COOLDOWN_CIRCLE or self.ui.icon.cooldown == DB.COOLDOWN_NONE then
+		-- 	f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
+		-- else
+		-- 	f.cd:SetMinMaxValues(f.spell.startTime, f.spell.endTime)
+		-- 	f.cd:SetValue(f.spell.endTime - (GetTime() - f.spell.startTime))
+		-- end
+		f.icon:SetCooldown(f.spell.startTime, f.spell.duration)
 		self:UpdateGlow(f, false)
 		f:Show()
 		if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then
-			self:UpdateBarValue(f, f.spell.startTime, f.spell.endTime, GetTime())
+			self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, GetTime())
 		end
+		print(f.spell.no, "cool")
 	else
-		if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then 
-			self:UpdateBarValue(f, 0, 1, 1)
-			r,g,b,a = adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color)
-			f.bar:SetStatusBarColor(r,g,b,a);
+		if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then
+			self:UpdateBarMinMaxValue(f, 0, 1, 1)
+			if select(4, GetBuildInfo()) < 100000 then
+				f.bar:SetStatusBarColor(adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color))
+			end
 		end
-		f.icon:SetDesaturated(nil)
+		-- f.icon:SetDesaturated(nil)
 		f.timetext:SetText("");
 		if self.ui.display_mode ~= DB.DISPLAY_BAR and (f.spell.display == DB.SPELL_ALWAYS_DISPLAY)then 
-			f.icon:SetAlpha(self.ui.icon.on_alpha)
-			f.border:SetAlpha(self.ui.icon.on_alpha)
-
-			if select(4, GetBuildInfo()) >= 100000 then
-				f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
-			else
-				r,g,b,a = adjuistColor(self.ui.icon.active_border_color, OLD_DK_COLOR[f.spell.no].color)
-				f.border:SetVertexColor(r,g,b,a) 
+			-- f.icon:SetAlpha(self.ui.icon.on_alpha)
+			-- f.border:SetAlpha(self.ui.icon.on_alpha)
+			-- f.icon:Stop()
+			f.icon:UpdateCooldowning(false)
+			f.icon:Stop()
+			if select(4, GetBuildInfo()) < 100000 then
+				f.icon:SetBorderColor(adjuistColor(self.ui.icon.active_border_color, OLD_DK_COLOR[f.spell.no].color))
 			end
 
 			f.counttext:SetText(nil)
-			f.iconSatCooldown:Hide()
-			f.iconSatCooldown.spark:Hide()
-			f.cd:Hide() 
 			self:UpdateGlow(f, true)
 			f:Show()
 		else
@@ -171,25 +174,34 @@ function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
 	self:UpdateLayout()
 end
 
-if select(4, GetBuildInfo()) < 100000 then
-	
-end
-
 function HDH_DK_RUNE_TRACKER:UpdateBarSettings(f)
 	super.UpdateBarSettings(self, f)
 	if self.ui.common.display_mode == DB.DISPLAY_ICON then return end
 
-	local op = self.ui.bar
-	local r, g, b, a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
-	local normalColor = {r, g, b, a}
-	local fr, fg, fb, fa = adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color)
-	local fullColor = {fr, fg, fb, fa}
+	local op = self.ui.bar;
+	local font = self.ui.font;
+	local show_tooltip = self.ui.common.show_tooltip;
+	local display_mode = self.ui.common.display_mode
+	local hide_icon = (display_mode == DB.DISPLAY_BAR)
 
-	if op.use_full_color and not self.ui.common.default_color then
-		f.bar:UseChangedStatusColor(normalColor, fullColor)
-	else
-		f.bar:UseChangedStatusColor(nil)
-		f.bar:SetStatusBarColor(unpack(normalColor))
+	if f.spell then
+		local op = self.ui.bar
+		local r, g, b, a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
+		local fr, fg, fb, fa = adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color)
+		local normalColor = {r, g, b, a}
+		local fullColor = {fr, fg, fb, fa}
+
+		if select(4, GetBuildInfo()) >= 100000 then
+			normalColor = self.ui.bar.color
+			fullColor = self.ui.bar.full_color
+		end
+
+		if op.use_full_color then
+			f.bar:UseChangedStatusColor(normalColor, fullColor)
+		else
+			f.bar:UseChangedStatusColor(nil)
+			f.bar:SetStatusBarColor(unpack(normalColor))
+		end
 	end
 end
 
@@ -324,7 +336,7 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 	self.frame:UnregisterAllEvents()
 	self.talentId = HDH_AT_UTIL.GetSpecialization()
 
-	if not self:IsHaveData() then
+	if self:GetElementCount() == 0 then
 		self:CreateData()
 	end
 
@@ -368,11 +380,11 @@ function HDH_DK_RUNE_TRACKER:InitIcons()
 		spell.charges.remaining = 0
 		spell.charges.startTime = 0
 		spell.charges.endTime = 0
-
+		
 		f.spell = spell
 		f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-		f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-
+		f.icon:SetHandler(nil, HDH_DK_RUNE_TRACKER_CooldownFinished)
+		self:UpdateBarSettings(f)
 		self:UpdateGlow(f, false)
 		f:Hide()
 	end
@@ -392,11 +404,8 @@ end
 
 function HDH_DK_RUNE_TRACKER:OnEvent(event, ...)
 	if not self.parent then return end
-	if ( event == "RUNE_POWER_UPDATE" ) then	
-		local runeIndex, isEnergize = ...;
-		if runeIndex and runeIndex >= 1 and runeIndex <= MAX_RUNES then
-			self.parent:Update();
-		end
+	if ( event == "RUNE_POWER_UPDATE" ) then
+		self.parent:Update()
 	elseif ( event == "RUNE_TYPE_UPDATE" ) then
 		local runeIndex = ...;
 		if ( runeIndex and runeIndex >= 1 and runeIndex <= MAX_RUNES ) then

@@ -118,12 +118,12 @@ function HDH_STAGGER_TRACKER:CreateData()
 	self:UpdateSetting();
 end
 
-function HDH_STAGGER_TRACKER:IsHaveData(spec)
+function HDH_STAGGER_TRACKER:GetElementCount(spec)
 	local key = DB:GetTrackerElement(self.id, 1)
 	if (STAGGER_KEY) == key then
-		return true
+		return 1
 	else
-		return false
+		return 0
 	end
 end
 
@@ -136,10 +136,10 @@ function HDH_STAGGER_TRACKER:CreateDummySpell(count)
 	f:SetMouseClickEnabled(false);
 	if not f:GetParent() then f:SetParent(self.frame) end
 	if f.icon:GetTexture() == nil then
-		f.icon:SetTexture(STAGGER_INFO[1].green_texture);
+		f.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[1].texture);
 	end
 	f:ClearAllPoints()
-	spell = {}
+	spell = f.spell or {}
 	spell.display = DB.SPELL_ALWAYS_DISPLAY
 	spell.id = 0
 	spell.count = 100
@@ -154,7 +154,6 @@ function HDH_STAGGER_TRACKER:CreateDummySpell(count)
 	spell.max = health_max;
 	spell.splitValues = f.spell.splitValues
 
-	f.cd:Hide();
 	if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 		f:SetScript("OnUpdate",nil);
 		if spell.showValue then
@@ -169,33 +168,40 @@ function HDH_STAGGER_TRACKER:CreateDummySpell(count)
 	end
 	f.spell = spell
 	f.counttext:SetText("100%")
-	f.icon:SetAlpha(ui.icon.on_alpha)
-	f.border:SetAlpha(ui.icon.on_alpha)
 	self:SetGameTooltip(f, false)
 	f:Show()
 	return 1;
 end
 
-function HDH_STAGGER_TRACKER:Update() -- HDH_TRACKER override
-	if not self.frame or not self.frame.icon or HDH_TRACKER.ENABLE_MOVE then return end
-	local f = self.frame.icon[1]
-	local show
-	if f and f.spell then
-		f.spell.v1 = UnitStagger('player') or 0;
-		f.spell.max = UnitHealthMax('player');
-		f.spell.count = (f.spell.v1/f.spell.max * 100);
-		if f.spell.v1 > 0 then 
-			show = true
-		end
-		self:UpdateAllIcons()
-	end
-	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
-		and (UnitAffectingCombat("player") or show or self.ui.common.always_show) then
-		self:ShowTracker();
-	else
-		self:HideTracker();
-	end
+
+function HDH_STAGGER_TRACKER:GetPower()
+	return UnitStagger('player') or 0;
 end
+
+function HDH_STAGGER_TRACKER:GetPowerMax()
+	return UnitHealthMax('player');
+end
+
+-- function HDH_STAGGER_TRACKER:Update() -- HDH_TRACKER override
+-- 	if not self.frame or not self.frame.icon or HDH_TRACKER.ENABLE_MOVE then return end
+-- 	local f = self.frame.icon[1]
+-- 	local show
+-- 	if f and f.spell then
+-- 		f.spell.v1 = UnitStagger('player') or 0;
+-- 		f.spell.max = UnitHealthMax('player');
+-- 		f.spell.count = (f.spell.v1/f.spell.max * 100);
+-- 		if f.spell.v1 > 0 then 
+-- 			show = true
+-- 		end
+-- 		self:UpdateAllIcons()
+-- 	end
+-- 	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
+-- 		and (UnitAffectingCombat("player") or show or self.ui.common.always_show) then
+-- 		self:ShowTracker();
+-- 	else
+-- 		self:HideTracker();
+-- 	end
+-- end
 
 function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 	local trackerId = self.id
@@ -217,10 +223,10 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 	
 	self.talentId = HDH_AT_UTIL.GetSpecialization()
 
-	if not self:IsHaveData() then
+	if self:GetElementCount() == 0 then
 		self:CreateData()
 	end
-	if self:IsHaveData() then
+	if self:GetElementCount() > 0 then
 		for i = 1 , elemSize do
 			elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
 			glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
@@ -256,9 +262,8 @@ function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
 			spell.showPer = true;
 			spell.splitPoints = splitValues
 			spell.splitPointType = splitType
+			spell.isOn = nil
 		
-			f.cooldown1:Hide()
-			f.cooldown2:Hide()
 			f.icon:SetTexture(texture)
 		
 			f.spell = spell

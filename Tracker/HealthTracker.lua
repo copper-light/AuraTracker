@@ -83,10 +83,7 @@ do -- HDH_HEALTH_TRACKER class
 			f.bar.absorb_f.texture = absorb
 		end
 	end
-	
-	function HDH_HEALTH_TRACKER:ChangeCooldownType(f, cooldown_type) -- 호출되지 말라고 빈함수
-	end
-	
+
 	local s2 = sqrt(2);
 	local cos, sin, rad = math.cos, math.sin, math.rad;
 	local function CalculateCorner(angle)

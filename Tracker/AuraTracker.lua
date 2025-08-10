@@ -245,9 +245,9 @@ do
 							f.spell.remaining = 0
 							f.spell.endTime = 1
 							f.spell.startTime = 0
-							self:UpdateBarValue(f, f.spell.startTime, f.spell.endTime, 0)
+							self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, 0)
 						else
-							self:UpdateBarValue(f, f.spell.startTime, f.spell.endTime, GetTime())
+							self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, GetTime())
 						end
 					end
 					f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
@@ -286,7 +286,7 @@ do
 							if self.ui.common.default_color and f.spell.dispelType then
 								f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r, DebuffTypeColor[f.spell.dispelType or ""].g, DebuffTypeColor[f.spell.dispelType or ""].b, 1)
 							end
-							self:UpdateBarValue(f, 0, 1, 1);
+							self:UpdateBarMinMaxValue(f, 0, 1, 1);
 						end--f.bar:Hide();)
 						f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
 						i = i + 1

@@ -22,68 +22,63 @@ HDH_TT_TRACKER.AdjustSpell[L.RAISE_DEAD] = "46585"
 ------------------------------------
 -- HDH_T_TRACKER class
 ------------------------------------
-do 
+do
 	setmetatable(HDH_TT_TRACKER, HDH_AURA_TRACKER) -- 상속
 	HDH_TT_TRACKER.__index = HDH_TT_TRACKER
 	HDH_TT_TRACKER.className = "HDH_TT_TRACKER"
 	HDH_TRACKER.TYPE.TOTEM = 4
 	HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.TOTEM, HDH_TT_TRACKER)
-	
+
 	function HDH_TT_TRACKER:Update(...) -- HDH_TRACKER override
 		if not self.frame or HDH_TRACKER.ENABLE_MOVE then return end
 		local haveTotem, name, startTime, duration, icon, endTime
-		local slot = ... or MAX_TOTEMS
+		-- local slot = ... or MAX_TOTEMS
 		local ui = self.ui
 		local f
 		local key
-		local ret = 1;
+		local ret = 1
+
 		if not self.frame.pointer or not ui then return end
-		if ( slot <= MAX_TOTEMS ) then
-			for i =1, MAX_TOTEMS do
-				haveTotem, name, startTime, duration, icon = GetTotemInfo(i)
-				if haveTotem then
-					if self.aura_filter == DB.AURA_FILTER_ALL then
-						f = self.frame.icon[ret];
-						f.spell = {};
-						f.spell.icon = icon;
-						f.icon:SetTexture(icon);
-						f.iconSatCooldown:SetTexture(icon)
-						f.no = i;
-						ret = ret +1;
-					else
-						key = HDH_TT_TRACKER.AdjustSpell[name] or name
-						f = self.frame.pointer[key];
+		for i =1, MAX_TOTEMS do
+			haveTotem, name, startTime, duration, icon = GetTotemInfo(i)
+			if haveTotem then
+				if self.aura_filter == DB.AURA_FILTER_ALL then
+					f = self.frame.icon[ret]
+					f.spell = {}
+					f.spell.icon = icon
+					f.icon:SetTexture(icon)
+					f.no = i
+					ret = ret +1
+				else
+					key = HDH_TT_TRACKER.AdjustSpell[name] or name
+					f = self.frame.pointer[key]
+				end
+				if f and f.spell then
+					f.spell.duration = duration
+					f.spell.count = 0
+					f.spell.overlay = 0
+					f.spell.startTime = startTime
+					f.spell.isUpdate = true
+					f.spell.name = name
+					endTime = startTime + duration
+					f.spell.remaining = endTime - GetTime()
+					if f.spell.endTime ~= endTime then
+						f.spell.endTime = endTime;
+						f.spell.happenTime = GetTime()
 					end
-					if f and f.spell then
-						f.spell.duration = duration
-						f.spell.count = 0
-						f.spell.overlay = 0
-						f.spell.startTime = startTime
-						f.spell.isUpdate = true
-						f.spell.name = name
-						endTime = startTime + duration;
-						f.spell.remaining = endTime - GetTime();
-						if f.spell.endTime ~= endTime then
-							f.spell.endTime = endTime;
-							f.spell.happenTime = GetTime();
-						end
-						f.spell.slot = i;
-						f.spell.isUpdate = true;
-					end
+					f.spell.slot = i
 				end
 			end
 		end
 		if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
 				and ((self:UpdateAllIcons() > 0) or self.ui.common.always_show or UnitAffectingCombat("player")) then
-			self:ShowTracker();
+			self:ShowTracker()
 		else
-			self:HideTracker();
+			self:HideTracker()
 		end
 	end
 
-	
 	function HDH_TT_TRACKER:InitIcons() -- HDH_TRACKER override
-		-- if HDH_TRACKER.ENABLE_MOVE then return end
 		local trackerId = self.id
 		local id, name, type, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
 		self.aura_filter = aura_filter
@@ -92,9 +87,9 @@ do
 		local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
 		local connectedId, connectedIsItem, unlearnedHideMode
 		local elemSize = DB:GetTrackerElementSize(trackerId)
-		local spell 
+		local spell
 		local f
-		local iconIdx = 0;
+		local iconIdx = 0
 		local isLearned = false
 		local needEquipmentEvent = false
 		self.frame.pointer = {}
@@ -145,14 +140,11 @@ do
 					spell.remaining = 0
 					spell.overlay = 0
 					spell.endTime = 0
-					spell.is_buff = isBuff;
+					-- spell.is_buff = isBuff;
 					spell.isUpdate = false
 					spell.isItem =  isItem
 					f.spell = spell
 					f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-					f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-					f.iconSatCooldown:SetDesaturated(nil)
-					self:ChangeCooldownType(f, self.ui.icon.cooldown)
 					self:UpdateGlow(f, false)
 					self.frame.pointer[spell.name] = f;
 				end
@@ -166,14 +158,12 @@ do
 		if #(self.frame.icon) > 0 or aura_filter == DB.AURA_FILTER_ALL then
 			self.frame:SetScript("OnEvent", HDH_TT_OnEvent)
 			self.frame:RegisterEvent("PLAYER_TOTEM_UPDATE");
-			--self.frame:RegisterEvent("UPDATE_SHAPESHIFT_FORM");
 			if needEquipmentEvent then
 				self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
 			end
 		end
 		self:Update()
 	end
-	
 end
 
 
