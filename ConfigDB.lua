@@ -104,6 +104,18 @@ CONFIG.INNER_CD_BUFF = 1
 CONFIG.BAR_SPLIT_RATIO = 1
 CONFIG.BAR_SPLIT_FIXED_VALUE = 2
 
+CONFIG.BAR_VALUE_TYPE_TIME = 1
+CONFIG.BAR_VALUE_TYPE_COUNT = 2
+CONFIG.BAR_VALUE_TYPE_VALUE = 3
+
+CONFIG.BAR_MAXVALUE_TYPE_CUSTOM = 1
+CONFIG.BAR_MAXVALUE_TYPE_TIME = 2
+CONFIG.BAR_MAXVALUE_TYPE_COUNT = 3
+CONFIG.BAR_MAXVALUE_TYPE_HEALTH = 4
+CONFIG.BAR_MAXVALUE_TYPE_MANA = 5
+CONFIG.BAR_MAXVALUE_TYPE_POWER = 6
+ 
+
 local DEFAULT_DISPLAY = { 
 
     -- 기본 설정
@@ -446,28 +458,74 @@ function HDH_AT_ConfigDB:VersionUpdateDB()
 		end
 		DB:SetVersion(3.0)
 	end
+    DB:SetVersion(3.0)
 
-	if DB:GetVersion() == 3.0 then
-		for _, trackerId in ipairs(DB:GetTrackerIds()) do
-			local id, name, type, unit, aura_filter, aura_caster, trait = DB:GetTrackerInfo(id)
-			if HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM == type then
-				for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
-					if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
-						local values = DB:GetTrackerElementSplitValues(trackerId, elemIdx)
-						local newValues = {}
-						if values and #values > 0 then
-							for _, v in ipairs(values) do 
-								v = math.floor(v / 10)
-								table.insert(newValues, v)
-							end
-							DB:SetTrackerElementSplitValues(trackerId, elemIdx, values)
-						end
-					end
-				end
-			end
-		end
-		DB:SetVersion(3.1)
-	end
+	-- if DB:GetVersion() == 3.0 then
+	-- 	for _, trackerId in ipairs(DB:GetTrackerIds()) do
+	-- 		local id, name, type, unit, aura_filter, aura_caster, trait = DB:GetTrackerInfo(id)
+	-- 		if HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM == type then
+	-- 			for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
+	-- 				if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
+	-- 					local _, _, _, _, values = DB:GetTrackerElementBarInfo(trackerId, elemIdx)
+	-- 					local newValues = {}
+	-- 					if values and #values > 0 then
+	-- 						for _, v in ipairs(values) do 
+	-- 							v = math.floor(v / 10)
+	-- 							table.insert(newValues, v)
+	-- 						end
+	-- 						DB:SetTrackerElementBarInfo(trackerId, elemIdx, nil, nil, nil, nil, values)
+	-- 					end
+	-- 				end
+	-- 			end
+	-- 		end
+	-- 	end
+	-- 	DB:SetVersion(3.1)
+	-- end
+
+
+    -- if DB:GetVersion() == 3.1 then
+	-- 	for _, trackerId in ipairs(DB:GetTrackerIds()) do
+	-- 		local id, name, trackerType, unit, aura_filter, aura_caster, trait = DB:GetTrackerInfo(id)
+    --         for elemIdx = 1, DB:GetTrackerElementSize(trackerId) or 0 do
+    --             if HDH_AT_DB.tracker and HDH_AT_DB.tracker[trackerId] and HDH_AT_DB.tracker[trackerId].element[elemIdx] then
+    --                 local barValueType, barMaxValueType, barMaxValue, splitValues, splitType = DB:GetTrackerElementBarInfo(trackerId, elemIdx)
+                    
+    --                 local className = HDH_TRACKER.GetClass(trackerType):GetClassName()
+
+    --                 if className =="HDH_AURA_TRACKER" or className =="HDH_C_TRACKER" or className =="HDH_TT_TRACKER" then
+    --                     barValueType = CONFIG.BAR_VALUE_TYPE_TIME
+    --                     barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_TIME
+
+    --                 elseif className =="HDH_COMBO_POINT_TRACKER" or className=="HDH_ESSENCE_TRACKER" then
+    --                     barValueType = CONFIG.BAR_VALUE_TYPE_VALUE
+    --                     barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_COMBO
+
+    --                 elseif className =="HDH_HEALTH_TRACKER" then
+    --                     barValueType = CONFIG.BAR_VALUE_TYPE_TIME
+    --                     barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_HEALTH
+
+    --                 elseif className =="HDH_DK_RUNE_TRACKER" then
+    --                     barValueType = CONFIG.BAR_VALUE_TYPE_TIME
+    --                     barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_TIME
+
+    --                 elseif className =="HDH_ENH_MAELSTROM_TRACKER" then
+    --                     barValueType = CONFIG.BAR_VALUE_TYPE_TIME
+    --                     barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_TIME
+                        
+    --                 elseif className =="HDH_POWER_TRACKER" then
+    --                     barValueType = CONFIG.BAR_VALUE_TYPE_TIME
+    --                     barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_TIME
+
+    --                 elseif className == "HDH_STAGGER_TRACKER" then
+                        
+    --                 end
+
+    --                 DB:SetTrackerElementBarInfo(trackerId, elemIdx, barValueType, barMaxValueType, barMaxValue, splitValues, splitType)
+    --             end
+	-- 		end
+	-- 	end
+	-- 	DB:SetVersion(3.2)
+	-- end
 end
 
 function HDH_AT_ConfigDB:GetVersion()
@@ -764,16 +822,28 @@ function HDH_AT_ConfigDB:UpdateTrackerElementValue(trackerId, elementIndex, bool
     element.isValue = bool
 end
 
-function HDH_AT_ConfigDB:SetTrackerElementSplitValues(trackerId, elementIndex, splitValues, splitType)
+function HDH_AT_ConfigDB:SetTrackerElementBarInfo(trackerId, elementIndex, barValueType, barMaxValueType, barMaxValue, splitValues, splitType)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
     element.splitValues = splitValues
     element.splitType = splitType or CONFIG.BAR_SPLIT_RATIO
+    element.barValueType = barValueType
+    element.barMaxValueType = barMaxValueType
+    element.barMaxValue = barMaxValue
 end
 
-function HDH_AT_ConfigDB:GetTrackerElementSplitValues(trackerId, elementIndex)
+function HDH_AT_ConfigDB:GetTrackerElementBarInfo(trackerId, elementIndex)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
+    local barValueType, barMaxValueType, barMaxValue
     if element then
-        return UTIL.Deepcopy(element.splitValues), element.splitType or CONFIG.BAR_SPLIT_RATIO
+        if not element.barValueType then
+            barValueType, barMaxValueType, barMaxValue = self:GetDefaultBarInfo(HDH_AT_DB.tracker[trackerId].type)
+        end
+
+        return element.barValueType or barValueType, 
+                element.barMaxValueType or barMaxValueType, 
+                element.barMaxValue or barMaxValue, 
+                UTIL.Deepcopy(element.splitValues or {}), 
+                element.splitType or CONFIG.BAR_SPLIT_RATIO
     else
         return nil
     end
@@ -966,4 +1036,40 @@ function HDH_AT_ConfigDB:VaildationProfile(data)
         end
     end
     return #data
+end
+
+function HDH_AT_ConfigDB:GetDefaultBarInfo(trackerType)
+    local className = HDH_TRACKER.GetClass(trackerType):GetClassName()
+    local barValueType, barMaxValueType, barMaxValue
+    if className =="HDH_AURA_TRACKER" or className =="HDH_C_TRACKER" or className =="HDH_TT_TRACKER" then
+        barValueType = CONFIG.BAR_VALUE_TYPE_TIME
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_TIME
+
+    elseif className =="HDH_COMBO_POINT_TRACKER" or className=="HDH_ESSENCE_TRACKER" then
+        barValueType = CONFIG.BAR_VALUE_TYPE_COUNT
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_CUSTOM
+        barMaxValue = 1
+
+    elseif className =="HDH_HEALTH_TRACKER" then
+        barValueType = CONFIG.BAR_VALUE_TYPE_VALUE
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_HEALTH
+
+    elseif className =="HDH_DK_RUNE_TRACKER" then
+        barValueType = CONFIG.BAR_VALUE_TYPE_TIME
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_TIME
+
+    elseif className =="HDH_ENH_MAELSTROM_TRACKER" then
+        barValueType = CONFIG.BAR_VALUE_TYPE_COUNT
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_CUSTOM
+        
+    elseif className =="HDH_POWER_TRACKER" then
+        barValueType = CONFIG.BAR_VALUE_TYPE_VALUE
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_POWER
+
+    elseif className == "HDH_STAGGER_TRACKER" then
+        barValueType = CONFIG.BAR_VALUE_TYPE_VALUE
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_HEALTH
+    end
+
+    return barValueType, barMaxValueType, barMaxValue
 end

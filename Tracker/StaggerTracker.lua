@@ -11,8 +11,8 @@ local STAGGER_KEY = "STAGGER"
 -- 	GREEN 	= { key = "green" }
 -- }
 
-local STAGGER_RED_TRANSITION = _G.STAGGER_RED_TRANSITION or 0.60  -- wow global var : 0.6
-local STAGGER_YELLOW_TRANSITION = _G.STAGGER_YELLOW_TRANSITION  or 0.30-- wow global var : 0.3
+local STAGGER_RED_TRANSITION = 60  -- wow global var : 0.6
+local STAGGER_YELLOW_TRANSITION = 30-- wow global var : 0.3
 local info = PowerBarColor[STAGGER_KEY]
 
 local STAGGER_GREEN_INDEX = info[1] and 1 or "green"
@@ -95,7 +95,7 @@ function HDH_STAGGER_TRACKER:CreateData()
 	local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
 	DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 	DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_COUNT, DB.CONDITION_GT_OR_EQ, STAGGER_RED_TRANSITION * 100)
-	DB:SetTrackerElementSplitValues(trackerId, elemIdx, HDH_STAGGER_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_RATIO)
+	DB:SetTrackerElementBarInfo(trackerId, elemIdx, HDH_STAGGER_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_RATIO)
 
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON_AND_BAR)
@@ -182,116 +182,20 @@ function HDH_STAGGER_TRACKER:GetPowerMax()
 	return UnitHealthMax('player');
 end
 
--- function HDH_STAGGER_TRACKER:Update() -- HDH_TRACKER override
--- 	if not self.frame or not self.frame.icon or HDH_TRACKER.ENABLE_MOVE then return end
--- 	local f = self.frame.icon[1]
--- 	local show
--- 	if f and f.spell then
--- 		f.spell.v1 = UnitStagger('player') or 0;
--- 		f.spell.max = UnitHealthMax('player');
--- 		f.spell.count = (f.spell.v1/f.spell.max * 100);
--- 		if f.spell.v1 > 0 then 
--- 			show = true
--- 		end
--- 		self:UpdateAllIcons()
--- 	end
--- 	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
--- 		and (UnitAffectingCombat("player") or show or self.ui.common.always_show) then
--- 		self:ShowTracker();
--- 	else
--- 		self:HideTracker();
--- 	end
--- end
-
-function HDH_STAGGER_TRACKER:InitIcons() -- HDH_TRACKER override
-	local trackerId = self.id
-	local id, name, _, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
-	self.aura_filter = aura_filter
-	self.aura_caster = aura_caster
-	if not id then 
-		return 
-	end
-
-	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitValues, splitType, glowEffectType, glowEffectColor, glowEffectPerSec
-	local elemSize = DB:GetTrackerElementSize(trackerId)
-	local spell 
-	local f
-	local iconIdx = 0
-
-	self.frame.pointer = {}
-	self.frame:UnregisterAllEvents()
-	
-	self.talentId = HDH_AT_UTIL.GetSpecialization()
-
-	if self:GetElementCount() == 0 then
-		self:CreateData()
-	end
-	if self:GetElementCount() > 0 then
-		for i = 1 , elemSize do
-			elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-			glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
-			splitValues, splitType = DB:GetTrackerElementSplitValues(trackerId, i)
-
-			iconIdx = iconIdx + 1
-			f = self.frame.icon[iconIdx]
-			if f:GetParent() == nil then f:SetParent(self.frame) end
-			self.frame.pointer[elemKey or tostring(elemId)] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
-			spell = {}
-			spell.glow = glowType
-			spell.glowCondtion = glowCondition
-			spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-			spell.glowEffectType = glowEffectType
-			spell.glowEffectColor = glowEffectColor
-			spell.glowEffectPerSec = glowEffectPerSec
-			spell.showValue = isValue
-			spell.display = display
-			spell.v1 = 0 -- 수치를 저장할 변수
-			spell.no = i
-			spell.name = elemName
-			spell.icon = texture
-			spell.id = tonumber(elemId)
-			spell.count = 0
-			spell.duration = 0
-			spell.remaining = 0
-			spell.overlay = 0
-			spell.endTime = 0
-			spell.startTime = 0
-			spell.is_buff = isBuff;
-			spell.isUpdate = false
-			spell.isItem =  isItem
-			spell.showPer = true;
-			spell.splitPoints = splitValues
-			spell.splitPointType = splitType
-			spell.isOn = nil
-		
-			f.icon:SetTexture(texture)
-		
-			f.spell = spell
-			f:SetScript("OnUpdate", STAGGER_TRACKER_OnUpdate)
-			f:Hide();
-			self:UpdateGlow(f, false)
-
-			if self.ui.common.display_mode ~= DB.DISPLAY_ICON then
-				self:UpdateBarSettings(f)
-			end
+function HDH_STAGGER_TRACKER:InitIcons()
+	local ret = super.InitIcons(self)
+	if ret then
+		for i = 1 , ret do
+			self.frame.icon[i]:SetScript("OnUpdate", STAGGER_TRACKER_OnUpdate)
 		end
-	else
 		self.frame:UnregisterAllEvents()
+		self:Update()
 	end
-	
-	for i = #self.frame.icon, iconIdx+1 , -1 do
-		self:ReleaseIcon(i)
-	end
-	self:Update()
-	return iconIdx
+	return ret
 end
 
-function HDH_STAGGER_TRACKER:ACTIVE_TALENT_GROUP_CHANGED()
-	self:InitIcons()
-end
-
-function HDH_STAGGER_TRACKER:PLAYER_ENTERING_WORLD()
-end
+-- function HDH_STAGGER_TRACKER:PLAYER_ENTERING_WORLD()
+-- end
 
 ------------------------------------
 -- HDH_STAGGER_TRACKER class

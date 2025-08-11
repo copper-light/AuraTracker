@@ -237,30 +237,20 @@ function HDH_ESSENCE_TRACKER:Update() -- HDH_TRACKER override
 		end
 	end
 
-	
-	return ret;
+	return power
 end
 
 function HDH_ESSENCE_TRACKER:InitIcons()
-	super.InitIcons(self)
-	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-	for i = 1, power_max do
+	local ret = super.InitIcons(self)
+	for i = 1, ret do
 		self.frame.icon[i]:SetScript("OnUpdate", OnUpdate)
 	end
 end
 
--- function HDH_ESSENCE_TRACKER:PLAYER_ENTERING_WORLD()
--- 	-- empty
--- end
-
--- function HDH_ESSENCE_TRACKER:OnEvent(event, unit, powerType)
--- 	-- empty
--- end
 ------------------------------------
 -- HDH_ESSENCE_TRACKER class
 ------------------------------------
----
----
+
 function HDH_ESSENCE_TRACKER:UNIT_POWER_UPDATE()
 	if not HDH_TRACKER.ENABLE_MOVE then
 		self.power = nil

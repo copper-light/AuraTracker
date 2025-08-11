@@ -4,7 +4,7 @@ HDH_C_TRACKER = {}
 ------------------------------------
 -- HDH_C_TRACKER class
 ------------------------------------
-local super = HDH_AURA_TRACKER
+local super = HDH_TRACKER
 setmetatable(HDH_C_TRACKER, super) -- 상속
 HDH_C_TRACKER.__index = HDH_C_TRACKER
 HDH_C_TRACKER.className = "HDH_C_TRACKER"
@@ -25,30 +25,30 @@ end
 
 ------- HDH_C_TRACKER member function -----------	
 
-function HDH_C_TRACKER:UpdateState(id, name, isItem, isToy)
-	local inRange, isAble, isNotEnoughMana
-	if isItem then
-		inRange = C_Item.IsItemInRange(id, "target")
-		if not isToy then
-			isAble = C_Item.IsUsableItem(id)
-		else
-			isAble = true
-		end
-		isNotEnoughMana = false
-	else
-		inRange = HDH_AT_UTIL.IsSpellInRange(name, "target")
-		isAble, isNotEnoughMana = HDH_AT_UTIL.IsSpellUsable(id)
-		isAble = isAble or isNotEnoughMana
-	end
-end
+-- function HDH_C_TRACKER:UpdateState(id, name, isItem, isToy)
+-- 	local inRange, isAble, isNotEnoughMana
+-- 	if isItem then
+-- 		inRange = C_Item.IsItemInRange(id, "target")
+-- 		if not isToy then
+-- 			isAble = C_Item.IsUsableItem(id)
+-- 		else
+-- 			isAble = true
+-- 		end
+-- 		isNotEnoughMana = false
+-- 	else
+-- 		inRange = HDH_AT_UTIL.IsSpellInRange(name, "target")
+-- 		isAble, isNotEnoughMana = HDH_AT_UTIL.IsSpellUsable(id)
+-- 		isAble = isAble or isNotEnoughMana
+-- 	end
+-- end
 
-function HDH_C_TRACKER:UpdateCount(id, name, isItem, isToy)
+-- function HDH_C_TRACKER:UpdateCount(id, name, isItem, isToy)
 
-end
+-- end
 
-function HDH_C_TRACKER:UpdateCooldown(id, name, isItem, isToy)
+-- function HDH_C_TRACKER:UpdateCooldown(id, name, isItem, isToy)
 
-end
+-- end
 
 function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 	local startTime, duration, count, remaining
@@ -157,10 +157,7 @@ function HDH_C_TRACKER:UpdateIcon(f)
 	local isUpdate = false
 	local spell = f.spell
 	local ui = self.ui
-	local maxtime = ui.icon.max_time or -1
 	local show_global_cooldown = ui.cooldown.show_global_cooldown
-	local cooldown_type = ui.icon.cooldown
-	local display_mode = ui.common.display_mode
 	local not_enough_mana_color = (self.ui.cooldown.not_enough_mana_color or {0.35, 0.35, 0.78})
 	local out_range_color = (self.ui.cooldown.out_range_color or {0.53, 0.1, 0.1})
 	local use_not_enough_mana_color = self.ui.cooldown.use_not_enough_mana_color
@@ -256,6 +253,10 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		f.icon:SetCooldown(spell.startTime, spell.duration)
 	else
 		f.icon:Stop()
+	end
+
+	if not f:IsShown() then
+		f:Show()
 	end
 
 	if (chargeCountMax and (chargeCountMax >= 2)) then
@@ -395,7 +396,6 @@ function HDH_C_TRACKER:UpdateAllSlot(onlyNotMappingSpell)
 						f.spell.id = f.spell.base_id
 						f.spell.slot = nil 
 						f.icon:SetTexture(f.spell.icon)
-						-- f.iconSatCooldown:SetTexture(f.spell.icon)
 						self:UpdateIcon(f)
 					end
 					self.slot_pointer[i] = nil
@@ -423,15 +423,12 @@ function HDH_C_TRACKER:UpdateSlotIcon(slot)
 			if f.icon:GetTexture() ~= texture then
 				if f.spell.defaultImg == texture then
 					f.icon:SetTexture(f.spell.icon)
-					-- f.iconSatCooldown:SetTexture(f.spell.icon)
 				else
 					f.icon:SetTexture(texture)
-					-- f.iconSatCooldown:SetTexture(texture)
 				end
 			end
 		else
 			f.icon:SetTexture(f.spell.icon)
-			-- f.iconSatCooldown:SetTexture(f.spell.icon)
 		end
 	end
 end
@@ -482,19 +479,6 @@ function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_HIDE(id)
 	elseif f.spell.base_id == id then
 		f.spell.base_ableGlow = false
 	end
-end
-
--- function HDH_C_TRACKER:InitVariblesOption() -- HDH_TRACKER override
--- 	super.InitVariblesOption(self)
-	
--- 	HDH_AT_UTIL.CheckToUpdateDB(DefaultCooldownDB, DB_OPTION);
--- 	if DB_OPTION[self.name].use_each then
--- 		HDH_AT_UTIL.CheckToUpdateDB(DefaultCooldownDB, DB_OPTION[self.name]);
--- 	end
--- end
-
-function HDH_C_TRACKER:Release() -- HDH_TRACKER override
-	super.Release(self)
 end
 
 function HDH_C_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
@@ -555,18 +539,11 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 		spell.isNotEnoughMana = false
 
 		self:SetGameTooltip(f,  false)
-		-- self:ChangeCooldownType(f, ui.icon.cooldown)
 		f.spell = spell
 		f.counttext:SetText(i)
 		f.timetext:Show();
 		spell.isCharging = false;
 		spell.isAble = true
-		-- if not f.cd:IsShown() then f.cd:Show(); end	
-		-- if (ui.icon.cooldown == DB.COOLDOWN_CIRCLE) or (ui.icon.cooldown == DB.COOLDOWN_NONE) then 
-		-- 	f.cd:SetCooldown(spell.startTime, spell.duration or 0); 
-		-- 	f.cd:SetDrawSwipe(spell.isCharging == false); 
-		-- end
-		
 		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 			f.bar:SetMinMaxValues(spell.startTime, spell.endTime);
 			f.bar:SetValue(spell.startTime);
@@ -575,16 +552,6 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 	end
 	return count;
 end
-
--- function HDH_C_TRACKER:UpdateIconSettings(f) -- HDH_TRACKER override
--- 	-- if f.cooldown1:GetScript("OnUpdate") ~= CT_OnUpdateCooldown or 
--- 	-- 	f.cooldown2:GetScript("OnUpdate") ~= CT_OnUpdateCooldown then
--- 	-- 	f.cooldown1:SetScript("OnUpdate", CT_OnUpdateCooldown)
--- 	-- 	f.cooldown2:SetScript("OnUpdate", CT_OnUpdateCooldown)
--- 	-- end
--- 	--if f.cg.cd1
--- 	super.UpdateIconSettings(self, f)
--- end
 
 function HDH_C_TRACKER:UpdateAllIcons() -- HDH_TRACKER override
 	local isUpdateLayout = false
@@ -636,156 +603,62 @@ function HDH_C_TRACKER:IsSwitchByRemining(icon1, icon2)
 end
 
 function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
-	-- if HDH_TRACKER.ENABLE_MOVE then return end
-	local trackerId = self.id
-	local id, name, _, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
-	self.aura_filter = aura_filter
-	self.aura_caster = aura_caster
-	if not id then 
-		return 
-	end
-
-	local elemKey, elemId, elemName, texture, defaultImg, glowType, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
-	local display, connectedId, connectedIsItem, unlearnedHideMode
-	local innerTrackingType, innerSpellId, innerCooldown
-	local elemSize = DB:GetTrackerElementSize(trackerId)
+	local ret = super.InitIcons(self)
 	local spell
-	local f
-	local iconIdx = 0
-	local hasEquipItem = false
-	local hasInnerCDItem = false
+	local needCombatEvent = false
 	local needEquipmentEvent = false;
-	local isLearned = false
-	local hasItem = false
+	local needBagEvent = false
 
-	self.frame.pointer = {};
-	self.frame:UnregisterAllEvents()
-	
-	for i = 1 , elemSize do
-		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-		display, connectedId, connectedIsItem, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, i)
-		glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
-		defaultImg = DB:GetTrackerElementDefaultImage(trackerId, i)
-		innerTrackingType, innerSpellId, innerCooldown =  DB:GetTrackerElementInnerCooldown(trackerId, i)
-		if innerSpellId then
-			hasInnerCDItem = true
+	if self.type ~= HDH_TRACKER.TYPE.COOLDOWN then return ret end
+	for i= 1, #self.frame.icon do
+		spell = self.frame.icon[i].spell
+		spell.charges = {}
+		spell.charges.duration = 0;
+		spell.charges.count = 0
+		spell.charges.remaining = 0
+		spell.charges.startTime = 0
+		spell.charges.endTime = 0
+		spell.castCount = 0
+		spell.inRange = true
+		spell.isAble = true
+		spell.isNotEnoughMana = false
+		spell.slot = nil 
+
+		if spell.isInnerCDItem then
+			needCombatEvent = true
 		end
 
-		if connectedId then
-			isLearned = HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(connectedId, nil, connectedIsItem)
-			if connectedIsItem then
-				needEquipmentEvent = true
+		if spell.isItem then
+			local _, _, _, _, _, _, _, itemStackCount, _, _, _, _, _ = GetItemInfo(spell.key)
+			if itemStackCount and itemStackCount > 2 then
+				spell.stackable = true
+			else
+				spell.stackable = false
 			end
+			if C_ToyBox.GetToyInfo(spell.id) then
+				spell.isToy = true
+			end
+
+			needEquipmentEvent = needEquipmentEvent or spell.isItem
 		else
-			isLearned = true
+			local chargeInfo = HDH_AT_UTIL.GetSpellCharges(spell.key)
+			if chargeInfo and chargeInfo.maxCharges and chargeInfo.maxCharges  > 2 then
+				spell.stackable = true 
+			else
+				spell.stackable = false
+			end
 		end
 
-		if unlearnedHideMode ~= DB.SPELL_HIDE or isLearned then
-			iconIdx = iconIdx + 1
-			f = self.frame.icon[iconIdx]
-			if f:GetParent() == nil then f:SetParent(self.frame) end
-			id = elemId -- ADJUST_ID[elemId] or
-			
-			spell = {}
-			if isLearned then
-				self.frame.pointer[id] = f
-			else
-				spell.blankDisplay = true
-				f:Hide()
-			end
-			
-			if type(elemKey) == "number" then
-				spell.key = tonumber(elemKey)
-			else
-				spell.key = elemKey
-			end
-			spell.id = tonumber(id)
-			spell.base_id = spell.id
-			spell.no = iconIdx
-			spell.name = elemName
-			spell.icon = texture
-			spell.defaultImg = defaultImg
-			spell.glow = glowType
-			spell.glowCondtion = glowCondition
-			spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-			spell.glowEffectType = glowEffectType
-			spell.glowEffectColor = glowEffectColor
-			spell.glowEffectPerSec = glowEffectPerSec
-			spell.showValue = isValue
-			spell.display = display
-			spell.isItem = (isItem or false)
-			if isItem then
-				local _, _, _, _, _, _, _, itemStackCount, _, _, _, _, _ = GetItemInfo(spell.key)
-				if itemStackCount and itemStackCount > 2 then
-					spell.stackable = true 
-				else
-					spell.stackable = false
+		if not spell.blankDisplay then
+			if not spell.isInnerCDItem then
+				if spell.isItem then
+					needBagEvent = true
 				end
-				if C_ToyBox.GetToyInfo(spell.id) then
-					spell.isToy = true
-				end
-
-				needEquipmentEvent = needEquipmentEvent or isItem
-			else
-				local chargeInfo = HDH_AT_UTIL.GetSpellCharges(spell.key)
-				if chargeInfo and chargeInfo.maxCharges and chargeInfo.maxCharges  > 2 then
-					spell.stackable = true 
-				else
-					spell.stackable = false
-				end
-			end
-			spell.duration = 0
-			spell.count = 0
-			spell.remaining = 0
-			spell.startTime = 0
-			spell.endTime = 0
-			spell.happenTime = 0
-			spell.charges = {};
-			spell.charges.duration = 0;
-			spell.charges.count = 0
-			spell.charges.remaining = 0
-			spell.charges.startTime = 0
-			spell.charges.endTime = 0
-			spell.castCount = 0
-			spell.inRange = true
-			spell.isAble = true
-			spell.isNotEnoughMana = false
-
-			spell.slot = nil --self:GetSlot(spell.id);
-			-- if not auraList[i].defaultImg then auraList[i].defaultImg = auraList[i].Texture; 
-			-- if auraList[i].defaultImg ~= auraList[i].Texture then spell.fix_icon = true end
-			if innerSpellId then
-				spell.isInnerCDItem = true
-				spell.innerSpellId = tonumber(innerSpellId)
-				spell.innerCooldown = tonumber(innerCooldown)
-				spell.innerTrackingType = innerTrackingType
-			end
-
-			f.spell = spell
-			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-			-- f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-			-- f.iconSatCooldown:SetDesaturated(nil)
-			-- f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
-
-			-- self:ChangeCooldownType(f, self.ui.icon.cooldown)
-			self:UpdateGlow(f, false)
-			
-			if not spell.blankDisplay then
-				-- f:SetScript("OnUpdate", CT_OnUpdateIcon)
-				if not spell.isInnerCDItem then
-					if spell.isItem then
-						hasItem = true
-					end
-				end
-			else
-				f:UnregisterAllEvents()
 			end
 		end
 	end
 
-	if iconIdx > 0 then
-		self:LoadOrderFunc();
-		self.frame:SetScript("OnEvent", CT_OnEvent_Frame)
+	if ret > 0 then
 		self.frame:RegisterEvent('PLAYER_TALENT_UPDATE')
 		self.frame:RegisterEvent('ACTIONBAR_SLOT_CHANGED')
 		self.frame:RegisterEvent('ACTIONBAR_UPDATE_STATE')
@@ -798,27 +671,20 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 		self.frame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 		self.frame:RegisterEvent("PLAYER_TARGET_CHANGED")
 		self.frame:RegisterEvent("ACTION_RANGE_CHECK_UPDATE")
+		self.frame:RegisterEvent('UNIT_PET')
 		
 		if needEquipmentEvent then
 			self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
 		end
 
-		if #(self.frame.icon) > 0 then
-			self.frame:RegisterEvent('UNIT_PET');
-		end
-
-		if hasItem then
+		if needBagEvent then
 			self.frame:RegisterEvent("BAG_UPDATE")
 			self.frame:RegisterEvent("BAG_UPDATE_COOLDOWN")
 		end
 
-		if hasInnerCDItem then
+		if needCombatEvent then
 			self.frame:RegisterEvent('COMBAT_LOG_EVENT_UNFILTERED')
 		end
-	end
-
-	for i = #self.frame.icon, iconIdx+1 , -1 do
-		self:ReleaseIcon(i)
 	end
 
 	self.isManualChange = false
@@ -827,6 +693,8 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	self.slot_pointer = {}
 	self:UpdateAllSlot()
 	self:Update()
+
+	return ret
 end
 
 function HDH_C_TRACKER:UpdateGlow(f, bool)
@@ -951,10 +819,8 @@ function HDH_C_TRACKER:COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED(base, override)
 		if info and info.iconID and info.iconID ~= f.icon:GetTexture() then
 			if f.spell.defaultImg == info.iconID then
 				f.icon:SetTexture(f.spell.icon)
-				-- f.iconSatCooldown:SetTexture(f.spell.icon)
 			else
 				f.icon:SetTexture(info.iconID)
-				-- f.iconSatCooldown:SetTexture(info.iconID)
 			end
 		end
 		if base then
@@ -1014,8 +880,9 @@ end
 
 -- BAG_UPDATE -- 
 
-function CT_OnEvent_Frame(self, event, ...)
-	local tracker = self.parent 
+
+function HDH_C_TRACKER:OnEvent(event, ...)
+	local tracker = self.parent
 	if not tracker then return end
 
 	if event == "ACTIONBAR_UPDATE_COOLDOWN" or event =="BAG_UPDATE_COOLDOWN" or event =="BAG_UPDATE" or event == "ACTIONBAR_UPDATE_USABLE"  then
@@ -1090,6 +957,5 @@ function CT_OnEvent_Frame(self, event, ...)
 
 	tracker.prevEvent = event
 end
-
 -------------------------------------------
 -------------------------------------------

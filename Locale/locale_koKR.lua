@@ -348,3 +348,6 @@ L.INCOMPATIBLE_CLASS = "입력된 프로필(|cffff0000%s|r)은\n현재 플레이
 L.DO_YOU_WANT_IMPORT_MISMATCH_CLASS_PROFILE = "|cffff0000%d개의 프로필|r이 선택되었으나\n플레이어와 일치되는 전문화를 찾을 수 없습니다.\n|cffff0000현재의 전문화 특성|r으로 추가하시겠습니까?\n(기존 추적창은 삭제되지 않으며 UI가 재시작 됩니다.)"
 L.UNSUPPORT = "지원 안함"
 L.SELECTED_COUNT = "%d개 선택 됨"
+
+-- 11.1.7.12
+L.GRATE_THEN_MAX_VALUE = "입력된 값이 예상 최댓값의 범위를 초과하였습니다.\n올바르게 표기 되지 않을 수 있습니다."

@@ -383,66 +383,20 @@ function HDH_COMBO_POINT_TRACKER:Update() -- HDH_TRACKER override
 end
 
 function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
-	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-	local elemKey, elemId, elemName, texture, glowType, display, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
-	local trackerId = self.id
-	local spell, f
-	
-	if self:GetElementCount() == 0 then
-		self:CreateData()
-	end
-	for i = 1, power_max do
-		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-		display, _, _, _ = DB:GetTrackerElementDisplay(trackerId, i)
-		glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
-
-		f = self.frame.icon[i]
-		spell = {}
-		spell.glow = glowType
-		spell.glowCondtion = glowCondition
-		spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-		spell.glowEffectType = glowEffectType
-		spell.glowEffectColor = glowEffectColor
-		spell.glowEffectPerSec = glowEffectPerSec
-		spell.per = 0
-		spell.showValue = isValue
-		spell.display = display
-		spell.v1 = 0 -- 수치를 저장할 변수
-		spell.no = i
-		spell.name = elemName
-		spell.icon = texture
-		spell.power_index = self.POWER_INFO[self.type].power_index
-		spell.id = tonumber(elemId)
-		spell.count = 0
-		spell.duration = 0
-		spell.remaining = 0
-		spell.overlay = 0
-		spell.endTime = 0
-		spell.happenTime = 0;
-		spell.startTime = 0;
-		spell.is_buff = false;
-		spell.isUpdate = false
-		spell.isItem =  isItem
-		f.spell = spell
-		f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-		if f.bar then
-			f.bar:SetMinMaxValues(0, 1)
+	local ret = super.InitIcons(self)
+	local f
+	if ret then
+		self.power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
+		for i = 1, ret do
+			f = self.frame.icon[i]
+			if f.bar then
+				f.bar:SetMinMaxValues(0, 1)
+			end
 		end
-		self:UpdateGlow(f, false)
-		f.spell = spell;
-		f:Hide();
+		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE',"player")
+		self.frame:RegisterUnitEvent('UNIT_MAXPOWER',"player")
 	end
-
-	self.frame:SetScript("OnEvent", self.OnEvent)
-	self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE',"player")
-	self.frame:RegisterUnitEvent('UNIT_MAXPOWER',"player")
-
-	for i = power_max+1, #self.frame.icon do
-		self:ReleaseIcon(i)
-	end
-	
-	self:Update()
-	return power_max
+	return ret
 end
 
 -------------------------------------------

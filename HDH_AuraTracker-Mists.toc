@@ -18,6 +18,7 @@ UITemplate\CheckButtonTemplate.xml
 UITemplate\ButtonTemplate.xml
 UITemplate\UITemplates.xml
 UITemplate\CooldownIconTemplate.xml
+UITemplate\StatusBarTemplate.xml
 Tooltip.lua
 
 Tracker\Tracker.xml

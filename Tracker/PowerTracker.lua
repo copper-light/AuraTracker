@@ -50,59 +50,59 @@ end
 
 HDH_POWER_TRACKER.POWER_INFO = POWER_INFO;
 
-local function HDH_POWER_OnUpdate(f, elapsed)
-	local self = f:GetParent().parent
-	f.spell.curTime = GetTime()
-	if f.spell.curTime - (f.spell.delay or 0) < 0.02  then return end 
-	f.spell.delay = f.spell.curTime
-	f.spell.powerMax = self:GetPowerMax()
-	f.spell.v1 = self:GetPower()
-	f.spell.count = math.ceil(f.spell.v1 / f.spell.powerMax  * 100);
-	if f.spell.count == 100 and f.spell.v1 ~= f.spell.powerMax  then f.spell.count = 99 end
-	f.counttext:SetText(f.spell.count .. "%")
-	if f.spell.showValue then
-		f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate))
-	else
-		f.v1:SetText(nil)
-	end
+-- local function HDH_POWER_OnUpdate(f, elapsed)
+-- 	local self = f:GetParent().parent
+-- 	f.spell.curTime = GetTime()
+-- 	if f.spell.curTime - (f.spell.delay or 0) < 0.02  then return end 
+-- 	f.spell.delay = f.spell.curTime
+-- 	f.spell.powerMax = self:GetPowerMax()
+-- 	f.spell.v1 = self:GetPower()
+-- 	f.spell.count = math.ceil(f.spell.v1 / f.spell.powerMax  * 100);
+-- 	if f.spell.count == 100 and f.spell.v1 ~= f.spell.powerMax  then f.spell.count = 99 end
+-- 	f.counttext:SetText(f.spell.count .. "%")
+-- 	if f.spell.showValue then
+-- 		f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate))
+-- 	else
+-- 		f.v1:SetText(nil)
+-- 	end
 
-	if self.power_info.regen then
-		if f.spell.v1 < f.spell.powerMax  then
-			if f.spell.isOn ~= true then
-				self:Update()
-				f.spell.isOn = true;
-			end
-		else 
-			if f.spell.isOn ~= false then
-				self:Update()
-				f.spell.isOn = false;
-			end
-			self:Update()
-		end
-	else
-		if f.spell.v1 > 0 then
-			if f.spell.isOn ~= true then
-				self:Update()
-				f.spell.isOn = true;
-			end
-		else
-			if f.spell.isOn ~= false then
-				self:Update()
-				f.spell.isOn = false;
-			end
-		end
-	end
+-- 	if self.power_info.regen then
+-- 		if f.spell.v1 < f.spell.powerMax  then
+-- 			if f.spell.isOn ~= true then
+-- 				self:Update()
+-- 				f.spell.isOn = true;
+-- 			end
+-- 		else 
+-- 			if f.spell.isOn ~= false then
+-- 				self:Update()
+-- 				f.spell.isOn = false;
+-- 			end
+-- 			self:Update()
+-- 		end
+-- 	else
+-- 		if f.spell.v1 > 0 then
+-- 			if f.spell.isOn ~= true then
+-- 				self:Update()
+-- 				f.spell.isOn = true;
+-- 			end
+-- 		else
+-- 			if f.spell.isOn ~= false then
+-- 				self:Update()
+-- 				f.spell.isOn = false;
+-- 			end
+-- 		end
+-- 	end
 
-	self:UpdateGlow(f, true)
-	if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-		if f.bar:GetMaxValue() == f.spell.powerMax then -- UpdateBar 함수안에 UpdateAbsorb 를 포함한다.
-			f.bar:SetValue(f.spell.v1, true)
-		else
-			f.bar:SetMinMaxValues(0, f.spell.powerMax)
-			f.bar:SetValue(f.spell.v1, false)
-		end
-	end
-end
+-- 	self:UpdateGlow(f, true)
+-- 	if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
+-- 		if f.bar:GetMaxValue() == f.spell.powerMax then -- UpdateBar 함수안에 UpdateAbsorb 를 포함한다.
+-- 			f.bar:SetValue(f.spell.v1, true)
+-- 		else
+-- 			f.bar:SetMinMaxValues(0, f.spell.powerMax)
+-- 			f.bar:SetValue(f.spell.v1, false)
+-- 		end
+-- 	end
+-- end
 
 function HDH_POWER_TRACKER:GetPower()
 	return UnitPower('player', self.power_info.power_index)
@@ -166,9 +166,6 @@ function HDH_POWER_TRACKER:GetElementCount()
 		return 0
 	end
 end
-
--- function HDH_POWER_TRACKER:ChangeCooldownType(f, cooldown_type) -- 호출되지 말라고 빈함수
--- end
 
 function HDH_POWER_TRACKER:CreateDummySpell(count)
 	local icons =  self.frame.icon
@@ -258,10 +255,6 @@ function HDH_POWER_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 	local f = self.frame.icon[1]
 	if f == nil or f.spell == nil then return end;
 	if f.spell.v1 > 0 then 
-		-- f.icon:SetDesaturated(nil)
-		-- f.icon:SetAlpha(self.ui.icon.on_alpha)
-		-- f.border:SetAlpha(self.ui.icon.on_alpha)
-		-- f.border:SetVertexColor(unpack(self.ui.icon.active_border_color))
 		f.icon:UpdateCooldowning(false)
 		ret = 1;
 		self:UpdateGlow(f, true)
@@ -275,7 +268,6 @@ function HDH_POWER_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 			f:Hide();
 		end
 	end
-	-- f.icon:SetCooldown(0, f.spell.max, false)
 	f:SetPoint('RIGHT');
 	return ret
 end
@@ -288,101 +280,16 @@ function HDH_POWER_TRACKER:UpdateIconSettings(f)
 end
 
 function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
-	-- if HDH_TRACKER.ENABLE_MOVE then return end
-	local trackerId = self.id
-	local id, name, _, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
-	self.aura_filter = aura_filter
-	self.aura_caster = aura_caster
-	if not id then 
-		return 
-	end
-	
+	local ret = super.InitIcons(self)
  	self.power_info = self.POWER_INFO[self.type]
 
-	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitPoints, splitPointType, glowEffectType, glowEffectColor, glowEffectPerSec
-	local elemSize = DB:GetTrackerElementSize(trackerId)
-	local spell 
-	local f
-	local iconIdx = 0
-	local hasEquipItem = false
-
-	self.frame.pointer = {}
-	self.frame:UnregisterAllEvents()
-	self.talentId = HDH_AT_UTIL.GetSpecialization()
-
-	if self:GetElementCount() == 0 then
-		self:CreateData()
-	end
-	if self:GetElementCount() > 0 then
-		for i = 1 , elemSize do
-			elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-			glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
-			splitPoints, splitPointType = DB:GetTrackerElementSplitValues(trackerId, i)
-			
-			iconIdx = iconIdx + 1
-			f = self.frame.icon[iconIdx]
-			if f:GetParent() == nil then f:SetParent(self.frame) end
-			self.frame.pointer[elemKey or tostring(elemId)] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
-			spell = {}
-			spell.glow = glowType
-			spell.glowCondtion = glowCondition
-			spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-			spell.showValue = isValue
-			spell.glowEffectType = glowEffectType
-			spell.glowEffectColor = glowEffectColor
-			spell.glowEffectPerSec = glowEffectPerSec
-			spell.display = display
-			spell.v1 = 0 -- 수치를 저장할 변수
-			spell.no = i
-			spell.name = elemName
-			spell.icon = texture
-			spell.power_index = self.power_info.power_index
-			spell.id = tonumber(elemId)
-			spell.count = 0
-			spell.duration = 0
-			spell.remaining = 0
-			spell.overlay = 0
-			spell.endTime = 0
-			spell.startTime = 0
-			spell.is_buff = isBuff;
-			spell.isUpdate = false
-			spell.isItem =  isItem
-			spell.splitPoints = splitPoints or {}
-			spell.splitPointType = splitPointType or DB.BAR_SPLIT_RATIO
-			f.spell = spell
-			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-
-			f.icon:UpdateCooldowning(false)
-			-- f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-			-- f.iconSatCooldown:SetDesaturated(nil)
-			-- f.iconSatCooldown:Hide()
-			self:UpdateGlow(f, false)
-			
-			f:SetScript("OnUpdate", HDH_POWER_OnUpdate);
-			f:Hide();
-			self:ActionButton_HideOverlayGlow(f)
-			if f.bar then
-				f.bar:SetSplitPoints(spell.splitPoints, spell.splitPointType)
-			end
-		end
-		self.frame:SetScript("OnEvent", self.OnEvent)
+	if ret > 0 then
 		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE',"player")
 		self:Update()
-		
-	else
-		self.frame:UnregisterAllEvents()
 	end
 	
-	for i = #self.frame.icon, iconIdx+1 , -1 do
-		self:ReleaseIcon(i)
-	end
-	return iconIdx
+	return ret
 end
-
--- function HDH_POWER_TRACKER:ACTIVE_TALENT_GROUP_CHANGED()
--- 	self:InitIcons()
--- 	-- self:UpdateBar(self.frame.icon[1]);
--- end
 
 function HDH_POWER_TRACKER:PLAYER_ENTERING_WORLD()
 end

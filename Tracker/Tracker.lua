@@ -35,7 +35,7 @@ HDH_TRACKER.startTime = 0
 local function UpdateCooldown(f, elapsed)
 	local spell = f.spell;
 	local tracker = f:GetParent().parent;
-	if not spell and not tracker then return end
+	if not spell or not tracker then return end
 	
 	-- f.elapsed = (f.elapsed or 0) + elapsed;
 	-- if f.elapsed < HDH_TRACKER.ONUPDATE_FRAME_TERM then  return end  -- 30프레임
@@ -63,7 +63,7 @@ end
 
 local function OnUpdateGlowColor(self, elapsed)
 	self.sparkElapsed = (self.sparkElapsed or 0) + elapsed
-	if self.sparkElapsed < (HDH_TRACKER.ONUPDATE_FRAME_TERM/2) then return end
+	if self.sparkElapsed < (HDH_TRACKER.ONUPDATE_FRAME_TERM/2) or not self:GetParent().spell then return end
 	self.playing = (self.playing or 0) + self.sparkElapsed
 	self.sparkElapsed = 0
 	self.p = HDH_AT_UTIL.LogScale(math.max(math.min((1.25 - (GetTime() % (1/self:GetParent().spell.glowEffectPerSec) + .001) / (1/self:GetParent().spell.glowEffectPerSec*0.8)), 1.), 0.3))
@@ -422,7 +422,7 @@ function HDH_TRACKER:GetElementCount()
 	if aura_filter ~=nil and aura_filter ~= DB.AURA_FILTER_REG then
 		cnt = HDH_TRACKER.MAX_ICONS_COUNT;
 	else
-		cnt = DB:GetTrackerElementSize(self.id) or 0;
+		cnt = (self.frame.icon and #self.frame.icon) or DB:GetTrackerElementSize(self.id) or 0;
 	end
 	return (cnt > 0) and cnt or 0;
 end
@@ -454,8 +454,8 @@ function HDH_TRACKER:UpdateBarSettings(f)
 	local splitPoints = nil
 	local splitPointType = nil
 	if f.spell then
-		splitPoints = f.spell.splitPoints
-		splitPointType = f.spell.splitPointType
+		splitPoints = f.spell.barSplitPoints
+		splitPointType = f.spell.barSplitPointType
 	end
 
 	if display_mode ~= DB.DISPLAY_ICON then
@@ -533,6 +533,14 @@ function HDH_TRACKER:UpdateBarMinMaxValue(f, minV, maxV, value, r, g, b, a)
 		f.bar:SetMinMaxValues(minV, maxV)
 		f.bar:SetValue(value)
 	end
+end
+
+function HDH_TRACKER:GetBarMax(elementIdx)
+	local ret = 0 
+	if self.frame.icon[elementIdx] and self.frame.icon[elementIdx].spell.duration then
+		ret = self.frame.icon[elementIdx].spell.tmpBarMax
+	end
+	return ret 
 end
 
 function HDH_TRACKER:IsSwitchByRemining(icon1, icon2) 
@@ -645,12 +653,11 @@ end
 
 function HDH_TRACKER:CreateDummySpell(count)
 	local icons =  self.frame.icon
-	local ui = self.ui
 	local curTime = GetTime()
-	local prevf, f, spell
-	if icons then
-		if #icons > count then count = #icons end
-	end
+	local f, spell
+	-- if icons then
+	-- 	if #icons > count then count = #icons end
+	-- end
 	count = count or 1;
 	for i=1, count do
 		f = icons[i]
@@ -692,7 +699,13 @@ function HDH_TRACKER:CreateDummySpell(count)
 		spell.isUpdate = true
 		f:Show()
 	end
-	return count;
+
+	if self.frame.icon then
+		for i = #self.frame.icon, count + 1, -1 do
+			self:ReleaseIcon(i)
+		end
+	end
+	return count
 end
 
 function HDH_TRACKER:IsRaiding()
@@ -1132,7 +1145,7 @@ end
 function HDH_TRACKER:SetMove(move)
 	if not self.frame then return end
 	if move then
-		local cnt = self:GetElementCount();
+		local cnt = self:GetElementCount()
 		if cnt then
 			if not self.frame.moveFrame then
 				CreateMoveFrame(self)
@@ -1349,10 +1362,127 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	end
 end
 
--- function HDH_TRACKER:InitIcons()
-	
--- end
+function HDH_TRACKER:InitIcons()
+	local trackerId = self.id
+	local id, name, trackerType, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
+	if not id then return 0 end
+	local elemKey, elemId, elemName, texture, glowType, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
+	local barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType, defaultImg
+	local innerTrackingType, innerSpellId, innerCooldown 
+	local display, connectedId, connectedIsItem, unlearnedHideMode
+	local spell 
+	local f
+	local isLearned = true
+	local iconIdx = 0;
+	local needEquipmentEvent = false
 
+	self.frame.pointer = {}
+	self.aura_filter = aura_filter
+	self.aura_caster = aura_caster
+	self.talentId = HDH_AT_UTIL.GetSpecialization()
+
+	if self:GetElementCount() == 0 then
+		self:CreateData()
+	end
+
+	local elemSize = DB:GetTrackerElementSize(trackerId)
+	for i = 1, elemSize do
+		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
+		display, connectedId, connectedIsItem, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, i)
+		glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
+		defaultImg = DB:GetTrackerElementDefaultImage(trackerId, i)
+		barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType = DB:GetTrackerElementBarInfo(trackerId, i)
+		innerTrackingType, innerSpellId, innerCooldown =  DB:GetTrackerElementInnerCooldown(trackerId, i)
+
+		if connectedId then
+			isLearned = HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(connectedId, nil, connectedIsItem)
+			if connectedIsItem then
+				needEquipmentEvent = true
+			end
+		else
+			isLearned = true
+		end
+		if unlearnedHideMode ~= DB.SPELL_HIDE or isLearned then
+			iconIdx = iconIdx + 1
+			f = self.frame.icon[iconIdx]
+			if f:GetParent() == nil then f:SetParent(self.frame) end
+			if isLearned then
+				self.frame.pointer[elemKey] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
+			else
+				spell.blankDisplay = true
+			end
+			spell = {}
+			if type(elemKey) == "number" then
+				spell.key = tonumber(elemKey)
+			else
+				spell.key = elemKey
+			end
+
+			spell.no = iconIdx
+			spell.name = elemName
+			spell.icon = texture
+			spell.id = tonumber(elemId)
+			spell.count = 0
+			spell.v1 = 0 -- 수치를 저장할 변수
+			spell.duration = 0
+			spell.remaining = 0
+			spell.overlay = 0
+			spell.endTime = 0
+			spell.isUpdate = false
+			spell.defaultImg = defaultImg
+			spell.isItem =  isItem
+			spell.happenTime = 0
+
+			spell.glow = glowType
+			spell.glowCondtion = glowCondition
+			spell.glowValue = (glowValue and tonumber(glowValue)) or 0
+			spell.glowEffectType = glowEffectType
+			spell.glowEffectColor = glowEffectColor
+			spell.glowEffectPerSec = glowEffectPerSec
+			spell.showValue = isValue
+			spell.display = display
+			
+			spell.barSplitPoints = splitPoints
+			spell.barSplitPointType = splitPointType or DB.BAR_SPLIT_RATIO
+			spell.barValueType = barValueType
+			spell.barMaxValueType = barMaxValueType
+			spell.barMaxValue = barMaxValue
+
+			if innerSpellId then
+				spell.isInnerCDItem = true
+				spell.innerSpellId = tonumber(innerSpellId)
+				spell.innerCooldown = tonumber(innerCooldown)
+				spell.innerTrackingType = innerTrackingType
+			end
+
+			f.spell = spell
+			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+			self:UpdateGlow(f, false)
+			self:UpdateBarSettings(f)
+
+			f:Hide()
+			self:ActionButton_HideOverlayGlow(f)
+			if f.bar then
+				f.bar:SetSplitPoints(spell.barSplitPoints, spell.barSplitPointType)
+			end
+		end
+	end
+	
+	for i = #(self.frame.icon) , iconIdx+1, -1 do
+		self:ReleaseIcon(i)
+	end
+	self.frame:UnregisterAllEvents()
+	if iconIdx > 0 then
+		if needEquipmentEvent then
+			self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
+		end
+
+		self.frame:SetScript("OnEvent", self.OnEvent)
+		self:LoadOrderFunc()
+	end
+	
+	return iconIdx;
+end
 -------------------------------------------
 -- 애니메이션 관련
 -------------------------------------------

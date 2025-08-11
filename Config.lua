@@ -1597,30 +1597,37 @@ function HDH_AT_OnClick_Button(self, button)
 		local index = self:GetParent().index
 		local trackerId = F.BODY.CONFIG_DETAIL.trackerId
 		local elemIdx = F.BODY.CONFIG_DETAIL.elemIdx
-		local values = DB:GetTrackerElementSplitValues(trackerId, elemIdx) or {}
+		local values = DB:GetTrackerElementBarInfo(trackerId, elemIdx)
 		local minValue, maxValue = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR:GetMinMaxValues()
-		local pointType = DB.BAR_SPLIT_FIXED_VALUE
+		local pointType = F.BODY.CONFIG_DETAIL.ETC.SW_SPLIT_TYPE:GetSelectedValue()
 		-- if maxValue < 10 then
 		-- 	main.Dialog:AlertShow(L.NEED_TO_MAXIMUM_VALUE)
 		-- 	return 
 		-- end
 
 		if self:GetParent().ButtonAdd == self then
-			local v = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR.ED_LIST[index]:GetValue()
-			if v == 0 then
+			local newValue = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR.ED_LIST[index]:GetValue()
+			local ok = true
+			if newValue == 0 then
 				main.Dialog:AlertShow(L.PLEASE_INPUT_VALUE)
 				return
 			end
-			if pointType == DB.BAR_SPLIT_RATIO then
-				if 0 < v and 100 > v then
-					values[index] = v / 100
-				end
-			else
-				if minValue < v and maxValue > v then
-					values[index] = v 
+
+			if newValue >= maxValue then
+				main.Dialog:AlertShow(L.GRATE_THEN_MAX_VALUE)
+			end
+
+			for _, value in ipairs(values) do
+				if value == newValue then
+					ok = false
+					break
 				end
 			end
-			table.sort(values)
+
+			if ok then
+				values[index] = newValue
+				table.sort(values)
+			end
 			-- if minValue < v and maxValue > v then
 			-- 	if pointType == DB.BAR_SPLIT_RATIO then
 			-- 		values[index] = v / 100
@@ -1647,7 +1654,7 @@ function HDH_AT_OnClick_Button(self, button)
 			table.remove(values, index)
 		end
 
-		DB:SetTrackerElementSplitValues(trackerId, elemIdx, values, pointType)
+		DB:SetTrackerElementBarInfo(trackerId, elemIdx, values, pointType)
 		main:LoadDetailFrame(BODY_DETAIL_ETC, trackerId, elemIdx)
 		HDH_TRACKER.InitVaribles(trackerId)
 
@@ -2402,7 +2409,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_EB_SPELL:SetText(key or "")
 		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CB_IS_ITEM:SetChecked(isItem)
 		
-		local tex = F.BODY:CreateTexture()
+		-- local tex = F.BODY:CreateTexture()
 		if key then
 			for _, cb in ipairs(CHANGE_ICON_CB_LIST) do
 				cb:SetChecked(false)
@@ -2414,7 +2421,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			end
 		end
 
-		local values = DB:GetTrackerElementSplitValues(trackerId, elemIdx) or {}
+		local values, splitType = DB:GetTrackerElementBarInfo(trackerId, elemIdx)
 		-- Load splitbar
 		local splitbar = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR
 		splitbar.ED_LIST = splitbar.ED_LIST or {}
@@ -2422,6 +2429,9 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 		local v 
 		local component
 		local parent = self.DETAIL_ETC_TAB[2].content
+
+		F.BODY.CONFIG_DETAIL.ETC.SW_SPLIT_TYPE:SetSelectedValue(splitType)
+
 		for i =1 , (#values + 1) do
 			v = values[i]
 			if not edList[i] then
@@ -2434,34 +2444,73 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 				component.ButtonDel:SetScript("OnClick", HDH_AT_OnClick_Button)
 				component.Text:SetText(L.SPLIT_POINT:format(i))
 				if i == 1 then
-					component:SetPoint('TOPLEFT', splitbar, 'BOTTOMLEFT', 0, -40)
+					component:SetPoint('TOP', F.BODY.CONFIG_DETAIL.ETC.SW_SPLIT_TYPE, 'BOTTOM', 0, -5)
 				else
-					component:SetPoint('TOPLEFT', edList[i -1], 'BOTTOMLEFT', 0, -5)
+					component:SetPoint('TOP', edList[i -1], 'BOTTOM', 0, -5)
 				end
+				component:SetPoint('LEFT', parent, 'LEFT', 10, 0)
+				component:SetPoint('RIGHT', parent, 'RIGHT', -25, 0)
 				edList[i] = component
 			end
 			edList[i].EditBox:SetText(v or "")
 			edList[i]:Show()
 			edList[i].index = i
-			if v then
-				splitbar:AddPointer(i, v)
-			else
-				splitbar:RemovePointer(i)
-			end
 		end
+
+		-- (#values + 1)
+		if not splitbar.MaxValueFrame then
+			local component = CreateFrame("Frame", (parent:GetName()..'MaxValueFrame'), splitbar, "HDH_AT_MaxValueEdtiboxTemplate")
+			component:SetSize(115, 26)
+			component:SetPoint('LEFT', parent, 'LEFT', 10, 0)
+			component:SetPoint('RIGHT', parent, 'RIGHT', -25, 0)
+			component.Text:SetText("최댓값")
+			HDH_AT_DropDown_Init(component.DDMaxValueType, {
+				{1, "직접 입력"},
+				{2, "자동"},
+			}, function(self, itemFrame, idx, value) 
+				if idx == 1 then
+					component.DDMaxValue:Hide()
+					component.EditBox:Show()
+				else
+					component.EditBox:Hide()
+					component.DDMaxValue:Show()
+				end
+			end)
+
+			HDH_AT_DropDown_Init(component.DDMaxValue, {
+				{DB.BAR_MAXVALUE_TYPE_TIME, "최대 지속 시간"},
+				{DB.BAR_MAXVALUE_TYPE_COUNT, "최대 중첩/충전 수"},
+				{DB.BAR_MAXVALUE_TYPE_HEALTH, "최대 체력"},
+				{DB.BAR_MAXVALUE_TYPE_MANA, "최대 마나"},
+				{DB.BAR_MAXVALUE_TYPE_POWER, "최대 분노/기력류"}
+			}, function(self, itemFrame, idx, value) 
+				
+			end)
+
+			splitbar.MaxValueFrame = component
+		end
+		splitbar.MaxValueFrame:SetPoint('TOP', edList[#values + 1], 'BOTTOM', 0, -5)
+
+
 		for i = #values + 2, #edList do
 			edList[i]:Hide()
-			splitbar:RemovePointer(i)
 		end
-		local obj = HDH_TRACKER.Get(trackerId)
-		if obj.GetPowerMax and trackerType ~= HDH_TRACKER.TYPE.STAGGER then
-			local max = obj:GetPowerMax()
-			if max then
-				splitbar:SetMinMaxValues(0, max)
+		local tracker = HDH_TRACKER.Get(trackerId)
+		if tracker then
+			if splitType == DB.BAR_SPLIT_RATIO then
+				splitbar:SetMinMaxValues(0, 100, true)
+			else
+				if tracker.GetPowerMax then
+					local max = tracker:GetPowerMax()
+					if max then
+						splitbar:SetMinMaxValues(0, max)
+					end
+				else
+					splitbar:SetMinMaxValues(0, 100)
+				end
 			end
-		else
-			splitbar:SetMinMaxValues(0, 1)
 		end
+		splitbar:SetSplitPoints(values)
 
 		-- Load Inner CD
 		local innerType, innerSpellId, innerCooldown = DB:GetTrackerElementInnerCooldown(trackerId, elemIdx)
@@ -3368,13 +3417,38 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 	end
 
 	-- Split power bar layer
-	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[2].content, COMP_TYPE.SPLIT_LINE, L.THIS_IS_ONLY_SPLIT_POWER_BAR)
-	comp.Line:Hide()
+	-- comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[2].content, COMP_TYPE.SPLIT_LINE, L.THIS_IS_ONLY_SPLIT_POWER_BAR)
+	-- comp.Line:Hide()
+
+	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[2].content, COMP_TYPE.DROPDOWN, "바 표시 값 유형") --  "바 분할 유형"
+	HDH_AT_DropDown_Init(comp, {
+		{DB.BAR_SPLIT_RATIO,       "시간"},
+		{DB.BAR_SPLIT_FIXED_VALUE, "중첩"},	
+		{DB.BAR_SPLIT_FIXED_VALUE, "수치/콤보/자원"}
+	}, HDH_AT_OnSelected_Dropdown)
+	self.F.BODY.CONFIG_DETAIL.ETC.DDP_BAR_VALUE_TYPE = comp
+
 	comp = CreateFrame("Frame", (self.DETAIL_ETC_TAB[2].content:GetName()..'SplitBar'), self.DETAIL_ETC_TAB[2].content, "HDH_AT_SplitBarTemplate")
 	comp:SetSize(230, 30)
 	comp:SetPoint('TOPLEFT', self.DETAIL_ETC_TAB[2].content, 'TOPLEFT', 20, -70)
 	comp:SetMinMaxValues(0, 1)
 	self.F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR = comp
+
+	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[2].content, COMP_TYPE.SWITCH) --  "바 분할 유형"
+	comp:SetPoint("TOP",self.F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR, "BOTTOM", 0, -40)
+	comp:Init({	
+		{DB.BAR_SPLIT_RATIO,       "비율 사용"},
+		{DB.BAR_SPLIT_FIXED_VALUE, "고정값 사용"}
+	}, HDH_AT_OnSelected_Dropdown)
+	self.F.BODY.CONFIG_DETAIL.ETC.SW_SPLIT_TYPE = comp
+
+	-- comp = CreateFrame("Button", (self.DETAIL_ETC_TAB[2].content:GetName()..'BtnSave'), self.DETAIL_ETC_TAB[2].content, "HDH_AT_ButtonTemplate")
+	-- comp:SetPoint("BOTTOMRIGHT", self.DETAIL_ETC_TAB[2].content:GetParent(), "BOTTOM", -5, 5)
+	-- comp:SetText("Save")
+
+	-- comp = CreateFrame("Button", (self.DETAIL_ETC_TAB[2].content:GetName()..'BtnCancel'), self.DETAIL_ETC_TAB[2].content, "HDH_AT_ButtonTemplate")
+	-- comp:SetPoint("BOTTOMLEFT", self.DETAIL_ETC_TAB[2].content:GetParent(), "BOTTOM", 5, 5)
+	-- comp:SetText("Cancel")
 
 	-- inner cooldown item layer
 	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[3].content, COMP_TYPE.SPLIT_LINE, L.COOLDOWN_ITEM_DESC)
@@ -3887,8 +3961,14 @@ function HDH_AT_CreateOptionComponent(parent, component_type, option_name, db_ke
 	elseif component_type == COMP_TYPE.SWITCH then
 		component = CreateFrame("Frame", (parent:GetName()..'Line'..parent.row.."_"..parent.col), parent, "HDH_AT_SwitchFrameTemplate")
 		component:SetSize(115, 20)
-		component:SetPoint('LEFT', frame, 'RIGHT', 25, 0)
+		-- component:SetPoint('LEFT', frame, 'RIGHT', 25, 0)
+		component:SetPoint('LEFT', frame, 'RIGHT', option_name and 25 or (MARGIN_X + x), 0)
+		if component then
+			component:SetPoint('RIGHT', parent, 'RIGHT', -25, 0)
+		end
 	end
+
+	
 
 	if component_type then
 		DBSync(component, component_type, db_key)

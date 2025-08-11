@@ -23,6 +23,7 @@ HDH_TT_TRACKER.AdjustSpell[L.RAISE_DEAD] = "46585"
 -- HDH_T_TRACKER class
 ------------------------------------
 do
+	local super = HDH_AURA_TRACKER
 	setmetatable(HDH_TT_TRACKER, HDH_AURA_TRACKER) -- 상속
 	HDH_TT_TRACKER.__index = HDH_TT_TRACKER
 	HDH_TT_TRACKER.className = "HDH_TT_TRACKER"
@@ -78,92 +79,57 @@ do
 		end
 	end
 
-	function HDH_TT_TRACKER:InitIcons() -- HDH_TRACKER override
+	function HDH_TT_TRACKER:InitIcons()
 		local trackerId = self.id
 		local id, name, type, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
+		if not id then return 0 end
+
+		local barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType
+		local f
+		local ret = 0
+
+		self.filter = (self.type == HDH_TRACKER.TYPE.BUFF) and "HELPFUL" or "HARMFUL"
 		self.aura_filter = aura_filter
 		self.aura_caster = aura_caster
-		if not id then return end
-		local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
-		local connectedId, connectedIsItem, unlearnedHideMode
-		local elemSize = DB:GetTrackerElementSize(trackerId)
-		local spell
-		local f
-		local iconIdx = 0
-		local isLearned = false
-		local needEquipmentEvent = false
 		self.frame.pointer = {}
 
 		if aura_filter == DB.AURA_FILTER_ALL then
-			if #(self.frame.icon) > 0 then self:ReleaseIcons() end
+			for i = 1 , MAX_TOTEMS do
+				barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType = DB:GetTrackerElementBarInfo(trackerId, i)
+				f = self.frame.icon[i]
+				if f:GetParent() == nil then f:SetParent(self.frame) end
+
+				f.spell = {}
+				f.spell.barSplitPoints = splitPoints
+				f.spell.barSplitPointType = splitPointType
+				f.spell.barValueType = barValueType
+				f.spell.barMaxValueType = barMaxValueType
+				f.spell.barMaxValue = barMaxValue
+				-- f:Hide()
+				if f.bar then
+					f.bar:SetSplitPoints(spell.barSplitPoints, spell.barSplitPointType)
+				end
+			end
+			
+			self.frame:UnregisterAllEvents()
+			self.frame:SetScript("OnEvent", self.OnEvent)
+			self:LoadOrderFunc()
 		else
-			for i = 1, elemSize do
-				elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-				display, connectedId, connectedIsItem, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, i)
-				glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
-				if connectedId then
-					isLearned = HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(connectedId, nil, connectedIsItem)
-					if connectedIsItem then
-						needEquipmentEvent = true
-					end
-				else
-					isLearned = true
-				end
-				if unlearnedHideMode ~= DB.SPELL_HIDE or isLearned then
-					iconIdx = iconIdx + 1
-					f = self.frame.icon[iconIdx]
-					if f:GetParent() == nil then f:SetParent(self.frame) end
-					spell = {}
-
-					if isLearned then
-						self.frame.pointer[elemKey or tostring(elemId)] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
-					else
-						spell.blankDisplay = true
-						f:Hide()
-					end
-
-					spell.glow = glowType
-					spell.glowCondtion = glowCondition
-					spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-					spell.glowEffectType = glowEffectType
-					spell.glowEffectColor = glowEffectColor
-					spell.glowEffectPerSec = glowEffectPerSec
-					spell.showValue = isValue
-					spell.display = display
-					spell.v1 = 0 -- 수치를 저장할 변수
-					spell.no = i
-					spell.name = elemName
-					spell.icon = texture
-					spell.id = tonumber(elemId)
-					spell.count = 0
-					spell.duration = 0
-					spell.remaining = 0
-					spell.overlay = 0
-					spell.endTime = 0
-					-- spell.is_buff = isBuff;
-					spell.isUpdate = false
-					spell.isItem =  isItem
-					f.spell = spell
-					f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-					self:UpdateGlow(f, false)
-					self.frame.pointer[spell.name] = f;
-				end
-			end
-			for i = #(self.frame.icon) , iconIdx+1, -1  do
-				self:ReleaseIcon(i)
+			ret = super.InitIcons(self)
+			for i = 1, ret do
+				local spell = self.frame.icon[i].spell
+				self.frame.pointer[spell.name] = self.frame.icon[i]
 			end
 		end
-		self:LoadOrderFunc();
-		self.frame:UnregisterAllEvents()
-		if #(self.frame.icon) > 0 or aura_filter == DB.AURA_FILTER_ALL then
-			self.frame:SetScript("OnEvent", HDH_TT_OnEvent)
-			self.frame:RegisterEvent("PLAYER_TOTEM_UPDATE");
-			if needEquipmentEvent then
-				self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
-			end
+
+		if #(self.frame.icon) > 0 then
+			self.frame:RegisterEvent("PLAYER_TOTEM_UPDATE")
 		end
+
 		self:Update()
+		return ret
 	end
+
 end
 
 
@@ -171,7 +137,7 @@ end
 -- icon 정보 업데이트 
 -----------------------------------------------------------------------------
 
-function HDH_TT_OnEvent(self, event, ...)
+function HDH_TT_TRACKER:OnEvent(event, ...)
 	if not self.parent then return end
 	local tracker = self.parent
 	

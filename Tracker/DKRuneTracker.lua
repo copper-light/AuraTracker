@@ -318,88 +318,16 @@ function HDH_DK_RUNE_TRACKER:Update() -- HDH_TRACKER override
 end
 
 function HDH_DK_RUNE_TRACKER:InitIcons()
-	-- if HDH_TRACKER.ENABLE_MOVE then return end
-	local trackerId = self.id
-	local id, name, _, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
-	self.aura_filter = aura_filter
-	self.aura_caster = aura_caster
-	if not id then 
-		return 
+	local ret = super.InitIcons(self)
+	for i = 1 , ret do
+		self.frame.icon[i].spell.power_index = self.POWER_INFO[self.type].power_index
 	end
 
-	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
-	
-	local spell 
-	local f
-	local iconIdx = 0
-	self.frame.pointer = {}
-	self.frame:UnregisterAllEvents()
-	self.talentId = HDH_AT_UTIL.GetSpecialization()
-
-	if self:GetElementCount() == 0 then
-		self:CreateData()
-	end
-
-	local elemSize = DB:GetTrackerElementSize(trackerId)
-
-	for i = 1 , elemSize do
-		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-		glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
-			
-		iconIdx = iconIdx + 1
-		f = self.frame.icon[iconIdx]
-		if f:GetParent() == nil then f:SetParent(self.frame) end
-		self.frame.pointer[iconIdx] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
-		spell = {}
-		spell.glow = glowType
-		spell.glowCondtion = glowCondition
-		spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-		spell.glowEffectType = glowEffectType
-		spell.glowEffectColor = glowEffectColor
-		spell.glowEffectPerSec = glowEffectPerSec
-		spell.showValue = isValue
-		spell.display = display
-		spell.v1 = 0 -- 수치를 저장할 변수
-		spell.no = i
-		spell.name = elemName
-		spell.icon = texture
-		spell.power_index = self.POWER_INFO[self.type].power_index
-		spell.id = tonumber(elemId)
-		spell.count = 0
-		spell.duration = 0
-		spell.remaining = 0
-		spell.overlay = 0
-		spell.endTime = 0
-		spell.startTime = 0
-		spell.is_buff = isBuff;
-		spell.isUpdate = false
-		spell.isItem =  isItem
-		spell.charges = {};
-		spell.charges.duration = 0;
-		spell.charges.count = 0
-		spell.charges.remaining = 0
-		spell.charges.startTime = 0
-		spell.charges.endTime = 0
-		
-		f.spell = spell
-		f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-		f.icon:SetHandler(nil, HDH_DK_RUNE_TRACKER_CooldownFinished)
-		self:UpdateBarSettings(f)
-		self:UpdateGlow(f, false)
-		f:Hide()
-	end
-
-	self.frame:SetScript("OnEvent", self.OnEvent)
 	self.frame:RegisterEvent("RUNE_POWER_UPDATE");
 	self.frame:RegisterEvent("RUNE_TYPE_UPDATE");
 	self.frame:RegisterEvent('UNIT_MAXPOWER')
 	self:Update()
-	self:LoadOrderFunc();
-
-	for i = #self.frame.icon, iconIdx+1 , -1 do
-		self:ReleaseIcon(i)
-	end
-	return iconIdx;
+	return ret
 end
 
 function HDH_DK_RUNE_TRACKER:OnEvent(event, ...)

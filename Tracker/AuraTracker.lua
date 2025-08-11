@@ -126,7 +126,7 @@ do
 				spell.startTime = aura.expirationTime - aura.duration
 				spell.icon = aura.icon
 				spell.index = i; -- 툴팁을 위해, 순서
-				spell.happenTime = GetTime()
+				spell.happenTime = curTime
 
 				if HDH_TRACKER.startTime > spell.startTime then
 					spell.startTime = HDH_TRACKER.startTime
@@ -134,7 +134,6 @@ do
 				end
 
 				f.icon:SetTexture(aura.icon)
-				-- f.iconSatCooldown:SetTexture(aura.icon)
 				ret = ret + 1;
 			end
 		end
@@ -170,7 +169,6 @@ do
 		local aura_filter = self.aura_filter
 		local aura_caster = self.aura_caster
 		local display_mode = self.ui.common.display_mode
-		local cooldown_type = self.ui.icon.cooldown
 		local i = 0 -- 몇번째로 아이콘을 출력했는가?
 		local col = 0  -- 열에 대한 위치 좌표값 = x
 		local row = 0  -- 행에 대한 위치 좌표값 = y
@@ -336,7 +334,8 @@ do
 	-- 버프, 디버프의 상태가 변경 되었을때 마다 실행되어, 데이터 리스트를 업데이트 하는 함수
 	function HDH_AURA_TRACKER:Update()
 		if not self.frame or HDH_TRACKER.ENABLE_MOVE then return end
-		if not UnitExists(self.unit) or not self.frame.pointer or not self.ui then 
+		if not UnitExists(self.unit) or not self.frame.pointer or not self.ui then
+			
 			self.frame:Hide() return 
 		end
 		self.GetAurasFunc(self)
@@ -352,114 +351,72 @@ do
 	function HDH_AURA_TRACKER:InitIcons()
 		local trackerId = self.id
 		local id, name, type, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
-		if not id then return end
-		local elemKey, elemId, elemName, texture, glowType, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
-		local display, connectedId, connectedIsItem, unlearnedHideMode
-		local elemSize = DB:GetTrackerElementSize(trackerId)
-		local spell 
-		local f
-		local isLearned = true
-		local iconIdx = 0;
-		local needEquipmentEvent = false
+		if not id then return 0 end
 
-		self.frame.pointer = {}
+		local barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType
+		local f
+		local ret = 0
+
+		self.filter = (self.type == HDH_TRACKER.TYPE.BUFF) and "HELPFUL" or "HARMFUL"
 		self.aura_filter = aura_filter
 		self.aura_caster = aura_caster
-		self.filter = (self.type == HDH_TRACKER.TYPE.BUFF) and "HELPFUL" or "HARMFUL"
+		self.frame.pointer = {}
 
 		if aura_filter == DB.AURA_FILTER_ALL or aura_filter == DB.AURA_FILTER_ONLY_BOSS then
+			for i = 1 , 40 do
+				barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType = DB:GetTrackerElementBarInfo(trackerId, i)
+				f = self.frame.icon[i]
+				if f:GetParent() == nil then f:SetParent(self.frame) end
+
+				f.spell = {}
+				f.spell.barSplitPoints = splitPoints
+				f.spell.barSplitPointType = splitPointType
+				f.spell.barValueType = barValueType
+				f.spell.barMaxValueType = barMaxValueType
+				f.spell.barMaxValue = barMaxValue
+				-- f:Hide()
+				if f.bar then
+					f.bar:SetSplitPoints(spell.barSplitPoints, spell.barSplitPointType)
+				end
+			end
+			
 			self.GetAurasFunc = HDH_AURA_TRACKER.GetAurasAll
-			if #(self.frame.icon) > 0 then self:ReleaseIcons() end
+			self.frame:UnregisterAllEvents()
+			self.frame:SetScript("OnEvent", self.OnEvent)
+			self:LoadOrderFunc()
 		else
-			for i = 1, elemSize do
-				elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-				display, connectedId, connectedIsItem, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, i)
-				glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
-
-				if connectedId then
-					isLearned = HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(connectedId, nil, connectedIsItem)
-					if connectedIsItem then
-						needEquipmentEvent = true
-					end
-				else
-					isLearned = true
-				end
-				if unlearnedHideMode ~= DB.SPELL_HIDE or isLearned then
-					iconIdx = iconIdx + 1
-					f = self.frame.icon[iconIdx]
-					if f:GetParent() == nil then f:SetParent(self.frame) end
-					if isLearned then
-						self.frame.pointer[elemKey] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
-					else
-						spell.blankDisplay = true
-						f:Hide()
-					end
-					spell = {}
-					spell.glow = glowType
-					spell.glowCondtion = glowCondition
-					spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-					spell.glowEffectType = glowEffectType
-					spell.glowEffectColor = glowEffectColor
-					spell.glowEffectPerSec = glowEffectPerSec
-					spell.showValue = isValue
-					spell.display = display
-					spell.v1 = 0 -- 수치를 저장할 변수
-					spell.no = iconIdx
-					spell.name = elemName
-					spell.icon = texture
-					spell.id = tonumber(elemId)
-					spell.count = 0
-					spell.duration = 0
-					spell.remaining = 0
-					spell.overlay = 0
-					spell.endTime = 0
-					spell.isUpdate = false
-					spell.isItem =  isItem
-					f.spell = spell
-					f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-					self:UpdateGlow(f, false)
-				end
-			end
+			ret = super.InitIcons(self)
 			self.GetAurasFunc = HDH_AURA_TRACKER.GetAuras
-			for i = #(self.frame.icon) , iconIdx+1, -1 do
-				self:ReleaseIcon(i)
-			end
-		end
-		self:LoadOrderFunc();
-
-		self.frame:SetScript("OnEvent", self.OnEvent)
-		self.frame:UnregisterAllEvents()
-
-		if aura_filter == DB.AURA_FILTER_ONLY_BOSS then
-			self.frame:RegisterEvent('UNIT_AURA')
-			self.frame:RegisterEvent("ENCOUNTER_START");
-			self.frame:RegisterEvent("ENCOUNTER_END");
-		end
-		if #(self.frame.icon) > 0 or aura_filter == DB.AURA_FILTER_ALL then
-			self.frame:RegisterEvent('UNIT_AURA')
-			if self.unit == 'target' then
-				self.frame:RegisterEvent('PLAYER_TARGET_CHANGED')
-			elseif self.unit == 'focus' then
-				self.frame:RegisterEvent('PLAYER_FOCUS_CHANGED')
-			elseif string.find(self.unit, "boss") then 
-				self.frame:RegisterEvent('INSTANCE_ENCOUNTER_ENGAGE_UNIT')
-			elseif string.find(self.unit, "party") then
-				self.frame:RegisterEvent('GROUP_ROSTER_UPDATE')
-			elseif self.unit == 'pet' then
-				self.frame:RegisterEvent('UNIT_PET')
-			elseif string.find(self.unit, 'arena') then
-				self.frame:RegisterEvent('ARENA_OPPONENT_UPDATE')
-			end
-
-			if needEquipmentEvent then
-				self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
-			end
-		else
-			return
 		end
 
-		self:Update()
-		return iconIdx;
+		if self.type == HDH_TRACKER.TYPE.BUFF or self.type == HDH_TRACKER.TYPE.DEBUFF then
+			if aura_filter == DB.AURA_FILTER_ONLY_BOSS then
+				self.frame:RegisterEvent('UNIT_AURA')
+				self.frame:RegisterEvent("ENCOUNTER_START");
+				self.frame:RegisterEvent("ENCOUNTER_END");
+			end
+			if #(self.frame.icon) > 0 or aura_filter == DB.AURA_FILTER_ALL then
+				self.frame:RegisterEvent('UNIT_AURA')
+				if self.unit == 'target' then
+					self.frame:RegisterEvent('PLAYER_TARGET_CHANGED')
+				elseif self.unit == 'focus' then
+					self.frame:RegisterEvent('PLAYER_FOCUS_CHANGED')
+				elseif string.find(self.unit, "boss") then 
+					self.frame:RegisterEvent('INSTANCE_ENCOUNTER_ENGAGE_UNIT')
+				elseif string.find(self.unit, "party") then
+					self.frame:RegisterEvent('GROUP_ROSTER_UPDATE')
+				elseif self.unit == 'pet' then
+					self.frame:RegisterEvent('UNIT_PET')
+				elseif string.find(self.unit, 'arena') then
+					self.frame:RegisterEvent('ARENA_OPPONENT_UPDATE')
+				end
+			else
+				return 0
+			end
+
+			self:Update()
+		end
+		return ret
 	end
 
 ------------------------------------------
@@ -479,9 +436,9 @@ function HDH_AURA_TRACKER:UNIT_AURA()
 	self:Update()
 end
 
-function HDH_AURA_TRACKER:PLAYER_EQUIPMENT_CHANGED()
-	self:InitIcons()
-end
+-- function HDH_AURA_TRACKER:PLAYER_EQUIPMENT_CHANGED()
+-- 	self:InitIcons()
+-- end
 
 function HDH_AURA_TRACKER:OnEvent(event, ...)
 	local self = self.parent

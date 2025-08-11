@@ -103,9 +103,9 @@ do
         local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
 
 		if select(4, GetBuildInfo()) <= 59999 then -- 대격변
-			DB:SetTrackerElementSplitValues(trackerId, elemIdx, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_FIXED_VALUE)
+			DB:SetTrackerElementBarInfo(trackerId, elemIdx, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_FIXED_VALUE)
 		else
-			DB:SetTrackerElementSplitValues(trackerId, elemIdx, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_FIXED_VALUE)
+			DB:SetTrackerElementBarInfo(trackerId, elemIdx, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_FIXED_VALUE)
 		end
         
 		DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_VALUE, DB.CONDITION_GT_OR_EQ, 5)
@@ -252,91 +252,23 @@ do
 		end
 	end
 
-	function HDH_ENH_MAELSTROM_TRACKER:InitIcons()
-		local trackerId = self.id
-		local id, name, _, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
+	function HDH_ENH_MAELSTROM_TRACKER:InitIcons() -- HDH_TRACKER override
 		self.unit = "player"
-		self.aura_filter = aura_filter
-		self.aura_caster = aura_caster
-		if not id then 
-			return 
-		end
+		local ret = super.InitIcons(self)
+		self.power_info = self.POWER_INFO[self.type]
 
 		if select(4, GetBuildInfo()) <= 59999 then -- 대격변
 			self.powerMax = 5
 		else
 			self.powerMax = ((263 == select(1,  HDH_AT_UTIL.GetSpecializationInfo(HDH_AT_UTIL.GetSpecialization()))) and 10) or 5
 		end
-		local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, splitValues, glowEffectType, glowEffectColor, glowEffectPerSec, splitType
-		local elemSize = DB:GetTrackerElementSize(trackerId)
-		local spell 
-		local f
-		local iconIdx = 0
-		local hasEquipItem = false
 
-		self.frame.pointer = {}
-		self.frame:UnregisterAllEvents()
-		
-		self.talentId = HDH_AT_UTIL.GetSpecialization()
-
-		if self:GetElementCount() == 0 then
-			self:CreateData()
-		end
-		if self:GetElementCount() > 0 then
-			for i = 1 , elemSize do
-				elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-				glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
-				splitValues, splitType = DB:GetTrackerElementSplitValues(trackerId, i)
-				
-				iconIdx = iconIdx + 1
-				f = self.frame.icon[iconIdx]
-				if f:GetParent() == nil then f:SetParent(self.frame) end
-				self.frame.pointer[elemKey or tostring(elemId)] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
-				spell = {}
-				spell.glow = glowType
-				spell.glowCondtion = glowCondition
-				spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-				spell.glowEffectType = glowEffectType
-				spell.glowEffectColor = glowEffectColor
-				spell.glowEffectPerSec = glowEffectPerSec
-				spell.showValue = isValue
-				spell.display = display
-				spell.v1 = 0 -- 수치를 저장할 변수
-				spell.no = i
-				spell.name = elemName
-				spell.icon = texture
-				spell.power_index = 1
-				spell.id = tonumber(elemId)
-				spell.count = 0
-				spell.duration = 0
-				spell.remaining = 0
-				spell.overlay = 0
-				spell.endTime = 0
-				spell.startTime = 0
-				spell.is_buff = isBuff;
-				spell.isUpdate = false
-				spell.isItem =  isItem
-				spell.splitPoints = splitValues or {}
-				spell.splitPointType = splitType
-				f.spell = spell
-				f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-				self:UpdateGlow(f, false)
-				self:UpdateBarSettings(f)
-				-- f:SetScript("OnUpdate", HDH_ENH_MAELSTROM_OnUpdate)
-				f:Hide();
-				self:ActionButton_HideOverlayGlow(f)
-			end
-			self.frame:SetScript("OnEvent", self.OnEvent)
+		if ret > 0 then
 			self.frame:RegisterUnitEvent('UNIT_AURA')
 			self:Update()
-		else
-			self.frame:UnregisterAllEvents()
 		end
 		
-		for i = #self.frame.icon, iconIdx+1 , -1 do
-			self:ReleaseIcon(i)
-		end
-		return iconIdx
+		return ret
 	end
 
 ------------------------------------------

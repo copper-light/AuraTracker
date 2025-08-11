@@ -107,6 +107,8 @@ do -- HDH_HEALTH_TRACKER class
 		local h_max = self:GetPowerMax()
 		local h_value = healthBar:GetValue()
 		local ui = DB:GetTrackerUI(self.id)
+		value = value * 100000
+		value = math.min(value, h_max)
 		if absorb_f then
 			if value == 0 then 
 				if absorb_f:IsShown() then absorb_f:Hide() end
@@ -152,9 +154,9 @@ do -- HDH_HEALTH_TRACKER class
 	end
 	
 	function HDH_HEALTH_TRACKER:InitIcons() -- HDH_TRACKER override
-		super.InitIcons(self)
-		if self.frame then
-			self.frame:SetScript("OnEvent", OnEventTracker)
+		local ret = super.InitIcons(self)
+		if ret and self.frame then
+			self.frame:SetScript("OnEvent", nil)
 			self.frame:UnregisterAllEvents()
 			if self.frame.icon and self.frame.icon[1] then
 				self.frame.icon[1]:HookScript('OnUpdate', function(f, elapsed)
@@ -165,20 +167,20 @@ do -- HDH_HEALTH_TRACKER class
 			end
 		end
 	end
+
+	-- function HDH_HEALTH_TRACKER:PLAYER_ENTERING_WORLD()
+	-- end
 	
-	function HDH_HEALTH_TRACKER:ACTIVE_TALENT_GROUP_CHANGED()
-		self:InitIcons()
-		-- self:UpdateBar(self.frame.icon[1]);
-	end
+	-- function HDH_HEALTH_TRACKER:ACTIVE_TALENT_GROUP_CHANGED()
+	-- 	self:InitIcons()
+	-- 	-- self:UpdateBar(self.frame.icon[1]);
+	-- end
 	
-	function HDH_HEALTH_TRACKER:PLAYER_ENTERING_WORLD()
-	end
-	
-	function HDH_HEALTH_TRACKER:OnEvent(event, unit, powerType)
-		if self == nil or self.parent == nil then return end
-		if (event == 'UNIT_MAXHEALTH')then  -- (event == "UNIT_POWER")
-		end
-	end
+	-- function HDH_HEALTH_TRACKER:OnEvent(event, unit, powerType)
+	-- 	if self == nil or self.parent == nil then return end
+	-- 	if (event == 'UNIT_MAXHEALTH')then  -- (event == "UNIT_POWER")
+	-- 	end
+	-- end
 ------------------------------------
 end -- HDH_HEALTH_TRACKER class
 ------------------------------------

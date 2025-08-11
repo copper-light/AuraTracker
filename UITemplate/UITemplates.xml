@@ -1771,10 +1771,26 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 			</Layer>
 		</Layers>
 		<Frames>
+
+			<Button name="$parentButtonDel"  parentKey="ButtonDel" inherits="HDH_AT_ButtonTemplate" text="-">
+				<Size x="26" y="26" />
+				<Anchors>
+					<Anchor point="RIGHT"  x="0" y="0" />
+				</Anchors>
+			</Button>
+
+			<Button name="$parentButtonAdd" parentKey="ButtonAdd" inherits="HDH_AT_ButtonTemplate" text="+">
+				<Size x="26" y="26" />
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentButtonDel" relativePoint="LEFT" x="-5" y="0" />
+				</Anchors>
+			</Button>
+			
 			<EditBox name="$parentEdit" parentKey="EditBox" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false"  >
 				<Size x="60" y="26" />
 				<Anchors>
 					<Anchor point="LEFT"  relativePoint="RIGHT" relativeTo="$parentText" x="0" y="0"/>
+					<Anchor point="RIGHT"  relativePoint="LEFT" relativeTo="$parentButtonAdd" x="-5" y="0"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>
@@ -1784,19 +1800,51 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 				</Scripts>
 			</EditBox>
 
-			<Button name="$parentButtonAdd" parentKey="ButtonAdd" inherits="HDH_AT_ButtonTemplate" text="+">
-				<Size x="26" y="26" />
+		</Frames>
+	</Frame>
+
+	<Frame name="HDH_AT_MaxValueEdtiboxTemplate" virtual="true" >
+		<Size x="100" y="30" />
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" parentKey="Text" inherits="Font_Yellow_S" text="" justifyH="LEFT">
+					<Size x="70" y="26" />
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="LEFT" x="5" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<EditBox name="$parentEdit" parentKey="EditBox" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false"  >
+				<Size x="100" y="26" />
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentEdit" relativePoint="RIGHT" x="5" y="0" />
+					<Anchor point="RIGHT"  x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetNumeric(true)
+						self.Desc:SetText(HDH_AT_L.PLEASE_INPUT)
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+
+			<Button name="$parentDDMaxValue"  parentKey="DDMaxValue" inherits="HDH_AT_DropDownOptionTemplate">
+				<Size x="100" y="26" />
+				<Anchors>
+					<Anchor point="LEFT"  relativePoint="LEFT" relativeTo="$parentEdit" x="0" y="0"/>
+					<Anchor point="RIGHT"  relativePoint="RIGHT" relativeTo="$parentEdit" x="0" y="0"/>
 				</Anchors>
 			</Button>
-			
-			<Button name="$parentButtonDel"  parentKey="ButtonDel" inherits="HDH_AT_ButtonTemplate" text="-">
-				<Size x="26" y="26" />
+
+			<Button name="$parentDDMaxValueType"  parentKey="DDMaxValueType" inherits="HDH_AT_DropDownOptionTemplate">
+				<Size x="100" y="26" />
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentButtonAdd" relativePoint="RIGHT" x="5" y="0" />
+					<Anchor point="LEFT"  relativePoint="RIGHT" relativeTo="$parentText" x="0" y="0"/>
+					<Anchor point="RIGHT"  relativePoint="LEFT" relativeTo="$parentEdit" x="-5" y="0"/>
 				</Anchors>
 			</Button>
+
 		</Frames>
 	</Frame>
 
@@ -2574,21 +2622,5 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 			</OnLoad>
 		</Scripts>
 	</ScrollFrame>
-	
-	<Frame name="HDH_AT_MultiStatusBarTemplate" mixin="HDH_AT_MultiStatusBarTemplateMixin" virtual="true">
-		<!-- 입력된 값에 따라서 모든걸 조정할 것이기 때문에 코드로 내부 구조를 생성함 -->
-	</Frame>
-
-	<StatusBar name="HDH_AT_StatusBarTemplate" mixin="HDH_AT_StatusBarTemplateMixin" virtual="true">
-		<Layers>
-			<Layer level="OVERLAY">
-				<Texture parentKey="Spark" alphaMode="ADD">
-				</Texture>
-			</Layer>
-		</Layers>
-		<Scripts>
-			<OnValueChanged function="HDH_AT_StatusBar_OnValueChanged"/>
-		</Scripts>
-	</StatusBar>
 
 </Ui> 
