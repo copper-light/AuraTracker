@@ -47,8 +47,19 @@ local function UpdateCooldown(f, elapsed)
 
 	spell.curTime = GetTime();
 	spell.remaining = (spell.endTime or 0) - spell.curTime
-	if spell.remaining > 0.0 and spell.duration > HDH_TRACKER.GlobalCooldown then
-		tracker:UpdateTimeText(f.timetext, spell.remaining)
+	spell.time = spell.remaining
+	
+	if spell.duration <= HDH_TRACKER.GlobalCooldown then
+		spell.time = 0
+	end
+
+	if spell.time < HDH_TRACKER.EndCooldown and spell.charges then
+		spell.charges.remaining = math.max((spell.charges.endTime or 0) - spell.curTime, 0)
+		spell.time = spell.charges.remaining or 0 
+	end
+	
+	if spell.time > 0.0 then
+		tracker:UpdateTimeText(f.timetext, spell.time)
 
 		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
 			tracker:UpdateBarValue(f, GetTime())
@@ -62,34 +73,34 @@ local function UpdateCooldown(f, elapsed)
 end
 
 local function OnUpdateGlowColor(self, elapsed)
-	self.sparkElapsed = (self.sparkElapsed or 0) + elapsed
-	if self.sparkElapsed < (HDH_TRACKER.ONUPDATE_FRAME_TERM/2) or not self:GetParent().spell then return end
-	self.playing = (self.playing or 0) + self.sparkElapsed
-	self.sparkElapsed = 0
-	self.p = HDH_AT_UTIL.LogScale(math.max(math.min((1.25 - (GetTime() % (1/self:GetParent().spell.glowEffectPerSec) + .001) / (1/self:GetParent().spell.glowEffectPerSec*0.8)), 1.), 0.3))
-	self.p_c = math.max(self.p, 0.5)
-	self.icon_size = self:GetParent():GetParent().parent.ui.icon.size
+	-- self.sparkElapsed = (self.sparkElapsed or 0) + elapsed
+	-- if self.sparkElapsed < (HDH_TRACKER.ONUPDATE_FRAME_TERM/2) or not self:GetParent().spell then return end
+	-- self.playing = (self.playing or 0) + self.sparkElapsed
+	-- self.sparkElapsed = 0
+	-- self.p = HDH_AT_UTIL.LogScale(math.max(math.min((1.25 - (GetTime() % (1/self:GetParent().spell.glowEffectPerSec) + .001) / (1/self:GetParent().spell.glowEffectPerSec*0.8)), 1.), 0.3))
+	-- self.p_c = math.max(self.p, 0.5)
+	-- self.icon_size = self:GetParent():GetParent().parent.ui.icon.size
 	
-	if (math.min(1.4, self.playing / 0.25)) == 1.4 then
-		self.color:SetSize(self.icon_size * 1.31, self.icon_size * 1.31)
-		self.spot:SetVertexColor(self.p, self.p, self.p, 0.74)
-		self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1] * self.p_c, 
-								  self:GetParent().spell.glowEffectColor[2] * self.p_c, 
-								  self:GetParent().spell.glowEffectColor[3] * self.p_c, 
-								  self:GetParent().spell.glowEffectColor[4] * self.p_c)
-		self.spot:SetSize(self.icon_size, self.icon_size)
-	else -- starting animation
-		self.color:SetSize(
-			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.4)), 
-			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.4)))
-		self.spot:SetSize(self.icon_size * (0.8 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)),  
-						  self.icon_size * (0.8 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)))
-		self.spot:SetVertexColor(1, 1, 1, 1)
-		self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1], 
-								  self:GetParent().spell.glowEffectColor[2], 
-								  self:GetParent().spell.glowEffectColor[3], 
-								  self:GetParent().spell.glowEffectColor[4])
-	end
+	-- if (math.min(1.4, self.playing / 0.25)) == 1.4 then
+	-- 	self.color:SetSize(self.icon_size * 1.31, self.icon_size * 1.31)
+	-- 	self.spot:SetVertexColor(self.p, self.p, self.p, 0.74)
+	-- 	self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1] * self.p_c, 
+	-- 							  self:GetParent().spell.glowEffectColor[2] * self.p_c, 
+	-- 							  self:GetParent().spell.glowEffectColor[3] * self.p_c, 
+	-- 							  self:GetParent().spell.glowEffectColor[4] * self.p_c)
+	-- 	self.spot:SetSize(self.icon_size, self.icon_size)
+	-- else -- starting animation
+	-- 	self.color:SetSize(
+	-- 		self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.4)), 
+	-- 		self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.4)))
+	-- 	self.spot:SetSize(self.icon_size * (0.8 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)),  
+	-- 					  self.icon_size * (0.8 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)))
+	-- 	self.spot:SetVertexColor(1, 1, 1, 1)
+	-- 	self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1], 
+	-- 							  self:GetParent().spell.glowEffectColor[2], 
+	-- 							  self:GetParent().spell.glowEffectColor[3], 
+	-- 							  self:GetParent().spell.glowEffectColor[4])
+	-- end
 end
 
 -------------------------------------------
@@ -506,8 +517,97 @@ function HDH_TRACKER:UpdateBarSettings(f)
 	end
 end
 
+function HDH_TRACKER:UpdateLayout()
+	if not self.ui or not self.frame.icon then return end
+	local f
+	local always_show = self.ui.common.always_show
+	local line = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
+	local margin_h = self.ui.common.margin_h
+	local margin_v = self.ui.common.margin_v
+	local reverse_v = self.ui.common.reverse_v -- 상하반전
+	local reverse_h = self.ui.common.reverse_h -- 좌우반전
+	local show_index = 0 -- 몇번째로 아이콘을 출력했는가?
+	local display_index = 0 -- 몇번째로 아이콘을 출력했는가?
+	local col = 0  -- 열에 대한 위치 좌표값 = x
+	local row = 0  -- 행에 대한 위치 좌표값 = y
+	local useSpace = false
+	local size_w, size_h
+
+	if self.ui.common.display_mode == DB.DISPLAY_BAR then
+		size_w = self.ui.bar.width
+		size_h = self.ui.bar.height
+	elseif self.ui.common.display_mode == DB.DISPLAY_ICON_AND_BAR then
+		if self.ui.bar.location == DB.BAR_LOCATION_R or self.ui.bar.location == DB.BAR_LOCATION_L then
+			size_w = self.ui.bar.width + self.ui.icon.size
+			size_h = math.max(self.ui.bar.height, self.ui.icon.size)
+		else
+			size_h = self.ui.bar.height + self.ui.icon.size
+			size_w = math.max(self.ui.bar.width, self.ui.icon.size)
+		end
+	else
+		size_w = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
+		size_h = self.ui.icon.size
+	end
+
+	for i = 1 , #self.frame.icon do
+		f = self.frame.icon[i]
+		useSpace = true
+		if f and f.spell then
+			if self.ui.common.order_by == DB.ORDERBY_REG then
+				if f.spell.isUpdate then
+					if f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then
+						if f:IsShown() then f:Hide() end
+					elseif f.spell.display == DB.SPELL_HIDE_TIME_ON then
+						if f:IsShown() then f:Hide() end
+						useSpace = false
+					else
+						if not f:IsShown() then f:Show() end
+					end
+					show_index = show_index + 1
+				else
+					if f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE then
+						if f:IsShown() then f:Hide() end
+					elseif f.spell.display == DB.SPELL_HIDE_TIME_OFF then
+						if f:IsShown() then f:Hide() end
+						useSpace = false
+					else
+						if not f:IsShown() then f:Show() end
+					end
+				end
+
+			else
+				if f.spell.isLearned then
+					if not f:IsShown() then f:Show() end
+				else
+					if f:IsShown() then f:Hide() end
+					useSpace = false
+				end
+			end
+		end
+		f.spell.isUpdate = false
+
+		if useSpace then
+			f:ClearAllPoints()
+			f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
+			if display_index % line == 0 then 
+				row = row + size_h + margin_v
+				col = 0	
+			else 
+				col = col + size_w + margin_h 
+			end
+		end
+	end
+
+	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
+			and (HDH_TRACKER.ENABLE_MOVE or show_index > 0 or always_show or UnitAffectingCombat("player")) then
+		self:ShowTracker();
+	else
+		self:HideTracker();
+	end
+end
+
 function HDH_TRACKER:Update()
-	-- interface
+
 end
 
 function HDH_TRACKER:UpdateTimeText(text, value)
@@ -543,7 +643,7 @@ function HDH_TRACKER:GetBarMax(elementIdx)
 	return ret 
 end
 
-function HDH_TRACKER:IsSwitchByRemining(icon1, icon2) 
+function HDH_TRACKER:IsSwitchByRemining(icon1, icon2, desc) 
 	if not icon1.spell and not icon2.spell then return end
 	local s1 = icon1.spell
 	local s2 = icon2.spell
@@ -554,7 +654,7 @@ function HDH_TRACKER:IsSwitchByRemining(icon1, icon2)
 		if (s1.remaining < s2.remaining) or (s2.duration == 0) then
 			ret = true;
 		end
-	elseif (not s1.isUpdate and not s2.isUpdate) and (s1.no <s2.no) then
+	elseif (not s1.isUpdate and not s2.isUpdate) and ((not desc) and s1.no < s2.no) or ((desc) and s1.no > s2.no) then
 		ret = true;
 	end
 	return ret;
@@ -562,14 +662,13 @@ end
 
 function HDH_TRACKER:InAsendingOrderByTime()
 	local tmp
-	local cnt = #self.frame.icon;
-	-- local order
+	local cnt = #self.frame.icon
 	for i = 1, cnt-1 do
 		for j = i+1 , cnt do
 			if self:IsSwitchByRemining(self.frame.icon[j], self.frame.icon[i]) then
-				tmp = self.frame.icon[i];
-				self.frame.icon[i] = self.frame.icon[j];
-				self.frame.icon[j] = tmp;
+				tmp = self.frame.icon[i]
+				self.frame.icon[i] = self.frame.icon[j]
+				self.frame.icon[j] = tmp
 			end
 		end
 	end
@@ -577,34 +676,33 @@ end
 
 function HDH_TRACKER:InDesendingOrderByTime()
 	local tmp
-	local cnt = #self.frame.icon;
-	-- local order
+	local cnt = #self.frame.icon
 	for i = 1, cnt-1 do
 		for j = i+1 , cnt do
-			if self:IsSwitchByRemining(self.frame.icon[i], self.frame.icon[j]) then
-				tmp = self.frame.icon[i];
-				self.frame.icon[i] = self.frame.icon[j];
-				self.frame.icon[j] = tmp;
+			if self:IsSwitchByRemining(self.frame.icon[i], self.frame.icon[j], true) then
+				tmp = self.frame.icon[i]
+				self.frame.icon[i] = self.frame.icon[j]
+				self.frame.icon[j] = tmp
 			end
 		end
 	end
 end
 
-function HDH_TRACKER:IsSwitchByHappenTime(icon1, icon2) 
+function HDH_TRACKER:IsSwitchByHappenTime(icon1, icon2, desc)
 	if not icon1.spell and not icon2.spell then return end
 	local s1 = icon1.spell
 	local s2 = icon2.spell
-	local ret = false;
+	local ret = false
 	if (not s1.isUpdate and s2.isUpdate) then
-		ret = true;
+		ret = true
 	elseif (s1.isUpdate and s2.isUpdate) then
 		if (s1.happenTime < s2.happenTime) then
-			ret = true;
+			ret = true
 		end
-	elseif (not s1.isUpdate and not s2.isUpdate) and (s1.no < s2.no) then
-		ret = true;
+	elseif (not s1.isUpdate and not s2.isUpdate) and ((not desc) and s1.no < s2.no) or ((desc) and s1.no > s2.no) then
+		ret = true
 	end
-	return ret;
+	return ret
 end
 
 function HDH_TRACKER:InAsendingOrderByCast()
@@ -628,7 +726,7 @@ function HDH_TRACKER:InDesendingOrderByCast()
 	-- local order
 	for i = 1, cnt-1 do
 		for j = i+1 , cnt do
-			if self:IsSwitchByHappenTime(self.frame.icon[j], self.frame.icon[i]) then
+			if self:IsSwitchByHappenTime(self.frame.icon[j], self.frame.icon[i], true) then
 				tmp = self.frame.icon[i];
 				self.frame.icon[i] = self.frame.icon[j];
 				self.frame.icon[j] = tmp;
@@ -1362,127 +1460,6 @@ function HDH_TRACKER:UpdateIconSettings(f)
 	end
 end
 
-function HDH_TRACKER:InitIcons()
-	local trackerId = self.id
-	local id, name, trackerType, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
-	if not id then return 0 end
-	local elemKey, elemId, elemName, texture, glowType, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
-	local barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType, defaultImg
-	local innerTrackingType, innerSpellId, innerCooldown 
-	local display, connectedId, connectedIsItem, unlearnedHideMode
-	local spell 
-	local f
-	local isLearned = true
-	local iconIdx = 0;
-	local needEquipmentEvent = false
-
-	self.frame.pointer = {}
-	self.aura_filter = aura_filter
-	self.aura_caster = aura_caster
-	self.talentId = HDH_AT_UTIL.GetSpecialization()
-
-	if self:GetElementCount() == 0 then
-		self:CreateData()
-	end
-
-	local elemSize = DB:GetTrackerElementSize(trackerId)
-	for i = 1, elemSize do
-		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-		display, connectedId, connectedIsItem, unlearnedHideMode = DB:GetTrackerElementDisplay(trackerId, i)
-		glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
-		defaultImg = DB:GetTrackerElementDefaultImage(trackerId, i)
-		barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType = DB:GetTrackerElementBarInfo(trackerId, i)
-		innerTrackingType, innerSpellId, innerCooldown =  DB:GetTrackerElementInnerCooldown(trackerId, i)
-
-		if connectedId then
-			isLearned = HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(connectedId, nil, connectedIsItem)
-			if connectedIsItem then
-				needEquipmentEvent = true
-			end
-		else
-			isLearned = true
-		end
-		if unlearnedHideMode ~= DB.SPELL_HIDE or isLearned then
-			iconIdx = iconIdx + 1
-			f = self.frame.icon[iconIdx]
-			if f:GetParent() == nil then f:SetParent(self.frame) end
-			if isLearned then
-				self.frame.pointer[elemKey] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
-			else
-				spell.blankDisplay = true
-			end
-			spell = {}
-			if type(elemKey) == "number" then
-				spell.key = tonumber(elemKey)
-			else
-				spell.key = elemKey
-			end
-
-			spell.no = iconIdx
-			spell.name = elemName
-			spell.icon = texture
-			spell.id = tonumber(elemId)
-			spell.count = 0
-			spell.v1 = 0 -- 수치를 저장할 변수
-			spell.duration = 0
-			spell.remaining = 0
-			spell.overlay = 0
-			spell.endTime = 0
-			spell.isUpdate = false
-			spell.defaultImg = defaultImg
-			spell.isItem =  isItem
-			spell.happenTime = 0
-
-			spell.glow = glowType
-			spell.glowCondtion = glowCondition
-			spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-			spell.glowEffectType = glowEffectType
-			spell.glowEffectColor = glowEffectColor
-			spell.glowEffectPerSec = glowEffectPerSec
-			spell.showValue = isValue
-			spell.display = display
-			
-			spell.barSplitPoints = splitPoints
-			spell.barSplitPointType = splitPointType or DB.BAR_SPLIT_RATIO
-			spell.barValueType = barValueType
-			spell.barMaxValueType = barMaxValueType
-			spell.barMaxValue = barMaxValue
-
-			if innerSpellId then
-				spell.isInnerCDItem = true
-				spell.innerSpellId = tonumber(innerSpellId)
-				spell.innerCooldown = tonumber(innerCooldown)
-				spell.innerTrackingType = innerTrackingType
-			end
-
-			f.spell = spell
-			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-			self:UpdateGlow(f, false)
-			self:UpdateBarSettings(f)
-
-			f:Hide()
-			self:ActionButton_HideOverlayGlow(f)
-			if f.bar then
-				f.bar:SetSplitPoints(spell.barSplitPoints, spell.barSplitPointType)
-			end
-		end
-	end
-	
-	for i = #(self.frame.icon) , iconIdx+1, -1 do
-		self:ReleaseIcon(i)
-	end
-	self.frame:UnregisterAllEvents()
-	if iconIdx > 0 then
-		if needEquipmentEvent then
-			self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
-		end
-
-		self.frame:SetScript("OnEvent", self.OnEvent)
-		self:LoadOrderFunc()
-	end
-	
-	return iconIdx;
-end
 -------------------------------------------
 -- 애니메이션 관련
 -------------------------------------------
@@ -1732,6 +1709,130 @@ function HDH_TRACKER:StartAni(f, ani_type) -- row 이동 실행
 			self:GetAni(f, ani_type):Play();
 		end
 	end
+end
+
+------------------------------------------
+--- 프레임 DB 로드 시작점
+------------------------------------------
+function HDH_TRACKER:InitIcons()
+	local trackerId = self.id
+	local id, name, trackerType, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
+	if not id then return 0 end
+	local elemKey, elemId, elemName, texture, glowType, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
+	local barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType, defaultImg
+	local innerTrackingType, innerSpellId, innerCooldown 
+	local display, connectedId, connectedIsItem, unlearnedHideMode
+	local spell 
+	local f
+	local isLearned = true
+	local iconIdx = 0;
+	local needEquipmentEvent = false
+
+	self.frame.pointer = {}
+	self.aura_filter = aura_filter
+	self.aura_caster = aura_caster
+	self.talentId = HDH_AT_UTIL.GetSpecialization()
+
+	if self:GetElementCount() == 0 then
+		self:CreateData()
+	end
+
+	local elemSize = DB:GetTrackerElementSize(trackerId)
+	for i = 1, elemSize do
+		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem                = DB:GetTrackerElement(trackerId, i)
+		barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType               = DB:GetTrackerElementBarInfo(trackerId, i)
+		glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
+		display, connectedId, connectedIsItem, unlearnedHideMode                              = DB:GetTrackerElementDisplay(trackerId, i)
+		innerTrackingType, innerSpellId, innerCooldown                                        = DB:GetTrackerElementInnerCooldown(trackerId, i)
+		defaultImg                                                                            = DB:GetTrackerElementDefaultImage(trackerId, i)
+
+		if connectedId then
+			isLearned = HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(connectedId, nil, connectedIsItem)
+			if connectedIsItem then
+				needEquipmentEvent = true
+			end
+		else
+			isLearned = true
+		end
+		if unlearnedHideMode ~= DB.SPELL_HIDE or isLearned then
+			iconIdx = iconIdx + 1
+			f = self.frame.icon[iconIdx]
+			if f:GetParent() == nil then f:SetParent(self.frame) end
+			if isLearned then
+				self.frame.pointer[elemKey] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
+			end
+			
+			spell = {}
+			if type(elemKey) == "number" then
+				spell.key = tonumber(elemKey)
+			else
+				spell.key = elemKey
+			end
+			spell.isLearned = isLearned
+			spell.no = iconIdx
+			spell.name = elemName
+			spell.icon = texture
+			spell.id = tonumber(elemId)
+			spell.count = 0
+			spell.v1 = 0 -- 수치를 저장할 변수
+			spell.duration = 0
+			spell.remaining = 0
+			spell.overlay = 0
+			spell.endTime = 0
+			spell.isUpdate = false
+			spell.defaultImg = defaultImg
+			spell.isItem =  isItem
+			spell.happenTime = 0
+
+			spell.glow = glowType
+			spell.glowCondtion = glowCondition
+			spell.glowValue = (glowValue and tonumber(glowValue)) or 0
+			spell.glowEffectType = glowEffectType
+			spell.glowEffectColor = glowEffectColor
+			spell.glowEffectPerSec = glowEffectPerSec
+			spell.showValue = isValue
+			spell.display = display
+			
+			spell.barSplitPoints = splitPoints
+			spell.barSplitPointType = splitPointType or DB.BAR_SPLIT_RATIO
+			spell.barValueType = barValueType
+			spell.barMaxValueType = barMaxValueType
+			spell.barMaxValue = barMaxValue
+
+			if innerSpellId then
+				spell.isInnerCDItem = true
+				spell.innerSpellId = tonumber(innerSpellId)
+				spell.innerCooldown = tonumber(innerCooldown)
+				spell.innerTrackingType = innerTrackingType
+			end
+
+			f.spell = spell
+			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+			self:UpdateGlow(f, false)
+			self:UpdateBarSettings(f)
+
+			f:Hide()
+			self:ActionButton_HideOverlayGlow(f)
+			if f.bar then
+				f.bar:SetSplitPoints(spell.barSplitPoints, spell.barSplitPointType)
+			end
+		end
+	end
+	
+	for i = #(self.frame.icon) , iconIdx+1, -1 do
+		self:ReleaseIcon(i)
+	end
+	self.frame:UnregisterAllEvents()
+	if iconIdx > 0 then
+		if needEquipmentEvent then
+			self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
+		end
+
+		self.frame:SetScript("OnEvent", self.OnEvent)
+		self:LoadOrderFunc()
+	end
+	
+	return iconIdx;
 end
 
 ------------------------------------------

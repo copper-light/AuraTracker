@@ -318,7 +318,7 @@ function HDH_DK_RUNE_TRACKER:Update() -- HDH_TRACKER override
 end
 
 function HDH_DK_RUNE_TRACKER:InitIcons()
-	local ret = super.InitIcons(self)
+	local ret = HDH_TRACKER.InitIcons(self)
 	for i = 1 , ret do
 		self.frame.icon[i].spell.power_index = self.POWER_INFO[self.type].power_index
 	end

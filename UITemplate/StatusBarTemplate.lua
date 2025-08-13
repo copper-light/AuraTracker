@@ -452,7 +452,7 @@ function HDH_AT_MultiStatusBarTemplateMixin:UpdateSplitPoints(points, pointType,
 end
 
 function HDH_AT_MultiStatusBarTemplateMixin:SetSplitPoints(points, pointType)
-    self.points = points
+    self.points = points or {}
     self.pointType = pointType
     self:SetMinMaxValues(self.minValue, self.maxValue, true)
 end

@@ -160,174 +160,81 @@ do
 	
 	function HDH_AURA_TRACKER:UpdateAllIcons()
 		local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
-		local column_count = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
-		local margin_h = self.ui.common.margin_h
-		local margin_v = self.ui.common.margin_v
-		local reverse_v = self.ui.common.reverse_v -- 상하반전
-		local reverse_h = self.ui.common.reverse_h -- 좌우반전
 		local icons = self.frame.icon
 		local aura_filter = self.aura_filter
 		local aura_caster = self.aura_caster
 		local display_mode = self.ui.common.display_mode
-		local i = 0 -- 몇번째로 아이콘을 출력했는가?
-		local col = 0  -- 열에 대한 위치 좌표값 = x
-		local row = 0  -- 행에 대한 위치 좌표값 = y
-		if self.OrderFunc then self.OrderFunc(self) end 
-
-		local size_w, size_h
-		if self.ui.common.display_mode == DB.DISPLAY_BAR then
-			size_w = self.ui.bar.width
-			size_h = self.ui.bar.height
-		elseif self.ui.common.display_mode == DB.DISPLAY_ICON_AND_BAR then
-			if self.ui.bar.location == DB.BAR_LOCATION_R or self.ui.bar.location == DB.BAR_LOCATION_L then
-				size_w = self.ui.bar.width + self.ui.icon.size
-				size_h = math.max(self.ui.bar.height, self.ui.icon.size)
-			else
-				size_h = self.ui.bar.height + self.ui.icon.size
-				size_w = math.max(self.ui.bar.width, self.ui.icon.size)
-			end
-
-		else
-			size_w = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
-			size_h = self.ui.icon.size
-		end
 
 		for _, f in ipairs(icons) do
 			if not f.spell then break end
 			if f.spell.isUpdate then
-				if not HDH_TRACKER.ENABLE_MOVE then
-					f.spell.isUpdate = false
-				end
-				
-				if aura_filter == DB.AURA_FILTER_ALL 
-						or aura_filter == DB.AURA_FILTER_ONLY_BOSS
-						or f.spell.display == DB.SPELL_ALWAYS_DISPLAY
-						or f.spell.display == DB.SPELL_HIDE_TIME_OFF
-						or f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE
-						or HDH_TRACKER.ENABLE_MOVE then
-					if aura_caster == DB.AURA_CASTER_ONLY_MINE then
-						f.counttext:SetText(f.spell.count >= 2 and f.spell.count or "")
-					else
-						if f.spell.count < 2 then f.counttext:SetText(f.spell.overlay >= 2 and f.spell.overlay or "")
-											 else f.counttext:SetText(f.spell.count) end
-					end
-					
-					f.icon:UpdateCooldowning()
-					f.v1:SetText((f.spell.showValue and f.spell.v1) and HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate) or nil)
-					if f.spell.duration == 0 then
-						f.timetext:SetText("")
-						f.icon:SetCooldown(0, 1, false)
-						f.icon:SetValue(0)
-					else 
-						self:UpdateTimeText(f.timetext, f.spell.remaining)
-						f.icon:SetCooldown(f.spell.startTime, f.spell.duration)
-					end
-					
-					if self.ui.common.default_color then
-						if f.spell.dispelType == nil then
-							f.icon:SetBorderColor(unpack(self.ui.icon.active_border_color))
-							if f.bar then
-								f.bar:SetStatusBarColor(unpack(self.ui.icon.active_border_color))
-							end
-						else
-							f.icon:SetBorderColor(DebuffTypeColor[f.spell.dispelType].r, DebuffTypeColor[f.spell.dispelType].g, DebuffTypeColor[f.spell.dispelType].b, 1)
-							if f.bar then
-								f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType].r, DebuffTypeColor[f.spell.dispelType].g, DebuffTypeColor[f.spell.dispelType].b, 1)
-							end
-						end
-					end
-
-					if display_mode ~= DB.DISPLAY_ICON and f.bar then
-						f.bar:SetText(f.spell.name)
-						if f.spell.duration == 0 then
-							f.spell.remaining = 0
-							f.spell.endTime = 1
-							f.spell.startTime = 0
-							self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, 0)
-						else
-							self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, GetTime())
-						end
-					end
-					f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-					i = i + 1
-					if i % column_count == 0 then row = row + size_h + margin_v; col = 0
-											else col = col + size_w + margin_h end
-					ret = ret + 1
-					f:Show()
-					self:UpdateGlow(f, true)
-				elseif (f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
-					i = i + 1
-					if i % column_count == 0 then 
-						row = row + size_h + margin_v
-						col = 0
-					else 
-						col = col + size_w + margin_h 
-					end
-					f:Hide()
-				elseif f.spell.display == DB.SPELL_HIDE_TIME_ON and f.spell.remaining > 0 then
-					f:Hide()
-				end
-			else
-				f.timetext:SetText(nil)
-				f.icon:Stop()
-				
-				if not f.spell.blankDisplay then
-					if f.spell.display == DB.SPELL_HIDE_TIME_ON or f.spell.display == DB.SPELL_ALWAYS_DISPLAY or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then
-						f.icon:UpdateCooldowning(false)
-						f.v1:SetText(nil)
-						f.counttext:SetText(nil)
-						if display_mode ~= DB.DISPLAY_ICON and f.bar then 
-							f.bar:SetText(f.spell.name);
-							f.spell.remaining = 0
-							f.spell.endTime = 1
-							f.spell.startTime = 0
-							if self.ui.common.default_color and f.spell.dispelType then
-								f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r, DebuffTypeColor[f.spell.dispelType or ""].g, DebuffTypeColor[f.spell.dispelType or ""].b, 1)
-							end
-							self:UpdateBarMinMaxValue(f, 0, 1, 1);
-						end--f.bar:Hide();)
-						f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-						i = i + 1
-						if i % column_count == 0 then 
-							row = row + size_h + margin_v; col = 0
-						else 
-							col = col + size_w + margin_h
-						end
-						f:Show()
-
-						self:UpdateGlow(f, f.spell.glow == DB.GLOW_CONDITION_TIME)
-					else
-						if (f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
-							i = i + 1
-							if i % column_count == 0 then 
-								row = row + size_h + margin_v
-								col = 0
-							else 
-								col = col + size_w + margin_h
-							end
-						end
-						f:Hide()
-					end
+				if aura_caster == DB.AURA_CASTER_ONLY_MINE then
+					f.counttext:SetText(f.spell.count >= 2 and f.spell.count or "")
 				else
-					if self.ui.common.order_by == DB.ORDERBY_REG then
-						i = i + 1
-						if i % column_count == 0 then 
-							row = row + size_h + margin_v
-							col = 0
-						else 
-							col = col + size_w + margin_h
+					if f.spell.count < 2 then f.counttext:SetText(f.spell.overlay >= 2 and f.spell.overlay or "")
+											else f.counttext:SetText(f.spell.count) end
+				end
+				
+				f.icon:UpdateCooldowning()
+				f.v1:SetText((f.spell.showValue and f.spell.v1) and HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate) or nil)
+				if f.spell.duration == 0 then
+					f.timetext:SetText("")
+					f.icon:SetCooldown(0, 1, false)
+					f.icon:SetValue(0)
+				else 
+					self:UpdateTimeText(f.timetext, f.spell.remaining)
+					f.icon:SetCooldown(f.spell.startTime, f.spell.duration)
+				end
+				
+				if self.ui.common.default_color then
+					if f.spell.dispelType == nil then
+						f.icon:SetBorderColor(unpack(self.ui.icon.active_border_color))
+						if f.bar then
+							f.bar:SetStatusBarColor(unpack(self.ui.icon.active_border_color))
+						end
+					else
+						f.icon:SetBorderColor(DebuffTypeColor[f.spell.dispelType].r, DebuffTypeColor[f.spell.dispelType].g, DebuffTypeColor[f.spell.dispelType].b, 1)
+						if f.bar then
+							f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType].r, DebuffTypeColor[f.spell.dispelType].g, DebuffTypeColor[f.spell.dispelType].b, 1)
 						end
 					end
 				end
-				f.spell.endTime = nil;
-				f.spell.duration = 0;
-				f.spell.duration = 0;
-				f.spell.remaining = 0;
-				f.spell.happenTime = nil;
-				f.spell.overlay = 0
-				f.spell.count = 0
+
+				if display_mode ~= DB.DISPLAY_ICON and f.bar then
+					f.bar:SetText(f.spell.name)
+					if f.spell.duration == 0 then
+						f.spell.remaining = 0
+						f.spell.endTime = 1
+						f.spell.startTime = 0
+						self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, 0)
+					else
+						self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, GetTime())
+					end
+				end
+				self:UpdateGlow(f, true)
+			else
+				if f.spell.isLearned then
+					f.timetext:SetText(nil)
+					f.icon:Stop()
+					f.icon:UpdateCooldowning(false)
+					f.v1:SetText(nil)
+					f.counttext:SetText(nil)
+					self:UpdateGlow(f, f.spell.glow == DB.GLOW_CONDITION_TIME)
+					f.spell.remaining = 1
+					f.spell.endTime = 1
+					f.spell.startTime = 0
+					if display_mode ~= DB.DISPLAY_ICON and f.bar then 
+						f.bar:SetText(f.spell.name)
+						if self.ui.common.default_color and f.spell.dispelType then
+							f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r, DebuffTypeColor[f.spell.dispelType or ""].g, DebuffTypeColor[f.spell.dispelType or ""].b, 1)
+						end
+						self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, f.spell.remaining);
+					end
+				end
 			end
 		end
+		
+		if self.OrderFunc then self.OrderFunc(self) end
 		return ret
 	end
 
@@ -339,13 +246,8 @@ do
 			self.frame:Hide() return 
 		end
 		self.GetAurasFunc(self)
-
-		if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
-				and ((self:UpdateAllIcons() > 0) or UnitAffectingCombat("player") or self.ui.common.always_show) then 
-			self:ShowTracker();
-		else
-			self:HideTracker();
-		end
+		self:UpdateAllIcons() 
+		self:UpdateLayout()
 	end
 
 	function HDH_AURA_TRACKER:InitIcons()
@@ -376,7 +278,7 @@ do
 				f.spell.barMaxValue = barMaxValue
 				-- f:Hide()
 				if f.bar then
-					f.bar:SetSplitPoints(spell.barSplitPoints, spell.barSplitPointType)
+					f.bar:SetSplitPoints(f.spell.barSplitPoints, f.spell.barSplitPointType)
 				end
 			end
 			
@@ -389,33 +291,31 @@ do
 			self.GetAurasFunc = HDH_AURA_TRACKER.GetAuras
 		end
 
-		if self.type == HDH_TRACKER.TYPE.BUFF or self.type == HDH_TRACKER.TYPE.DEBUFF then
-			if aura_filter == DB.AURA_FILTER_ONLY_BOSS then
-				self.frame:RegisterEvent('UNIT_AURA')
-				self.frame:RegisterEvent("ENCOUNTER_START");
-				self.frame:RegisterEvent("ENCOUNTER_END");
-			end
-			if #(self.frame.icon) > 0 or aura_filter == DB.AURA_FILTER_ALL then
-				self.frame:RegisterEvent('UNIT_AURA')
-				if self.unit == 'target' then
-					self.frame:RegisterEvent('PLAYER_TARGET_CHANGED')
-				elseif self.unit == 'focus' then
-					self.frame:RegisterEvent('PLAYER_FOCUS_CHANGED')
-				elseif string.find(self.unit, "boss") then 
-					self.frame:RegisterEvent('INSTANCE_ENCOUNTER_ENGAGE_UNIT')
-				elseif string.find(self.unit, "party") then
-					self.frame:RegisterEvent('GROUP_ROSTER_UPDATE')
-				elseif self.unit == 'pet' then
-					self.frame:RegisterEvent('UNIT_PET')
-				elseif string.find(self.unit, 'arena') then
-					self.frame:RegisterEvent('ARENA_OPPONENT_UPDATE')
-				end
-			else
-				return 0
-			end
-
-			self:Update()
+		if aura_filter == DB.AURA_FILTER_ONLY_BOSS then
+			self.frame:RegisterEvent('UNIT_AURA')
+			self.frame:RegisterEvent("ENCOUNTER_START");
+			self.frame:RegisterEvent("ENCOUNTER_END");
 		end
+		if #(self.frame.icon) > 0 or aura_filter == DB.AURA_FILTER_ALL then
+			self.frame:RegisterEvent('UNIT_AURA')
+			if self.unit == 'target' then
+				self.frame:RegisterEvent('PLAYER_TARGET_CHANGED')
+			elseif self.unit == 'focus' then
+				self.frame:RegisterEvent('PLAYER_FOCUS_CHANGED')
+			elseif string.find(self.unit, "boss") then 
+				self.frame:RegisterEvent('INSTANCE_ENCOUNTER_ENGAGE_UNIT')
+			elseif string.find(self.unit, "party") then
+				self.frame:RegisterEvent('GROUP_ROSTER_UPDATE')
+			elseif self.unit == 'pet' then
+				self.frame:RegisterEvent('UNIT_PET')
+			elseif string.find(self.unit, 'arena') then
+				self.frame:RegisterEvent('ARENA_OPPONENT_UPDATE')
+			end
+		else
+			return 0
+		end
+
+		self:Update()
 		return ret
 	end
 

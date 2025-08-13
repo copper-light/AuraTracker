@@ -1090,6 +1090,12 @@ local function HDH_AT_OnSelected_Dropdown(self, itemFrame, idx, value)
 			F.DD_TRACKER_AURA_CASTER:Disable()
 			F.DD_TRACKER_AURA_FILTER:Disable()
 		end
+	
+	elseif self == F.BODY.CONFIG_UI.DD_ICON_ORDER then
+		local main = GetMainFrame()
+		local trackerId = main:GetCurTrackerId()
+		HDH_TRACKER.InitVaribles(trackerId)
+
 	end
 
 	if self.dbKey then
@@ -3611,6 +3617,7 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.DROPDOWN,       L.ICON_ORDER,         "ui.%s.common.order_by")
 	HDH_AT_DropDown_Init(comp, DDP_ICON_ORDER_LIST, HDH_AT_OnSelected_Dropdown)
+	self.F.BODY.CONFIG_UI.DD_ICON_ORDER = comp
 
 	comp = HDH_AT_CreateOptionComponent(tabUIList[5].content, COMP_TYPE.SLIDER,       L.ICON_NUMBER_OF_HORIZONTAL,           "ui.%s.common.column_count")
 	comp:Init(1, 1, 20, nil, L.ROW_N_COL_N)

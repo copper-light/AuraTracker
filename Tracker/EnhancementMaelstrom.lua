@@ -10,6 +10,8 @@ else
 end
 
 -- 거인의 힘 : 446738
+HDH_ENH_MAELSTROM_TRACKER.power_info = {power_type="MAELSTROM", 		power_index =11,	color={0.25, 0.5, 1, 1},		regen=false,  texture = "Interface/Icons/Spell_Shaman_StaticShock"};
+
 
 ------------------------------------------
  -- AURA TRACKER Class
@@ -144,7 +146,7 @@ do
 	function HDH_ENH_MAELSTROM_TRACKER:CreateDummySpell(count)
 		local icons =  self.frame.icon
 		local ui = self.ui
-		local f, spell
+		local f
 		local power_max = self:GetPowerMax()
 		f = icons[1];
 		f:SetMouseClickEnabled(false);
@@ -153,7 +155,8 @@ do
 			f.icon:SetTexture(self.power_info.texture);
 		end
 		f:ClearAllPoints()
-		spell = {}
+		local spell = f.spell
+		if not spell then spell = {} f.spell = spell end
 		spell.display = DB.SPELL_ALWAYS_DISPLAY
 		spell.id = 0
 		spell.count = 100
@@ -180,7 +183,7 @@ do
 			f.bar:Show()
 			self:UpdateBarMinMaxValue(f, 0, 1, 1)
 		end
-		f.spell = spell
+		
 		f.counttext:SetText("100%")
 		self:SetGameTooltip(f, false)
 		f:Show()
@@ -254,8 +257,7 @@ do
 
 	function HDH_ENH_MAELSTROM_TRACKER:InitIcons() -- HDH_TRACKER override
 		self.unit = "player"
-		local ret = super.InitIcons(self)
-		self.power_info = self.POWER_INFO[self.type]
+		local ret = HDH_TRACKER.InitIcons(self)
 
 		if select(4, GetBuildInfo()) <= 59999 then -- 대격변
 			self.powerMax = 5

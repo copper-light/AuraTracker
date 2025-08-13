@@ -130,7 +130,7 @@ end
 function HDH_STAGGER_TRACKER:CreateDummySpell(count)
 	local icons =  self.frame.icon
 	local ui = self.ui
-	local f, spell
+	local f
 	local health_max = UnitHealthMax("player");
 	f = icons[1];
 	f:SetMouseClickEnabled(false);
@@ -139,7 +139,8 @@ function HDH_STAGGER_TRACKER:CreateDummySpell(count)
 		f.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[1].texture);
 	end
 	f:ClearAllPoints()
-	spell = f.spell or {}
+	local spell = f.spell
+	if not spell then spell = {} f.spell = spell end
 	spell.display = DB.SPELL_ALWAYS_DISPLAY
 	spell.id = 0
 	spell.count = 100

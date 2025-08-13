@@ -148,6 +148,16 @@ function HDH_AT_CircleCooldownTemplateMixin:Stop()
 	end
 end
 
+
+function HDH_AT_CircleCooldownTemplateMixin:Clear()
+	self.startValue = nil
+	self.duration = nil
+	self.isTimer = nil
+	self.per = nil
+	self.prevPer = nil
+	self.isCharging = nil
+end
+
 -----------------------------------------------
 --- HDH_AT_LinearCooldownTemplateMixin
 -----------------------------------------------
@@ -305,6 +315,7 @@ function HDH_AT_LinearCooldownTemplateMixin:Setup(w, h, cooldownType, toFill, en
 end
 
 function HDH_AT_LinearCooldownTemplateMixin:SetShownProgressTexture(bool)
+	self.prevPer = nil
 	self.Progress.Texture:SetShown(bool)
 end
 
@@ -411,6 +422,14 @@ function HDH_AT_LinearCooldownTemplateMixin:Stop()
 	end
 
 	self:SetScript('OnUpdate', nil)
+end
+
+function HDH_AT_LinearCooldownTemplateMixin:Clear()
+	self.startValue = nil
+	self.duration = nil
+	self.isTimer = nil
+	self.per = nil
+	self.prevPer = nil
 end
 
 -----------------------------------------------
@@ -577,6 +596,7 @@ function HDH_AT_CooldownIconTemplateMixin:UpdateCooldowning(bool)
 			end
 			self.Border.Texture:SetVertexColor(0, 0, 0, self.offAlpha)
 		end
+		self.Cooldown:Clear()
 	end
 end
 

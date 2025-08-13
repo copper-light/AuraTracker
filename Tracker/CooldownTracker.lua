@@ -97,6 +97,10 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 		if chargeStartTime ~= nil and chargeDuration ~= nil then
 			chargeRemaining = chargeStartTime + chargeDuration - curTime
 			chargeRemaining = math.max(chargeRemaining, 0)
+		else
+			chargeRemaining = 0
+			chargeStartTime = 0
+			chargeDuration =0
 		end
 	end
 	
@@ -104,7 +108,7 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 		startTime = HDH_TRACKER.startTime
 		duration = duration - (HDH_TRACKER.startTime - startTime)
 	end
-	if chargeStartTime ~= nil and (HDH_TRACKER.startTime > chargeStartTime) then
+	if chargeStartTime ~= nil and chargeStartTime~=0 and (HDH_TRACKER.startTime > chargeStartTime) then
 		chargeStartTime = HDH_TRACKER.startTime
 		chargeDuration = chargeDuration - (HDH_TRACKER.startTime - chargeStartTime)
 	end
@@ -150,10 +154,11 @@ function HDH_C_TRACKER:UpdateAuras(f)
 	return spell.startTime, spell.duration
 end
 
-
 function HDH_C_TRACKER:UpdateIcon(f)
-	if not f or not f.spell or not self or not self.ui or f.spell.blankDisplay then return false end
-	local startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana, isGlobalCooldown
+	if not f or not f.spell or not self or not self.ui or not f.spell.isLearned then return false end
+	local startTime, duration, remaining, count
+	local chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax
+	local inRange, isAble, isNotEnoughMana, isGlobalCooldown
 	local isUpdate = false
 	local spell = f.spell
 	local ui = self.ui
@@ -247,16 +252,19 @@ function HDH_C_TRACKER:UpdateIcon(f)
 	-- 쿨다운 업데이트
 	if not spell.isGlobalCooldown and spell.remaining > HDH_C_TRACKER.EndCooldown then
 		f.icon:SetCooldown(spell.startTime, spell.duration)
+		spell.isUpdate = true
+
 	elseif spell.isCharging then
 		f.icon:SetCharge(spell.charges.startTime, spell.charges.duration)
+		spell.isUpdate = true
+
 	elseif spell.isGlobalCooldown then
 		f.icon:SetCooldown(spell.startTime, spell.duration)
+		spell.isUpdate = false
+
 	else
 		f.icon:Stop()
-	end
-
-	if not f:IsShown() then
-		f:Show()
+		spell.isUpdate = false
 	end
 
 	if (chargeCountMax and (chargeCountMax >= 2)) then
@@ -267,7 +275,6 @@ function HDH_C_TRACKER:UpdateIcon(f)
 		f.counttext:SetText(nil)
 	end
 
-
 	if f.bar then
 		f.bar:SetText(spell.name)
 		if spell.remaining > HDH_C_TRACKER.EndCooldown and not spell.isGlobalCooldown then
@@ -276,100 +283,10 @@ function HDH_C_TRACKER:UpdateIcon(f)
 			self:UpdateBarMinMaxValue(f, 0, 1, 1)
 		end
 	end
-
-
 	self:UpdateGlow(f, true)
-
 	if self.OrderFunc then self:OrderFunc(self) end
 	self:UpdateLayout()
 	return isUpdate
-end
-
-function HDH_C_TRACKER:UpdateLayout()
-	if not self.ui or not self.frame.icon then return end
-	local f
-	local line = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
-	local margin_h = self.ui.common.margin_h
-	local margin_v = self.ui.common.margin_v
-	local reverse_v = self.ui.common.reverse_v -- 상하반전
-	local reverse_h = self.ui.common.reverse_h -- 좌우반전
-	local show_index = 0 -- 몇번째로 아이콘을 출력했는가?
-	local display_index = 0 -- 몇번째로 아이콘을 출력했는가?
-	local col = 0  -- 열에 대한 위치 좌표값 = x
-	local row = 0  -- 행에 대한 위치 좌표값 = y
-	local always_show = self.ui.common.always_show
-	local size_w, size_h
-	if self.ui.common.display_mode == DB.DISPLAY_BAR then
-		size_w = self.ui.bar.width
-		size_h = self.ui.bar.height
-	elseif self.ui.common.display_mode == DB.DISPLAY_ICON_AND_BAR then
-		if self.ui.bar.location == DB.BAR_LOCATION_R or self.ui.bar.location == DB.BAR_LOCATION_L then
-			size_w = self.ui.bar.width + self.ui.icon.size
-			size_h = max(self.ui.bar.height, self.ui.icon.size)
-		else
-			size_h = self.ui.bar.height + self.ui.icon.size
-			size_w = max(self.ui.bar.width, self.ui.icon.size)
-		end
-
-	else
-		size_w = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
-		size_h = self.ui.icon.size
-	end
-
-	for i = 1 , #self.frame.icon do
-		f = self.frame.icon[i]
-		if f and f.spell then
-			if not f.spell.blankDisplay then
-				if HDH_TRACKER.ENABLE_MOVE or f:IsShown() then
-					f:ClearAllPoints()
-					f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-					display_index = display_index + 1
-					if display_index % line == 0 then 
-						row = row + size_h + margin_v
-						col = 0			
-					else 
-						col = col + size_w + margin_h 
-					end
-					if (f.spell.duration > HDH_C_TRACKER.GlobalCooldown and f.spell.remaining > 0.5) 
-							or (f.spell.charges and f.spell.charges.remaining and f.spell.charges.remaining > 0) then 
-						show_index = show_index + 1
-					end -- 비전투라도 쿨이 돌고 잇는 스킬이 있으면 화면에 출력하기 위해서 체크함
-				else
-					if (f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
-						display_index = display_index + 1
-						f:ClearAllPoints()
-						f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-						if display_index % line == 0 then
-							row = row + size_h + margin_v
-							col = 0
-						else 
-							col = col + size_w + margin_h
-						end
-					end
-				end
-			else
-				if self.ui.common.order_by == DB.ORDERBY_REG then
-					display_index = display_index + 1
-					if display_index % line == 0 then
-						row = row + size_h + margin_v
-						col = 0
-					else 
-						col = col + size_w + margin_h
-					end
-					if f:IsShown() then
-						f:Hide()
-					end
-				end
-			end
-		end
-	end
-
-	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
-			and (HDH_TRACKER.ENABLE_MOVE or show_index > 0 or always_show or UnitAffectingCombat("player")) then
-		self:ShowTracker();
-	else
-		self:HideTracker();
-	end
 end
 
 function HDH_C_TRACKER:UpdateAllSlot(onlyNotMappingSpell)
@@ -516,7 +433,8 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 			f.iconSatCooldown:SetTexture("Interface/ICONS/TEMP")
 		end
 		f:ClearAllPoints()
-		local spell = {}
+		local spell = f.spell
+		if not spell then spell = {} f.spell = spell end
 		spell.name = f.spell.name
 		spell.icon = nil
 		spell.display = DB.SPELL_ALWAYS_DISPLAY
@@ -537,6 +455,7 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 		spell.inRange = true
 		spell.isAble = true
 		spell.isNotEnoughMana = false
+		spell.isLearned = true
 
 		self:SetGameTooltip(f,  false)
 		f.spell = spell
@@ -559,7 +478,10 @@ function HDH_C_TRACKER:UpdateAllIcons() -- HDH_TRACKER override
 	for i = 1 , #self.frame.icon do
 		isUpdateLayout = self:UpdateIcon(self.frame.icon[i]) -- icon frame
 	end
-	if self.OrderFunc then self:OrderFunc(self); self:UpdateLayout(); end 
+	if self.OrderFunc then 
+		self:OrderFunc(self)
+		self:UpdateLayout()	
+	end 
 
 	return isUpdateLayout
 end
@@ -570,32 +492,15 @@ function HDH_C_TRACKER:Update() -- HDH_TRACKER override
 	self:UpdateAllIcons();
 end
 
-function HDH_C_TRACKER:IsSwitchByHappenTime(icon1, icon2) 
+function HDH_C_TRACKER:IsSwitchByRemining(icon1, icon2, desc) 
 	if not icon1.spell and not icon2.spell then return end
 	local s1 = icon1.spell
 	local s2 = icon2.spell
-	local ret = false;
-	if (not s1.isUpdate and s2.isUpdate) then
-		ret = true;
-	elseif (s1.isUpdate and s2.isUpdate) then
-		if (s1.happenTime < s2.happenTime) then
-			ret = true;
-		end
-	elseif (not s1.isUpdate and not s2.isUpdate) and (s1.no < s2.no) then
-		ret = true;
-	end
-	return ret;
-end
-
-function HDH_C_TRACKER:IsSwitchByRemining(icon1, icon2) 
-	if not icon1.spell and not icon2.spell then return end
-	local s1 = icon1.spell
-	local s2 = icon2.spell
-	local ret = false;
+	local ret = false
 	if (s1.duration > HDH_C_TRACKER.GlobalCooldown and s2.duration > HDH_C_TRACKER.GlobalCooldown) and (s1.remaining < s2.remaining) then
 		ret = true;
-	elseif (s1.remaining == 0 and s2.remaining == 0) and (s1.no <s2.no) then
-		ret = true;
+	elseif ((s1.isGlobalCooldown or s1.remaining == 0) and (s2.isGlobalCooldown or s2.remaining == 0)) and (((not desc) and s1.no < s2.no) or ((desc) and s1.no > s2.no)) then
+		ret = true
 	elseif (s1.duration < HDH_C_TRACKER.GlobalCooldown and s2.duration > HDH_C_TRACKER.GlobalCooldown) then
 		ret = true;
 	end
@@ -609,7 +514,6 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	local needEquipmentEvent = false;
 	local needBagEvent = false
 
-	if self.type ~= HDH_TRACKER.TYPE.COOLDOWN then return ret end
 	for i= 1, #self.frame.icon do
 		spell = self.frame.icon[i].spell
 		spell.charges = {}

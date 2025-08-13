@@ -50,59 +50,59 @@ end
 
 HDH_POWER_TRACKER.POWER_INFO = POWER_INFO;
 
--- local function HDH_POWER_OnUpdate(f, elapsed)
--- 	local self = f:GetParent().parent
--- 	f.spell.curTime = GetTime()
--- 	if f.spell.curTime - (f.spell.delay or 0) < 0.02  then return end 
--- 	f.spell.delay = f.spell.curTime
--- 	f.spell.powerMax = self:GetPowerMax()
--- 	f.spell.v1 = self:GetPower()
--- 	f.spell.count = math.ceil(f.spell.v1 / f.spell.powerMax  * 100);
--- 	if f.spell.count == 100 and f.spell.v1 ~= f.spell.powerMax  then f.spell.count = 99 end
--- 	f.counttext:SetText(f.spell.count .. "%")
--- 	if f.spell.showValue then
--- 		f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate))
--- 	else
--- 		f.v1:SetText(nil)
--- 	end
+local function HDH_POWER_OnUpdate(f, elapsed)
+	local self = f:GetParent().parent
+	f.spell.curTime = GetTime()
+	if f.spell.curTime - (f.spell.delay or 0) < 0.02  then return end 
+	f.spell.delay = f.spell.curTime
+	f.spell.powerMax = self:GetPowerMax()
+	f.spell.v1 = self:GetPower()
+	f.spell.count = math.ceil(f.spell.v1 / f.spell.powerMax  * 100);
+	if f.spell.count == 100 and f.spell.v1 ~= f.spell.powerMax  then f.spell.count = 99 end
+	f.counttext:SetText(f.spell.count .. "%")
+	if f.spell.showValue then
+		f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate))
+	else
+		f.v1:SetText(nil)
+	end
 
--- 	if self.power_info.regen then
--- 		if f.spell.v1 < f.spell.powerMax  then
--- 			if f.spell.isOn ~= true then
--- 				self:Update()
--- 				f.spell.isOn = true;
--- 			end
--- 		else 
--- 			if f.spell.isOn ~= false then
--- 				self:Update()
--- 				f.spell.isOn = false;
--- 			end
--- 			self:Update()
--- 		end
--- 	else
--- 		if f.spell.v1 > 0 then
--- 			if f.spell.isOn ~= true then
--- 				self:Update()
--- 				f.spell.isOn = true;
--- 			end
--- 		else
--- 			if f.spell.isOn ~= false then
--- 				self:Update()
--- 				f.spell.isOn = false;
--- 			end
--- 		end
--- 	end
+	if self.power_info.regen then
+		if f.spell.v1 < f.spell.powerMax  then
+			if f.spell.isOn ~= true then
+				self:Update()
+				f.spell.isOn = true;
+			end
+		else 
+			if f.spell.isOn ~= false then
+				self:Update()
+				f.spell.isOn = false;
+			end
+			self:Update()
+		end
+	else
+		if f.spell.v1 > 0 then
+			if f.spell.isOn ~= true then
+				self:Update()
+				f.spell.isOn = true;
+			end
+		else
+			if f.spell.isOn ~= false then
+				self:Update()
+				f.spell.isOn = false;
+			end
+		end
+	end
 
--- 	self:UpdateGlow(f, true)
--- 	if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
--- 		if f.bar:GetMaxValue() == f.spell.powerMax then -- UpdateBar 함수안에 UpdateAbsorb 를 포함한다.
--- 			f.bar:SetValue(f.spell.v1, true)
--- 		else
--- 			f.bar:SetMinMaxValues(0, f.spell.powerMax)
--- 			f.bar:SetValue(f.spell.v1, false)
--- 		end
--- 	end
--- end
+	self:UpdateGlow(f, true)
+	if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
+		if f.bar:GetMaxValue() == f.spell.powerMax then -- UpdateBar 함수안에 UpdateAbsorb 를 포함한다.
+			f.bar:SetValue(f.spell.v1, true)
+		else
+			f.bar:SetMinMaxValues(0, f.spell.powerMax)
+			f.bar:SetValue(f.spell.v1, false)
+		end
+	end
+end
 
 function HDH_POWER_TRACKER:GetPower()
 	return UnitPower('player', self.power_info.power_index)
@@ -170,7 +170,7 @@ end
 function HDH_POWER_TRACKER:CreateDummySpell(count)
 	local icons =  self.frame.icon
 	local ui = self.ui
-	local f, spell
+	local f
 	local power_max = self:GetPowerMax()
 	f = icons[1];
 	f:SetMouseClickEnabled(false);
@@ -179,7 +179,8 @@ function HDH_POWER_TRACKER:CreateDummySpell(count)
 		f.icon:SetTexture(self.power_info.texture)
 	end
 	f:ClearAllPoints()
-	spell = f.spell or {}
+	local spell = f.spell
+	if not spell then spell = {} f.spell = spell end
 	spell.display = DB.SPELL_ALWAYS_DISPLAY
 	spell.id = 0
 	spell.count = 100
@@ -280,11 +281,12 @@ function HDH_POWER_TRACKER:UpdateIconSettings(f)
 end
 
 function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
-	local ret = super.InitIcons(self)
  	self.power_info = self.POWER_INFO[self.type]
+	local ret = HDH_TRACKER.InitIcons(self)
 
 	if ret > 0 then
 		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE',"player")
+		self.frame.icon[1]:SetScript("OnUpdate", HDH_POWER_OnUpdate)
 		self:Update()
 	end
 	

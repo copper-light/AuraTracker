@@ -133,7 +133,7 @@ function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 			if not iconf.spell then
 				iconf.spell = {}
 			end
-			iconf:SetParent(self.frame) 
+			iconf:SetParent(self.frame)
 			iconf.spell.duration = 0
 			iconf.spell.count = 1
 			iconf.spell.remaining = 0
@@ -383,10 +383,11 @@ function HDH_COMBO_POINT_TRACKER:Update() -- HDH_TRACKER override
 end
 
 function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
-	local ret = super.InitIcons(self)
+	self.power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
+	local ret = HDH_TRACKER.InitIcons(self)
 	local f
 	if ret then
-		self.power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
+		
 		for i = 1, ret do
 			f = self.frame.icon[i]
 			if f.bar then

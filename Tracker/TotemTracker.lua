@@ -107,7 +107,7 @@ do
 				f.spell.barMaxValue = barMaxValue
 				-- f:Hide()
 				if f.bar then
-					f.bar:SetSplitPoints(spell.barSplitPoints, spell.barSplitPointType)
+					f.bar:SetSplitPoints(f.spell.barSplitPoints, f.spell.barSplitPointType)
 				end
 			end
 			
@@ -115,7 +115,7 @@ do
 			self.frame:SetScript("OnEvent", self.OnEvent)
 			self:LoadOrderFunc()
 		else
-			ret = super.InitIcons(self)
+			ret = HDH_TRACKER.InitIcons(self)
 			for i = 1, ret do
 				local spell = self.frame.icon[i].spell
 				self.frame.pointer[spell.name] = self.frame.icon[i]

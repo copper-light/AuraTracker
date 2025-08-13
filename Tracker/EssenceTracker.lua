@@ -241,7 +241,7 @@ function HDH_ESSENCE_TRACKER:Update() -- HDH_TRACKER override
 end
 
 function HDH_ESSENCE_TRACKER:InitIcons()
-	local ret = super.InitIcons(self)
+	local ret = HDH_TRACKER.InitIcons(self)
 	for i = 1, ret do
 		self.frame.icon[i]:SetScript("OnUpdate", OnUpdate)
 	end
