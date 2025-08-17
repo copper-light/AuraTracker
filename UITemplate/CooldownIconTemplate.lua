@@ -58,7 +58,7 @@ function HDH_AT_CircleCooldownTemplateMixin:SetOverlayColor(r, g, b, a)
 	else
 		if self.Overlay:IsShown() then
 			self.Overlay:Hide()
-			self.Progress.Texture:SetShown(self.cooldownType == DB.COOLDOWN_CIRCLE and not self.toFill)
+			self.Progress.Texture:SetShown(not self.toFill)
 		end
 	end
 end
@@ -71,22 +71,23 @@ end
 
 -- toFill은 컬러 아이콘이 더 잘보이는 쪽으로 컬러가 채워지는 관점으로 의미로 사용 (swipColor 관점이 아님)
 function HDH_AT_CircleCooldownTemplateMixin:Setup(cooldownType, toFill, color, textureAlpha)
+	self.Progress:Show()
+	self.Charge:Show()
+	self.Charge:SetDrawEdge(true)
+	self.Progress:SetDrawSwipe(true)
+	self.Progress:SetReverse(not toFill)
+	self.Charge:SetReverse(not toFill)
+	self.Progress:SetSwipeTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg")
+	self.Progress:SetScript('OnHide', function(self) HDH_AT_CircleCooldownTemplate_OnFinished(self:GetParent()) end)
+	self.Progress:SetScript('OnShow', function(self) HDH_AT_CircleCooldownTemplate_OnStarted(self:GetParent()) end)
+	self.Progress.Texture:SetShown(not toFill)
+
 	if cooldownType == DB.COOLDOWN_CIRCLE then
-		self.Progress:Show()
-		self.Charge:Show()
-		self.Progress:SetReverse(not toFill)
-		self.Charge:SetReverse(not toFill)
-		self.Charge:SetDrawEdge(true)
-		self.Progress:SetDrawSwipe(true)
 		self.Progress:SetSwipeColor(unpack(color))
-		self.Progress:SetSwipeTexture("Interface/AddOns/HDH_AuraTracker/Texture/cooldown_bg")
-		self.Progress:SetScript('OnHide', function(self) HDH_AT_CircleCooldownTemplate_OnFinished(self:GetParent()) end)
-		self.Progress:SetScript('OnShow', function(self) HDH_AT_CircleCooldownTemplate_OnStarted(self:GetParent()) end)
-		self.Progress.Texture:SetShown(not toFill)
 	else
-		self.Charge:SetDrawEdge(false)
-		self.Progress:SetDrawSwipe(false)
+		self.Progress:SetSwipeColor(1,1,1,0)
 	end
+
 	self.isRunning = false
 	self.textureAlpha = textureAlpha
 	self.toFill = toFill
@@ -117,8 +118,6 @@ function HDH_AT_CircleCooldownTemplateMixin:SetCooldown(startValue, duration, is
 		self.startValue = startValue
 		self.duration = duration
 	end
-	
-	
 
 	self.isTimer = isTimer
 	self.isCharging = isCharging
@@ -497,11 +496,12 @@ function HDH_AT_CooldownIconTemplateMixin:Setup(w, h, cooldownType, toFill, enab
 	self.offAlpha = offAlpha
 	self.isAble = true
 	self.toFill = toFill
-	if self.cooldownType ~= DB.COOLDOWN_NONE then
-		self.Icon.Texture:SetAlpha(offAlpha)
-	else
-		self.Icon.Texture:SetAlpha(onAlpha)
-	end
+	-- if self.cooldownType ~= DB.COOLDOWN_NONE then
+	-- 	self.Icon.Texture:SetAlpha(offAlpha)
+	-- else
+	-- 	self.Icon.Texture:SetAlpha(onAlpha)
+	-- end
+	self.Icon.Texture:SetAlpha(offAlpha)
 	self.borderColor = self.borderColor or {1, 1, 1, 1}
 	
 	self.Border:SetFrameLevel(self.Icon:GetFrameLevel() + 3)
@@ -577,10 +577,12 @@ function HDH_AT_CooldownIconTemplateMixin:UpdateCooldowning(bool)
 			self.Border.Texture:SetVertexColor(self.borderColor[1], self.borderColor[2], self.borderColor[3], self.borderColor[4])
 		end
 		
-		if self.cooldownType ~= DB.COOLDOWN_NONE then
-			self.Icon.Texture:SetAlpha(self.offAlpha)
-			self.Icon.Texture:SetDesaturated(true)
-		end
+		-- if self.cooldownType ~= DB.COOLDOWN_NONE then
+		-- 	self.Icon.Texture:SetAlpha(self.offAlpha)
+		-- 	self.Icon.Texture:SetDesaturated(true)
+		-- end
+		self.Icon.Texture:SetAlpha(self.offAlpha)
+		self.Icon.Texture:SetDesaturated(true)
 		if not self.Cooldown.Progress.Texture:IsShown() then
 			self.Cooldown:SetShownProgressTexture(true)
 		end
@@ -590,10 +592,12 @@ function HDH_AT_CooldownIconTemplateMixin:UpdateCooldowning(bool)
 			self.Icon.Texture:SetDesaturated(false)
 			self.Border.Texture:SetVertexColor(self.borderColor[1], self.borderColor[2], self.borderColor[3], self.borderColor[4])
 		else
-			if self.cooldownType ~= DB.COOLDOWN_NONE then
-				self.Icon.Texture:SetAlpha(self.offAlpha)
-				self.Icon.Texture:SetDesaturated(true)
-			end
+			-- if self.cooldownType ~= DB.COOLDOWN_NONE then
+			-- 	self.Icon.Texture:SetAlpha(self.offAlpha)
+			-- 	self.Icon.Texture:SetDesaturated(true)
+			-- end
+			self.Icon.Texture:SetAlpha(self.offAlpha)
+			self.Icon.Texture:SetDesaturated(true)
 			self.Border.Texture:SetVertexColor(0, 0, 0, self.offAlpha)
 		end
 		self.Cooldown:Clear()

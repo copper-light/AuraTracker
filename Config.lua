@@ -1978,8 +1978,12 @@ function HDH_AT_ConfigFrameMixin:GetElementFrame(listFrame, trackerId, index)
 		row = CreateFrame("Button",(listFrame:GetName().."Row"..index), listFrame, "HDH_AT_RowTemplate")
 		row:SetParent(listFrame)
 		row:SetOnClickHandler(function(self)
-			if HDH_AT_DB.show_latest_spell and not GetMainFrame().F.LATEST_SPELL_WINDOW:IsShown() then
-				GetMainFrame().F.LATEST_SPELL_WINDOW:Show()
+			if self.readOnly then
+				GetMainFrame().Dialog:AlertShow(L.THIS_ROW_IS_NOT_EDIT)
+			else
+				if HDH_AT_DB.show_latest_spell and not GetMainFrame().F.LATEST_SPELL_WINDOW:IsShown() then
+					GetMainFrame().F.LATEST_SPELL_WINDOW:Show()
+				end	
 			end
 		end)
 		if index == 1 then row:SetPoint("TOPLEFT",listFrame,"TOPLEFT") row:SetPoint("TOPLEFT",listFrame,"TOPLEFT")

@@ -4,7 +4,7 @@ HDH_AT_UTIL = {}
 do -- 애드온 버전 호환성
 ----------------------------------
     ------------------------------------------------------
-	if select(4, GetBuildInfo()) <= 59999 then -- 대격변
+	if select(4, GetBuildInfo()) <= 59999 then -- 판다리아
 	------------------------------------------------------
 		HDH_AT_UTIL.GetSpecialization = function()
 			return GetPrimaryTalentTree() or 5

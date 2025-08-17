@@ -62,7 +62,7 @@ local function UpdateCooldown(f, elapsed)
 		tracker:UpdateTimeText(f.timetext, spell.time)
 
 		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-			tracker:UpdateBarValue(f, GetTime())
+			tracker:UpdateBarValue(f, tracker:GetBarValue(f))
 		end
 		if f.spell.glow == DB.GLOW_CONDITION_TIME then
 			tracker:UpdateGlow(f, true)
@@ -277,7 +277,7 @@ function HDH_TRACKER.UpdateSettings(trackerId)
 		local t = HDH_TRACKER.Get(trackerId)
 		if t then
 			t:UpdateSetting()
-			t:UpdateAllIcons()
+			t:UpdateIconAndBar()
 			t:Update()
 			if HDH_TRACKER.ENABLE_MOVE then
 				t:UpdateMoveFrame()
@@ -287,7 +287,7 @@ function HDH_TRACKER.UpdateSettings(trackerId)
 		for k, t in pairs(HDH_TRACKER.GetList()) do
 			if not DB:HasUI(k) then
 				t:UpdateSetting()
-				t:UpdateAllIcons()
+				t:UpdateIconAndBar()
 				t:Update()
 				if HDH_TRACKER.ENABLE_MOVE then
 					t:UpdateMoveFrame()
@@ -517,99 +517,6 @@ function HDH_TRACKER:UpdateBarSettings(f)
 	end
 end
 
-function HDH_TRACKER:UpdateLayout()
-	if not self.ui or not self.frame.icon then return end
-	local f
-	local always_show = self.ui.common.always_show
-	local line = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
-	local margin_h = self.ui.common.margin_h
-	local margin_v = self.ui.common.margin_v
-	local reverse_v = self.ui.common.reverse_v -- 상하반전
-	local reverse_h = self.ui.common.reverse_h -- 좌우반전
-	local show_index = 0 -- 몇번째로 아이콘을 출력했는가?
-	local display_index = 0 -- 몇번째로 아이콘을 출력했는가?
-	local col = 0  -- 열에 대한 위치 좌표값 = x
-	local row = 0  -- 행에 대한 위치 좌표값 = y
-	local useSpace = false
-	local size_w, size_h
-
-	if self.ui.common.display_mode == DB.DISPLAY_BAR then
-		size_w = self.ui.bar.width
-		size_h = self.ui.bar.height
-	elseif self.ui.common.display_mode == DB.DISPLAY_ICON_AND_BAR then
-		if self.ui.bar.location == DB.BAR_LOCATION_R or self.ui.bar.location == DB.BAR_LOCATION_L then
-			size_w = self.ui.bar.width + self.ui.icon.size
-			size_h = math.max(self.ui.bar.height, self.ui.icon.size)
-		else
-			size_h = self.ui.bar.height + self.ui.icon.size
-			size_w = math.max(self.ui.bar.width, self.ui.icon.size)
-		end
-	else
-		size_w = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
-		size_h = self.ui.icon.size
-	end
-
-	for i = 1 , #self.frame.icon do
-		f = self.frame.icon[i]
-		useSpace = true
-		if f and f.spell then
-			if self.ui.common.order_by == DB.ORDERBY_REG then
-				if f.spell.isUpdate then
-					if f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then
-						if f:IsShown() then f:Hide() end
-					elseif f.spell.display == DB.SPELL_HIDE_TIME_ON then
-						if f:IsShown() then f:Hide() end
-						useSpace = false
-					else
-						if not f:IsShown() then f:Show() end
-					end
-					show_index = show_index + 1
-				else
-					if f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE then
-						if f:IsShown() then f:Hide() end
-					elseif f.spell.display == DB.SPELL_HIDE_TIME_OFF then
-						if f:IsShown() then f:Hide() end
-						useSpace = false
-					else
-						if not f:IsShown() then f:Show() end
-					end
-				end
-
-			else
-				if f.spell.isLearned then
-					if not f:IsShown() then f:Show() end
-				else
-					if f:IsShown() then f:Hide() end
-					useSpace = false
-				end
-			end
-		end
-		f.spell.isUpdate = false
-
-		if useSpace then
-			f:ClearAllPoints()
-			f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-			if display_index % line == 0 then 
-				row = row + size_h + margin_v
-				col = 0	
-			else 
-				col = col + size_w + margin_h 
-			end
-		end
-	end
-
-	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
-			and (HDH_TRACKER.ENABLE_MOVE or show_index > 0 or always_show or UnitAffectingCombat("player")) then
-		self:ShowTracker();
-	else
-		self:HideTracker();
-	end
-end
-
-function HDH_TRACKER:Update()
-
-end
-
 function HDH_TRACKER:UpdateTimeText(text, value)
 	if self.ui.font.cd_format == DB.TIME_TYPE_CEIL then value = value + 1; end
 	if value > 5 then text:SetTextColor(unpack(self.ui.font.cd_color)) 
@@ -619,6 +526,14 @@ function HDH_TRACKER:UpdateTimeText(text, value)
 	else
 		text:SetText(UTIL.AbbreviateTime(value, self.ui.font.cd_abbreviate or false))
 	end
+end
+
+function HDH_TRACKER:GetBarMinMax(f)
+	return f.spell.startTime, f.spell.endTime
+end
+
+function HDH_TRACKER:GetBarValue(f)
+	return GetTime()
 end
 
 function HDH_TRACKER:UpdateBarValue(f, value)
@@ -631,7 +546,7 @@ function HDH_TRACKER:UpdateBarMinMaxValue(f, minV, maxV, value, r, g, b, a)
 			f.bar:SetStatusBarColor(r, g, b, a or 1)
 		end
 		f.bar:SetMinMaxValues(minV, maxV)
-		f.bar:SetValue(value)
+		self:UpdateBarValue(f, value)
 	end
 end
 
@@ -787,8 +702,9 @@ function HDH_TRACKER:CreateDummySpell(count)
 		f.icon:SetCooldown(spell.startTime, spell.duration)
 		f.icon:UpdateCooldowning()
 		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-			f:SetScript("OnUpdate",nil);
-			self:UpdateBarMinMaxValue(f, spell.startTime, spell.endTime, spell.startTime);
+			-- f:SetScript("OnUpdate",nil);
+			local bMin, bMax = self:GetBarMinMax(f)
+			self:UpdateBarMinMaxValue(f, bMin, bMax, self:GetBarValue(f))
 			f.bar:Show();
 			spell.name = spell.name or ("NAME"..i);
 		end
@@ -1260,7 +1176,7 @@ function HDH_TRACKER:SetMove(move)
 			self.frame.moveFrame:Show()
 			cnt = self:CreateDummySpell(cnt);
 			self:ShowTracker();
-			self:UpdateAllIcons()
+			self:UpdateIconAndBar()
 			self:UpdateMoveFrame()
 		end
 	else
@@ -1363,7 +1279,7 @@ local function ChangeFontLocation(f, fontf, location, op_font)
 		fontf:SetPoint('BOTTOMLEFT', parent, 'BOTTOMRIGHT', 1, 0)
 		fontf:SetWidth(parent:GetWidth()+200);
 		fontf:SetJustifyH('LEFT')
-		fontf:SetJustifyV('RIGHT')
+		fontf:SetJustifyV('MIDDLE')
 	elseif location == DB.FONT_LOCATION_BAR_L then
 		fontf:SetPoint('LEFT', f.bar or parent, 'LEFT', 2, 0)
 		fontf:SetWidth(parent:GetWidth()+200);
@@ -1714,6 +1630,116 @@ end
 ------------------------------------------
 --- 프레임 DB 로드 시작점
 ------------------------------------------
+
+function HDH_TRACKER:UpdateSpellInfo(index)
+	-- interface 필수 구현
+end
+
+function HDH_TRACKER:UpdateIconAndBar(index)
+	-- interface 필수 구현
+end
+
+function HDH_TRACKER:UpdateLayout()
+	if not self.ui or not self.frame.icon then return end
+	local f
+	local line = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
+	local margin_h = self.ui.common.margin_h
+	local margin_v = self.ui.common.margin_v
+	local reverse_v = self.ui.common.reverse_v -- 상하반전
+	local reverse_h = self.ui.common.reverse_h -- 좌우반전
+	local activedCount = 0 -- 몇번째로 아이콘을 출력했는가?
+	local display_index = 0 -- 몇번째로 아이콘을 출력했는가?
+	local col = 0  -- 열에 대한 위치 좌표값 = x
+	local row = 0  -- 행에 대한 위치 좌표값 = y
+	local useSpace = false
+	local size_w, size_h
+
+	if self.ui.common.display_mode == DB.DISPLAY_BAR then
+		size_w = self.ui.bar.width
+		size_h = self.ui.bar.height
+	elseif self.ui.common.display_mode == DB.DISPLAY_ICON_AND_BAR then
+		if self.ui.bar.location == DB.BAR_LOCATION_R or self.ui.bar.location == DB.BAR_LOCATION_L then
+			size_w = self.ui.bar.width + self.ui.icon.size
+			size_h = math.max(self.ui.bar.height, self.ui.icon.size)
+		else
+			size_h = self.ui.bar.height + self.ui.icon.size
+			size_w = math.max(self.ui.bar.width, self.ui.icon.size)
+		end
+	else
+		size_w = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
+		size_h = self.ui.icon.size
+	end
+
+	for i = 1 , #self.frame.icon do
+		f = self.frame.icon[i]
+		useSpace = true
+		if f and f.spell then
+			if f.spell.isLearned then
+				if f.spell.isUpdate then
+					if f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then
+						if f:IsShown() then f:Hide() end
+					elseif f.spell.display == DB.SPELL_HIDE_TIME_ON then
+						if f:IsShown() then f:Hide() end
+						useSpace = false
+					else
+						if not f:IsShown() then f:Show() end
+					end
+					activedCount = activedCount + 1
+				else
+					if f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE then
+						if f:IsShown() then f:Hide() end
+					elseif f.spell.display == DB.SPELL_HIDE_TIME_OFF then
+						if f:IsShown() then f:Hide() end
+						useSpace = false
+					else
+						if not f:IsShown() then f:Show() end
+					end	
+				end
+			else
+				if f:IsShown() then f:Hide() end
+			end
+		end
+
+		if useSpace then
+			f:ClearAllPoints()
+			f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
+			if display_index % line == 0 then
+				row = row + size_h + margin_v
+				col = 0
+			else
+				col = col + size_w + margin_h
+			end
+		end
+	end
+
+	return activedCount
+end
+
+function HDH_TRACKER:Update(index)
+	if not self.frame then return end
+	if not UnitExists(self.unit) or not self.frame.pointer or not self.ui then
+		self.frame:Hide() return 
+	end
+	if not HDH_TRACKER.ENABLE_MOVE then
+		self:UpdateSpellInfo(index) -- 데이터 업데이트
+	end
+	self:UpdateIconAndBar(index)  -- 아이콘 업데이트
+	if self.OrderFunc then 
+		self.OrderFunc(self)
+	end
+	local activedCount = self:UpdateLayout()  -- 레이아웃 업데이트
+
+	if (not (self.ui.common.hide_in_raid and IsInRaid())) 
+		and (HDH_TRACKER.ENABLE_MOVE 
+				or activedCount > 0 
+				or self.ui.common.always_show 
+				or UnitAffectingCombat("player")) then
+		self:ShowTracker();
+	else
+		self:HideTracker();
+	end
+end
+
 function HDH_TRACKER:InitIcons()
 	local trackerId = self.id
 	local id, name, trackerType, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
@@ -1729,6 +1755,7 @@ function HDH_TRACKER:InitIcons()
 	local needEquipmentEvent = false
 
 	self.frame.pointer = {}
+	self.unit = unit or "player"
 	self.aura_filter = aura_filter
 	self.aura_caster = aura_caster
 	self.talentId = HDH_AT_UTIL.GetSpecialization()
@@ -1754,11 +1781,12 @@ function HDH_TRACKER:InitIcons()
 		else
 			isLearned = true
 		end
+
 		if unlearnedHideMode ~= DB.SPELL_HIDE or isLearned then
 			iconIdx = iconIdx + 1
 			f = self.frame.icon[iconIdx]
 			if f:GetParent() == nil then f:SetParent(self.frame) end
-			if isLearned then
+			if isLearned and elemKey then
 				self.frame.pointer[elemKey] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
 			end
 			
@@ -1827,7 +1855,6 @@ function HDH_TRACKER:InitIcons()
 		if needEquipmentEvent then
 			self.frame:RegisterEvent('PLAYER_EQUIPMENT_CHANGED')
 		end
-
 		self.frame:SetScript("OnEvent", self.OnEvent)
 		self:LoadOrderFunc()
 	end

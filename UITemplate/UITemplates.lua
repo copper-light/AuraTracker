@@ -178,11 +178,10 @@ function HDH_AT_OnClickRowFrame(self)
         _G[self:GetName().."CheckButtonIsItem"]:Show()
         _G[self:GetName().."EditBoxID"]:Show()
         _G[self:GetName().."EditBoxID"]:SetFocus()
-        if self.onClickHandler then
-            self.onClickHandler(self)
-        end
     end
-    
+     if self.onClickHandler then
+        self.onClickHandler(self)
+    end
 end
 
 -------------------------------------------------------------

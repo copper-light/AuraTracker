@@ -52,9 +52,15 @@ HDH_POWER_TRACKER.POWER_INFO = POWER_INFO;
 
 local function HDH_POWER_OnUpdate(f, elapsed)
 	local self = f:GetParent().parent
-	f.spell.curTime = GetTime()
-	if f.spell.curTime - (f.spell.delay or 0) < 0.02  then return end 
-	f.spell.delay = f.spell.curTime
+	
+	-- f.spell.curTime = GetTime()
+	-- if f.spell.curTime - (f.spell.delay or 0) < 0.02  then return end 
+	-- f.spell.delay = f.spell.curTime
+
+	f.skip = (f.skip or 0) + 1
+	if f.skip % 2 ~= 0 and elapsed < 0.02 then return end
+	f.skip = 0
+
 	f.spell.powerMax = self:GetPowerMax()
 	f.spell.v1 = self:GetPower()
 	f.spell.count = math.ceil(f.spell.v1 / f.spell.powerMax  * 100);
@@ -167,49 +173,6 @@ function HDH_POWER_TRACKER:GetElementCount()
 	end
 end
 
-function HDH_POWER_TRACKER:CreateDummySpell(count)
-	local icons =  self.frame.icon
-	local ui = self.ui
-	local f
-	local power_max = self:GetPowerMax()
-	f = icons[1];
-	f:SetMouseClickEnabled(false);
-	if not f:GetParent() then f:SetParent(self.frame) end
-	if f.icon:GetTexture() == nil then
-		f.icon:SetTexture(self.power_info.texture)
-	end
-	f:ClearAllPoints()
-	local spell = f.spell
-	if not spell then spell = {} f.spell = spell end
-	spell.display = DB.SPELL_ALWAYS_DISPLAY
-	spell.id = 0
-	spell.count = 100
-	spell.duration = 0
-	spell.happenTime = 0;
-	spell.glow = false
-	spell.endTime = 0
-	spell.startTime = 0
-	spell.remaining = 0
-	spell.showValue = f.spell.showValue
-	spell.v1 = power_max
-	spell.max = power_max;
-	spell.splitValues = f.spell.splitValues
-	if ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-		if spell.showValue then
-			f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(spell.v1, self.ui.font.v1_abbreviate))
-		else
-			f.v1:SetText('')
-		end
-		f.bar:Show()
-		self:UpdateBarMinMaxValue(f, 0, 1, 1)
-	end
-	f.spell = spell
-	f.counttext:SetText("100%")
-	self:SetGameTooltip(f, false)
-	f:Show()
-	return 1;
-end
-
 function HDH_POWER_TRACKER:Release() -- HDH_TRACKER override
 	if self and self.frame then
 		self.frame:UnregisterAllEvents()
@@ -228,56 +191,37 @@ function HDH_POWER_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
 	self.frame.icon[idx] = nil
 end
 
-function HDH_POWER_TRACKER:Update() -- HDH_TRACKER override
-	if not self.frame or not self.frame.icon or HDH_TRACKER.ENABLE_MOVE then return end
-	local f = self.frame.icon[1]
-	local show = false
-	if f and f.spell then
-		-- f.spell.type = UnitPowerType('player');
-		f.spell.v1 = self:GetPower()
-		f.spell.max = self:GetPowerMax()
-		f.spell.count = (f.spell.v1/f.spell.max * 100);
-		self:UpdateAllIcons()
-		if self.power_info and self.power_info.regen then
-			if f.spell.max ~= f.spell.v1 and not UnitIsDead("player") then show = true end
-		elseif f.spell.v1 > 0 then show = true end
-	end
-
-	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
-			and (HDH_TRACKER.ENABLE_MOVE or UnitAffectingCombat("player") or show or self.ui.common.always_show) then
-		self:ShowTracker();
-	else
-		self:HideTracker();
-	end
-end
-
-function HDH_POWER_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
-	local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
-	local f = self.frame.icon[1]
-	if f == nil or f.spell == nil then return end;
-	if f.spell.v1 > 0 then 
-		f.icon:UpdateCooldowning(false)
-		ret = 1;
-		self:UpdateGlow(f, true)
-		f:Show();
-	else
-		f.icon:UpdateCooldowning(true)
-		if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then
-			self:UpdateGlow(f, false)
-			f:Show();
-		else
-			f:Hide();
-		end
-	end
-	f:SetPoint('RIGHT');
-	return ret
-end
-
-function HDH_POWER_TRACKER:UpdateIconSettings(f)
+function HDH_POWER_TRACKER:UpdateIconSettings(f) -- HDH_TRACKER override
 	super.UpdateIconSettings(self, f)
 	local op_icon = self.ui.icon
 	f.icon:Setup(op_icon.size, op_icon.size, op_icon.cooldown, true, true, op_icon.spark_color, op_icon.cooldown_bg_color, op_icon.on_alpha, op_icon.off_alpha, op_icon.border_size)
 	f.icon:SetHandler(nil, nil)
+end
+
+function HDH_POWER_TRACKER:UpdateSpellInfo(index) -- HDH_TRACKER override
+	local f = self.frame.icon[1]
+	if f and f.spell then
+		f.spell.v1 = self:GetPower()
+		f.spell.max = self:GetPowerMax()
+		f.spell.count = (f.spell.v1/f.spell.max * 100)
+		if self.power_info and self.power_info.regen then
+			f.spell.isUpdate = (f.spell.max ~= f.spell.v1 and not UnitIsDead("player"))
+		else
+			f.spell.isUpdate = (f.spell.v1 > 0)
+		end
+	end
+end
+
+function HDH_POWER_TRACKER:UpdateIconAndBar(index) -- HDH_TRACKER override
+	local f = self.frame.icon[1]
+	if f == nil or f.spell == nil then return end
+	if f.spell.v1 > 0 then
+		f.icon:UpdateCooldowning(false)
+		self:UpdateGlow(f, true)
+	else
+		f.icon:UpdateCooldowning(true)
+		self:UpdateGlow(f, false)
+	end
 end
 
 function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
@@ -289,7 +233,7 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 		self.frame.icon[1]:SetScript("OnUpdate", HDH_POWER_OnUpdate)
 		self:Update()
 	end
-	
+
 	return ret
 end
 

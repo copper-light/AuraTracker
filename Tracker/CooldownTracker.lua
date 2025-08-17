@@ -18,7 +18,7 @@ HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.COOLDOWN, HDH_C_TRACKER)
 
 local function HDH_AT_CooldownIconTemplate_OnCooldownFinished(cooldown)
 	local tracker = cooldown:GetParent():GetParent().parent
-	tracker:UpdateIcon(cooldown:GetParent())
+	tracker:Update(cooldown:GetParent().spell.no)
 end
 
 
@@ -50,7 +50,7 @@ end
 
 -- end
 
-function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
+function HDH_C_TRACKER:GetCooldownInfo(id, name, isItem, isToy)
 	local startTime, duration, count, remaining
 	local chargeCount, chargeCountMax, chargeStartTime, chargeDuration, chargeRemaining, castCount
 	local inRange, isAble, isNotEnoughMana
@@ -87,7 +87,7 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 		inRange = true
 	end
 
-	local charges = HDH_AT_UTIL.GetSpellCharges(id) -- 스킬의 중첩count과 충전charge은 다른 개념이다. 
+	local charges = HDH_AT_UTIL.GetSpellCharges(id)
 	if charges then
 		chargeCount = charges.currentCharges
 		chargeCountMax = charges.maxCharges
@@ -100,7 +100,7 @@ function HDH_C_TRACKER:UpdateSpellInfo(id, name, isItem, isToy)
 		else
 			chargeRemaining = 0
 			chargeStartTime = 0
-			chargeDuration =0
+			chargeDuration = 0
 		end
 	end
 	
@@ -152,141 +152,6 @@ function HDH_C_TRACKER:UpdateAuras(f)
 		end
 	end
 	return spell.startTime, spell.duration
-end
-
-function HDH_C_TRACKER:UpdateIcon(f)
-	if not f or not f.spell or not self or not self.ui or not f.spell.isLearned then return false end
-	local startTime, duration, remaining, count
-	local chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax
-	local inRange, isAble, isNotEnoughMana, isGlobalCooldown
-	local isUpdate = false
-	local spell = f.spell
-	local ui = self.ui
-	local show_global_cooldown = ui.cooldown.show_global_cooldown
-	local not_enough_mana_color = (self.ui.cooldown.not_enough_mana_color or {0.35, 0.35, 0.78})
-	local out_range_color = (self.ui.cooldown.out_range_color or {0.53, 0.1, 0.1})
-	local use_not_enough_mana_color = self.ui.cooldown.use_not_enough_mana_color
-	local use_out_range_color = self.ui.cooldown.use_out_range_color
-
-	if not HDH_TRACKER.ENABLE_MOVE and not spell.isInnerCDItem then
-		startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana = self:UpdateSpellInfo(f.spell.id, f.spell.name, f.spell.isItem, f.spell.isToy)
-	
-		isGlobalCooldown = (duration > 0 and duration < HDH_C_TRACKER.GlobalCooldown)
-		if spell.isGlobalCooldown then
-			spell.isGlobalCooldown = isGlobalCooldown
-			if show_global_cooldown or not spell.isGlobalCooldown then
-				spell.startTime = startTime
-				spell.endTime = startTime + duration
-				spell.duration = duration
-				spell.remaining = remaining
-			end
-		else
-			-- 와우 기본 쿨다운 시스템의 경우, 스킬 쿨다운 끝자락에서 글로벌 쿨다운이 들어오면 글쿨을 우선 표시하도록 구현됨.
-			-- 하지만, 쿨다운 여부를 흑백으로 처리하는 입장에서 보면 글쿨 때문에 의도치 않게 흑백으로 표시되는 문제를 야기함. 
-			-- 그래서 스킬 쿨다운 종료 전에 모든 글쿨은 무시하도록 구현함 (글쿨이 들어왔을때, startTime > spell.endTime 인 경우만 글쿨로 인식)
-			-- 이로 인하여, 쿨다운이 끝나고 스킬을 사용가능한것으로 보이나 글쿨로 인해서 스킬을 바로 사용하지 못하는 텀이 발생할 수 있으나
-			-- 글쿨보다 적은 시간이기 때문에 사용성 측면에서 용인 가능한 수준으로 판단됨
-			if isGlobalCooldown then
-				if show_global_cooldown and (startTime >= spell.endTime or spell.endTime > (startTime + duration)) then
-					spell.startTime = startTime
-					spell.endTime = startTime + duration
-					spell.duration = duration
-					spell.remaining = remaining
-					spell.isGlobalCooldown = true
-				else
-					spell.remaining = math.max(spell.endTime - GetTime(), 0)
-				end
-			else
-				spell.startTime = startTime
-				spell.endTime = startTime + duration
-				spell.duration = duration
-				spell.remaining = remaining
-			end
-		end
-
-		if not show_global_cooldown then
-			spell.isGlobalCooldown = false
-		end
-
-		if count >= 2 and f.spell.isItem then
-			spell.stackable = true
-		end
-		spell.count = count
-		spell.charges.count = chargeCount
-		spell.charges.remaining = chargeRemaining
-		spell.charges.startTime = chargeStartTime
-		spell.charges.endTime = chargeStartTime + chargeDuration
-		spell.charges.duration = chargeDuration
-		spell.isCharging = (chargeRemaining > 0 and chargeCount >= 1) and true or false
-		spell.isAble = isAble
-		spell.inRange = not use_out_range_color and true or inRange
-		spell.isNotEnoughMana = use_not_enough_mana_color and isNotEnoughMana or false
-	end
-
-	-- 쿨다운 상태 업데이트
-	if (spell.remaining > HDH_C_TRACKER.EndCooldown and not spell.isGlobalCooldown ) then
-		f.icon:UpdateCooldowning()
-	else -- 스킬 쿨 아닌 상태
-		f.icon:UpdateCooldowning(false)
-
-		-- 글쿨, 차지 상태 업데이트
-		if spell.isCharging and spell.isGlobalCooldown then
-			f.icon:ShowOnlyEdgeSpark()
-		end
-	end
-
-	-- 색상 상태 업데이트
-	if not spell.inRange then
-		f.icon:SetOverlayColor(out_range_color[1], out_range_color[2], out_range_color[3], out_range_color[4])
-	elseif spell.isNotEnoughMana then
-		f.icon:SetOverlayColor(not_enough_mana_color[1], not_enough_mana_color[2], not_enough_mana_color[3], not_enough_mana_color[4])
-	else
-		f.icon:SetOverlayColor(nil)
-	end
-
-	-- 사용 가능 상태 업데이트
-	if not spell.isAble then
-		f.icon:SetDesaturated()
-	end
-
-	-- 쿨다운 업데이트
-	if not spell.isGlobalCooldown and spell.remaining > HDH_C_TRACKER.EndCooldown then
-		f.icon:SetCooldown(spell.startTime, spell.duration)
-		spell.isUpdate = true
-
-	elseif spell.isCharging then
-		f.icon:SetCharge(spell.charges.startTime, spell.charges.duration)
-		spell.isUpdate = true
-
-	elseif spell.isGlobalCooldown then
-		f.icon:SetCooldown(spell.startTime, spell.duration)
-		spell.isUpdate = false
-
-	else
-		f.icon:Stop()
-		spell.isUpdate = false
-	end
-
-	if (chargeCountMax and (chargeCountMax >= 2)) then
-		f.counttext:SetText(spell.charges.count)
-	elseif spell.stackable or spell.count > 0 then
-		f.counttext:SetText(spell.count)
-	else
-		f.counttext:SetText(nil)
-	end
-
-	if f.bar then
-		f.bar:SetText(spell.name)
-		if spell.remaining > HDH_C_TRACKER.EndCooldown and not spell.isGlobalCooldown then
-			self:UpdateBarMinMaxValue(f, spell.startTime, spell.endTime, GetTime())
-		else
-			self:UpdateBarMinMaxValue(f, 0, 1, 1)
-		end
-	end
-	self:UpdateGlow(f, true)
-	if self.OrderFunc then self:OrderFunc(self) end
-	self:UpdateLayout()
-	return isUpdate
 end
 
 function HDH_C_TRACKER:UpdateAllSlot(onlyNotMappingSpell)
@@ -354,50 +219,6 @@ function HDH_C_TRACKER:GetSlot(id)
 	return self.frame.pointer[id].slot;
 end
 
-function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_SHOW(id)
-	local f = self.frame.pointer[id]
-	if not f or not f.spell then return end
-
-	if f.spell.id == id then
-		f.spell.ableGlow = true
-		if not f:IsShown() then
-			if self:UpdateIcon(f) then
-				self:UpdateLayout(f)
-			end
-		else
-			if f.spell.glowEffectType == DB.GLOW_EFFECT_DEFAULT then
-				self:ActionButton_ShowOverlayGlow(f)
-				if f.icon.spark:IsShown() then
-					f.icon.spark:Hide() 
-					f.spell.glowColorOn = false
-				end
-			else
-				if not f.icon.spark:IsShown() then
-					f.icon.spark.playing = 0
-					f.icon.spark:Show() 
-					f.spell.glowColorOn = true
-				end
-			end
-		end
-
-	elseif f.spell.base_id == id then
-		f.spell.base_ableGlow = true
-	end
-end
-
-function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_HIDE(id)
-	local f = self.frame.pointer[id]
-	if not f or not f.spell then return end
-
-	if f.spell.id == id then
-		f.spell.ableGlow = false
-		self:UpdateIcon(f)
-
-	elseif f.spell.base_id == id then
-		f.spell.base_ableGlow = false
-	end
-end
-
 function HDH_C_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
 	local icon = self.frame.icon[idx]
 	icon:UnregisterAllEvents()
@@ -406,90 +227,6 @@ function HDH_C_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
 	icon:SetParent(nil)
 	icon.spell = nil
 	self.frame.icon[idx] = nil
-end
-
-function HDH_C_TRACKER:UpdateIconSettings(f)
-	super.UpdateIconSettings(self, f)
-	local op_icon = self.ui.icon
-	f.icon:Setup(op_icon.size, op_icon.size, op_icon.cooldown, true, true, op_icon.spark_color, op_icon.cooldown_bg_color, op_icon.on_alpha, op_icon.off_alpha, op_icon.border_size)
-	f.icon:SetHandler(nil, HDH_AT_CooldownIconTemplate_OnCooldownFinished)
-end
-
-function HDH_C_TRACKER:CreateDummySpell(count)
-	local icons =  self.frame.icon
-	local ui = self.ui
-	local curTime = GetTime()
-	local f
-	
-	if icons then
-		if #icons > 0 then count = #icons end
-	end
-	--local limit = 
-	for i=1, count do
-		f = icons[i]
-		if not f:GetParent() then f:SetParent(self.frame) end
-		if not f.icon:GetTexture() then
-			f.icon:SetTexture("Interface/ICONS/TEMP")
-			f.iconSatCooldown:SetTexture("Interface/ICONS/TEMP")
-		end
-		f:ClearAllPoints()
-		local spell = f.spell
-		if not spell then spell = {} f.spell = spell end
-		spell.name = f.spell.name
-		spell.icon = nil
-		spell.display = DB.SPELL_ALWAYS_DISPLAY
-		spell.id = 0
-		spell.no = i
-		spell.glow = false
-		spell.count = 3+i
-		spell.duration = 50*i
-		spell.happenTime = 0
-		spell.remaining = spell.duration
-		spell.charges = {};
-		spell.charges.duration = 0;
-		spell.charges.endTime = 0;
-		spell.charges.remaining = 0;
-		spell.endTime = curTime + spell.duration
-		spell.startTime = curTime
-		spell.castCount = 0
-		spell.inRange = true
-		spell.isAble = true
-		spell.isNotEnoughMana = false
-		spell.isLearned = true
-
-		self:SetGameTooltip(f,  false)
-		f.spell = spell
-		f.counttext:SetText(i)
-		f.timetext:Show();
-		spell.isCharging = false;
-		spell.isAble = true
-		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-			f.bar:SetMinMaxValues(spell.startTime, spell.endTime);
-			f.bar:SetValue(spell.startTime);
-		end
-		f:Show()
-	end
-	return count;
-end
-
-function HDH_C_TRACKER:UpdateAllIcons() -- HDH_TRACKER override
-	local isUpdateLayout = false
-	if not self.frame or not self.frame.icon then return end
-	for i = 1 , #self.frame.icon do
-		isUpdateLayout = self:UpdateIcon(self.frame.icon[i]) -- icon frame
-	end
-	if self.OrderFunc then 
-		self:OrderFunc(self)
-		self:UpdateLayout()	
-	end 
-
-	return isUpdateLayout
-end
-
-function HDH_C_TRACKER:Update() -- HDH_TRACKER override
-	if not self.ui then return end
-
-	self:UpdateAllIcons();
 end
 
 function HDH_C_TRACKER:IsSwitchByRemining(icon1, icon2, desc) 
@@ -505,6 +242,219 @@ function HDH_C_TRACKER:IsSwitchByRemining(icon1, icon2, desc)
 		ret = true;
 	end
 	return ret;
+end
+
+function HDH_C_TRACKER:UpdateIconSettings(f)
+	super.UpdateIconSettings(self, f)
+	local op_icon = self.ui.icon
+	f.icon:Setup(op_icon.size, op_icon.size, op_icon.cooldown, true, true, op_icon.spark_color, op_icon.cooldown_bg_color, op_icon.on_alpha, op_icon.off_alpha, op_icon.border_size)
+	f.icon:SetHandler(nil, HDH_AT_CooldownIconTemplate_OnCooldownFinished)
+end
+
+function HDH_C_TRACKER:CreateDummySpell(count)
+	local icons =  self.frame.icon
+	local ui = self.ui
+	local curTime = GetTime()
+	local f, spell
+	
+	if icons then
+		if #icons > 0 then count = #icons end
+	end
+	--local limit = 
+	for i=1, count do
+		f = icons[i]
+		if not f:GetParent() then f:SetParent(self.frame) end
+		if not f.icon:GetTexture() then
+			f.icon:SetTexture("Interface/ICONS/TEMP")
+		end
+		spell = f.spell
+		if not spell then spell = {} f.spell = spell end
+		spell.name = f.spell.name
+		spell.icon = nil
+		spell.display = DB.SPELL_ALWAYS_DISPLAY
+		spell.id = 0
+		spell.no = i
+		spell.glow = false
+		spell.count = 3+i
+		spell.duration = 50*i
+		spell.happenTime = 0
+		spell.remaining = spell.duration
+		spell.charges = {}
+		spell.charges.duration = 0
+		spell.charges.endTime = 0
+		spell.charges.remaining = 0
+		spell.endTime = curTime + spell.duration
+		spell.startTime = curTime
+		spell.castCount = 0
+		spell.inRange = true
+		spell.isAble = true
+		spell.isNotEnoughMana = false
+		-- spell.isLearned = true
+		spell.isUpdate = true
+
+		self:SetGameTooltip(f,  false)
+		f.spell = spell
+		f.counttext:SetText(i)
+		f.timetext:Show()
+		spell.isCharging = false;
+		spell.isAble = true
+		f.icon:SetCooldown(spell.startTime, spell.duration)
+		f.icon:UpdateCooldowning()
+
+		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
+			f.bar:SetMinMaxValues(spell.startTime, spell.endTime);
+			f.bar:SetValue(spell.startTime);
+		end
+		f:Show()
+	end
+	return count;
+end
+
+function HDH_C_TRACKER:UpdateSpellInfo(index)
+	local show_global_cooldown = self.ui.cooldown.show_global_cooldown
+	local use_not_enough_mana_color = self.ui.cooldown.use_not_enough_mana_color
+	local use_out_range_color = self.ui.cooldown.use_out_range_color
+
+	local startTime, duration, remaining, count
+	local chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax
+	local inRange, isAble, isNotEnoughMana, isGlobalCooldown
+	local spell
+	local startIndex = index or 1
+	local endIndex = index or #self.frame.icon
+
+	for i = startIndex, endIndex do
+		spell = self.frame.icon[i].spell
+		if spell and not HDH_TRACKER.ENABLE_MOVE and not spell.isInnerCDItem then
+			startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana = self:GetCooldownInfo(spell.id, spell.name, spell.isItem, spell.isToy)
+			isGlobalCooldown = (duration > 0 and duration < HDH_C_TRACKER.GlobalCooldown)
+
+			if spell.isGlobalCooldown then
+				spell.isGlobalCooldown = isGlobalCooldown
+				if show_global_cooldown or not spell.isGlobalCooldown then
+					spell.startTime = startTime
+					spell.endTime = startTime + duration
+					spell.duration = duration
+					spell.remaining = remaining
+				end
+			else
+				-- 와우 기본 쿨다운 시스템의 경우, 스킬 쿨다운 끝자락에서 글로벌 쿨다운이 들어오면 글쿨을 우선 표시하도록 구현됨.
+				-- 하지만, 쿨다운 여부를 흑백으로 처리하는 입장에서 보면 글쿨 때문에 의도치 않게 흑백으로 표시되는 문제를 야기함. 
+				-- 그래서 스킬 쿨다운 종료 전에 모든 글쿨은 무시하도록 구현함 (글쿨이 들어왔을때, startTime > spell.endTime 인 경우만 글쿨로 인식)
+				-- 이로 인하여, 쿨다운이 끝나고 스킬을 사용가능한것으로 보이나 글쿨로 인해서 스킬을 바로 사용하지 못하는 텀이 발생할 수 있으나
+				-- 글쿨보다 적은 시간이기 때문에 사용성 측면에서 용인 가능한 수준으로 판단됨
+				if isGlobalCooldown then
+					if show_global_cooldown and (startTime >= spell.endTime or spell.endTime > (startTime + duration)) then
+						spell.startTime = startTime
+						spell.endTime = startTime + duration
+						spell.duration = duration
+						spell.remaining = remaining
+						spell.isGlobalCooldown = true
+					else
+						spell.remaining = math.max(spell.endTime - GetTime(), 0)
+					end
+				else
+					spell.startTime = startTime
+					spell.endTime = startTime + duration
+					spell.duration = duration
+					spell.remaining = remaining
+				end
+			end
+
+			if not show_global_cooldown then
+				spell.isGlobalCooldown = false
+			end
+
+			if count >= 2 and spell.isItem then
+				spell.stackable = true
+			end
+			spell.count = count
+			if not spell.charges then spell.charges = {} end 
+			spell.charges.count = chargeCount
+			spell.charges.remaining = chargeRemaining
+			spell.charges.startTime = chargeStartTime
+			spell.charges.endTime = chargeStartTime + chargeDuration
+			spell.charges.duration = chargeDuration
+			spell.charges.CountMax = chargeCountMax
+
+			spell.isCharging = (chargeRemaining > 0 and chargeCount >= 1) and true or false
+			spell.isAble = isAble
+			spell.inRange = not use_out_range_color and true or inRange
+			spell.isNotEnoughMana = use_not_enough_mana_color and isNotEnoughMana or false
+
+			if (not spell.isGlobalCooldown) and (spell.remaining > HDH_C_TRACKER.EndCooldown) then
+				spell.isUpdate = true
+			else
+				spell.isUpdate = false
+			end
+		end
+	end
+end
+
+function HDH_C_TRACKER:UpdateIconAndBar(index) -- HDH_TRACKER override
+	local f, spell
+	local not_enough_mana_color = (self.ui.cooldown.not_enough_mana_color or {0.35, 0.35, 0.78})
+	local out_range_color = (self.ui.cooldown.out_range_color or {0.53, 0.1, 0.1})
+
+	local startIndex = index or 1
+	local endIndex = index or #self.frame.icon
+	for i = startIndex, endIndex do
+		f = self.frame.icon[i]
+		spell = f.spell
+
+		-- 쿨다운 상태 업데이트
+		if (spell.remaining > HDH_C_TRACKER.EndCooldown and not spell.isGlobalCooldown ) then
+			f.icon:UpdateCooldowning()
+		else -- 스킬 쿨 아닌 상태
+			f.icon:UpdateCooldowning(false)
+			-- 글쿨, 차지 상태 업데이트
+			if spell.isCharging and spell.isGlobalCooldown then
+				f.icon:ShowOnlyEdgeSpark()
+			end
+		end
+
+		-- 색상 상태 업데이트
+		if not spell.inRange then
+			f.icon:SetOverlayColor(out_range_color[1], out_range_color[2], out_range_color[3], out_range_color[4])
+		elseif spell.isNotEnoughMana then
+			f.icon:SetOverlayColor(not_enough_mana_color[1], not_enough_mana_color[2], not_enough_mana_color[3], not_enough_mana_color[4])
+		else
+			f.icon:SetOverlayColor(nil)
+		end
+
+		-- 사용 가능 상태 업데이트
+		if not spell.isAble then
+			f.icon:SetDesaturated()
+		end
+
+		-- 쿨다운 업데이트
+		if not spell.isGlobalCooldown and spell.remaining > HDH_C_TRACKER.EndCooldown then
+			f.icon:SetCooldown(spell.startTime, spell.duration)
+		elseif spell.isCharging then
+			f.icon:SetCharge(spell.charges.startTime, spell.charges.duration)
+		elseif spell.isGlobalCooldown then
+			f.icon:SetCooldown(spell.startTime, spell.duration)
+		else
+			f.icon:Stop()
+		end
+
+		if (spell.charges.CountMax and (spell.charges.CountMax >= 2)) then
+			f.counttext:SetText(spell.charges.count)
+		elseif spell.stackable or spell.count > 0 then
+			f.counttext:SetText(spell.count)
+		else
+			f.counttext:SetText(nil)
+		end
+
+		if f.bar then
+			f.bar:SetText(spell.name)
+			if spell.remaining > HDH_C_TRACKER.EndCooldown and not spell.isGlobalCooldown then
+				self:UpdateBarMinMaxValue(f, spell.startTime, spell.endTime, GetTime())
+			else
+				self:UpdateBarMinMaxValue(f, 0, 1, 1)
+			end
+		end
+		self:UpdateGlow(f, true)
+	end
 end
 
 function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
@@ -685,6 +635,48 @@ function HDH_C_TRACKER:UpdateGlow(f, bool)
 	end
 end
 
+
+function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_SHOW(id)
+	local f = self.frame.pointer[id]
+	if not f or not f.spell then return end
+
+	if f.spell.id == id then
+		f.spell.ableGlow = true
+		if not f:IsShown() then
+			self:Update(f.spell.no)
+		else
+			if f.spell.glowEffectType == DB.GLOW_EFFECT_DEFAULT then
+				self:ActionButton_ShowOverlayGlow(f)
+				if f.icon.spark:IsShown() then
+					f.icon.spark:Hide() 
+					f.spell.glowColorOn = false
+				end
+			else
+				if not f.icon.spark:IsShown() then
+					f.icon.spark.playing = 0
+					f.icon.spark:Show() 
+					f.spell.glowColorOn = true
+				end
+			end
+		end
+
+	elseif f.spell.base_id == id then
+		f.spell.base_ableGlow = true
+	end
+end
+
+function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_HIDE(id)
+	local f = self.frame.pointer[id]
+	if not f or not f.spell then return end
+
+	if f.spell.id == id then
+		f.spell.ableGlow = false
+		self:Update(f.spell.no)
+	elseif f.spell.base_id == id then
+		f.spell.base_ableGlow = false
+	end
+end
+
 function HDH_C_TRACKER:ACTIVE_TALENT_GROUP_CHANGED()
 	-- self:RunTimer("PLAYER_TALENT_UPDATE", 0.2, HDH_C_TRACKER.InitIcons, self)
 end
@@ -703,7 +695,9 @@ function HDH_C_TRACKER:PLAYER_ENTERING_WORLD()
 end
 
 function HDH_C_TRACKER:ACTION_RANGE_CHECK_UPDATE(slot, isInRange, checksRange)
-
+	if not HDH_TRACKER.ENABLE_MOVE then
+		self:Update()
+	end
 end
 
 function HDH_C_TRACKER:ACTIONBAR_UPDATE_STATE()
@@ -738,7 +732,7 @@ function HDH_C_TRACKER:COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED(base, override)
 				end
 			end
 		end
-		self:UpdateIcon(f)
+		self:Update(f.spell.no)
 	end
 end
 
@@ -747,8 +741,8 @@ function HDH_C_TRACKER:COMBAT_LOG_EVENT_UNFILTERED(subEvent, srcGUID, spellID)
 		if subEvent == "SPELL_DAMAGE" or subEvent == "SPELL_HEAL" or subEvent == "SPELL_CAST_SUCCESS" or subEvent == "SPELL_SUMMON" or subEvent == "SPELL_CREATE" or subEvent == "SPELL_AURA_APPLIED" then
 			for i = 1, #self.frame.icon do
 				if self.frame.icon[i].spell.isInnerCDItem then
-					self:UpdateCombatSpellInfo(self.frame.icon[i], spellID);
-					self:UpdateIcon(self.frame.icon[i])
+					self:UpdateCombatSpellInfo(self.frame.icon[i], spellID)
+					self:Update(i)
 				end
 			end
 		end
@@ -784,7 +778,6 @@ end
 
 -- BAG_UPDATE -- 
 
-
 function HDH_C_TRACKER:OnEvent(event, ...)
 	local tracker = self.parent
 	if not tracker then return end
@@ -796,10 +789,6 @@ function HDH_C_TRACKER:OnEvent(event, ...)
 
 	elseif event == "ACTION_RANGE_CHECK_UPDATE" then
 		tracker:ACTION_RANGE_CHECK_UPDATE(...)
-		if not HDH_TRACKER.ENABLE_MOVE then
-			-- HDH_AT_UTIL.RunTimer(tracker, "ACTIONBAR_UPDATE_COOLDOWN", 0.05, HDH_C_TRACKER.Update, tracker)
-			HDH_C_TRACKER.Update(tracker)
-		end
 
 	elseif event == "ACTIONBAR_UPDATE_STATE" then
 		tracker:ACTIONBAR_UPDATE_STATE()

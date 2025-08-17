@@ -94,8 +94,8 @@ function HDH_STAGGER_TRACKER:CreateData()
 	end
 	local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
 	DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
-	DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_COUNT, DB.CONDITION_GT_OR_EQ, STAGGER_RED_TRANSITION * 100)
-	DB:SetTrackerElementBarInfo(trackerId, elemIdx, HDH_STAGGER_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_RATIO)
+	DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_COUNT, DB.CONDITION_GT_OR_EQ, STAGGER_RED_TRANSITION)
+	DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_VALUE_TYPE_VALUE, DB.BAR_MAXVALUE_TYPE_HEALTH, nil, HDH_STAGGER_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_RATIO)
 
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON_AND_BAR)
@@ -138,7 +138,6 @@ function HDH_STAGGER_TRACKER:CreateDummySpell(count)
 	if f.icon:GetTexture() == nil then
 		f.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[1].texture);
 	end
-	f:ClearAllPoints()
 	local spell = f.spell
 	if not spell then spell = {} f.spell = spell end
 	spell.display = DB.SPELL_ALWAYS_DISPLAY

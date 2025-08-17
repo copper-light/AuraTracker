@@ -16,8 +16,6 @@ HDH_TRACKER.TYPE.DEBUFF = 2
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.BUFF, HDH_AURA_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.DEBUFF, HDH_AURA_TRACKER)
 
-
--- HDH_TRACKER.startTime, spell.duration - (spell.startTime - HDH_TRACKER.startTime)
 do
 	local StaggerID = { }
 	StaggerID[124275] = true
@@ -31,6 +29,10 @@ do
 		local f
 		local spell
 
+		for i = 1, #self.frame.icon do
+			self.frame.icon[i].spell.isUpdate = false
+		end
+		
 		for i = 1, 40 do 
 			aura = C_UnitAuras.GetAuraDataByIndex(self.unit, i, self.filter)
 			if not aura then break end
@@ -46,7 +48,6 @@ do
 			end
 			if f and f.spell then
 				spell = f.spell
-
 				if not StaggerID[aura.spellId] then -- 시간차가 아니면
 					spell.v1 = (aura.points[1] ~= 0) and aura.points[1] or nil
 				else -- 시간차
@@ -83,31 +84,45 @@ do
 				spell.isUpdate = true
 			end
 		end
+
+		for i = 1, #self.frame.icon do
+			if not self.frame.icon[i].spell.isUpdate then
+				self.frame.icon[i].spell.duration = 0
+				self.frame.icon[i].spell.count = 0
+				self.frame.icon[i].spell.v1 = 0
+				self.frame.icon[i].spell.overlay = 0
+				self.frame.icon[i].spell.startTime = 0
+				self.frame.icon[i].spell.endTime = 1
+			end
+		end
+
 		return ret;
 	end
 
 	function HDH_AURA_TRACKER.GetAurasAll(self)
 		local aura, spell
 		local curTime = GetTime()
-		local ret = 1
 		local f
+		self.prevUpdateCount = self.updateCount
 		for i = 1, 40 do 
 			aura = C_UnitAuras.GetAuraDataByIndex(self.unit, i, self.filter)
-			if not aura then break end
+			if not aura then
+				break
+			end
 			if self.aura_filter == DB.AURA_FILTER_ONLY_BOSS then
 				if not aura.isFromPlayerOrPlayerPet and (self.isRaiding or (aura.isBossAura)) then
-					f = self.frame.icon[ret]
+					f = self.frame.icon[i]
 				else
 					f = nil
 				end
 			elseif self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
 				if aura.sourceUnit == 'player' then
-					f = self.frame.icon[ret]
+					f = self.frame.icon[i]
 				else
 					f = nil
 				end
 			else
-				f = self.frame.icon[ret]
+				f = self.frame.icon[i]
 			end
 			
 			if f then
@@ -127,6 +142,7 @@ do
 				spell.icon = aura.icon
 				spell.index = i; -- 툴팁을 위해, 순서
 				spell.happenTime = curTime
+				spell.isLearned = true
 
 				if HDH_TRACKER.startTime > spell.startTime then
 					spell.startTime = HDH_TRACKER.startTime
@@ -134,11 +150,13 @@ do
 				end
 
 				f.icon:SetTexture(aura.icon)
-				ret = ret + 1;
+				
+				self.updateCount = i
 			end
 		end
-		for i = ret, #(self.frame.icon) do
-			self.frame.icon[i]:Hide()
+		for i = (self.updateCount or 0) + 1, self.prevUpdateCount or 0 do
+			self.frame.icon[i].spell.isLearned = false
+			self.frame.icon[i].spell.isUpdate = false
 		end
 	end
 	
@@ -157,11 +175,10 @@ do
 		end
 		return ret;
 	end
-	
-	function HDH_AURA_TRACKER:UpdateAllIcons()
+
+	function HDH_AURA_TRACKER:UpdateIconAndBar(index)
 		local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
 		local icons = self.frame.icon
-		local aura_filter = self.aura_filter
 		local aura_caster = self.aura_caster
 		local display_mode = self.ui.common.display_mode
 
@@ -172,20 +189,20 @@ do
 					f.counttext:SetText(f.spell.count >= 2 and f.spell.count or "")
 				else
 					if f.spell.count < 2 then f.counttext:SetText(f.spell.overlay >= 2 and f.spell.overlay or "")
-											else f.counttext:SetText(f.spell.count) end
+										 else f.counttext:SetText(f.spell.count) end
 				end
-				
+
 				f.icon:UpdateCooldowning()
 				f.v1:SetText((f.spell.showValue and f.spell.v1) and HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate) or nil)
 				if f.spell.duration == 0 then
 					f.timetext:SetText("")
 					f.icon:SetCooldown(0, 1, false)
 					f.icon:SetValue(0)
-				else 
+				else
 					self:UpdateTimeText(f.timetext, f.spell.remaining)
 					f.icon:SetCooldown(f.spell.startTime, f.spell.duration)
 				end
-				
+
 				if self.ui.common.default_color then
 					if f.spell.dispelType == nil then
 						f.icon:SetBorderColor(unpack(self.ui.icon.active_border_color))
@@ -203,10 +220,7 @@ do
 				if display_mode ~= DB.DISPLAY_ICON and f.bar then
 					f.bar:SetText(f.spell.name)
 					if f.spell.duration == 0 then
-						f.spell.remaining = 0
-						f.spell.endTime = 1
-						f.spell.startTime = 0
-						self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, 0)
+						self:UpdateBarMinMaxValue(f, 0, 1, 0)
 					else
 						self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, GetTime())
 					end
@@ -220,34 +234,23 @@ do
 					f.v1:SetText(nil)
 					f.counttext:SetText(nil)
 					self:UpdateGlow(f, f.spell.glow == DB.GLOW_CONDITION_TIME)
-					f.spell.remaining = 1
-					f.spell.endTime = 1
-					f.spell.startTime = 0
 					if display_mode ~= DB.DISPLAY_ICON and f.bar then 
 						f.bar:SetText(f.spell.name)
 						if self.ui.common.default_color and f.spell.dispelType then
-							f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType or ""].r, DebuffTypeColor[f.spell.dispelType or ""].g, DebuffTypeColor[f.spell.dispelType or ""].b, 1)
+							f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType].r, DebuffTypeColor[f.spell.dispelType].g, DebuffTypeColor[f.spell.dispelType].b, 1)
 						end
-						self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, f.spell.remaining);
+						self:UpdateBarMinMaxValue(f, 0, 1, 1)
 					end
 				end
 			end
 		end
-		
+
 		if self.OrderFunc then self.OrderFunc(self) end
 		return ret
 	end
 
-	-- 버프, 디버프의 상태가 변경 되었을때 마다 실행되어, 데이터 리스트를 업데이트 하는 함수
-	function HDH_AURA_TRACKER:Update()
-		if not self.frame or HDH_TRACKER.ENABLE_MOVE then return end
-		if not UnitExists(self.unit) or not self.frame.pointer or not self.ui then
-			
-			self.frame:Hide() return 
-		end
+	function HDH_AURA_TRACKER:UpdateSpellInfo(index)
 		self.GetAurasFunc(self)
-		self:UpdateAllIcons() 
-		self:UpdateLayout()
 	end
 
 	function HDH_AURA_TRACKER:InitIcons()
@@ -255,7 +258,7 @@ do
 		local id, name, type, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
 		if not id then return 0 end
 
-		local barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType
+		local barValueType, barMaxValueType, barMaxValue
 		local f
 		local ret = 0
 
@@ -266,17 +269,14 @@ do
 
 		if aura_filter == DB.AURA_FILTER_ALL or aura_filter == DB.AURA_FILTER_ONLY_BOSS then
 			for i = 1 , 40 do
-				barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType = DB:GetTrackerElementBarInfo(trackerId, i)
+				barValueType, barMaxValueType, barMaxValue = DB:GetDefaultBarInfo(self.type)
 				f = self.frame.icon[i]
 				if f:GetParent() == nil then f:SetParent(self.frame) end
-
 				f.spell = {}
-				f.spell.barSplitPoints = splitPoints
-				f.spell.barSplitPointType = splitPointType
+				f.spell.barSplitPoints = {}
 				f.spell.barValueType = barValueType
 				f.spell.barMaxValueType = barMaxValueType
 				f.spell.barMaxValue = barMaxValue
-				-- f:Hide()
 				if f.bar then
 					f.bar:SetSplitPoints(f.spell.barSplitPoints, f.spell.barSplitPointType)
 				end
@@ -286,18 +286,19 @@ do
 			self.frame:UnregisterAllEvents()
 			self.frame:SetScript("OnEvent", self.OnEvent)
 			self:LoadOrderFunc()
+			ret = 40
 		else
 			ret = super.InitIcons(self)
 			self.GetAurasFunc = HDH_AURA_TRACKER.GetAuras
 		end
 
 		if aura_filter == DB.AURA_FILTER_ONLY_BOSS then
-			self.frame:RegisterEvent('UNIT_AURA')
+			self.frame:RegisterUnitEvent('UNIT_AURA', self.unit)
 			self.frame:RegisterEvent("ENCOUNTER_START");
 			self.frame:RegisterEvent("ENCOUNTER_END");
 		end
 		if #(self.frame.icon) > 0 or aura_filter == DB.AURA_FILTER_ALL then
-			self.frame:RegisterEvent('UNIT_AURA')
+			self.frame:RegisterUnitEvent('UNIT_AURA', self.unit)
 			if self.unit == 'target' then
 				self.frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 			elseif self.unit == 'focus' then

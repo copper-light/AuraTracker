@@ -453,7 +453,7 @@ end
 
 function HDH_AT_MultiStatusBarTemplateMixin:SetSplitPoints(points, pointType)
     self.points = points or {}
-    self.pointType = pointType
+    self.pointType = pointType or DB.BAR_SPLIT_RATIO
     self:SetMinMaxValues(self.minValue, self.maxValue, true)
 end
 

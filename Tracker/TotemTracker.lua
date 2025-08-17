@@ -30,52 +30,105 @@ do
 	HDH_TRACKER.TYPE.TOTEM = 4
 	HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.TOTEM, HDH_TT_TRACKER)
 
-	function HDH_TT_TRACKER:Update(...) -- HDH_TRACKER override
-		if not self.frame or HDH_TRACKER.ENABLE_MOVE then return end
-		local haveTotem, name, startTime, duration, icon, endTime
-		-- local slot = ... or MAX_TOTEMS
-		local ui = self.ui
-		local f
-		local key
-		local ret = 1
-
-		if not self.frame.pointer or not ui then return end
-		for i =1, MAX_TOTEMS do
-			haveTotem, name, startTime, duration, icon = GetTotemInfo(i)
-			if haveTotem then
-				if self.aura_filter == DB.AURA_FILTER_ALL then
-					f = self.frame.icon[ret]
-					f.spell = {}
-					f.spell.icon = icon
-					f.icon:SetTexture(icon)
-					f.no = i
-					ret = ret +1
-				else
-					key = HDH_TT_TRACKER.AdjustSpell[name] or name
-					f = self.frame.pointer[key]
+	-- 판다리아까지는 주술사 토템을 유형별로 1개씩 설치할 수 있음
+	if select(4, GetBuildInfo()) <= 59999 then
+		function HDH_TT_TRACKER:UpdateSpellInfo(index)
+			local haveTotem, name, startTime, duration, icon, endTime, key, f
+			if self.aura_filter ~= DB.AURA_FILTER_ALL then
+				for i = 1, #self.frame.icon do
+					self.frame.icon[i].spell.isUpdate = false
 				end
-				if f and f.spell then
-					f.spell.duration = duration
-					f.spell.count = 0
-					f.spell.overlay = 0
-					f.spell.startTime = startTime
-					f.spell.isUpdate = true
-					f.spell.name = name
-					endTime = startTime + duration
-					f.spell.remaining = endTime - GetTime()
-					if f.spell.endTime ~= endTime then
-						f.spell.endTime = endTime;
-						f.spell.happenTime = GetTime()
+			end
+
+			for i =1, MAX_TOTEMS do
+				haveTotem, name, startTime, duration, icon = GetTotemInfo(i)
+				if haveTotem then
+					if self.aura_filter == DB.AURA_FILTER_ALL then
+						f = self.frame.icon[i]
+						f.spell = {}
+						f.spell.icon = icon
+						f.spell.isLearned = true
+						f.icon:SetTexture(icon)
+						f.spell.no = i
+					else
+						key = HDH_TT_TRACKER.AdjustSpell[name] or name
+						f = self.frame.pointer[key]
 					end
-					f.spell.slot = i
+					if f and f.spell then
+						f.spell.duration = duration
+						f.spell.count = 0
+						f.spell.overlay = 0
+						f.spell.startTime = startTime
+						f.spell.isUpdate = true
+						f.spell.name = name
+						endTime = startTime + duration
+						f.spell.remaining = endTime - GetTime()
+						if f.spell.endTime ~= endTime then
+							f.spell.endTime = endTime;
+							f.spell.happenTime = GetTime()
+						end
+					end
+				else
+					if self.aura_filter == DB.AURA_FILTER_ALL then
+						f = self.frame.icon[i]
+						f.spell.isLearned = false
+						f.spell.isUpdate = false
+					end
 				end
 			end
 		end
-		if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
-				and ((self:UpdateAllIcons() > 0) or self.ui.common.always_show or UnitAffectingCombat("player")) then
-			self:ShowTracker()
-		else
-			self:HideTracker()
+	else 
+		-- 드레노어 부터는 구분없이 총 4개 설치할 수 있도록 구성됨
+		-- 하지만 토템 기본 인덱스는 순차적으로 오지 않음.
+	    -- 따라서 토템 기본 인덱스 대신 별도의 순차적인 인덱스 사용 필요 : self.updateCount
+		-- ???? 오더링 순서를 잘 모르겠음
+		function HDH_TT_TRACKER:UpdateSpellInfo(index)
+			local haveTotem, name, startTime, duration, icon, endTime, key, f
+			if self.aura_filter ~= DB.AURA_FILTER_ALL then
+				for i = 1, #self.frame.icon do
+					self.frame.icon[i].spell.isUpdate = false
+				end
+			end
+			self.prevUpdateCount = self.updateCount or 0
+			self.updateCount = 0
+
+			for i =1, MAX_TOTEMS do
+				haveTotem, name, startTime, duration, icon = GetTotemInfo(i)
+				if haveTotem then
+					if self.aura_filter == DB.AURA_FILTER_ALL then
+						self.updateCount = self.updateCount + 1
+						f = self.frame.icon[self.updateCount]
+						f.spell = {}
+						f.spell.icon = icon
+						f.spell.isLearned = true
+						f.icon:SetTexture(icon)
+						f.spell.no = self.updateCount
+					else
+						key = HDH_TT_TRACKER.AdjustSpell[name] or name
+						f = self.frame.pointer[key]
+					end
+					if f and f.spell then
+						f.spell.duration = duration
+						f.spell.count = 0
+						f.spell.overlay = 0
+						f.spell.startTime = startTime
+						f.spell.isUpdate = true
+						f.spell.name = name
+						endTime = startTime + duration
+						f.spell.remaining = endTime - GetTime()
+						if f.spell.endTime ~= endTime then
+							f.spell.endTime = endTime;
+							f.spell.happenTime = GetTime()
+						end
+					end
+				end
+			end
+			if self.aura_filter == DB.AURA_FILTER_ALL then
+				for i = self.updateCount + 1, self.prevUpdateCount do
+					self.frame.icon[i].spell.isLearned = false
+					self.frame.icon[i].spell.isUpdate = false
+				end
+			end
 		end
 	end
 
@@ -84,28 +137,23 @@ do
 		local id, name, type, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
 		if not id then return 0 end
 
-		local barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType
+		local barValueType, barMaxValueType, barMaxValue
 		local f
 		local ret = 0
-
-		self.filter = (self.type == HDH_TRACKER.TYPE.BUFF) and "HELPFUL" or "HARMFUL"
-		self.aura_filter = aura_filter
-		self.aura_caster = aura_caster
-		self.frame.pointer = {}
-
 		if aura_filter == DB.AURA_FILTER_ALL then
+			self.aura_filter = aura_filter
+			self.aura_caster = aura_caster
+			self.unit = "player"
+			self.frame.pointer = {}
 			for i = 1 , MAX_TOTEMS do
-				barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType = DB:GetTrackerElementBarInfo(trackerId, i)
+				barValueType, barMaxValueType, barMaxValue = DB:GetDefaultBarInfo(self.type)
 				f = self.frame.icon[i]
 				if f:GetParent() == nil then f:SetParent(self.frame) end
-
 				f.spell = {}
-				f.spell.barSplitPoints = splitPoints
-				f.spell.barSplitPointType = splitPointType
+				f.spell.barSplitPoints = {}
 				f.spell.barValueType = barValueType
 				f.spell.barMaxValueType = barMaxValueType
 				f.spell.barMaxValue = barMaxValue
-				-- f:Hide()
 				if f.bar then
 					f.bar:SetSplitPoints(f.spell.barSplitPoints, f.spell.barSplitPointType)
 				end
@@ -141,10 +189,9 @@ function HDH_TT_TRACKER:OnEvent(event, ...)
 	if not self.parent then return end
 	local tracker = self.parent
 	
-	if event == "PLAYER_TOTEM_UPDATE" then 
-		if not HDH_TRACKER.ENABLE_MOVE then
-			tracker:Update(...)
-		end
+	if event == "PLAYER_TOTEM_UPDATE" then
+		tracker:Update()
+
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
 		tracker:InitIcons()
 	end

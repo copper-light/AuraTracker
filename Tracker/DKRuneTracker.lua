@@ -205,7 +205,7 @@ function HDH_DK_RUNE_TRACKER:UpdateBarSettings(f)
 	end
 end
 
-function HDH_DK_RUNE_TRACKER:UpdateAllIcons()
+function HDH_DK_RUNE_TRACKER:UpdateIconAndBar(index)
 	for k,v in pairs(self.frame.icon) do
 		self:UpdateIcon(v)
 	end
@@ -314,7 +314,7 @@ function HDH_DK_RUNE_TRACKER:Update() -- HDH_TRACKER override
 	-- 	self:UpdateRune(i)
 	-- 	--self:UpdateRuneType(i)
 	-- end
-	self:UpdateAllIcons()
+	self:UpdateIconAndBar()
 end
 
 function HDH_DK_RUNE_TRACKER:InitIcons()

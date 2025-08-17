@@ -350,4 +350,5 @@ L.UNSUPPORT = "지원 안함"
 L.SELECTED_COUNT = "%d개 선택 됨"
 
 -- 11.1.7.12
+L.THIS_ROW_IS_NOT_EDIT = "해당 주문은 현재 설정된 추척 유형에서\n자동으로 생성되는 주문이므로 수정할 수 없습니다."
 L.GRATE_THEN_MAX_VALUE = "입력된 값이 예상 최댓값의 범위를 초과하였습니다.\n올바르게 표기 되지 않을 수 있습니다."
