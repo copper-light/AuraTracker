@@ -439,17 +439,21 @@ do
 		return x, y
 	end
 
-	function HDH_AT_UTIL.RunTimer(obj, timerName, time, func, ...)
+	function HDH_AT_UTIL.RunTimer(obj, timerName, time, func, args)
 		if not obj.timer then obj.timer = {} end
 		if obj.timer[timerName] then
-			obj.timer[timerName].args = ...
+			obj.timer[timerName].args = args
 			if (GetTime() - obj.timer[timerName].startTime) <= time then
 				return
 			end
 		end
 		obj.timer[timerName] = C_Timer.NewTimer(time, function(timer)
-			if timer.parent then 
-				timer.func(timer.args) 
+			if timer.parent then
+				if timer.args and #timer.args >= 1 then
+					timer.func(unpack(timer.args)) 
+				else
+					timer.func() 
+				end
 				timer.parent[timer.timerName] = nil
 				timer.timerName = nil
 				timer.args = nil
@@ -460,7 +464,14 @@ do
 		obj.timer[timerName].parent = obj.timer
 		obj.timer[timerName].timerName = timerName
 		obj.timer[timerName].func = func
-		obj.timer[timerName].args = ...
+		obj.timer[timerName].args = args
+	end
+
+	function HDH_AT_UTIL.StopTimer(obj, timerName)
+		if obj.timer and obj.timer[timerName] then
+			obj.timer[timerName]:Cancel()
+			obj.timer[timerName] = nil
+		end
 	end
 
 	function HDH_AT_UTIL.CT_Timer_Func(self)

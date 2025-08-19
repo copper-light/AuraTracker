@@ -127,6 +127,7 @@ end
 function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
 	local iconf
+	local power = power_max - 1
 	for i = 1, power_max do
 		iconf = self.frame.icon[i]
 		if iconf then 
@@ -152,6 +153,7 @@ function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 			iconf.icon:SetTexture(self.POWER_INFO[self.type].texture);
 			
 			iconf.spell.v1 = power_max - 1
+
 			if (power_max) == i then
 				if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS ~= self.type and HDH_TRACKER.TYPE.POWER_ESSENCE ~= self.type then
 					iconf.spell.isUpdate = false
@@ -165,6 +167,18 @@ function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 			end
 		end
 	end
+
+	
+	for i = 1, power_max do
+		iconf = self.frame.icon[i]
+		if iconf then 
+			if not iconf.spell then
+				iconf.spell = {}
+			end
+			
+		end
+	end
+	
 	return power_max;
 end
 
@@ -184,42 +198,65 @@ function HDH_COMBO_POINT_TRACKER:UpdateIconSettings(f)
 	f.icon:SetValue(0)
 end
 
-function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
-	local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
-	local num_col = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
-	local reverse_v = self.ui.common.reverse_v -- 상하반전
-	local reverse_h = self.ui.common.reverse_h -- 좌우반전
-	local margin_h = self.ui.common.margin_h
-	local margin_v = self.ui.common.margin_v
-	local icons = self.frame.icon
-	local i = 0 -- 몇번째로 아이콘을 출력했는가?
-	local col = 0  -- 열에 대한 위치 좌표값 = x
-	local row = 0  -- 행에 대한 위치 좌표값 = y
-	local size_w, size_h
+-- isUpdate 에 관하여
+-- isUpdate의 개념은 아이콘이 쿨다운이 도는 중을 의미함
+-- 콤보에서는 콤보 포인트가 채워졌을때, 쿨다운이 돌지 않는 상황임
+-- 즉, 콤보를 포인트가 있는 아이콘이 isUpdate == false 인 상황인 것임
+-- coolodwn tracker 와 동일한 의미이므로 혼동하지 말것
+function HDH_COMBO_POINT_TRACKER:UpdateSpellInfo(index)
+	local iconf;
+	local ret = 0;
+	local power = UnitPower('player', self.POWER_INFO[self.type].power_index, true);
+	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index);
 
-	if self.ui.common.display_mode == DB.DISPLAY_BAR then
-		size_w = self.ui.bar.width
-		size_h = self.ui.bar.height
-	elseif self.ui.common.display_mode == DB.DISPLAY_ICON_AND_BAR then
-		if self.ui.bar.location == DB.BAR_LOCATION_R or self.ui.bar.location == DB.BAR_LOCATION_L then
-			size_w = self.ui.bar.width + self.ui.icon.size
-			size_h = math.max(self.ui.bar.height, self.ui.icon.size)
-		else
-			size_h = self.ui.bar.height + self.ui.icon.size
-			size_w = math.max(self.ui.bar.width, self.ui.icon.size)
-		end
-		
-	else
-		size_w = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
-		size_h = self.ui.icon.size
+	if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type then
+		power = power / 10
 	end
+	
+	for i = 1, power_max do
+		iconf = self.frame.icon[i]
+		if iconf then 
+			if not iconf.spell then
+				iconf.spell = {}
+			end
+			if math.ceil(power) >= i then
+				iconf.spell.isUpdate = false
+				if (power + 1 - i) < 1 then
+					iconf.spell.count = power + 1 - i 
+				else
+					iconf.spell.count = 1
+					iconf.spell.v1 = power
+				end
+			else
+				iconf.spell.isUpdate = true
+				iconf.spell.v1 = 0
+				iconf.spell.count = 0
+			end
+			ret = ret + 1
+		end
+	end
+end
+
+function HDH_COMBO_POINT_TRACKER:UpdateIconAndBar(index)
+	local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
+	local icons = self.frame.icon
 	
 	for k,f in ipairs(icons) do
 		if not f.spell then break end
-		f.counttext:SetText(nil)
 		if f.spell.isUpdate then
-			f.spell.isUpdate = false
-
+			if k <= UnitPowerMax('player', self.POWER_INFO[self.type].power_index) then 
+				f.icon:UpdateCooldowning()
+				f.icon:Stop()
+				f.v1:SetText("")
+				f.counttext:SetText("")
+				self:UpdateGlow(f, false)
+				if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
+					f.bar:SetValue(0)
+				end
+			else
+				self:ReleaseIcon(k);
+			end
+		else
 			if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS ~= self.type and HDH_TRACKER.TYPE.POWER_ESSENCE ~= self.type then
 				f.icon:UpdateCooldowning(false)
 				f.v1:SetText((f.spell.showValue and f.spell.v1 >= 1) and f.spell.v1 or "")
@@ -227,6 +264,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 					f.bar:SetValue(1)
 				end
 				self:UpdateGlow(f, true)
+				f.counttext:SetText(nil)
 			else
 				if f.spell.count < 1.0  then
 					if f.counttext:IsShown() and f.spell.count < 1 then
@@ -237,11 +275,6 @@ function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 
 					if self.ui.common.display_mode ~= DB.DISPLAY_BAR then
 						f.icon:SetValue(f.spell.count)
-						-- if f.spell.count > 0 then
-						-- 	f.icon:UpdateCooldowning()
-						-- else
-						-- 	f.icon:UpdateCooldowning(false)
-						-- end
 						f.icon:UpdateCooldowning()
 					end
 
@@ -266,128 +299,23 @@ function HDH_COMBO_POINT_TRACKER:UpdateAllIcons()  -- HDH_TRACKER override
 
 				f.v1:SetText((f.spell.showValue and f.spell.v1 >= 1) and f.spell.v1 or "")
 			end
-			
-			f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-			f:Show()
-
-			i = i + 1
-			if i % num_col == 0 then 
-				row = row + size_h + margin_v; 
-				col = 0
-			else 
-				col = col + size_w + margin_h 
-			end
-			ret = ret + 1
-
-		else
-			if k <= UnitPowerMax('player', self.POWER_INFO[self.type].power_index) then 
-				if f.spell.display == DB.SPELL_ALWAYS_DISPLAY then 
-					f.icon:UpdateCooldowning()
-					f.icon:Stop()
-					f.v1:SetText("")
-					f.counttext:SetText("")
-					self:UpdateGlow(f, false)
-					f:SetPoint('RIGHT', f:GetParent(), 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-					f:Show()
-					if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-						f.bar:SetValue(0)
-					end
-
-					i = i + 1
-					if i % num_col == 0 then 
-						row = row + size_h + margin_v; 
-						col = 0
-					else 
-						col = col + size_w + margin_h 
-					end
-				else
-					if (f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE or f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
-						i = i + 1
-						if i % num_col == 0 then 
-							row = row + size_h + margin_v
-							col = 0
-						else 
-							col = col + size_w + margin_h
-						end
-					end
-					f:Hide();
-				end
-			else
-				self:ReleaseIcon(k);
-			end
 		end
 	end
 	return ret
 end
 
-function HDH_COMBO_POINT_TRACKER:Update() -- HDH_TRACKER override
-	if not self.frame or not self.frame.icon then return end
-	local iconf;
-	local spell;
-	local ret = 0;
-	local power = UnitPower('player', self.POWER_INFO[self.type].power_index, true);
-	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index);
-
-	if not HDH_TRACKER.ENABLE_MOVE then
-		if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type then
-			power = power / 10
-		end
-			
-		for i = 1, power_max do
-			iconf = self.frame.icon[i]
-			if iconf then 
-				if not iconf.spell then
-					iconf.spell = {}
-				end
-				if math.ceil(power) >= i then
-					iconf.spell.isUpdate = true
-					if (power + 1 - i) < 1 then
-						iconf.spell.count = power + 1 - i 
-					else
-						iconf.spell.count = 1
-						iconf.spell.v1 = power
-					end
-				else
-					iconf.spell.isUpdate = false
-					iconf.spell.v1 = 0
-					iconf.spell.count = 0
-				end
-				ret = ret + 1
-			end
-		end
-	else
-		power = power_max - 1
-		for i = 1, power_max do
-			iconf = self.frame.icon[i]
-			if iconf then 
-				if not iconf.spell then
-					iconf.spell = {}
-				end
-				if math.ceil(power) >= i then
-					iconf.spell.isUpdate = true
-				else
-					iconf.spell.isUpdate = false
-				end
-			end
-		end
-	end
-	self:UpdateAllIcons();
-
-	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
-			and (UnitAffectingCombat("player") or self.ui.common.always_show) then
-		self:ShowTracker();
-	else
-		self:HideTracker();
-	end
-	return ret;
+-- 콤보 포인트가 2~3 이 기본으로 충전되는 것들이 있어서 최종 확인 하고 기본값이 트래커 사라짐 옵션 활성화 필요
+-- 단, 판다리아 버전과 호환될수 있도록 구현할 필요 있음
+function HDH_COMBO_POINT_TRACKER:UpdateLayout()
+	super.UpdateLayout(self)
+	return 0
 end
 
 function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 	self.power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
 	local ret = HDH_TRACKER.InitIcons(self)
 	local f
-	if ret then
-		
+	if ret > 0 then
 		for i = 1, ret do
 			f = self.frame.icon[i]
 			if f.bar then
@@ -396,6 +324,7 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 		end
 		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE',"player")
 		self.frame:RegisterUnitEvent('UNIT_MAXPOWER',"player")
+		self:Update()
 	end
 	return ret
 end
@@ -405,15 +334,11 @@ end
 -------------------------------------------
 
 function HDH_COMBO_POINT_TRACKER:UNIT_POWER_UPDATE()
-	if not HDH_TRACKER.ENABLE_MOVE then
-		self:Update()
-	end
+	self:Update()
 end
 
 function HDH_COMBO_POINT_TRACKER:UNIT_MAXPOWER()
-	if not HDH_TRACKER.ENABLE_MOVE then
-		self:InitIcons()
-	end
+	self:InitIcons()
 end
 
 function HDH_COMBO_POINT_TRACKER:ACTIVE_TALENT_GROUP_CHANGED()
@@ -428,8 +353,7 @@ end
 
 function HDH_COMBO_POINT_TRACKER:OnEvent(event, unit, powerType)
 	local self = self.parent
-	if self == nil then return end
-	if (event == "UNIT_POWER_UPDATE" ) and (self.POWER_INFO[self.type].power_type == powerType) then 
+	if (event == "UNIT_POWER_UPDATE" ) and (self.POWER_INFO[self.type].power_type == powerType) then
 		self:UNIT_POWER_UPDATE()
 	elseif (event == 'UNIT_MAXPOWER') and (self.POWER_INFO[self.type].power_type == powerType) then
 		self:UNIT_MAXPOWER()

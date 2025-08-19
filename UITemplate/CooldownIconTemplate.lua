@@ -125,7 +125,6 @@ end
 
 function HDH_AT_CircleCooldownTemplateMixin:SetValue(value)
 	if self.isTimer then return end
-
 	self.per = (value - self.startValue) / self.duration
 	self.per = math.max(math.min(1, self.per), 0)
 	self.Progress:SetCooldown(GetTime() - (100 * self.per), 100)
@@ -600,7 +599,9 @@ function HDH_AT_CooldownIconTemplateMixin:UpdateCooldowning(bool)
 			self.Icon.Texture:SetDesaturated(true)
 			self.Border.Texture:SetVertexColor(0, 0, 0, self.offAlpha)
 		end
-		self.Cooldown:Clear()
+		if self.Cooldown.isTimer then
+			self.Cooldown:Clear()
+		end
 	end
 end
 

@@ -33,6 +33,7 @@ HDH_TRACKER.startTime = 0
 -------------------------------------------
 
 local function UpdateCooldown(f, elapsed)
+	if not f then return end
 	local spell = f.spell;
 	local tracker = f:GetParent().parent;
 	if not spell or not tracker then return end
@@ -1598,11 +1599,13 @@ function HDH_TRACKER:GetAni(f, ani_type) -- row 이동 애니
 end
 
 function HDH_TRACKER:ShowTracker()
-	self:StartAni(self.frame, HDH_TRACKER.ANI_SHOW);
+	HDH_AT_UTIL.StopTimer(self, "HideTracker")
+	self:StartAni(self.frame, HDH_TRACKER.ANI_SHOW)
 end
 
 function HDH_TRACKER:HideTracker()
-	self:StartAni(self.frame, HDH_TRACKER.ANI_HIDE);
+	-- self:StartAni(self.frame, HDH_TRACKER.ANI_HIDE);
+	HDH_AT_UTIL.RunTimer(self, "HideTracker", 5, HDH_C_TRACKER.StartAni, {self, self.frame, HDH_TRACKER.ANI_HIDE}) 
 end
 
 function HDH_TRACKER:IsShown()
@@ -1723,10 +1726,10 @@ function HDH_TRACKER:Update(index)
 	if not HDH_TRACKER.ENABLE_MOVE then
 		self:UpdateSpellInfo(index) -- 데이터 업데이트
 	end
-	self:UpdateIconAndBar(index)  -- 아이콘 업데이트
 	if self.OrderFunc then 
 		self.OrderFunc(self)
 	end
+	self:UpdateIconAndBar(index)  -- 아이콘 업데이트
 	local activedCount = self:UpdateLayout()  -- 레이아웃 업데이트
 
 	if (not (self.ui.common.hide_in_raid and IsInRaid())) 

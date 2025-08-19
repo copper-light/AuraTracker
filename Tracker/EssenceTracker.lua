@@ -27,7 +27,7 @@ local function OnUpdate(self)
 	self.spell.delay = self.spell.curTime
 	
 	if self.spell.count <= 1.0 and self.spell.no == 1 then
-		self:GetParent().parent:Update();
+		self:GetParent().parent:Update()
 	end
 	
 	self:GetParent().parent:UpdateGlow(self, true);
@@ -160,15 +160,12 @@ function HDH_ESSENCE_TRACKER:GetElementCount(index)
 		end 
 		return DB:GetTrackerElementSize(self.id)
 	end
-	
-	
 end
 
-function HDH_ESSENCE_TRACKER:Update() -- HDH_TRACKER override
-	if not self.frame or not self.frame.icon or HDH_TRACKER.ENABLE_MOVE then return end
+function HDH_ESSENCE_TRACKER:UpdateSpellInfo(index)
 	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
 	local power =  UnitPower('player', self.POWER_INFO[self.type].power_index)
-	local partPower = UnitPartialPower('player', self.POWER_INFO[self.type].power_index)
+	-- local partPower = UnitPartialPower('player', self.POWER_INFO[self.type].power_index)
 	local powerTick, _  = GetPowerRegenForPowerType(self.POWER_INFO[self.type].power_index)
 	local progress = self:GetEssenceFillingProgress(power + 1) 
 	local spell
@@ -187,7 +184,7 @@ function HDH_ESSENCE_TRACKER:Update() -- HDH_TRACKER override
 		spell = self.frame.icon[i].spell
 		if not spell then break end
 		if power >= i then
-			spell.isUpdate = true
+			spell.isUpdate = false
 			spell.duration = 0
 			spell.count = 1
 			spell.v1 = power
@@ -205,7 +202,7 @@ function HDH_ESSENCE_TRACKER:Update() -- HDH_TRACKER override
 				else
 					spell.count = spell.count + powerTick
 				end
-				spell.isUpdate = true
+				spell.isUpdate = false
 				spell.v1 = 0
 			else
 				spell.duration = 0
@@ -214,34 +211,16 @@ function HDH_ESSENCE_TRACKER:Update() -- HDH_TRACKER override
 				spell.v1 = 0
 				spell.startTime = 0
 				spell.endTime = 0
-				spell.isUpdate = false
+				spell.isUpdate = true
 			end
 		end
 	end
 	self.power = power
 	self.curTime = curTime
-
-	self:UpdateAllIcons()
-	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
-			and (UnitAffectingCombat("player") or power < power_max or self.ui.common.always_show) then
-		self:ShowTracker();
-		local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-		for i = 1, power_max do
-			self.frame.icon[i]:SetScript("OnUpdate", OnUpdate)
-		end
-	else
-		self:HideTracker();
-		local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-		for i = 1, power_max do
-			self.frame.icon[i]:SetScript("OnUpdate", nil)
-		end
-	end
-
-	return power
 end
 
 function HDH_ESSENCE_TRACKER:InitIcons()
-	local ret = HDH_TRACKER.InitIcons(self)
+	local ret = super.InitIcons(self)
 	for i = 1, ret do
 		self.frame.icon[i]:SetScript("OnUpdate", OnUpdate)
 	end
@@ -252,8 +231,6 @@ end
 ------------------------------------
 
 function HDH_ESSENCE_TRACKER:UNIT_POWER_UPDATE()
-	if not HDH_TRACKER.ENABLE_MOVE then
-		self.power = nil
-		self:Update()
-	end
+	self.power = nil
+	self:Update()
 end

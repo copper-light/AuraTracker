@@ -350,7 +350,7 @@ function HDH_AURA_TRACKER:OnEvent(event, ...)
 			self:UNIT_AURA()
 		end
 	elseif event =="PLAYER_TARGET_CHANGED" then
-		HDH_AT_UTIL.RunTimer(self, "PLAYER_TARGET_CHANGED", 0.02, self.UNIT_AURA, self) 
+		HDH_AT_UTIL.RunTimer(self, "PLAYER_TARGET_CHANGED", 0.02, self.UNIT_AURA, {self}) 
 	elseif event == 'PLAYER_FOCUS_CHANGED' then
 		self:UNIT_AURA()
 	elseif event == 'INSTANCE_ENCOUNTER_ENGAGE_UNIT' then
@@ -360,7 +360,7 @@ function HDH_AURA_TRACKER:OnEvent(event, ...)
 	elseif event == 'UNIT_PET' then
 		HDH_AT_UTIL.RunTimer(self, "UNIT_PET", 0.5, self.UNIT_AURA, self) 
 	elseif event == 'ARENA_OPPONENT_UPDATE' then
-		HDH_AT_UTIL.RunTimer(self, "ARENA_OPPONENT_UPDATE", 0.5, self.UNIT_AURA, self) 
+		HDH_AT_UTIL.RunTimer(self, "ARENA_OPPONENT_UPDATE", 0.5, self.UNIT_AURA, {self}) 
 	elseif event == "ENCOUNTER_START" then
 		self.isRaiding = true;
 	elseif event == "ENCOUNTER_END" then

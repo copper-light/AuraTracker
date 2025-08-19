@@ -690,7 +690,7 @@ function HDH_C_TRACKER:PLAYER_ENTERING_WORLD()
 		HDH_AT_UTIL.RunTimer(self, "UpdateSetting", 0.5, function(self) 
 			HDH_C_TRACKER.UpdateSetting(self)
 			HDH_C_TRACKER.Update(self)
-		end, self)
+		end, {self})
 	end	
 end
 
@@ -784,7 +784,7 @@ function HDH_C_TRACKER:OnEvent(event, ...)
 
 	if event == "ACTIONBAR_UPDATE_COOLDOWN" or event =="BAG_UPDATE_COOLDOWN" or event =="BAG_UPDATE" or event == "ACTIONBAR_UPDATE_USABLE"  then
 		if not HDH_TRACKER.ENABLE_MOVE then
-			HDH_AT_UTIL.RunTimer(tracker, "ACTIONBAR_UPDATE_COOLDOWN", 0.05, HDH_C_TRACKER.Update, tracker)
+			HDH_AT_UTIL.RunTimer(tracker, "ACTIONBAR_UPDATE_COOLDOWN", 0.05, HDH_C_TRACKER.Update, {tracker})
 		end
 
 	elseif event == "ACTION_RANGE_CHECK_UPDATE" then
@@ -818,23 +818,23 @@ function HDH_C_TRACKER:OnEvent(event, ...)
 		tracker:Update()
 
 	elseif event == 'UNIT_PET' then
-		HDH_AT_UTIL.RunTimer(tracker, "UNIT_PET", 0.5, HDH_C_TRACKER.Update, tracker) 
+		HDH_AT_UTIL.RunTimer(tracker, "UNIT_PET", 0.5, HDH_C_TRACKER.Update, {tracker}) 
 
 	elseif event == 'ARENA_OPPONENT_UPDATE' then
-		HDH_AT_UTIL.RunTimer(tracker, "ARENA_OPPONENT_UPDATE", 0.5, HDH_C_TRACKER.Update, tracker)
+		HDH_AT_UTIL.RunTimer(tracker, "ARENA_OPPONENT_UPDATE", 0.5, HDH_C_TRACKER.Update, {tracker})
 
 	elseif event == 'PLAYER_TALENT_UPDATE' then
-		HDH_AT_UTIL.RunTimer(tracker, "PLAYER_TALENT_UPDATE", 0.5, HDH_C_TRACKER.InitIcons, tracker)
+		HDH_AT_UTIL.RunTimer(tracker, "PLAYER_TALENT_UPDATE", 0.5, HDH_C_TRACKER.InitIcons, {tracker})
 
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
-		HDH_AT_UTIL.RunTimer(tracker, "PLAYER_EQUIPMENT_CHANGED", 0.5, HDH_C_TRACKER.InitIcons, tracker)
+		HDH_AT_UTIL.RunTimer(tracker, "PLAYER_EQUIPMENT_CHANGED", 0.5, HDH_C_TRACKER.InitIcons, {tracker})
 
 	elseif event == "ACTIONBAR_SLOT_CHANGED" then
 		tracker:ACTIONBAR_SLOT_CHANGED(...)
 
 	elseif event == 'UNIT_AURA' then
 		if select(1, ...) == "player" then 
-			HDH_AT_UTIL.RunTimer(tracker, "ACTIONBAR_UPDATE_COOLDOWN", 0.05, HDH_C_TRACKER.Update, tracker)	
+			HDH_AT_UTIL.RunTimer(tracker, "ACTIONBAR_UPDATE_COOLDOWN", 0.05, HDH_C_TRACKER.Update, {tracker})	
 		end
 
 	elseif event == "COMBAT_LOG_EVENT_UNFILTERED" then
