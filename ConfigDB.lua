@@ -824,24 +824,29 @@ end
 
 function HDH_AT_ConfigDB:SetTrackerElementBarInfo(trackerId, elementIndex, barValueType, barMaxValueType, barMaxValue, splitValues, splitType)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
-    element.splitValues = splitValues
-    element.splitType = splitType or CONFIG.BAR_SPLIT_RATIO
     element.barValueType = barValueType
     element.barMaxValueType = barMaxValueType
     element.barMaxValue = barMaxValue
+    element.splitValues = splitValues
+    element.splitType = splitType or CONFIG.BAR_SPLIT_RATIO
 end
 
 function HDH_AT_ConfigDB:GetTrackerElementBarInfo(trackerId, elementIndex)
     local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
-    local barValueType, barMaxValueType, barMaxValue
+    local barValueType, barMaxValueType, barMaxValue, splitValues, splitType 
     if element then
         if not element.barValueType then
-            barValueType, barMaxValueType, barMaxValue = self:GetDefaultBarInfo(HDH_AT_DB.tracker[trackerId].type)
+            barValueType, barMaxValueType, barMaxValue, splitValues, splitType = self:GetDefaultBarInfo(HDH_AT_DB.tracker[trackerId].type)
+            element.barValueType = barValueType
+            element.barMaxValueType = barMaxValueType
+            element.barMaxValue =  barMaxValue
+            element.splitValues = splitValues
+            element.splitType = splitType
         end
 
-        return element.barValueType or barValueType, 
-                element.barMaxValueType or barMaxValueType, 
-                element.barMaxValue or barMaxValue, 
+        return element.barValueType , 
+                element.barMaxValueType , 
+                element.barMaxValue , 
                 UTIL.Deepcopy(element.splitValues or {}), 
                 element.splitType or CONFIG.BAR_SPLIT_RATIO
     else
@@ -1040,15 +1045,16 @@ end
 
 function HDH_AT_ConfigDB:GetDefaultBarInfo(trackerType)
     local className = HDH_TRACKER.GetClass(trackerType):GetClassName()
-    local barValueType, barMaxValueType, barMaxValue
+    local barValueType, barMaxValueType, barMaxValue, splitType 
     if className =="HDH_AURA_TRACKER" or className =="HDH_C_TRACKER" or className =="HDH_TT_TRACKER" then
         barValueType = CONFIG.BAR_VALUE_TYPE_TIME
         barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_TIME
 
     elseif className =="HDH_COMBO_POINT_TRACKER" or className=="HDH_ESSENCE_TRACKER" then
-        barValueType = CONFIG.BAR_VALUE_TYPE_COUNT
+        barValueType = CONFIG.BAR_VALUE_TYPE_VALUE
         barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_CUSTOM
         barMaxValue = 1
+        splitType = CONFIG.BAR_SPLIT_FIXED_VALUE
 
     elseif className =="HDH_HEALTH_TRACKER" then
         barValueType = CONFIG.BAR_VALUE_TYPE_VALUE
@@ -1071,5 +1077,5 @@ function HDH_AT_ConfigDB:GetDefaultBarInfo(trackerType)
         barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_HEALTH
     end
 
-    return barValueType, barMaxValueType, barMaxValue
+    return barValueType, barMaxValueType, barMaxValue, {}, splitType or CONFIG.BAR_SPLIT_RATIO
 end

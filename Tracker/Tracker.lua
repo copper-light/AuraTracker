@@ -62,8 +62,8 @@ local function UpdateCooldown(f, elapsed)
 	if spell.time > 0.0 then
 		tracker:UpdateTimeText(f.timetext, spell.time)
 
-		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-			tracker:UpdateBarValue(f, tracker:GetBarValue(f))
+		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar and tracker.GetBarValue then
+			tracker:UpdateBarValue(f, tracker.GetBarValue(f))
 		end
 		if f.spell.glow == DB.GLOW_CONDITION_TIME then
 			tracker:UpdateGlow(f, true)
@@ -74,34 +74,34 @@ local function UpdateCooldown(f, elapsed)
 end
 
 local function OnUpdateGlowColor(self, elapsed)
-	-- self.sparkElapsed = (self.sparkElapsed or 0) + elapsed
-	-- if self.sparkElapsed < (HDH_TRACKER.ONUPDATE_FRAME_TERM/2) or not self:GetParent().spell then return end
-	-- self.playing = (self.playing or 0) + self.sparkElapsed
-	-- self.sparkElapsed = 0
-	-- self.p = HDH_AT_UTIL.LogScale(math.max(math.min((1.25 - (GetTime() % (1/self:GetParent().spell.glowEffectPerSec) + .001) / (1/self:GetParent().spell.glowEffectPerSec*0.8)), 1.), 0.3))
-	-- self.p_c = math.max(self.p, 0.5)
-	-- self.icon_size = self:GetParent():GetParent().parent.ui.icon.size
+	self.sparkElapsed = (self.sparkElapsed or 0) + elapsed
+	if self.sparkElapsed < (HDH_TRACKER.ONUPDATE_FRAME_TERM/2) or not self:GetParent().spell then return end
+	self.playing = (self.playing or 0) + self.sparkElapsed
+	self.sparkElapsed = 0
+	self.p = HDH_AT_UTIL.LogScale(math.max(math.min((1.25 - (GetTime() % (1/self:GetParent().spell.glowEffectPerSec) + .001) / (1/self:GetParent().spell.glowEffectPerSec*0.8)), 1.), 0.3))
+	self.p_c = math.max(self.p, 0.5)
+	self.icon_size = self:GetParent():GetParent().parent.ui.icon.size
 	
-	-- if (math.min(1.4, self.playing / 0.25)) == 1.4 then
-	-- 	self.color:SetSize(self.icon_size * 1.31, self.icon_size * 1.31)
-	-- 	self.spot:SetVertexColor(self.p, self.p, self.p, 0.74)
-	-- 	self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1] * self.p_c, 
-	-- 							  self:GetParent().spell.glowEffectColor[2] * self.p_c, 
-	-- 							  self:GetParent().spell.glowEffectColor[3] * self.p_c, 
-	-- 							  self:GetParent().spell.glowEffectColor[4] * self.p_c)
-	-- 	self.spot:SetSize(self.icon_size, self.icon_size)
-	-- else -- starting animation
-	-- 	self.color:SetSize(
-	-- 		self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.4)), 
-	-- 		self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.4)))
-	-- 	self.spot:SetSize(self.icon_size * (0.8 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)),  
-	-- 					  self.icon_size * (0.8 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)))
-	-- 	self.spot:SetVertexColor(1, 1, 1, 1)
-	-- 	self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1], 
-	-- 							  self:GetParent().spell.glowEffectColor[2], 
-	-- 							  self:GetParent().spell.glowEffectColor[3], 
-	-- 							  self:GetParent().spell.glowEffectColor[4])
-	-- end
+	if (math.min(1.4, self.playing / 0.25)) == 1.4 then
+		self.color:SetSize(self.icon_size * 1.31, self.icon_size * 1.31)
+		self.spot:SetVertexColor(self.p, self.p, self.p, 0.74)
+		self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1] * self.p_c, 
+								  self:GetParent().spell.glowEffectColor[2] * self.p_c, 
+								  self:GetParent().spell.glowEffectColor[3] * self.p_c, 
+								  self:GetParent().spell.glowEffectColor[4] * self.p_c)
+		self.spot:SetSize(self.icon_size, self.icon_size)
+	else -- starting animation
+		self.color:SetSize(
+			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.4)), 
+			self.icon_size * (1.1 + (HDH_AT_UTIL.LogScale(self.playing/0.25) *.4)))
+		self.spot:SetSize(self.icon_size * (0.8 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)),  
+						  self.icon_size * (0.8 + (HDH_AT_UTIL.LogScale(self.playing/0.25) * 0.3)))
+		self.spot:SetVertexColor(1, 1, 1, 1)
+		self.color:SetVertexColor(self:GetParent().spell.glowEffectColor[1], 
+								  self:GetParent().spell.glowEffectColor[2], 
+								  self:GetParent().spell.glowEffectColor[3], 
+								  self:GetParent().spell.glowEffectColor[4])
+	end
 end
 
 -------------------------------------------
@@ -361,6 +361,14 @@ function HDH_TRACKER:Init(id, name, type, unit)
 end
 
 function HDH_TRACKER:ReleaseIcon(idx)
+	local spell = self.frame.icon[idx].spell
+	if spell.key then
+		self.frame.pointer[spell.key] = nil
+		if tonumber(spell.key) then
+			self.frame.pointer[tonumber(spell.key)] = nil
+		end
+	end
+	
 	self.frame.icon[idx]:SetScript('OnDragStart', nil)
 	self.frame.icon[idx]:SetScript('OnDragStop', nil)
 	self.frame.icon[idx]:SetScript('OnMouseDown', nil)
@@ -529,13 +537,13 @@ function HDH_TRACKER:UpdateTimeText(text, value)
 	end
 end
 
-function HDH_TRACKER:GetBarMinMax(f)
-	return f.spell.startTime, f.spell.endTime
-end
+-- function HDH_TRACKER:GetBarMinMax(f)
+-- 	return f.spell.startTime, f.spell.endTime
+-- end
 
-function HDH_TRACKER:GetBarValue(f)
-	return GetTime()
-end
+-- function HDH_TRACKER:GetBarValue(f)
+-- 	return GetTime()
+-- end
 
 function HDH_TRACKER:UpdateBarValue(f, value)
 	f.bar:SetValue(value)
@@ -1743,6 +1751,62 @@ function HDH_TRACKER:Update(index)
 	end
 end
 
+-- function HDH_TRACKER:GetBarMinMax(f)
+-- 	return f.spell.startTime, f.spell.endTime
+-- end
+
+-- function HDH_TRACKER:GetBarValue(f)
+-- 	return GetTime()
+-- end
+
+function HDH_TRACKER:SetupBarValue(barValueType, barMaxValueType)
+	if barValueType == DB.BAR_VALUE_TYPE_TIME then
+		self.GetBarValue = function(f)
+			return GetTime()
+		end
+	elseif barValueType == DB.BAR_VALUE_TYPE_COUNT then
+		self.GetBarValue = function(f)
+			return math.max(f.spell.count, (f.spell.charges and f.spell.charges.count or 0))
+		end
+	else -- DB.BAR_VALUE_TYPE_VALUE
+		self.GetBarValue = function(f)
+			return f.spell.v1
+		end
+	end
+
+	if barMaxValueType == DB.BAR_MAXVALUE_TYPE_TIME then
+		self.GetBarMinMax = function(f)
+			return f.spell.startTime, f.spell.endTime
+		end
+	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_CHARGES then
+		self.GetBarMinMax = function(f)
+			return 0, (f.spell.charges and f.spell.charges.CountMax or 0)
+		end
+	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_HEALTH then
+		self.GetBarMinMax = function(f)
+			return 0, UnitHealthMax(self.unit)
+		end
+	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_MANA then
+		self.GetBarMinMax = function(f)
+			-- return 0, self:GetPowerMax()
+		end
+	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_POWER then
+		self.GetBarMinMax = function(f)
+			-- return 0, UnitPowerMax('player', self.POWER_INFO[self.type].power_index) 
+		end
+	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_CUSTOM then
+		if barValueType == DB.BAR_VALUE_TYPE_TIME then
+			self.GetBarMinMax = function(f)
+				return f.spell.endTime - (f.spell.barMaxValue or 0), f.spell.endTime
+			end
+		else
+			self.GetBarMinMax = function(f)
+				return 0, f.spell.barMaxValue or 0
+			end
+		end
+	end
+end
+
 function HDH_TRACKER:InitIcons()
 	local trackerId = self.id
 	local id, name, trackerType, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
@@ -1791,6 +1855,9 @@ function HDH_TRACKER:InitIcons()
 			if f:GetParent() == nil then f:SetParent(self.frame) end
 			if isLearned and elemKey then
 				self.frame.pointer[elemKey] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
+				if tonumber(elemKey) then
+					self.frame.pointer[tonumber(elemKey)] = f
+				end
 			end
 			
 			spell = {}
@@ -1829,6 +1896,7 @@ function HDH_TRACKER:InitIcons()
 			spell.barValueType = barValueType
 			spell.barMaxValueType = barMaxValueType
 			spell.barMaxValue = barMaxValue
+			self:SetupBarValue(barValueType, barMaxValueType, barMaxValue)
 
 			if innerSpellId then
 				spell.isInnerCDItem = true

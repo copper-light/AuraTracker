@@ -156,14 +156,14 @@ function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 
 			if (power_max) == i then
 				if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS ~= self.type and HDH_TRACKER.TYPE.POWER_ESSENCE ~= self.type then
-					iconf.spell.isUpdate = false
-				else
 					iconf.spell.isUpdate = true
+				else
+					iconf.spell.isUpdate = false
 					iconf.spell.count = 0.5
 				end
 				iconf.spell.v1 = 0
 			else
-				iconf.spell.isUpdate = true;
+				iconf.spell.isUpdate = false;
 			end
 		end
 	end

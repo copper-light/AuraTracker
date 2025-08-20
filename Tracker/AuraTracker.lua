@@ -219,10 +219,13 @@ do
 
 				if display_mode ~= DB.DISPLAY_ICON and f.bar then
 					f.bar:SetText(f.spell.name)
-					if f.spell.duration == 0 then
+					
+					if f.spell.duration == 0 and f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
 						self:UpdateBarMinMaxValue(f, 0, 1, 0)
 					else
-						self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, GetTime())
+						local minV, maxV = self.GetBarMinMax(f)
+						self:UpdateBarMinMaxValue(f, minV, maxV, self.GetBarValue(f))
+						-- self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, GetTime())
 					end
 				end
 				self:UpdateGlow(f, true)
@@ -239,7 +242,13 @@ do
 						if self.ui.common.default_color and f.spell.dispelType then
 							f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType].r, DebuffTypeColor[f.spell.dispelType].g, DebuffTypeColor[f.spell.dispelType].b, 1)
 						end
-						self:UpdateBarMinMaxValue(f, 0, 1, 1)
+						
+						if f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
+							self:UpdateBarMinMaxValue(f, 0, 1, 1)
+						else
+							local minV, maxV = self.GetBarMinMax(f)
+							self:UpdateBarMinMaxValue(f, minV, maxV, 0)
+						end
 					end
 				end
 			end

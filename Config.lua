@@ -1603,9 +1603,9 @@ function HDH_AT_OnClick_Button(self, button)
 		local index = self:GetParent().index
 		local trackerId = F.BODY.CONFIG_DETAIL.trackerId
 		local elemIdx = F.BODY.CONFIG_DETAIL.elemIdx
-		local values = DB:GetTrackerElementBarInfo(trackerId, elemIdx)
+		local barValueType, barMaxValueType, barMaxValue, splitPoints, splitType = DB:GetTrackerElementBarInfo(trackerId, elemIdx)
 		local minValue, maxValue = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR:GetMinMaxValues()
-		local pointType = F.BODY.CONFIG_DETAIL.ETC.SW_SPLIT_TYPE:GetSelectedValue()
+		local splitType = F.BODY.CONFIG_DETAIL.ETC.SW_SPLIT_TYPE:GetSelectedValue()
 		-- if maxValue < 10 then
 		-- 	main.Dialog:AlertShow(L.NEED_TO_MAXIMUM_VALUE)
 		-- 	return 
@@ -1623,7 +1623,7 @@ function HDH_AT_OnClick_Button(self, button)
 				main.Dialog:AlertShow(L.GRATE_THEN_MAX_VALUE)
 			end
 
-			for _, value in ipairs(values) do
+			for _, value in ipairs(splitPoints) do
 				if value == newValue then
 					ok = false
 					break
@@ -1631,8 +1631,8 @@ function HDH_AT_OnClick_Button(self, button)
 			end
 
 			if ok then
-				values[index] = newValue
-				table.sort(values)
+				splitPoints[index] = newValue
+				table.sort(splitPoints)
 			end
 			-- if minValue < v and maxValue > v then
 			-- 	if pointType == DB.BAR_SPLIT_RATIO then
@@ -1657,10 +1657,19 @@ function HDH_AT_OnClick_Button(self, button)
 			-- 	return
 			-- end
 		elseif self:GetParent().ButtonDel == self then
-			table.remove(values, index)
+			table.remove(splitPoints, index)
 		end
 
-		DB:SetTrackerElementBarInfo(trackerId, elemIdx, values, pointType)
+		barValueType = F.BODY.CONFIG_DETAIL.ETC.DDP_BAR_VALUE_TYPE:GetSelectedValue()
+		barMaxValueType = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR.MaxValueFrame.DDMaxValueType:GetSelectedValue()
+		if barMaxValueType == 1 then
+			barMaxValueType = DB.BAR_MAXVALUE_TYPE_CUSTOM
+		else
+			barMaxValueType = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR.MaxValueFrame.DDMaxValue:GetSelectedValue()
+		end
+		barMaxValue = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR.MaxValueFrame.EditBox:GetText()
+
+		DB:SetTrackerElementBarInfo(trackerId, elemIdx, barValueType, barMaxValueType, barMaxValue, splitPoints, splitType)
 		main:LoadDetailFrame(BODY_DETAIL_ETC, trackerId, elemIdx)
 		HDH_TRACKER.InitVaribles(trackerId)
 
@@ -2431,7 +2440,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			end
 		end
 
-		local values, splitType = DB:GetTrackerElementBarInfo(trackerId, elemIdx)
+		local barValueType, barMaxValueType, barMaxValue, splitPoints, splitType = DB:GetTrackerElementBarInfo(trackerId, elemIdx)
 		-- Load splitbar
 		local splitbar = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR
 		splitbar.ED_LIST = splitbar.ED_LIST or {}
@@ -2442,8 +2451,8 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 
 		F.BODY.CONFIG_DETAIL.ETC.SW_SPLIT_TYPE:SetSelectedValue(splitType)
 
-		for i =1 , (#values + 1) do
-			v = values[i]
+		for i =1 , (#splitPoints + 1) do
+			v = splitPoints[i]
 			if not edList[i] then
 				component = CreateFrame("Frame", (parent:GetName()..'AddDelEdtibox'..i), parent, "HDH_AT_AddDelEdtiboxTemplate")
 				component:SetSize(115, 26)
@@ -2475,7 +2484,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			component:SetPoint('RIGHT', parent, 'RIGHT', -25, 0)
 			component.Text:SetText("최댓값")
 			HDH_AT_DropDown_Init(component.DDMaxValueType, {
-				{1, "직접 입력"},
+				{1, "고정값 입력"},
 				{2, "자동"},
 			}, function(self, itemFrame, idx, value) 
 				if idx == 1 then
@@ -2489,20 +2498,32 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 
 			HDH_AT_DropDown_Init(component.DDMaxValue, {
 				{DB.BAR_MAXVALUE_TYPE_TIME, "최대 지속 시간"},
-				{DB.BAR_MAXVALUE_TYPE_COUNT, "최대 중첩/충전 수"},
+				{DB.BAR_MAXVALUE_TYPE_CHARGES, "최대 중첩/충전 수"},
 				{DB.BAR_MAXVALUE_TYPE_HEALTH, "최대 체력"},
 				{DB.BAR_MAXVALUE_TYPE_MANA, "최대 마나"},
 				{DB.BAR_MAXVALUE_TYPE_POWER, "최대 분노/기력류"}
 			}, function(self, itemFrame, idx, value) 
 				
 			end)
-
 			splitbar.MaxValueFrame = component
 		end
-		splitbar.MaxValueFrame:SetPoint('TOP', edList[#values + 1], 'BOTTOM', 0, -5)
 
+		if barMaxValueType == DB.BAR_MAXVALUE_TYPE_CUSTOM then
+			splitbar.MaxValueFrame.DDMaxValue:Hide()
+			splitbar.MaxValueFrame.EditBox:Show()
+		else
+			splitbar.MaxValueFrame.EditBox:Hide()
+			splitbar.MaxValueFrame.DDMaxValue:Show()
+		end
+		splitbar.MaxValueFrame.DDMaxValueType:SetSelectedIndex(barMaxValueType == DB.BAR_MAXVALUE_TYPE_CUSTOM and 1 or 2)
+		splitbar.MaxValueFrame.DDMaxValue:SetSelectedValue(barMaxValueType)
+		splitbar.MaxValueFrame.EditBox:SetText(barMaxValue or "")
 
-		for i = #values + 2, #edList do
+		F.BODY.CONFIG_DETAIL.ETC.DDP_BAR_VALUE_TYPE:SetSelectedValue(barValueType)
+
+		splitbar.MaxValueFrame:SetPoint('TOP', edList[#splitPoints + 1], 'BOTTOM', 0, -5)
+
+		for i = #splitPoints + 2, #edList do
 			edList[i]:Hide()
 		end
 		local tracker = HDH_TRACKER.Get(trackerId)
@@ -2520,7 +2541,9 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 				end
 			end
 		end
-		splitbar:SetSplitPoints(values)
+		F.BODY.CONFIG_DETAIL.ETC.SW_SPLIT_TYPE:SetSelectedValue(splitType)
+
+		splitbar:SetSplitPoints(splitPoints)
 
 		-- Load Inner CD
 		local innerType, innerSpellId, innerCooldown = DB:GetTrackerElementInnerCooldown(trackerId, elemIdx)
@@ -3432,9 +3455,9 @@ function HDH_AT_ConfigFrameMixin:InitFrame()
 
 	comp = HDH_AT_CreateOptionComponent(self.DETAIL_ETC_TAB[2].content, COMP_TYPE.DROPDOWN, "바 표시 값 유형") --  "바 분할 유형"
 	HDH_AT_DropDown_Init(comp, {
-		{DB.BAR_SPLIT_RATIO,       "시간"},
-		{DB.BAR_SPLIT_FIXED_VALUE, "중첩"},	
-		{DB.BAR_SPLIT_FIXED_VALUE, "수치/콤보/자원"}
+		{DB.BAR_VALUE_TYPE_TIME,       "시간"},
+		{DB.BAR_VALUE_TYPE_COUNT, "중첩"},	
+		{DB.BAR_VALUE_TYPE_VALUE, "수치/콤보/자원"}
 	}, HDH_AT_OnSelected_Dropdown)
 	self.F.BODY.CONFIG_DETAIL.ETC.DDP_BAR_VALUE_TYPE = comp
 

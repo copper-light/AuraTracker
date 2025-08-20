@@ -639,7 +639,6 @@ end
 function HDH_C_TRACKER:ACTIVATION_OVERLAY_GLOW_SHOW(id)
 	local f = self.frame.pointer[id]
 	if not f or not f.spell then return end
-
 	if f.spell.id == id then
 		f.spell.ableGlow = true
 		if not f:IsShown() then
