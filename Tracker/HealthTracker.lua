@@ -58,7 +58,6 @@ do -- HDH_HEALTH_TRACKER class
 		return UnitGetTotalAbsorbs(self.unit) or 0 
 	end
 
-
 	function HDH_HEALTH_TRACKER:UpdateBarSettings(f)
 		super.UpdateBarSettings(self, f)
 

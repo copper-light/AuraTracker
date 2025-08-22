@@ -164,11 +164,13 @@ function HDH_DK_RUNE_TRACKER:UpdateSpellInfo(runeIndex)
 				spell.remaining = spell.endTime - GetTime()
 				spell.isUpdate = true
 				spell.v1 = 0
+				spell.count = 1
 			else
+				spell.count = 0
 				spell.duration = 0
 				spell.startTime = 0
 				spell.endTime = GetTime()
-				spell.remaining = 0 
+				spell.remaining = 0
 				spell.isUpdate = false
 			end
 		end
@@ -204,11 +206,15 @@ function HDH_DK_RUNE_TRACKER:UpdateIconAndBar(index)
 
 				f.v1:SetText("")
 				if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then
-					self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, GetTime())
+					self:UpdateBarMinMaxValue(f)
 				end
 			else
 				if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then
-					self:UpdateBarMinMaxValue(f, 0, 1, 1)
+					if f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
+						self:UpdateBarMinMaxValue(f, 0, 1, 1)
+					else
+						self:UpdateBarMinMaxValue(f)
+					end
 					if select(4, GetBuildInfo()) < 100000 then
 						f.bar:SetStatusBarColor(adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color))
 					end

@@ -33,8 +33,7 @@ local function OnUpdate(self)
 	self:GetParent().parent:UpdateGlow(self, true);
 
 	if self.bar then
-		self.bar:SetMinMaxValues(0, 1)
-		self.bar:SetValue(self.spell.count)
+		self.bar:SetValue()
 	end
 	
 	if self.spell.remaining > 0 then

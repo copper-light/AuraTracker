@@ -25,13 +25,13 @@ HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM = 23
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM, HDH_ENH_MAELSTROM_TRACKER)
 
 do
-	function HDH_ENH_MAELSTROM_TRACKER:GetBarMinMax(f)
-		return 0, f.spell.barMaxValue
-	end
+	-- function HDH_ENH_MAELSTROM_TRACKER:GetBarMinMax(f)
+	-- 	return 0, f.spell.barMaxValue
+	-- end
 
-	function HDH_ENH_MAELSTROM_TRACKER:GetBarValue(f)
-		return f.spell.count
-	end
+	-- function HDH_ENH_MAELSTROM_TRACKER:GetBarValue(f)
+	-- 	return f.spell.count
+	-- end
     
     function HDH_ENH_MAELSTROM_TRACKER:CreateData()
 		local name, rank, texture = HDH_AT_UTIL.GetInfo(HDH_ENH_MAELSTROM_TRACKER.TRACKING_SPELL_ID)
@@ -47,7 +47,7 @@ do
         end
         local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
 
-		DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_VALUE_TYPE_COUNT, DB.BAR_MAXVALUE_TYPE_CHARGES, nil, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_FIXED_VALUE)
+		DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_VALUE_TYPE_COUNT, DB.BAR_MAXVALUE_TYPE_COUNT, nil, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_FIXED_VALUE)
 		DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_COUNT, DB.CONDITION_GT_OR_EQ, 5)
 		DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 		
@@ -105,8 +105,16 @@ do
 			self:UpdateGlow(f, false)
 		end
 
-		if f.bar and f.spell.barMaxValue then
-			self:UpdateBarMinMaxValue(f, 0, f.spell.barMaxValue, f.spell.count)
+		if f.bar then
+			if f.spell.isUpdate then
+				self:UpdateBarMinMaxValue(f)
+			else
+				if f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
+					self:UpdateBarMinMaxValue(f, 0, 1, 1)
+				else
+					self:UpdateBarMinMaxValue(f, nil, nil, 0)
+				end
+			end
 		end
 		
 		return ret
@@ -116,7 +124,7 @@ do
 		local ret = super.InitIcons(self)
 		if ret > 0 then
 			self.filter = "HELPFUL"
-			if self.frame.icon[1].spell.barMaxValueType == DB.BAR_MAXVALUE_TYPE_CHARGES then -- 호환성 코드
+			if self.frame.icon[1].spell.barMaxValueType == DB.BAR_MAXVALUE_TYPE_COUNT then -- 호환성 코드
 				if select(4, GetBuildInfo()) <= 59999 then -- 대격변
 					self.frame.icon[1].spell.barMaxValue = 5
 				else

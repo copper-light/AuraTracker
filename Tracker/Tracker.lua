@@ -1,6 +1,7 @@
 local DB = HDH_AT_ConfigDB
 local UTIL = HDH_AT_UTIL
 local L = HDH_AT_L
+
 --------------------------------------------
 -- TRACKER Class 
 --------------------------------------------
@@ -62,8 +63,8 @@ local function UpdateCooldown(f, elapsed)
 	if spell.time > 0.0 then
 		tracker:UpdateTimeText(f.timetext, spell.time)
 
-		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar and tracker.GetBarValue then
-			tracker:UpdateBarValue(f, tracker.GetBarValue(f))
+		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar and f.GetBarValue then
+			tracker:UpdateBarValue(f)
 		end
 		if f.spell.glow == DB.GLOW_CONDITION_TIME then
 			tracker:UpdateGlow(f, true)
@@ -545,8 +546,12 @@ end
 -- 	return GetTime()
 -- end
 
-function HDH_TRACKER:UpdateBarValue(f, value)
-	f.bar:SetValue(value)
+function HDH_TRACKER:UpdateBarValue(f, value, animate)
+	if value == nil then
+		value = f:GetBarValue()
+		print("UpdateBarValue", value)
+	end
+	f.bar:SetValue(value, animate)
 end
 
 function HDH_TRACKER:UpdateBarMinMaxValue(f, minV, maxV, value, r, g, b, a)
@@ -554,7 +559,15 @@ function HDH_TRACKER:UpdateBarMinMaxValue(f, minV, maxV, value, r, g, b, a)
 		if r then
 			f.bar:SetStatusBarColor(r, g, b, a or 1)
 		end
+
+		if not minV or not maxV then
+			minV, maxV = f:GetBarMinMax()
+		end
 		f.bar:SetMinMaxValues(minV, maxV)
+		
+		local a, b = f.bar:GetMinMaxValues()
+		-- print("UpdateBarMinMaxValue", minV, maxV, a, b) -> 0, 1, 0, 1 로 나옴
+
 		self:UpdateBarValue(f, value)
 	end
 end
@@ -661,15 +674,15 @@ end
 
 function HDH_TRACKER:LoadOrderFunc()
 	if self.ui.common.order_by == DB.ORDERBY_REG then
-		self.OrderFunc = nil;
+		self.UpdateOrder = nil
 	elseif self.ui.common.order_by == DB.ORDERBY_CD_ASC then
-		self.OrderFunc = self.InAsendingOrderByTime
+		self.UpdateOrder = self.InAsendingOrderByTime
 	elseif self.ui.common.order_by == DB.ORDERBY_CD_DESC then
-		self.OrderFunc = self.InDesendingOrderByTime
+		self.UpdateOrder = self.InDesendingOrderByTime
 	elseif self.ui.common.order_by == DB.ORDERBY_CAST_ASC then
-		self.OrderFunc = self.InAsendingOrderByCast;
+		self.UpdateOrder = self.InAsendingOrderByCast
 	elseif self.ui.common.order_by == DB.ORDERBY_CAST_DESC then
-		self.OrderFunc = self.InDesendingOrderByCast;
+		self.UpdateOrder = self.InDesendingOrderByCast
 	end
 end
 
@@ -677,9 +690,6 @@ function HDH_TRACKER:CreateDummySpell(count)
 	local icons =  self.frame.icon
 	local curTime = GetTime()
 	local f, spell
-	-- if icons then
-	-- 	if #icons > count then count = #icons end
-	-- end
 	count = count or 1;
 	for i=1, count do
 		f = icons[i]
@@ -711,9 +721,7 @@ function HDH_TRACKER:CreateDummySpell(count)
 		f.icon:SetCooldown(spell.startTime, spell.duration)
 		f.icon:UpdateCooldowning()
 		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-			-- f:SetScript("OnUpdate",nil);
-			local bMin, bMax = self:GetBarMinMax(f)
-			self:UpdateBarMinMaxValue(f, bMin, bMax, self:GetBarValue(f))
+			self:UpdateBarMinMaxValue(f)
 			f.bar:Show();
 			spell.name = spell.name or ("NAME"..i);
 		end
@@ -744,11 +752,10 @@ function HDH_TRACKER:IsRaiding()
 end
 
 function HDH_TRACKER:UpdateMoveFrame(isDragging)
-	local x, y, w, h, editingY, editingX
 	local top, bottom, left, right
 	local col_size = math.min(self.ui.common.column_count, #self.frame.icon)
-	editingY = 0	
-	editingX = 0
+	local editingY = 0	
+	local editingX = 0
 	if self.ui.common.display_mode == DB.DISPLAY_ICON then
 		if self.ui.common.reverse_v then
 			top = self.frame.icon[#self.frame.icon]
@@ -918,7 +925,10 @@ local function OnMouseDown_MoveFrame(self)
 	local cur = HDH_TRACKER.Get(self:GetParent().id)
 	self.isDragging = true
 	self:StartMoving()
+	
+	if not cur then return end
 	cur:UpdateMoveFrame()
+
 	local x, y= self:GetCenter()
 	self.preX = math.ceil(x)
 	self.preY = math.ceil(y)
@@ -944,6 +954,7 @@ local function OnMouseUp_MoveFrame(self)
 		self.isSelected = not self.isSelected
 	end
 	local cur = HDH_TRACKER.Get(self:GetParent().id)
+	if not cur then return end
 	cur:UpdateMoveFrame()
 
 	if HDH_AT_ConfigFrame.trackerId ~= self:GetParent().id then
@@ -956,7 +967,7 @@ end
 
 local function OnUpdate_MoveFrame(self)
 	local t = HDH_TRACKER.Get(self:GetParent().id)
-
+	if not t then return end
 	if self.isDragging then
 		local x, y
 		if t.ui.common.reverse_h then
@@ -986,11 +997,8 @@ local function OnUpdate_MoveFrame(self)
 			break
 		end
 	end
-	if otherSelected then
-		t.frame.moveFrame.text:Hide()
-	else
-		t.frame.moveFrame.text:Show()
-	end
+	
+	t.frame.moveFrame.text:SetShown(not otherSelected)
 
 	if self.isSelected or self.isDragging then
 		if self.isDragging then
@@ -1642,6 +1650,10 @@ end
 --- 프레임 DB 로드 시작점
 ------------------------------------------
 
+function HDH_TRACKER:GetPowerMax()
+	return 0
+end
+
 function HDH_TRACKER:UpdateSpellInfo(index)
 	-- interface 필수 구현
 end
@@ -1734,9 +1746,7 @@ function HDH_TRACKER:Update(index)
 	if not HDH_TRACKER.ENABLE_MOVE then
 		self:UpdateSpellInfo(index) -- 데이터 업데이트
 	end
-	if self.OrderFunc then 
-		self.OrderFunc(self)
-	end
+	if self.UpdateOrder then self:UpdateOrder() end
 	self:UpdateIconAndBar(index)  -- 아이콘 업데이트
 	local activedCount = self:UpdateLayout()  -- 레이아웃 업데이트
 
@@ -1759,48 +1769,54 @@ end
 -- 	return GetTime()
 -- end
 
-function HDH_TRACKER:SetupBarValue(barValueType, barMaxValueType)
+-- 함수를 f 단위로 만들어야함.
+-- 지금은 frame 전체로 반영되는 코드라서 마지막 icon  값이 전체를 먹어버림
+function HDH_TRACKER:SetupBarValue(f, barValueType, barMaxValueType, barMaxValue)
 	if barValueType == DB.BAR_VALUE_TYPE_TIME then
-		self.GetBarValue = function(f)
+		f.GetBarValue = function(f)
 			return GetTime()
 		end
 	elseif barValueType == DB.BAR_VALUE_TYPE_COUNT then
-		self.GetBarValue = function(f)
+		f.GetBarValue = function(f)
 			return math.max(f.spell.count, (f.spell.charges and f.spell.charges.count or 0))
 		end
 	else -- DB.BAR_VALUE_TYPE_VALUE
-		self.GetBarValue = function(f)
+		f.GetBarValue = function(f)
 			return f.spell.v1
 		end
 	end
 
 	if barMaxValueType == DB.BAR_MAXVALUE_TYPE_TIME then
-		self.GetBarMinMax = function(f)
+		f.GetBarMinMax = function(f)
 			return f.spell.startTime, f.spell.endTime
 		end
-	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_CHARGES then
-		self.GetBarMinMax = function(f)
-			return 0, (f.spell.charges and f.spell.charges.CountMax or 0)
+	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_COUNT then
+		f.GetBarMinMax = function(f)
+			return 0, f.spell.countMax
+		end
+	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_VALUE then
+		f.GetBarMinMax = function(f)
+			return 0, f.spell.valueMax
 		end
 	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_HEALTH then
-		self.GetBarMinMax = function(f)
-			return 0, UnitHealthMax(self.unit)
+		f.GetBarMinMax = function(f)
+			return 0, f:GetParent().parent:GetPowerMax()
 		end
 	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_MANA then
-		self.GetBarMinMax = function(f)
-			-- return 0, self:GetPowerMax()
+		f.GetBarMinMax = function(f)
+			return 0, f:GetParent().parent:GetPowerMax()
 		end
 	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_POWER then
-		self.GetBarMinMax = function(f)
-			-- return 0, UnitPowerMax('player', self.POWER_INFO[self.type].power_index) 
+		f.GetBarMinMax = function(f)
+			return 0, f:GetParent().parent:GetPowerMax()
 		end
 	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_CUSTOM then
 		if barValueType == DB.BAR_VALUE_TYPE_TIME then
-			self.GetBarMinMax = function(f)
+			f.GetBarMinMax = function(f)
 				return f.spell.endTime - (f.spell.barMaxValue or 0), f.spell.endTime
 			end
 		else
-			self.GetBarMinMax = function(f)
+			f.GetBarMinMax = function(f)
 				return 0, f.spell.barMaxValue or 0
 			end
 		end
@@ -1815,6 +1831,7 @@ function HDH_TRACKER:InitIcons()
 	local barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType, defaultImg
 	local innerTrackingType, innerSpellId, innerCooldown 
 	local display, connectedId, connectedIsItem, unlearnedHideMode
+	local valueMax, countMax, durationMax
 	local spell 
 	local f
 	local isLearned = true
@@ -1835,6 +1852,7 @@ function HDH_TRACKER:InitIcons()
 	for i = 1, elemSize do
 		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem                = DB:GetTrackerElement(trackerId, i)
 		barValueType, barMaxValueType, barMaxValue, splitPoints, splitPointType               = DB:GetTrackerElementBarInfo(trackerId, i)
+		durationMax, countMax, valueMax														  = DB:GetTrackerElementBarMaxValues(trackerId, i)
 		glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
 		display, connectedId, connectedIsItem, unlearnedHideMode                              = DB:GetTrackerElementDisplay(trackerId, i)
 		innerTrackingType, innerSpellId, innerCooldown                                        = DB:GetTrackerElementInnerCooldown(trackerId, i)
@@ -1881,6 +1899,9 @@ function HDH_TRACKER:InitIcons()
 			spell.defaultImg = defaultImg
 			spell.isItem =  isItem
 			spell.happenTime = 0
+			spell.valueMax = valueMax
+			spell.countMax = countMax
+			spell.durationMax = durationMax
 
 			spell.glow = glowType
 			spell.glowCondtion = glowCondition
@@ -1895,8 +1916,7 @@ function HDH_TRACKER:InitIcons()
 			spell.barSplitPointType = splitPointType or DB.BAR_SPLIT_RATIO
 			spell.barValueType = barValueType
 			spell.barMaxValueType = barMaxValueType
-			spell.barMaxValue = barMaxValue
-			self:SetupBarValue(barValueType, barMaxValueType, barMaxValue)
+			spell.barMaxValue = barMaxValue and tonumber(barMaxValue)
 
 			if innerSpellId then
 				spell.isInnerCDItem = true
@@ -1907,6 +1927,8 @@ function HDH_TRACKER:InitIcons()
 
 			f.spell = spell
 			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
+			
+			self:SetupBarValue(f, barValueType, barMaxValueType, barMaxValue)
 			self:UpdateGlow(f, false)
 			self:UpdateBarSettings(f)
 
@@ -1938,5 +1960,20 @@ end
 ------------------------------------------
 
 function HDH_TRACKER:PLAYER_ENTERING_WORLD()
--- interface
+	-- interface
 end
+
+function HDH_TRACKER:PLAYER_REGEN_ENABLED()
+	local elemSize = DB:GetTrackerElementSize(self.id)
+	local spell
+	for i = 1, elemSize do
+		spell = self.frame.icon[i].spell
+		if spell then
+			DB:SetTrackerElementBarMaxValues(self.id, i, spell.durationMax, spell.countMax, spell.valueMax)
+		end
+	end
+end
+
+-- function HDH_TRACKER:PLAYER_REGEN_DISABLED()
+	
+-- end

@@ -1668,6 +1668,9 @@ function HDH_AT_OnClick_Button(self, button)
 			barMaxValueType = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR.MaxValueFrame.DDMaxValue:GetSelectedValue()
 		end
 		barMaxValue = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR.MaxValueFrame.EditBox:GetText()
+		if barMaxValue then
+			barMaxValue = tonumber(barMaxValue)
+		end
 
 		DB:SetTrackerElementBarInfo(trackerId, elemIdx, barValueType, barMaxValueType, barMaxValue, splitPoints, splitType)
 		main:LoadDetailFrame(BODY_DETAIL_ETC, trackerId, elemIdx)
@@ -2405,6 +2408,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			F.BODY.CONFIG_DETAIL.BTN_CLOSE:Show()
 			F.BODY.CONFIG_DETAIL.BTN_SAVE_CLOSE:Show()
 		end
+
 	elseif detailMode == BODY_DETAIL_ETC then
 		local trackerType = select(3, DB:GetTrackerInfo(trackerId))
 		local texture, key, isItem = DB:GetTrackerElementImage(trackerId, elemIdx)
@@ -2419,7 +2423,9 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 		F.BODY.CONFIG_DETAIL.BTN_CLOSE:Hide()
 		F.BODY.CONFIG_DETAIL.BTN_SAVE_CLOSE:Hide()
 
+		------------------------------------------------
 		-- Load ChangeIcon
+		------------------------------------------------
 		if key then
 			F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon:SetTexture(texture)
 		else
@@ -2440,12 +2446,15 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			end
 		end
 
-		local barValueType, barMaxValueType, barMaxValue, splitPoints, splitType = DB:GetTrackerElementBarInfo(trackerId, elemIdx)
+		------------------------------------------------
 		-- Load splitbar
+		------------------------------------------------
+		local barValueType, barMaxValueType, barMaxValue, splitPoints, splitType = DB:GetTrackerElementBarInfo(trackerId, elemIdx)
+		
 		local splitbar = F.BODY.CONFIG_DETAIL.ETC.SPLIT_BAR
 		splitbar.ED_LIST = splitbar.ED_LIST or {}
 		local edList = splitbar.ED_LIST
-		local v 
+		local v
 		local component
 		local parent = self.DETAIL_ETC_TAB[2].content
 
@@ -2483,6 +2492,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			component:SetPoint('LEFT', parent, 'LEFT', 10, 0)
 			component:SetPoint('RIGHT', parent, 'RIGHT', -25, 0)
 			component.Text:SetText("최댓값")
+
 			HDH_AT_DropDown_Init(component.DDMaxValueType, {
 				{1, "고정값 입력"},
 				{2, "자동"},
@@ -2498,7 +2508,8 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 
 			HDH_AT_DropDown_Init(component.DDMaxValue, {
 				{DB.BAR_MAXVALUE_TYPE_TIME, "최대 지속 시간"},
-				{DB.BAR_MAXVALUE_TYPE_CHARGES, "최대 중첩/충전 수"},
+				{DB.BAR_MAXVALUE_TYPE_COUNT, "최대 중첩/충전 수"},
+				{DB.BAR_MAXVALUE_TYPE_VALUE, "최대 수치"},
 				{DB.BAR_MAXVALUE_TYPE_HEALTH, "최대 체력"},
 				{DB.BAR_MAXVALUE_TYPE_MANA, "최대 마나"},
 				{DB.BAR_MAXVALUE_TYPE_POWER, "최대 분노/기력류"}
@@ -2531,11 +2542,12 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 			if splitType == DB.BAR_SPLIT_RATIO then
 				splitbar:SetMinMaxValues(0, 100, true)
 			else
-				if tracker.GetPowerMax then
-					local max = tracker:GetPowerMax()
-					if max then
-						splitbar:SetMinMaxValues(0, max)
-					end
+				local minV, maxV = tracker.frame.icon[elemIdx]:GetBarMinMax()
+				if barMaxValueType == DB.BAR_MAXVALUE_TYPE_TIME then
+					maxV = tracker.frame.icon[elemIdx].spell.durationMax or 10
+				end
+				if maxV and maxV > 0 then
+					splitbar:SetMinMaxValues(0, maxV)
 				else
 					splitbar:SetMinMaxValues(0, 100)
 				end
@@ -2545,7 +2557,9 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 
 		splitbar:SetSplitPoints(splitPoints)
 
+		------------------------------------------------
 		-- Load Inner CD
+		------------------------------------------------
 		local innerType, innerSpellId, innerCooldown = DB:GetTrackerElementInnerCooldown(trackerId, elemIdx)
 		F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_CD:SetText(innerCooldown or "")
 		F.BODY.CONFIG_DETAIL.ETC.INNER_CD_ITEM_EB_SPELL_ID:SetText(innerSpellId or "")

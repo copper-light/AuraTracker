@@ -72,9 +72,12 @@ local function STAGGER_TRACKER_OnUpdate(self, elapsed)
 	if self.bar then
 		if self.spell.healthMax ~= self.spell.preHealthMax then
 			self.bar:SetMinMaxValues(0, self.spell.healthMax)
+			self:GetParent().parent:UpdateBarMinMaxValue(self)
 			self.spell.preHealthMax = self.spell.healthMax
+		else
+		-- self.bar:SetValue(self.spell.v1, true)
+			self:GetParent().parent:UpdateBarValue(self, nil, true)
 		end
-		self.bar:SetValue(self.spell.v1, true)
 	end
 	self:GetParent().parent:UpdateGlow(self, true);
 end

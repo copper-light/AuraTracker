@@ -146,6 +146,11 @@ function HDH_AT_CircleCooldownTemplateMixin:Stop()
 	end
 end
 
+function HDH_AT_CircleCooldownTemplateMixin:StopCharge()
+	if self.Charge:IsShown() then
+		self.Charge:Clear()
+	end
+end
 
 function HDH_AT_CircleCooldownTemplateMixin:Clear()
 	self.startValue = nil
@@ -343,9 +348,6 @@ function HDH_AT_LinearCooldownTemplateMixin:SetCooldown(startValue, duration, is
 	else
 		self:SetScript('OnUpdate', nil)
 	end
-	-- self.Progress:Show()
-	-- self.Progress.Texture:Show()
-	-- self.Progress.Text
 end
 
 function HDH_AT_LinearCooldownTemplateMixin:SetValue(value)
@@ -357,8 +359,7 @@ function HDH_AT_LinearCooldownTemplateMixin:SetValue(value)
 	end	
 	
 	self.per = math.floor(self.per * 100 + 0.1) / 100
-	if self.prevPer == self.per then return end
-	-- print(GetTime(), self.per)
+	if self.isTimer and self.prevPer == self.per then return end
 	if self.isTimer then
 		if self.toFill then
 			if self.per == 0 then
@@ -412,7 +413,6 @@ end
 function HDH_AT_LinearCooldownTemplateMixin:Stop()
 	if self.Progress:IsShown() then
 		self.Progress:Hide()
-		-- HDH_AT_LinearCooldownTemplate_OnFinished(self)
 	end
 
 	if self.Spark:IsShown() then
@@ -420,6 +420,12 @@ function HDH_AT_LinearCooldownTemplateMixin:Stop()
 	end
 
 	self:SetScript('OnUpdate', nil)
+end
+
+function HDH_AT_LinearCooldownTemplateMixin:StopCharge()
+	if self.isCharging then
+		self:Stop()
+	end
 end
 
 function HDH_AT_LinearCooldownTemplateMixin:Clear()
@@ -445,7 +451,6 @@ end
 
 function HDH_AT_CooldownIconTemplate_OnCooldownStarted(cooldownFrame)
 	local self = cooldownFrame:GetParent():GetParent()
-	-- print(GetTime(), "HDH_AT_CooldownIconTemplate_OnCooldownStarted")
 	if self.OnCooldownStarted then
 		self.OnCooldownStarted(self)
 	end
@@ -453,7 +458,6 @@ end
 
 function HDH_AT_CooldownIconTemplate_OnCooldownFinished(cooldownFrame)
 	local self = cooldownFrame:GetParent():GetParent()
-	-- print(GetTime(), "HDH_AT_CooldownIconTemplate_OnCooldownFinished")
 	if self.OnCooldownFinished then
 		self.OnCooldownFinished(self)
 	end
@@ -495,11 +499,7 @@ function HDH_AT_CooldownIconTemplateMixin:Setup(w, h, cooldownType, toFill, enab
 	self.offAlpha = offAlpha
 	self.isAble = true
 	self.toFill = toFill
-	-- if self.cooldownType ~= DB.COOLDOWN_NONE then
-	-- 	self.Icon.Texture:SetAlpha(offAlpha)
-	-- else
-	-- 	self.Icon.Texture:SetAlpha(onAlpha)
-	-- end
+	
 	self.Icon.Texture:SetAlpha(offAlpha)
 	self.borderColor = self.borderColor or {1, 1, 1, 1}
 	
@@ -567,6 +567,10 @@ function HDH_AT_CooldownIconTemplateMixin:Stop()
 	self.Cooldown:Stop()
 end
 
+function HDH_AT_CooldownIconTemplateMixin:StopCharge()
+	self.Cooldown:StopCharge()
+end
+
 function HDH_AT_CooldownIconTemplateMixin:UpdateCooldowning(bool)
 	bool = (bool == nil) and true or false
 	if bool then
@@ -575,11 +579,6 @@ function HDH_AT_CooldownIconTemplateMixin:UpdateCooldowning(bool)
 		else
 			self.Border.Texture:SetVertexColor(self.borderColor[1], self.borderColor[2], self.borderColor[3], self.borderColor[4])
 		end
-		
-		-- if self.cooldownType ~= DB.COOLDOWN_NONE then
-		-- 	self.Icon.Texture:SetAlpha(self.offAlpha)
-		-- 	self.Icon.Texture:SetDesaturated(true)
-		-- end
 		self.Icon.Texture:SetAlpha(self.offAlpha)
 		self.Icon.Texture:SetDesaturated(true)
 		if not self.Cooldown.Progress.Texture:IsShown() then
@@ -591,10 +590,6 @@ function HDH_AT_CooldownIconTemplateMixin:UpdateCooldowning(bool)
 			self.Icon.Texture:SetDesaturated(false)
 			self.Border.Texture:SetVertexColor(self.borderColor[1], self.borderColor[2], self.borderColor[3], self.borderColor[4])
 		else
-			-- if self.cooldownType ~= DB.COOLDOWN_NONE then
-			-- 	self.Icon.Texture:SetAlpha(self.offAlpha)
-			-- 	self.Icon.Texture:SetDesaturated(true)
-			-- end
 			self.Icon.Texture:SetAlpha(self.offAlpha)
 			self.Icon.Texture:SetDesaturated(true)
 			self.Border.Texture:SetVertexColor(0, 0, 0, self.offAlpha)

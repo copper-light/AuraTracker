@@ -110,11 +110,11 @@ CONFIG.BAR_VALUE_TYPE_VALUE = 3
 
 CONFIG.BAR_MAXVALUE_TYPE_CUSTOM = 1
 CONFIG.BAR_MAXVALUE_TYPE_TIME = 2
-CONFIG.BAR_MAXVALUE_TYPE_CHARGES = 3
-CONFIG.BAR_MAXVALUE_TYPE_HEALTH = 4
-CONFIG.BAR_MAXVALUE_TYPE_MANA = 5
-CONFIG.BAR_MAXVALUE_TYPE_POWER = 6
- 
+CONFIG.BAR_MAXVALUE_TYPE_COUNT = 3
+CONFIG.BAR_MAXVALUE_TYPE_VALUE = 4
+CONFIG.BAR_MAXVALUE_TYPE_HEALTH = 5
+CONFIG.BAR_MAXVALUE_TYPE_MANA = 6
+CONFIG.BAR_MAXVALUE_TYPE_POWER = 7
 
 local DEFAULT_DISPLAY = { 
 
@@ -849,6 +849,24 @@ function HDH_AT_ConfigDB:GetTrackerElementBarInfo(trackerId, elementIndex)
                 element.barMaxValue , 
                 UTIL.Deepcopy(element.splitValues or {}), 
                 element.splitType or CONFIG.BAR_SPLIT_RATIO
+    else
+        return nil
+    end
+end
+
+function HDH_AT_ConfigDB:SetTrackerElementBarMaxValues(trackerId, elementIndex, durationMax, countMax, valueMax)
+    local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
+    if element then
+        element.durationMax = durationMax
+        element.countMax = countMax
+        element.valueMax = valueMax
+    end
+end
+
+function HDH_AT_ConfigDB:GetTrackerElementBarMaxValues(trackerId, elementIndex)
+    local element = HDH_AT_DB.tracker[trackerId].element[elementIndex]
+    if element then
+        return element.durationMax or 0, element.countMax or 0, element.valueMax or 0
     else
         return nil
     end

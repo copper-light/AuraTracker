@@ -22,12 +22,10 @@ do
 	StaggerID[124274] = true
 	StaggerID[124273] = true
 	
-	function HDH_AURA_TRACKER.GetAuras(self)
+	function HDH_AURA_TRACKER:GetAuras()
+		local aura, f, spell
 		local curTime = GetTime()
-		local aura
-		local ret = 0;
-		local f
-		local spell
+		local ret = 0
 
 		for i = 1, #self.frame.icon do
 			self.frame.icon[i].spell.isUpdate = false
@@ -68,7 +66,7 @@ do
 					spell.overlay = 1
 				end
 
-				if spell.endTime ~= aura.expirationTime then spell.endTime = aura.expirationTime ; spell.happenTime = GetTime(); end
+				if spell.endTime ~= aura.expirationTime then spell.endTime = aura.expirationTime ; spell.happenTime = curTime end
 				if aura.expirationTime  > 0 then spell.remaining = spell.endTime - curTime
 				else spell.remaining = 0; end
 				spell.duration = aura.duration
@@ -80,8 +78,13 @@ do
 				end
 
 				spell.index = i -- 툴팁을 위해, 순서
-				ret = ret + 1
 				spell.isUpdate = true
+
+				spell.countMax = math.max(spell.count or 0, spell.countMax or 0)
+				spell.valueMax = math.max(spell.v1 or 0, spell.valueMax or 0)
+				spell.durationMax = math.max(spell.duration or 0, spell.durationMax or 0)
+
+				ret = ret + 1
 			end
 		end
 
@@ -99,7 +102,7 @@ do
 		return ret;
 	end
 
-	function HDH_AURA_TRACKER.GetAurasAll(self)
+	function HDH_AURA_TRACKER:GetAurasAll()
 		local aura, spell
 		local curTime = GetTime()
 		local f
@@ -219,13 +222,10 @@ do
 
 				if display_mode ~= DB.DISPLAY_ICON and f.bar then
 					f.bar:SetText(f.spell.name)
-					
 					if f.spell.duration == 0 and f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
 						self:UpdateBarMinMaxValue(f, 0, 1, 0)
 					else
-						local minV, maxV = self.GetBarMinMax(f)
-						self:UpdateBarMinMaxValue(f, minV, maxV, self.GetBarValue(f))
-						-- self:UpdateBarMinMaxValue(f, f.spell.startTime, f.spell.endTime, GetTime())
+						self:UpdateBarMinMaxValue(f)
 					end
 				end
 				self:UpdateGlow(f, true)
@@ -242,24 +242,22 @@ do
 						if self.ui.common.default_color and f.spell.dispelType then
 							f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType].r, DebuffTypeColor[f.spell.dispelType].g, DebuffTypeColor[f.spell.dispelType].b, 1)
 						end
-						
 						if f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
 							self:UpdateBarMinMaxValue(f, 0, 1, 1)
 						else
-							local minV, maxV = self.GetBarMinMax(f)
-							self:UpdateBarMinMaxValue(f, minV, maxV, 0)
+							self:UpdateBarMinMaxValue(f, nil, nil, 0)
 						end
 					end
 				end
 			end
 		end
 
-		if self.OrderFunc then self.OrderFunc(self) end
+		if self.UpdateOrder then self:UpdateOrder() end
 		return ret
 	end
 
 	function HDH_AURA_TRACKER:UpdateSpellInfo(index)
-		self.GetAurasFunc(self)
+		self:GetAurasFunc()
 	end
 
 	function HDH_AURA_TRACKER:InitIcons()
@@ -290,15 +288,14 @@ do
 					f.bar:SetSplitPoints(f.spell.barSplitPoints, f.spell.barSplitPointType)
 				end
 			end
-			
 			self.GetAurasFunc = HDH_AURA_TRACKER.GetAurasAll
 			self.frame:UnregisterAllEvents()
 			self.frame:SetScript("OnEvent", self.OnEvent)
 			self:LoadOrderFunc()
 			ret = 40
 		else
-			ret = super.InitIcons(self)
 			self.GetAurasFunc = HDH_AURA_TRACKER.GetAuras
+			ret = super.InitIcons(self)
 		end
 
 		if aura_filter == DB.AURA_FILTER_ONLY_BOSS then

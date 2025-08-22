@@ -41,9 +41,13 @@ local function OnEvent(self, event, ...)
 	if event =='ACTIVE_TALENT_GROUP_CHANGED' or (event =='PLAYER_SPECIALIZATION_CHANGED' and 'player' == select(1, ...)) then
 		HDH_AT_UTIL.RunTimer(self, "ACTIVE_TALENT_GROUP_CHANGED", 1, ACTIVE_TALENT_GROUP_CHANGED)
         
-	elseif event == 'PLAYER_REGEN_ENABLED' then	
+	elseif event == 'PLAYER_REGEN_ENABLED' then
 		if not HDH_TRACKER.ENABLE_MOVE then
 			HDH_TRACKER.Updates()
+			local trackerList = HDH_TRACKER.GetList()
+			for _, t in pairs(trackerList) do
+				t:PLAYER_REGEN_ENABLED()
+			end
 		end
 	
 	elseif event == 'PLAYER_REGEN_DISABLED' then

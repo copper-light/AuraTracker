@@ -244,14 +244,16 @@ function HDH_COMBO_POINT_TRACKER:UpdateIconAndBar(index)
 	for k,f in ipairs(icons) do
 		if not f.spell then break end
 		if f.spell.isUpdate then
-			if k <= UnitPowerMax('player', self.POWER_INFO[self.type].power_index) then 
-				f.icon:UpdateCooldowning()
-				f.icon:Stop()
+			if k <= UnitPowerMax('player', self.POWER_INFO[self.type].power_index) then
+				if self.ui.common.display_mode ~= DB.DISPLAY_BAR then
+					f.icon:UpdateCooldowning()
+					f.icon:Stop()
+				end
 				f.v1:SetText("")
 				f.counttext:SetText("")
 				self:UpdateGlow(f, false)
 				if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-					f.bar:SetValue(0)
+					self:UpdateBarValue(f)
 				end
 			else
 				self:ReleaseIcon(k);
@@ -267,36 +269,27 @@ function HDH_COMBO_POINT_TRACKER:UpdateIconAndBar(index)
 				f.counttext:SetText(nil)
 			else
 				if f.spell.count < 1.0  then
-					if f.counttext:IsShown() and f.spell.count < 1 then
-						f.counttext:SetText(string.format('%.1f', f.spell.count))
-					else
-						f.counttext:SetText("")
-					end
-
 					if self.ui.common.display_mode ~= DB.DISPLAY_BAR then
 						f.icon:SetValue(f.spell.count)
 						f.icon:UpdateCooldowning()
+						self:UpdateGlow(f, false)
 					end
-
-					if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-						f.bar:SetValue(f.spell.count)
-					end
-					self:UpdateGlow(f, false)
 				else
-					if f.counttext:IsShown() and f.spell.count < 1 then
-						f.counttext:SetText(string.format('%.1f', f.spell.count))
-					else
-						f.counttext:SetText("")
-					end
-					f.icon:UpdateCooldowning(false)
-					f.icon:Stop()
-					self:UpdateGlow(f, true)
-
-					if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-						f.bar:SetValue(1)
+					if self.ui.common.display_mode ~= DB.DISPLAY_BAR then
+						f.icon:UpdateCooldowning(false)
+						f.icon:Stop()
+						self:UpdateGlow(f, true)
 					end
 				end
+				if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
+					self:UpdateBarValue(f)
+				end
 
+				if f.counttext:IsShown() and f.spell.count < 1 then
+					f.counttext:SetText(string.format('%.1f', f.spell.count))
+				else
+					f.counttext:SetText("")
+				end
 				f.v1:SetText((f.spell.showValue and f.spell.v1 >= 1) and f.spell.v1 or "")
 			end
 		end

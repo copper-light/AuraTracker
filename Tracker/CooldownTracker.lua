@@ -52,7 +52,7 @@ end
 
 function HDH_C_TRACKER:GetCooldownInfo(id, name, isItem, isToy)
 	local startTime, duration, count, remaining
-	local chargeCount, chargeCountMax, chargeStartTime, chargeDuration, chargeRemaining, castCount
+	local chargeCount, chargeCountMax, chargeStartTime, chargeDuration, chargeRemaining
 	local inRange, isAble, isNotEnoughMana
 	local curTime = GetTime()
 
@@ -316,7 +316,7 @@ function HDH_C_TRACKER:UpdateSpellInfo(index)
 	local use_out_range_color = self.ui.cooldown.use_out_range_color
 
 	local startTime, duration, remaining, count
-	local chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax
+	local chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeMax
 	local inRange, isAble, isNotEnoughMana, isGlobalCooldown
 	local spell
 	local startIndex = index or 1
@@ -325,7 +325,7 @@ function HDH_C_TRACKER:UpdateSpellInfo(index)
 	for i = startIndex, endIndex do
 		spell = self.frame.icon[i].spell
 		if spell and not HDH_TRACKER.ENABLE_MOVE and not spell.isInnerCDItem then
-			startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeCountMax, inRange, isAble, isNotEnoughMana = self:GetCooldownInfo(spell.id, spell.name, spell.isItem, spell.isToy)
+			startTime, duration, remaining, count, chargeStartTime, chargeDuration, chargeRemaining, chargeCount, chargeMax, inRange, isAble, isNotEnoughMana = self:GetCooldownInfo(spell.id, spell.name, spell.isItem, spell.isToy)
 			isGlobalCooldown = (duration > 0 and duration < HDH_C_TRACKER.GlobalCooldown)
 
 			if spell.isGlobalCooldown then
@@ -350,7 +350,13 @@ function HDH_C_TRACKER:UpdateSpellInfo(index)
 						spell.remaining = remaining
 						spell.isGlobalCooldown = true
 					else
-						spell.remaining = math.max(spell.endTime - GetTime(), 0)
+						if (spell.endTime or 0) > (startTime + duration) then
+							spell.endTime = GetTime()
+							spell.duration = spell.endTime - (spell.startTime or startTime)
+							spell.remaining = 0
+						else
+							spell.remaining = math.max(spell.endTime - GetTime(), 0)
+						end
 					end
 				else
 					spell.startTime = startTime
@@ -374,7 +380,7 @@ function HDH_C_TRACKER:UpdateSpellInfo(index)
 			spell.charges.startTime = chargeStartTime
 			spell.charges.endTime = chargeStartTime + chargeDuration
 			spell.charges.duration = chargeDuration
-			spell.charges.CountMax = chargeCountMax
+			spell.charges.max = chargeMax
 
 			spell.isCharging = (chargeRemaining > 0 and chargeCount >= 1) and true or false
 			spell.isAble = isAble
@@ -386,6 +392,8 @@ function HDH_C_TRACKER:UpdateSpellInfo(index)
 			else
 				spell.isUpdate = false
 			end
+			spell.countMax = math.max(spell.countMax or 0, count or 0, spell.charges.max or 0)
+			spell.valueMax = 0
 		end
 	end
 end
@@ -433,11 +441,18 @@ function HDH_C_TRACKER:UpdateIconAndBar(index) -- HDH_TRACKER override
 			f.icon:SetCharge(spell.charges.startTime, spell.charges.duration)
 		elseif spell.isGlobalCooldown then
 			f.icon:SetCooldown(spell.startTime, spell.duration)
-		else
+		end
+
+		-- 쿨다운 중인 스킬의 발동으로 쿨이 사라지면 쿨다운, 차징 멈춤 
+		if spell.charges.remaining == 0  then
+			f.icon:StopCharge()
+		end
+
+		if spell.remaining == 0 then
 			f.icon:Stop()
 		end
 
-		if (spell.charges.CountMax and (spell.charges.CountMax >= 2)) then
+		if (spell.charges.max and (spell.charges.max >= 2)) then
 			f.counttext:SetText(spell.charges.count)
 		elseif spell.stackable or spell.count > 0 then
 			f.counttext:SetText(spell.count)
@@ -448,9 +463,13 @@ function HDH_C_TRACKER:UpdateIconAndBar(index) -- HDH_TRACKER override
 		if f.bar then
 			f.bar:SetText(spell.name)
 			if spell.remaining > HDH_C_TRACKER.EndCooldown and not spell.isGlobalCooldown then
-				self:UpdateBarMinMaxValue(f, spell.startTime, spell.endTime, GetTime())
+				self:UpdateBarMinMaxValue(f)
 			else
-				self:UpdateBarMinMaxValue(f, 0, 1, 1)
+				if f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
+					self:UpdateBarMinMaxValue(f, 0, 1, 1)
+				else
+					self:UpdateBarMinMaxValue(f)
+				end
 			end
 		end
 		self:UpdateGlow(f, true)

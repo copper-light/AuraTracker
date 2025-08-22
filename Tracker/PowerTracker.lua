@@ -61,10 +61,10 @@ local function HDH_POWER_OnUpdate(f, elapsed)
 	if f.skip % 2 ~= 0 and elapsed < 0.02 then return end
 	f.skip = 0
 
-	f.spell.powerMax = self:GetPowerMax()
+	f.spell.max = self:GetPowerMax()
 	f.spell.v1 = self:GetPower()
-	f.spell.count = math.ceil(f.spell.v1 / f.spell.powerMax  * 100);
-	if f.spell.count == 100 and f.spell.v1 ~= f.spell.powerMax  then f.spell.count = 99 end
+	f.spell.count = math.ceil(f.spell.v1 / f.spell.max  * 100);
+	if f.spell.count == 100 and f.spell.v1 ~= f.spell.max  then f.spell.count = 99 end
 	f.counttext:SetText(f.spell.count .. "%")
 	if f.spell.showValue then
 		f.v1:SetText(HDH_AT_UTIL.AbbreviateValue(f.spell.v1, self.ui.font.v1_abbreviate))
@@ -73,7 +73,7 @@ local function HDH_POWER_OnUpdate(f, elapsed)
 	end
 
 	if self.power_info.regen then
-		if f.spell.v1 < f.spell.powerMax  then
+		if f.spell.v1 < f.spell.max  then
 			if f.spell.isOn ~= true then
 				self:Update()
 				f.spell.isOn = true;
@@ -101,11 +101,12 @@ local function HDH_POWER_OnUpdate(f, elapsed)
 
 	self:UpdateGlow(f, true)
 	if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-		if f.bar:GetMaxValue() == f.spell.powerMax then -- UpdateBar 함수안에 UpdateAbsorb 를 포함한다.
-			f.bar:SetValue(f.spell.v1, true)
+		if f.bar:GetMaxValue() == f.spell.max then -- UpdateBar 함수안에 UpdateAbsorb 를 포함한다.
+			self:UpdateBarValue(f, nil, true)
 		else
-			f.bar:SetMinMaxValues(0, f.spell.powerMax)
-			f.bar:SetValue(f.spell.v1, false)
+			-- f.bar:SetMinMaxValues(0, f.spell.max)
+			-- f.bar:SetValue(f.spell.v1, false)
+			self:UpdateBarMinMaxValue(f)
 		end
 	end
 end
@@ -232,6 +233,7 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE',"player")
 		self.frame.icon[1]:SetScript("OnUpdate", HDH_POWER_OnUpdate)
 		self:Update()
+		self:UpdateBarMinMaxValue(self.frame.icon[1])
 	end
 
 	return ret
