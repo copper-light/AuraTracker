@@ -65,11 +65,13 @@ function HDH_DK_RUNE_TRACKER:CreateData()
 	if select(4, GetBuildInfo()) >= 100000 then
 		for i = 1 , MAX_RUNES do
 			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, display, isValue, isItem)
+			DB:SetTrackerElementBarInfo(trackerId, i, DB.BAR_VALUE_TYPE_TIME, DB.BAR_MAXVALUE_TYPE_TIME, nil, {}, DB.BAR_SPLIT_RATIO)
 			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 		end 
 	else
 		for i = 1 , MAX_RUNES do
 			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, OLD_DK_COLOR[i].texture, display, isValue, isItem)
+			DB:SetTrackerElementBarInfo(trackerId, i, DB.BAR_VALUE_TYPE_TIME, DB.BAR_MAXVALUE_TYPE_TIME, nil, {}, DB.BAR_SPLIT_RATIO)
 			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 		end 
 	end

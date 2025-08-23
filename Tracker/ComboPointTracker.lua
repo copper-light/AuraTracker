@@ -33,10 +33,18 @@ else
 	POWER_INFO[HDH_TRACKER.TYPE.POWER_COMBO_POINTS] 	= {power_type="COMBO_POINTS", 	power_index = 14,	color={0.77, 0.12, 0.23, 1}, texture = "Interface/Icons/INV_Misc_Gem_Pearl_05"};
 end
 
-HDH_COMBO_POINT_TRACKER.POWER_INFO = POWER_INFO;
+HDH_COMBO_POINT_TRACKER.POWER_INFO = POWER_INFO
+
+function HDH_COMBO_POINT_TRACKER:GetPower()
+	return UnitPower('player', self.POWER_INFO[self.type].power_index, true);
+end
+
+function HDH_COMBO_POINT_TRACKER:GetPowerMax()
+	return UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
+end
 
 function HDH_COMBO_POINT_TRACKER:CreateData()
-	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
+	local power_max = self:GetPowerMax()
 	local trackerId = self.id
 	local id = 0
 	local key
@@ -51,7 +59,15 @@ function HDH_COMBO_POINT_TRACKER:CreateData()
 			key = self.POWER_INFO[self.type].power_type .. elemIdx
 			name = self.POWER_INFO[self.type].power_type .. elemIdx
 			DB:SetTrackerElement(trackerId, elemIdx, key, id, name, texture, display, isValue, isItem)
-			DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_VALUE, DB.CONDITION_GT_OR_EQ, power_max, DB.GLOW_EFFECT_COLOR_SPARK, self.POWER_INFO[self.type].color, 2)
+			DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_VALUE, DB.CONDITION_GT_OR_EQ, power_max, DB.GLOW_EFFECT_COLOR_SPARK, 
+				{
+					self.POWER_INFO[self.type].color[1],
+					self.POWER_INFO[self.type].color[2],
+					self.POWER_INFO[self.type].color[3],
+					0.25
+				}, 
+				2)
+			DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_VALUE_TYPE_COUNT, DB.BAR_MAXVALUE_TYPE_CUSTOM, 1, {}, DB.BAR_SPLIT_RATIO)
 			DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 			if elemIdx == 1 then
 				isFirstCreated = true
@@ -99,7 +115,7 @@ function HDH_COMBO_POINT_TRACKER:GetElementCount(index)
 		end
 		return 1
 	else
-		for i = 1 , UnitPowerMax('player', self.POWER_INFO[self.type].power_index) do
+		for i = 1 , self:GetPowerMax() do
 			local key = DB:GetTrackerElement(self.id, i)
 			if (self.POWER_INFO[self.type].power_type .. i) ~= key then
 				return 0
@@ -125,15 +141,15 @@ function HDH_COMBO_POINT_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
 end
 
 function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
-	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
 	local iconf
+	local power_max = self:GetPowerMax()
 	local power = power_max - 1
+	local key = self.POWER_INFO[self.type].power_type
+
 	for i = 1, power_max do
-		iconf = self.frame.icon[i]
+		iconf = self.frame.pointer[key .. i]
+		
 		if iconf then 
-			if not iconf.spell then
-				iconf.spell = {}
-			end
 			iconf:SetParent(self.frame)
 			iconf.spell.duration = 0
 			iconf.spell.count = 1
@@ -152,7 +168,7 @@ function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 			iconf.spell.display = DB.SPELL_ALWAYS_DISPLAY
 			iconf.icon:SetTexture(self.POWER_INFO[self.type].texture);
 			
-			iconf.spell.v1 = power_max - 1
+			iconf.spell.v1 = power
 
 			if (power_max) == i then
 				if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS ~= self.type and HDH_TRACKER.TYPE.POWER_ESSENCE ~= self.type then
@@ -168,9 +184,8 @@ function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 		end
 	end
 
-	
 	for i = 1, power_max do
-		iconf = self.frame.icon[i]
+		iconf = self.frame.pointer[key .. i]
 		if iconf then 
 			if not iconf.spell then
 				iconf.spell = {}
@@ -206,19 +221,17 @@ end
 function HDH_COMBO_POINT_TRACKER:UpdateSpellInfo(index)
 	local iconf;
 	local ret = 0;
-	local power = UnitPower('player', self.POWER_INFO[self.type].power_index, true);
-	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index);
+	local power = self:GetPower()
+	local power_max = self:GetPowerMax()
+	local key = self.POWER_INFO[self.type].power_type
 
 	if HDH_TRACKER.TYPE.POWER_SOUL_SHARDS == self.type then
 		power = power / 10
 	end
 	
 	for i = 1, power_max do
-		iconf = self.frame.icon[i]
+		iconf = self.frame.pointer[key .. i]
 		if iconf then 
-			if not iconf.spell then
-				iconf.spell = {}
-			end
 			if math.ceil(power) >= i then
 				iconf.spell.isUpdate = false
 				if (power + 1 - i) < 1 then
@@ -244,7 +257,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateIconAndBar(index)
 	for k,f in ipairs(icons) do
 		if not f.spell then break end
 		if f.spell.isUpdate then
-			if k <= UnitPowerMax('player', self.POWER_INFO[self.type].power_index) then
+			if k <= self:GetPowerMax() then
 				if self.ui.common.display_mode ~= DB.DISPLAY_BAR then
 					f.icon:UpdateCooldowning()
 					f.icon:Stop()
@@ -263,7 +276,8 @@ function HDH_COMBO_POINT_TRACKER:UpdateIconAndBar(index)
 				f.icon:UpdateCooldowning(false)
 				f.v1:SetText((f.spell.showValue and f.spell.v1 >= 1) and f.spell.v1 or "")
 				if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-					f.bar:SetValue(1)
+					-- f.bar:SetValue(1)
+					self:UpdateBarValue(f)
 				end
 				self:UpdateGlow(f, true)
 				f.counttext:SetText(nil)
@@ -305,18 +319,10 @@ function HDH_COMBO_POINT_TRACKER:UpdateLayout()
 end
 
 function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
-	self.power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
 	local ret = HDH_TRACKER.InitIcons(self)
-	local f
 	if ret > 0 then
-		for i = 1, ret do
-			f = self.frame.icon[i]
-			if f.bar then
-				f.bar:SetMinMaxValues(0, 1)
-			end
-		end
-		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE',"player")
-		self.frame:RegisterUnitEvent('UNIT_MAXPOWER',"player")
+		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE', "player")
+		self.frame:RegisterUnitEvent('UNIT_MAXPOWER', "player")
 		self:Update()
 	end
 	return ret
@@ -339,7 +345,7 @@ function HDH_COMBO_POINT_TRACKER:ACTIVE_TALENT_GROUP_CHANGED()
 end
 
 function HDH_COMBO_POINT_TRACKER:PLAYER_ENTERING_WORLD()
-	if  UnitAffectingCombat("player") then
+	if UnitAffectingCombat("player") then
 		self:Update()
 	end
 end

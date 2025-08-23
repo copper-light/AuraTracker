@@ -146,17 +146,13 @@ do
 			self.unit = "player"
 			self.frame.pointer = {}
 			for i = 1 , MAX_TOTEMS do
-				barValueType, barMaxValueType, barMaxValue = DB:GetDefaultBarInfo(self.type)
-				f = self.frame.icon[i]
-				if f:GetParent() == nil then f:SetParent(self.frame) end
+				f = self:CreateBaseIcon(i)
 				f.spell = {}
 				f.spell.barSplitPoints = {}
-				f.spell.barValueType = barValueType
-				f.spell.barMaxValueType = barMaxValueType
-				f.spell.barMaxValue = barMaxValue
-				if f.bar then
-					f.bar:SetSplitPoints(f.spell.barSplitPoints, f.spell.barSplitPointType)
-				end
+				f.spell.barValueType = DB.BAR_VALUE_TYPE_TIME
+				f.spell.barMaxValueType = DB.BAR_MAXVALUE_TYPE_TIME
+				f.spell.barMaxValue = nil
+				self:UpdateIconSettings(f)
 			end
 			
 			self.frame:UnregisterAllEvents()

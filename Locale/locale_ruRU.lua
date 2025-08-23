@@ -321,7 +321,7 @@ L.PLEASE_INPUT_SPELL = "Введите имя или ID" -- (Enter name or ID)
 L.PLEASE_INPUT = "Ввод" -- (Input)
 L.HIDE_MODE_UNLEARNED_ICON = "Скрывать иконку, если не изучено" -- (Hide icon when not learned)
 L.REVERT = "Отмена " -- (Revert)
-L.ONLY_FOR_AURA_CD_TOTEM = "Эта функция доступна только для |cffff0000баффов/дебаффов|r, |cffff0000перезарядок|r и |cffff0000тотемов|r." -- (This feature is only available for Buffs/Debuffs, Cooldowns, and Totems.)
+L.ONLY_FOR_AURA_CD_TOTEM = "Эта функция доступна только для |cffff0000баффов/дебаффов|r, |cffff0000перезарядок|r, |cffff0000тотемов|r и |cffff0000Combo|r." -- (This feature is only available for Buffs/Debuffs, Cooldowns, and Totems.)
 
 -- 11.1.7.4
 L.UNASSIGNED = "Не назначено" -- (Unassigned)

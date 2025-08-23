@@ -220,7 +220,7 @@ function HDH_POWER_TRACKER:UpdateIconAndBar(index) -- HDH_TRACKER override
 		f.icon:UpdateCooldowning(false)
 		self:UpdateGlow(f, true)
 	else
-		f.icon:UpdateCooldowning(true)
+		f.icon:UpdateCooldowning()
 		self:UpdateGlow(f, false)
 	end
 end
@@ -230,10 +230,13 @@ function HDH_POWER_TRACKER:InitIcons() -- HDH_TRACKER override
 	local ret = HDH_TRACKER.InitIcons(self)
 
 	if ret > 0 then
+		self.frame.icon[1].spell.countMax = 100
+		self.frame.icon[1].spell.valueMax = self:GetPowerMax()
 		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE',"player")
 		self.frame.icon[1]:SetScript("OnUpdate", HDH_POWER_OnUpdate)
-		self:Update()
 		self:UpdateBarMinMaxValue(self.frame.icon[1])
+		self.frame.icon[1].icon:Stop()
+		self:Update()
 	end
 
 	return ret

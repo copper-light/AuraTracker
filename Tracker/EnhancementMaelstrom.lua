@@ -124,17 +124,19 @@ do
 		local ret = super.InitIcons(self)
 		if ret > 0 then
 			self.filter = "HELPFUL"
-			if self.frame.icon[1].spell.barMaxValueType == DB.BAR_MAXVALUE_TYPE_COUNT then -- 호환성 코드
+			local f = self.frame.icon[1]
+			if f.spell.barMaxValueType == DB.BAR_MAXVALUE_TYPE_COUNT then -- 호환성 코드
 				if select(4, GetBuildInfo()) <= 59999 then -- 대격변
-					self.frame.icon[1].spell.barMaxValue = 5
+					f.spell.countMax = 5
 				else
 					if HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(HDH_ENH_MAELSTROM_TRACKER.TALENT_EXTEND_10, nil) then
-						self.frame.icon[1].spell.barMaxValue = 10
+						f.spell.countMax = 10
 					else
-						self.frame.icon[1].spell.barMaxValue = 5
+						f.spell.countMax = 5
 					end
 				end
 			end
+			self:SetupBarValue(f)
 			self:Update()
 		end
 		return ret

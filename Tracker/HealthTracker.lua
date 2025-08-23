@@ -181,14 +181,6 @@ do -- HDH_HEALTH_TRACKER class
 			end
 		end
 	end
-
-	-- function HDH_HEALTH_TRACKER:PLAYER_ENTERING_WORLD()
-	-- end
-	
-	-- function HDH_HEALTH_TRACKER:ACTIVE_TALENT_GROUP_CHANGED()
-	-- 	self:InitIcons()
-	-- 	-- self:UpdateBar(self.frame.icon[1]);
-	-- end
 	
 	function HDH_HEALTH_TRACKER:OnEvent(event, unit, powerType)
 		local self = self.parent

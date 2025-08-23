@@ -565,12 +565,7 @@ function HDH_AT_ConfigFrameMixin:ChangeBody(bodyType, trackerIndex, elemIndex, s
 		
 		local trackerType = select(3, DB:GetTrackerInfo(self.trackerId))
 		local CLASS = HDH_TRACKER.GetClass(trackerType)
-		if trackerType == HDH_TRACKER.TYPE.STAGGER then
-			self.DETAIL_ETC_TAB[1]:Disable()
-			-- self.DETAIL_ETC_TAB[2]:Disable()
-			self.DETAIL_ETC_TAB[3]:Disable()
-			ChangeTab(self.DETAIL_ETC_TAB, -1)
-		elseif CLASS:GetClassName() == "HDH_POWER_TRACKER" or CLASS:GetClassName() == "HDH_ENH_MAELSTROM_TRACKER" then
+		if CLASS:GetClassName() == "HDH_POWER_TRACKER" or CLASS:GetClassName() == "HDH_ENH_MAELSTROM_TRACKER" then
 			self.DETAIL_ETC_TAB[1]:Enable()
 			self.DETAIL_ETC_TAB[2]:Enable()
 			self.DETAIL_ETC_TAB[3]:Disable()
@@ -854,7 +849,7 @@ function HDH_AT_OnCheck(self)
 	elseif self == F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT2 then
 		local tracker = HDH_TRACKER.Get(trackerId)
 		local className = (tracker and tracker:GetClassName()) or nil
-		if className == "HDH_AURA_TRACKER" or className == "HDH_C_TRACKER" or className == "HDH_TT_TRACKER" then
+		if className == "HDH_AURA_TRACKER" or className == "HDH_C_TRACKER" or className == "HDH_TT_TRACKER" or className == "HDH_COMBO_POINT_TRACKER" then
 			self:SetChecked(true)
 			F.BODY.CONFIG_DETAIL.DISPLAY.CB_LEARNED_TRAIT1:SetChecked(false)
 			F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE_UNLEARNED_TRAIT:Show()

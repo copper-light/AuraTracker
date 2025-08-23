@@ -33,7 +33,7 @@ local function OnUpdate(self)
 	self:GetParent().parent:UpdateGlow(self, true);
 
 	if self.bar then
-		self.bar:SetValue()
+		self:GetParent().parent:UpdateBarValue(self, nil, true)
 	end
 	
 	if self.spell.remaining > 0 then
@@ -98,7 +98,7 @@ function HDH_ESSENCE_TRACKER:CreateData()
 	local isValue = false
 	local isItem = false
 	local r,g,b,a = unpack(self.POWER_INFO[self.type].color)
-	local max_power = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
+	local max_power = self:GetPowerMax()
 	local isFirstCreated = false
 	if DB:GetTrackerElementSize(trackerId) > max_power then
 		DB:TrancateTrackerElements(trackerId)
@@ -107,7 +107,15 @@ function HDH_ESSENCE_TRACKER:CreateData()
 	for i = 1 , max_power do
 		if self:GetElementCount(i) == 0 then
 			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, display, isValue, isItem)
-			DB:UpdateTrackerElementGlow(trackerId, i, DB.GLOW_CONDITION_VALUE, DB.CONDITION_GT_OR_EQ, max_power, DB.GLOW_EFFECT_COLOR_SPARK, self.POWER_INFO[self.type].color, 2)
+			DB:UpdateTrackerElementGlow(trackerId, i, DB.GLOW_CONDITION_VALUE, DB.CONDITION_GT_OR_EQ, max_power, DB.GLOW_EFFECT_COLOR_SPARK, 
+				{
+					self.POWER_INFO[self.type].color[1],
+					self.POWER_INFO[self.type].color[2],
+					self.POWER_INFO[self.type].color[3],
+					0.25
+				}, 
+				2)
+			DB:SetTrackerElementBarInfo(trackerId, i, DB.BAR_VALUE_TYPE_COUNT, DB.BAR_MAXVALUE_TYPE_CUSTOM, 1, {}, DB.BAR_SPLIT_RATIO)
 			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 			if i == i then
 				isFirstCreated = true
@@ -151,7 +159,7 @@ function HDH_ESSENCE_TRACKER:GetElementCount(index)
 		end
 		return 1
 	else
-		for i = 1 , UnitPowerMax('player', self.POWER_INFO[self.type].power_index) do
+		for i = 1 , self:GetPowerMax() do
 			local key = DB:GetTrackerElement(self.id, i)
 			if (self.POWER_INFO[self.type].power_type .. i) ~= key then
 				return 0
@@ -162,8 +170,8 @@ function HDH_ESSENCE_TRACKER:GetElementCount(index)
 end
 
 function HDH_ESSENCE_TRACKER:UpdateSpellInfo(index)
-	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-	local power =  UnitPower('player', self.POWER_INFO[self.type].power_index)
+	local power_max = self:GetPowerMax()
+	local power =  self:GetPower()
 	-- local partPower = UnitPartialPower('player', self.POWER_INFO[self.type].power_index)
 	local powerTick, _  = GetPowerRegenForPowerType(self.POWER_INFO[self.type].power_index)
 	local progress = self:GetEssenceFillingProgress(power + 1) 

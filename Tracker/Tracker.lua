@@ -105,57 +105,6 @@ local function OnUpdateGlowColor(self, elapsed)
 	end
 end
 
--------------------------------------------
--- icon frame struct
--------------------------------------------
-
-local function frameBaseSettings(f)
-	f:SetClampedToScreen(true)
-	f:SetMouseClickEnabled(false);
-	f.icon = CreateFrame("Frame", nil, f, "HDH_AT_CooldownIconTemplate")
-	f.icon:SetAllPoints(true)
-	f.icon:Show()
-	
-	local tempf = CreateFrame("Frame", nil, f)
-	tempf:SetFrameLevel(f.icon:GetFrameLevel() + 5)
-	f.counttext = tempf:CreateFontString(nil, 'OVERLAY')
-	f.counttext:SetPoint('TOPLEFT', f, 'TOPLEFT', -1, 0)
-	f.counttext:SetPoint('BOTTOMRIGHT', f, 'BOTTOMRIGHT', 0, 0)
-	f.counttext:SetNonSpaceWrap(false)
-	f.counttext:SetJustifyH('RIGHT')
-	f.counttext:SetJustifyV('TOP')
-	
-	f.timetext = tempf:CreateFontString(nil, 'OVERLAY');
-	f.timetext:SetPoint('TOPLEFT', f, 'TOPLEFT', -10, -1)
-	f.timetext:SetPoint('BOTTOMRIGHT', f, 'BOTTOMRIGHT', 10, 0)
-	f.timetext:SetJustifyH('CENTER')
-	f.timetext:SetJustifyV('MIDDLE')
-	f.timetext:SetNonSpaceWrap(false)
-	
-	f.v1 = tempf:CreateFontString(nil, 'OVERLAY')
-	f.v1:SetPoint('TOPLEFT', f, 'TOPLEFT', -1, 0)
-	f.v1:SetPoint('BOTTOMRIGHT', f, 'BOTTOMRIGHT', 0, 0)
-	f.v1:SetNonSpaceWrap(false)
-	f.v1:SetJustifyH('RIGHT')
-	f.v1:SetJustifyV('TOP')
-		
-	tempf = CreateFrame("Frame", nil, f)
-	tempf:SetPoint('TOPLEFT', f.icon, 'TOPLEFT', 0, 0)
-	tempf:SetPoint('BOTTOMRIGHT', f.icon, 'BOTTOMRIGHT', 0, 0)
-	tempf:SetScript("Onupdate", OnUpdateGlowColor)
-	tempf:SetFrameLevel(f.icon:GetFrameLevel() + 4)
-	f.icon.spark = tempf
-	f.icon.spark.color = tempf:CreateTexture(nil, 'BORDER')
-	f.icon.spark.color:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/spark_rect.blp]])
-	f.icon.spark.color:SetPoint('CENTER', tempf, 'CENTER', 0, 0)
-	f.icon.spark.spot = tempf:CreateTexture(nil, 'OVERLAY')
-	f.icon.spark.spot:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/border2.blp]])
-	f.icon.spark.spot:SetBlendMode("ADD")
-	f.icon.spark.spot:SetPoint('CENTER', tempf, 'CENTER', 0, 0)
-
-	f:SetScript('OnUpdate', UpdateCooldown)
-end
-
 --------------------------------------------
 -- do -- TRACKER Static function
 --------------------------------------------
@@ -319,6 +268,67 @@ end
 -- end -- TRACKER Static function 
 ------------------------------------------
 
+-------------------------------------------
+-- icon frame struct
+-------------------------------------------
+
+function HDH_TRACKER:CreateBaseIcon(index)
+	if self.frame.icon[index] then 
+		if self.frame.icon[index]:GetParent() == nil then
+			self.frame.icon[index]:SetParent(self.frame)
+		end
+		return self.frame.icon[index] 
+	end
+
+	local f = CreateFrame('Button', self.frame:GetName()..k, self.frame)
+
+	f:SetClampedToScreen(true)
+	f:SetMouseClickEnabled(false);
+	f.icon = CreateFrame("Frame", nil, f, "HDH_AT_CooldownIconTemplate")
+	f.icon:SetAllPoints(true)
+	f.icon:Show()
+	
+	local tempf = CreateFrame("Frame", nil, f)
+	tempf:SetFrameLevel(f.icon:GetFrameLevel() + 5)
+	f.counttext = tempf:CreateFontString(nil, 'OVERLAY')
+	f.counttext:SetPoint('TOPLEFT', f, 'TOPLEFT', -1, 0)
+	f.counttext:SetPoint('BOTTOMRIGHT', f, 'BOTTOMRIGHT', 0, 0)
+	f.counttext:SetNonSpaceWrap(false)
+	f.counttext:SetJustifyH('RIGHT')
+	f.counttext:SetJustifyV('TOP')
+	
+	f.timetext = tempf:CreateFontString(nil, 'OVERLAY');
+	f.timetext:SetPoint('TOPLEFT', f, 'TOPLEFT', -10, -1)
+	f.timetext:SetPoint('BOTTOMRIGHT', f, 'BOTTOMRIGHT', 10, 0)
+	f.timetext:SetJustifyH('CENTER')
+	f.timetext:SetJustifyV('MIDDLE')
+	f.timetext:SetNonSpaceWrap(false)
+	
+	f.v1 = tempf:CreateFontString(nil, 'OVERLAY')
+	f.v1:SetPoint('TOPLEFT', f, 'TOPLEFT', -1, 0)
+	f.v1:SetPoint('BOTTOMRIGHT', f, 'BOTTOMRIGHT', 0, 0)
+	f.v1:SetNonSpaceWrap(false)
+	f.v1:SetJustifyH('RIGHT')
+	f.v1:SetJustifyV('TOP')
+		
+	tempf = CreateFrame("Frame", nil, f)
+	tempf:SetPoint('TOPLEFT', f.icon, 'TOPLEFT', 0, 0)
+	tempf:SetPoint('BOTTOMRIGHT', f.icon, 'BOTTOMRIGHT', 0, 0)
+	tempf:SetScript("Onupdate", OnUpdateGlowColor)
+	tempf:SetFrameLevel(f.icon:GetFrameLevel() + 4)
+	f.icon.spark = tempf
+	f.icon.spark.color = tempf:CreateTexture(nil, 'BORDER')
+	f.icon.spark.color:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/spark_rect.blp]])
+	f.icon.spark.color:SetPoint('CENTER', tempf, 'CENTER', 0, 0)
+	f.icon.spark.spot = tempf:CreateTexture(nil, 'OVERLAY')
+	f.icon.spark.spot:SetTexture([[Interface/AddOns/HDH_AuraTracker/Texture/border2.blp]])
+	f.icon.spark.spot:SetBlendMode("ADD")
+	f.icon.spark.spot:SetPoint('CENTER', tempf, 'CENTER', 0, 0)
+
+	f:SetScript('OnUpdate', UpdateCooldown)
+	self.frame.icon[index] = f
+	return f
+end
 
 ------------------------------------------
  -- TRACKER instance function
@@ -340,15 +350,14 @@ function HDH_TRACKER:Init(id, name, type, unit)
 		self.frame.icon = {}
 		self.frame.pointer = {}
 		
-		setmetatable(self.frame.icon, {
-			__index = function(t,k) 
-				local f = CreateFrame('Button', self.frame:GetName()..k, self.frame)
-				t[k] = f
-				frameBaseSettings(f)
-				self:UpdateIconSettings(f)
-				return f
-			end}
-		)
+		-- setmetatable(self.frame.icon, {
+		-- 	__index = function(t, k) 
+		-- 		local f = self:CreateBaseIcon()
+		-- 		self:UpdateIconSettings(f)
+		-- 		t[k] = f
+		-- 		return f
+		-- 	end}
+		-- )
 	else
 		self:UpdateSetting()
 	end
@@ -441,7 +450,7 @@ function HDH_TRACKER:GetElementCount()
 	local cnt;
 	_, _, _, _, aura_filter = DB:GetTrackerInfo(self.id)
 	if aura_filter ~=nil and aura_filter ~= DB.AURA_FILTER_REG then
-		cnt = HDH_TRACKER.MAX_ICONS_COUNT;
+		cnt = math.min(#self.frame.icon, HDH_TRACKER.MAX_ICONS_COUNT)
 	else
 		cnt = (self.frame.icon and #self.frame.icon) or DB:GetTrackerElementSize(self.id) or 0;
 	end
@@ -517,6 +526,8 @@ function HDH_TRACKER:UpdateBarSettings(f)
 		if not HDH_TRACKER.ENABLE_MOVE then
 			bar:SetMouseClickEnabled(false)
 		end
+
+		self:SetupBarValue(f)
 		f.bar:Show()
 	else
 		if f.bar then
@@ -548,8 +559,11 @@ end
 
 function HDH_TRACKER:UpdateBarValue(f, value, animate)
 	if value == nil then
-		value = f:GetBarValue()
-		print("UpdateBarValue", value)
+		if  f.GetBarValue then
+			value = f:GetBarValue()
+		else
+			return
+		end
 	end
 	f.bar:SetValue(value, animate)
 end
@@ -560,14 +574,14 @@ function HDH_TRACKER:UpdateBarMinMaxValue(f, minV, maxV, value, r, g, b, a)
 			f.bar:SetStatusBarColor(r, g, b, a or 1)
 		end
 
-		if not minV or not maxV then
-			minV, maxV = f:GetBarMinMax()
+		if (not minV or not maxV) then
+			if f.GetBarMinMax then
+				minV, maxV = f:GetBarMinMax()
+			else
+				return
+			end
 		end
 		f.bar:SetMinMaxValues(minV, maxV)
-		
-		local a, b = f.bar:GetMinMaxValues()
-		-- print("UpdateBarMinMaxValue", minV, maxV, a, b) -> 0, 1, 0, 1 로 나옴
-
 		self:UpdateBarValue(f, value)
 	end
 end
@@ -690,7 +704,7 @@ function HDH_TRACKER:CreateDummySpell(count)
 	local icons =  self.frame.icon
 	local curTime = GetTime()
 	local f, spell
-	count = count or 1;
+	count = count or 0
 	for i=1, count do
 		f = icons[i]
 		f:SetMouseClickEnabled(false);
@@ -699,13 +713,12 @@ function HDH_TRACKER:CreateDummySpell(count)
 			f.icon:SetTexture("Interface/ICONS/TEMP")
 		end
 		spell = f.spell
-		if not spell then spell = {} f.spell = spell end
 		spell.display = DB.SPELL_ALWAYS_DISPLAY
 		spell.id = 0
 		spell.no = i
 		spell.count = i
 		spell.overlay = 0
-		spell.duration = 50 * i
+		spell.duration = 30 * i
 		spell.happenTime = 0;
 		spell.glow = false
 		spell.endTime = curTime + spell.duration
@@ -1664,7 +1677,6 @@ end
 
 function HDH_TRACKER:UpdateLayout()
 	if not self.ui or not self.frame.icon then return end
-	local f
 	local line = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
 	local margin_h = self.ui.common.margin_h
 	local margin_v = self.ui.common.margin_v
@@ -1693,8 +1705,7 @@ function HDH_TRACKER:UpdateLayout()
 		size_h = self.ui.icon.size
 	end
 
-	for i = 1 , #self.frame.icon do
-		f = self.frame.icon[i]
+	for i, f in ipairs(self.frame.icon) do
 		useSpace = true
 		if f and f.spell then
 			if f.spell.isLearned then
@@ -1771,32 +1782,35 @@ end
 
 -- 함수를 f 단위로 만들어야함.
 -- 지금은 frame 전체로 반영되는 코드라서 마지막 icon  값이 전체를 먹어버림
-function HDH_TRACKER:SetupBarValue(f, barValueType, barMaxValueType, barMaxValue)
+function HDH_TRACKER:SetupBarValue(f)
+	local barValueType = f.spell.barValueType
+	local barMaxValueType = f.spell.barMaxValueType
+	-- local barMaxValue = f.spell.barMaxValue
 	if barValueType == DB.BAR_VALUE_TYPE_TIME then
 		f.GetBarValue = function(f)
 			return GetTime()
 		end
 	elseif barValueType == DB.BAR_VALUE_TYPE_COUNT then
 		f.GetBarValue = function(f)
-			return math.max(f.spell.count, (f.spell.charges and f.spell.charges.count or 0))
+			return math.max(f.spell.count or 0, (f.spell.charges and f.spell.charges.count or 0))
 		end
 	else -- DB.BAR_VALUE_TYPE_VALUE
 		f.GetBarValue = function(f)
-			return f.spell.v1
+			return f.spell.v1 or 0
 		end
 	end
 
 	if barMaxValueType == DB.BAR_MAXVALUE_TYPE_TIME then
 		f.GetBarMinMax = function(f)
-			return f.spell.startTime, f.spell.endTime
+			return f.spell.startTime or 0, f.spell.endTime or 0
 		end
 	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_COUNT then
 		f.GetBarMinMax = function(f)
-			return 0, f.spell.countMax
+			return 0, f.spell.countMax or 0
 		end
 	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_VALUE then
 		f.GetBarMinMax = function(f)
-			return 0, f.spell.valueMax
+			return 0, f.spell.valueMax or 0
 		end
 	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_HEALTH then
 		f.GetBarMinMax = function(f)
@@ -1813,7 +1827,7 @@ function HDH_TRACKER:SetupBarValue(f, barValueType, barMaxValueType, barMaxValue
 	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_CUSTOM then
 		if barValueType == DB.BAR_VALUE_TYPE_TIME then
 			f.GetBarMinMax = function(f)
-				return f.spell.endTime - (f.spell.barMaxValue or 0), f.spell.endTime
+				return (f.spell.endTime or 0) - (f.spell.barMaxValue or 0), f.spell.endTime or 0
 			end
 		else
 			f.GetBarMinMax = function(f)
@@ -1821,6 +1835,8 @@ function HDH_TRACKER:SetupBarValue(f, barValueType, barMaxValueType, barMaxValue
 			end
 		end
 	end
+	f.bar:SetSplitPoints(f.spell.barSplitPoints, f.spell.barSplitPointType)
+	self:UpdateBarMinMaxValue(f)
 end
 
 function HDH_TRACKER:InitIcons()
@@ -1869,7 +1885,8 @@ function HDH_TRACKER:InitIcons()
 
 		if unlearnedHideMode ~= DB.SPELL_HIDE or isLearned then
 			iconIdx = iconIdx + 1
-			f = self.frame.icon[iconIdx]
+			f = self:CreateBaseIcon(iconIdx)
+
 			if f:GetParent() == nil then f:SetParent(self.frame) end
 			if isLearned and elemKey then
 				self.frame.pointer[elemKey] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
@@ -1924,19 +1941,13 @@ function HDH_TRACKER:InitIcons()
 				spell.innerCooldown = tonumber(innerCooldown)
 				spell.innerTrackingType = innerTrackingType
 			end
-
 			f.spell = spell
-			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-			
-			self:SetupBarValue(f, barValueType, barMaxValueType, barMaxValue)
+			-- self:UpdateBarSettings(f)
+			self:UpdateIconSettings(f)
 			self:UpdateGlow(f, false)
-			self:UpdateBarSettings(f)
-
+			f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
 			f:Hide()
 			self:ActionButton_HideOverlayGlow(f)
-			if f.bar then
-				f.bar:SetSplitPoints(spell.barSplitPoints, spell.barSplitPointType)
-			end
 		end
 	end
 	
@@ -1964,12 +1975,9 @@ function HDH_TRACKER:PLAYER_ENTERING_WORLD()
 end
 
 function HDH_TRACKER:PLAYER_REGEN_ENABLED()
-	local elemSize = DB:GetTrackerElementSize(self.id)
-	local spell
-	for i = 1, elemSize do
-		spell = self.frame.icon[i].spell
-		if spell then
-			DB:SetTrackerElementBarMaxValues(self.id, i, spell.durationMax, spell.countMax, spell.valueMax)
+	for i = 1, #self.frame.icon do
+		if self.frame.icon[i] then
+			DB:SetTrackerElementBarMaxValues(self.id, i, self.frame.icon[i].spell.durationMax, self.frame.icon[i].spell.countMax, self.frame.icon[i].spell.valueMax)
 		end
 	end
 end

@@ -86,6 +86,7 @@ end
 --- HDH_AT_MultiStatusBarTemplateMixin
 ------------------------------------------
 HDH_AT_MultiStatusBarTemplateMixin = {}
+HDH_AT_MultiStatusBarTemplateMixin.BAR_INNER_MAX = BAR_INNER_MAX
 
 function HDH_AT_MultiStatusBarTemplateMixin:OnUpdate(elapsed)
     -- self.elapsed = (self.elapsed or 0) + elapsed
@@ -126,6 +127,7 @@ function HDH_AT_MultiStatusBarTemplateMixin:Setup(minMaxValues, points, pointTyp
     self.normalTextColor= {1,1,1,1}
     self.enbaleSpark = self.enbaleSpark or true
     self.sparkColor = self.sparkColor or {1,1,1,1}
+   
 
     setmetatable(self.list, {
         __index = function(list, index)
@@ -188,7 +190,7 @@ end
 
 function HDH_AT_MultiStatusBarTemplateMixin:ToInnerValue(value)
     if self.range == 0 then return 0 end
-    return (value - self.minValue) / self.range * BAR_INNER_MAX
+    return (value - self.minValue) / self.range * self.BAR_INNER_MAX
 end
 
 function HDH_AT_MultiStatusBarTemplateMixin:GetValue()
@@ -264,14 +266,14 @@ function HDH_AT_MultiStatusBarTemplateMixin:UpdateLayout()
     local sumMaxValue = 0
 
      if not self.toFill then
-        sumMinValue = BAR_INNER_MAX
+        sumMinValue = self.BAR_INNER_MAX
     end
 
     for i=1, length do
         prevBar = bar
         bar = self.list[i]
 
-        barSize = ((self.innerPoints[i] or BAR_INNER_MAX) - (self.innerPoints[i-1] or 0))
+        barSize = ((self.innerPoints[i] or self.BAR_INNER_MAX) - (self.innerPoints[i-1] or 0))
         if self.toFill then
             sumMaxValue = barSize + sumMinValue
             bar.StatusBar:SetMinMaxValues(sumMinValue, sumMaxValue)
@@ -281,28 +283,28 @@ function HDH_AT_MultiStatusBarTemplateMixin:UpdateLayout()
         end
         bar:ClearAllPoints()
         if direction == DB.COOLDOWN_LEFT then
-            bar:SetSize((w - (margin_x * #self.innerPoints)) * (barSize / BAR_INNER_MAX), h)
+            bar:SetSize((w - (margin_x * #self.innerPoints)) * (barSize / self.BAR_INNER_MAX), h)
             if     i == 1      then bar:SetPoint("RIGHT", 0, 0)
             elseif i == length then bar:SetPoint("LEFT", 0, 0)
                                     bar:SetPoint("RIGHT", prevBar, "LEFT", -margin_x, 0)
                                else bar:SetPoint("RIGHT", prevBar, "LEFT", -margin_x, 0) end
 
         elseif direction == DB.COOLDOWN_RIGHT then
-            bar:SetSize((w - (margin_x * #self.innerPoints)) * (barSize / BAR_INNER_MAX), h)
+            bar:SetSize((w - (margin_x * #self.innerPoints)) * (barSize / self.BAR_INNER_MAX), h)
             if     i == 1      then bar:SetPoint("LEFT", 0, 0)
             elseif i == length then bar:SetPoint("RIGHT", 0, 0)
                                     bar:SetPoint("LEFT", prevBar, "RIGHT", margin_x, 0)
                                else bar:SetPoint("LEFT", prevBar, "RIGHT", margin_x, 0) end
 
         elseif direction == DB.COOLDOWN_UP then
-            bar:SetSize(w, (h - (margin_y * #self.innerPoints)) * (barSize / BAR_INNER_MAX))
+            bar:SetSize(w, (h - (margin_y * #self.innerPoints)) * (barSize / self.BAR_INNER_MAX))
             if     i == 1      then bar:SetPoint("BOTTOM", 0, 0)
 			elseif i == length then bar:SetPoint("TOP", 0, 0)
                                     bar:SetPoint("BOTTOM", prevBar, "TOP", 0, margin_y)
                                else bar:SetPoint("BOTTOM", prevBar, "TOP", 0, margin_y) end
 
         else -- COOLDOWN_DOWN
-            bar:SetSize(w, (h - (margin_y * #self.innerPoints)) * (barSize / BAR_INNER_MAX))
+            bar:SetSize(w, (h - (margin_y * #self.innerPoints)) * (barSize / self.BAR_INNER_MAX))
             if     i == 1      then bar:SetPoint("TOP", 0, 0)
 			elseif i == length then bar:SetPoint("BOTTOM", 0, 0)
                                     bar:SetPoint("TOP", prevBar, "BOTTOM", 0, -margin_y)
@@ -392,12 +394,12 @@ function HDH_AT_MultiStatusBarTemplateMixin:SetInnerValue(value)
         end
     else
         for _, bar in ipairs(self.list) do
-            bar.StatusBar:SetValue(BAR_INNER_MAX - self.innerValue)
+            bar.StatusBar:SetValue(self.BAR_INNER_MAX - self.innerValue)
         end
     end
     
     if self.Text:IsShown() then
-        if self.innerValue >= BAR_INNER_MAX then
+        if self.innerValue >= self.BAR_INNER_MAX then
             if self.Text.full == false or self.Text.full == nil then
                 self.Text.full = true
                 self.Text:SetTextColor(unpack(self.fullTextColor))
@@ -420,7 +422,7 @@ end
 
 function HDH_AT_MultiStatusBarTemplateMixin:SetMinMaxValues(minValue, maxValue, reload)
     if not reload and self.minValue == minValue and self.maxValue == maxValue then return false end
-    if #self.points >= 1 and self.points[#self.points] >= ((maxValue - minValue) / (self.range) * BAR_INNER_MAX) then return false end
+    -- if #self.points >= 1 and self.points[#self.points] >= ((maxValue - minValue) / (self.range) * BAR_INNER_MAX) then return false end
     self.minValue = minValue
     self.maxValue = maxValue
     self.range = maxValue - minValue
@@ -438,13 +440,13 @@ function HDH_AT_MultiStatusBarTemplateMixin:UpdateSplitPoints(points, pointType,
     if pointType == DB.BAR_SPLIT_RATIO then
         for i, v in ipairs(points) do
             if v < 100 then
-                table.insert(innerPoints, v / 100 * BAR_INNER_MAX)
+                table.insert(innerPoints, math.floor(v / 100 * self.BAR_INNER_MAX))
             end
         end
     else
         for _, v in ipairs(points) do
             if v < range then
-                table.insert(innerPoints, v / range * BAR_INNER_MAX)
+                table.insert(innerPoints,  math.floor(v / range * self.BAR_INNER_MAX))
             end
         end
     end

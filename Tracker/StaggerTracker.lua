@@ -11,14 +11,14 @@ local STAGGER_KEY = "STAGGER"
 -- 	GREEN 	= { key = "green" }
 -- }
 
-local STAGGER_RED_TRANSITION = 60  -- wow global var : 0.6
-local STAGGER_YELLOW_TRANSITION = 30-- wow global var : 0.3
+local STAGGER_RED_TRANSITION = 0.6  -- wow global var : 0.6
+local STAGGER_YELLOW_TRANSITION = 0.3-- wow global var : 0.3
 local info = PowerBarColor[STAGGER_KEY]
 
 local STAGGER_GREEN_INDEX = info[1] and 1 or "green"
 local STAGGER_YELLOW_INDEX = info[2] and 2 or "yellow"
 local STAGGER_RED_INDEX = info[3] and 3 or "red"
-HDH_STAGGER_TRACKER.SPLIT_BAR_VALUES = {STAGGER_YELLOW_TRANSITION, STAGGER_RED_TRANSITION}
+HDH_STAGGER_TRACKER.SPLIT_BAR_VALUES = {STAGGER_YELLOW_TRANSITION*100, STAGGER_RED_TRANSITION*100}
 HDH_STAGGER_TRACKER.POWER_INFO = {
 	{ texture = "Interface/Icons/Priest_icon_Chakra_green", color = {info[STAGGER_GREEN_INDEX].r, info[STAGGER_GREEN_INDEX].g, info[STAGGER_GREEN_INDEX].b, 1}},
 	{ texture = "Interface/Icons/Priest_icon_Chakra", 	    color = {info[STAGGER_YELLOW_INDEX].r, info[STAGGER_YELLOW_INDEX].g, info[STAGGER_YELLOW_INDEX].b, 1}},
@@ -41,19 +41,21 @@ local function STAGGER_TRACKER_OnUpdate(self, elapsed)
 	self.spell.curTime = GetTime()
 	if self.spell.curTime - (self.spell.delay or 0) < HDH_TRACKER.BAR_UP_ANI_TERM then return end 
 	self.spell.delay = self.spell.curTime
-	self.spell.healthMax = UnitHealthMax("player")
-	self.spell.v1 = UnitStagger('player') or 0
+	self.spell.healthMax = self:GetParent().parent:GetPowerMax()
+	self.spell.v1 = self:GetParent().parent:GetPower()
 	self.spell.per = self.spell.v1 / self.spell.healthMax
 	self.spell.count = math.ceil(self.spell.per * 100)
 	if self.spell.count == math.huge then self.spell.count = 0; end
 	self.counttext:SetText(format("%d%%", math.ceil(self.spell.count or 0))); 
 	
-	if self.spell.per > STAGGER_RED_TRANSITION then
-		self.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[3].texture);
-	elseif self.spell.per > STAGGER_YELLOW_TRANSITION then
-		self.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[2].texture);
-	else
-		self.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[1].texture);
+	if not self.spell.is_fixed_texture then
+		if self.spell.per > STAGGER_RED_TRANSITION then
+			self.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[3].texture);
+		elseif self.spell.per > STAGGER_YELLOW_TRANSITION then
+			self.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[2].texture);
+		else
+			self.icon:SetTexture(HDH_STAGGER_TRACKER.POWER_INFO[1].texture);
+		end
 	end
 	
 	if self.spell.showValue then self.v1:SetText(HDH_AT_UTIL.AbbreviateValue(self.spell.v1, self:GetParent().parent.ui.font.v1_abbreviate)); else self.v1:SetText(nil) end
@@ -71,7 +73,6 @@ local function STAGGER_TRACKER_OnUpdate(self, elapsed)
 	end
 	if self.bar then
 		if self.spell.healthMax ~= self.spell.preHealthMax then
-			self.bar:SetMinMaxValues(0, self.spell.healthMax)
 			self:GetParent().parent:UpdateBarMinMaxValue(self)
 			self.spell.preHealthMax = self.spell.healthMax
 		else
@@ -97,7 +98,7 @@ function HDH_STAGGER_TRACKER:CreateData()
 	end
 	local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
 	DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
-	DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_COUNT, DB.CONDITION_GT_OR_EQ, STAGGER_RED_TRANSITION)
+	DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_COUNT, DB.CONDITION_GT_OR_EQ, STAGGER_RED_TRANSITION*100)
 	DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_VALUE_TYPE_VALUE, DB.BAR_MAXVALUE_TYPE_HEALTH, nil, HDH_STAGGER_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_RATIO)
 
 	DB:CopyGlobelToTracker(trackerId)
@@ -119,6 +120,14 @@ function HDH_STAGGER_TRACKER:CreateData()
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 30)
 	DB:SetTrackerValue(trackerId, 'ui.%s.icon.active_border_color', {0, 0, 0, 1})
 	self:UpdateSetting();
+end
+
+function HDH_STAGGER_TRACKER:GetPower()
+	return UnitStagger('player') or 0;
+end
+
+function HDH_STAGGER_TRACKER:GetPowerMax()
+	return UnitHealthMax('player');
 end
 
 function HDH_STAGGER_TRACKER:GetElementCount(spec)
@@ -176,21 +185,18 @@ function HDH_STAGGER_TRACKER:CreateDummySpell(count)
 	return 1;
 end
 
-
-function HDH_STAGGER_TRACKER:GetPower()
-	return UnitStagger('player') or 0;
-end
-
-function HDH_STAGGER_TRACKER:GetPowerMax()
-	return UnitHealthMax('player');
-end
-
 function HDH_STAGGER_TRACKER:InitIcons()
 	local ret = super.InitIcons(self)
 	if ret then
 		for i = 1 , ret do
+			if self.frame.icon[i].spell.icon ~= 463281 then -- 463281 = Interface/Icons/ability_monk_stagger_green
+				self.frame.icon[i].spell.is_fixed_texture = true
+			else
+				self.frame.icon[i].spell.is_fixed_texture = false
+			end
 			self.frame.icon[i]:SetScript("OnUpdate", STAGGER_TRACKER_OnUpdate)
 		end
+
 		self.frame:UnregisterAllEvents()
 		self:Update()
 	end

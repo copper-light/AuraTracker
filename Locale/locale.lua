@@ -323,7 +323,7 @@ L.PLEASE_INPUT_SPELL = "Enter Name or ID"
 L.PLEASE_INPUT = "Input"
 L.HIDE_MODE_UNLEARNED_ICON = "Hide Icon When Not Learned"
 L.REVERT = "Revert"
-L.ONLY_FOR_AURA_CD_TOTEM = "This feature is only available for\n|cffff0000Buffs/Debuffs|r, |cffff0000Cooldowns|r, and |cffff0000Totems|r."
+L.ONLY_FOR_AURA_CD_TOTEM = "This feature is only available for\n|cffff0000Buffs/Debuffs|r, |cffff0000Cooldowns|r, |cffff0000Totems|r, and |cffff0000Combo points|r."
 
 -- 11.1.7.4
 L.UNASSIGNED = "Unassigned"

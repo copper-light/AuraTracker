@@ -411,12 +411,14 @@ function HDH_AT_LinearCooldownTemplateMixin:SetValue(value)
 end
 
 function HDH_AT_LinearCooldownTemplateMixin:Stop()
-	if self.Progress:IsShown() then
-		self.Progress:Hide()
-	end
+	if not self.isCharging then
+		if self.Progress:IsShown() then
+			self.Progress:Hide()
+		end
 
-	if self.Spark:IsShown() then
-		self.Spark:Hide()
+		if self.Spark:IsShown() then
+			self.Spark:Hide()
+		end
 	end
 
 	self:SetScript('OnUpdate', nil)
@@ -424,6 +426,7 @@ end
 
 function HDH_AT_LinearCooldownTemplateMixin:StopCharge()
 	if self.isCharging then
+		self.isCharging = false
 		self:Stop()
 	end
 end
@@ -499,10 +502,10 @@ function HDH_AT_CooldownIconTemplateMixin:Setup(w, h, cooldownType, toFill, enab
 	self.offAlpha = offAlpha
 	self.isAble = true
 	self.toFill = toFill
-	
+
 	self.Icon.Texture:SetAlpha(offAlpha)
 	self.borderColor = self.borderColor or {1, 1, 1, 1}
-	
+
 	self.Border:SetFrameLevel(self.Icon:GetFrameLevel() + 3)
 	self.cooldownType = cooldownType
 end
@@ -572,7 +575,9 @@ function HDH_AT_CooldownIconTemplateMixin:StopCharge()
 end
 
 function HDH_AT_CooldownIconTemplateMixin:UpdateCooldowning(bool)
-	bool = (bool == nil) and true or false
+	if bool == nil then
+		bool = true
+	end
 	if bool then
 		if self.toFill then
 			self.Border.Texture:SetVertexColor(0, 0, 0, self.offAlpha)

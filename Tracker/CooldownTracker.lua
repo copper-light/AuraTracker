@@ -268,7 +268,6 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 			f.icon:SetTexture("Interface/ICONS/TEMP")
 		end
 		spell = f.spell
-		if not spell then spell = {} f.spell = spell end
 		spell.name = f.spell.name
 		spell.icon = nil
 		spell.display = DB.SPELL_ALWAYS_DISPLAY
@@ -302,8 +301,7 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 		f.icon:UpdateCooldowning()
 
 		if self.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar then
-			f.bar:SetMinMaxValues(spell.startTime, spell.endTime);
-			f.bar:SetValue(spell.startTime);
+			self:UpdateBarMinMaxValue(f)
 		end
 		f:Show()
 	end

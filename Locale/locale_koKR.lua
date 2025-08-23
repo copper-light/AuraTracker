@@ -320,7 +320,7 @@ L.PLEASE_INPUT_SPELL = "주문명 또는 ID 입력"
 L.PLEASE_INPUT = "입력"
 L.HIDE_MODE_UNLEARNED_ICON = "미습득 시 아이콘 숨김 방식"
 L.REVERT = "원래대로"
-L.ONLY_FOR_AURA_CD_TOTEM = "해당 기능은 |cffff0000버프/디버프|r, |cffff0000쿨다운|r, |cffff0000토템류|r에서만\n사용 가능 합니다."
+L.ONLY_FOR_AURA_CD_TOTEM = "해당 기능은 |cffff0000버프/디버프|r, |cffff0000쿨다운|r, |cffff0000토템류|r, |cffff0000연계점수류|r에서만\n사용 가능 합니다."
 
 -- 11.1.7.4
 L.UNASSIGNED = "미할당"
