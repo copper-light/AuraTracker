@@ -115,7 +115,7 @@ function HDH_ESSENCE_TRACKER:CreateData()
 					0.25
 				}, 
 				2)
-			DB:SetTrackerElementBarInfo(trackerId, i, DB.BAR_VALUE_TYPE_COUNT, DB.BAR_MAXVALUE_TYPE_CUSTOM, 1, {}, DB.BAR_SPLIT_RATIO)
+			DB:SetTrackerElementBarInfo(trackerId, i, DB.BAR_VALUE_TYPE_COUNT, DB.BAR_MAXVALUE_TYPE_AUTO, 1, {}, DB.BAR_SPLIT_RATIO)
 			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 			if i == i then
 				isFirstCreated = true
@@ -221,6 +221,7 @@ function HDH_ESSENCE_TRACKER:UpdateSpellInfo(index)
 				spell.isUpdate = true
 			end
 		end
+		spell.valueMax = power_max
 	end
 	self.power = power
 	self.curTime = curTime

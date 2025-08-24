@@ -67,7 +67,7 @@ function HDH_COMBO_POINT_TRACKER:CreateData()
 					0.25
 				}, 
 				2)
-			DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_VALUE_TYPE_COUNT, DB.BAR_MAXVALUE_TYPE_CUSTOM, 1, {}, DB.BAR_SPLIT_RATIO)
+			DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_VALUE_TYPE_COUNT, DB.BAR_MAXVALUE_TYPE_MANUAL, 1, {}, DB.BAR_SPLIT_RATIO)
 			DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 			if elemIdx == 1 then
 				isFirstCreated = true
@@ -245,6 +245,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateSpellInfo(index)
 				iconf.spell.v1 = 0
 				iconf.spell.count = 0
 			end
+			iconf.spell.valueMax = power_max
 			ret = ret + 1
 		end
 	end
@@ -253,7 +254,7 @@ end
 function HDH_COMBO_POINT_TRACKER:UpdateIconAndBar(index)
 	local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
 	local icons = self.frame.icon
-	
+
 	for k,f in ipairs(icons) do
 		if not f.spell then break end
 		if f.spell.isUpdate then

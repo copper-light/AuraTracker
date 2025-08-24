@@ -337,7 +337,7 @@ end
 function HDH_TRACKER:Init(id, name, type, unit)
 	self.ui = DB:GetUI(id)
 	self.location = DB:GetLocation(id)
-	self.unit = unit
+	self.unit = unit or "player"
 	self.name = name
 	self.id = id
 	self.type = type
@@ -349,7 +349,6 @@ function HDH_TRACKER:Init(id, name, type, unit)
 		self.frame.parent = self
 		self.frame.icon = {}
 		self.frame.pointer = {}
-		
 		-- setmetatable(self.frame.icon, {
 		-- 	__index = function(t, k) 
 		-- 		local f = self:CreateBaseIcon()
@@ -362,11 +361,13 @@ function HDH_TRACKER:Init(id, name, type, unit)
 		self:UpdateSetting()
 	end
 
-	self.frame:SetFrameLevel(tonumber(id)*10)
+	self.frame:SetFrameLevel(tonumber(self.id)*10)
 	self.frame:Hide();
 	self.frame:ClearAllPoints()
 	self.frame:SetPoint("CENTER", UIParent, "CENTER" , self.location.x, self.location.y)
 	self.frame:SetSize(self.ui.icon.size, self.ui.icon.size)
+
+	
 	self:InitIcons()
 end
 
@@ -1613,7 +1614,7 @@ function HDH_TRACKER:GetAni(f, ani_type) -- row 이동 애니
 			f.aniShow = ag
 			ag.a1 = ag:CreateAnimation("ALPHA")
 			ag.a1:SetOrder(1)
-			ag.a1:SetDuration(0.2)
+			ag.a1:SetDuration(0.1)
 			ag.a1:SetFromAlpha(0)
 			ag.a1:SetToAlpha(1)
 			ag.tracker = f.parent
@@ -1766,7 +1767,13 @@ function HDH_TRACKER:Update(index)
 				or activedCount > 0 
 				or self.ui.common.always_show 
 				or UnitAffectingCombat("player")) then
-		self:ShowTracker();
+		if self.unit == "player" then
+			self:ShowTracker()
+		else
+			if not self.frame:IsShown() then
+				self.frame:Show()
+			end
+		end
 	else
 		self:HideTracker();
 	end
@@ -1800,31 +1807,7 @@ function HDH_TRACKER:SetupBarValue(f)
 		end
 	end
 
-	if barMaxValueType == DB.BAR_MAXVALUE_TYPE_TIME then
-		f.GetBarMinMax = function(f)
-			return f.spell.startTime or 0, f.spell.endTime or 0
-		end
-	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_COUNT then
-		f.GetBarMinMax = function(f)
-			return 0, f.spell.countMax or 0
-		end
-	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_VALUE then
-		f.GetBarMinMax = function(f)
-			return 0, f.spell.valueMax or 0
-		end
-	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_HEALTH then
-		f.GetBarMinMax = function(f)
-			return 0, f:GetParent().parent:GetPowerMax()
-		end
-	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_MANA then
-		f.GetBarMinMax = function(f)
-			return 0, f:GetParent().parent:GetPowerMax()
-		end
-	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_POWER then
-		f.GetBarMinMax = function(f)
-			return 0, f:GetParent().parent:GetPowerMax()
-		end
-	elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_CUSTOM then
+	if barMaxValueType == DB.BAR_MAXVALUE_TYPE_MANUAL then
 		if barValueType == DB.BAR_VALUE_TYPE_TIME then
 			f.GetBarMinMax = function(f)
 				return (f.spell.endTime or 0) - (f.spell.barMaxValue or 0), f.spell.endTime or 0
@@ -1834,7 +1817,47 @@ function HDH_TRACKER:SetupBarValue(f)
 				return 0, f.spell.barMaxValue or 0
 			end
 		end
+	else
+		if barValueType == DB.BAR_VALUE_TYPE_TIME then
+			f.GetBarMinMax = function(f)
+				return f.spell.startTime or 0, f.spell.endTime or 0
+			end
+		elseif barValueType == DB.BAR_VALUE_TYPE_COUNT then
+			f.GetBarMinMax = function(f)
+				return 0, f.spell.countMax or 1
+			end
+		else -- if barMaxValueType == DB.BAR_MAXVALUE_TYPE_VALUE then
+			f.GetBarMinMax = function(f)
+				return 0, f.spell.valueMax or 0
+			end
+		end
 	end
+
+	-- if barMaxValueType == DB.BAR_MAXVALUE_TYPE_TIME then
+	-- 	f.GetBarMinMax = function(f)
+	-- 		return f.spell.startTime or 0, f.spell.endTime or 0
+	-- 	end
+	-- elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_COUNT then
+	-- 	f.GetBarMinMax = function(f)
+	-- 		return 0, f.spell.countMax or 1
+	-- 	end
+	-- elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_VALUE then
+	-- 	f.GetBarMinMax = function(f)
+	-- 		return 0, f.spell.valueMax or 0
+	-- 	end
+	-- elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_HEALTH then
+	-- 	f.GetBarMinMax = function(f)
+	-- 		return 0, f:GetParent().parent:GetPowerMax()
+	-- 	end
+	-- elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_MANA then
+	-- 	f.GetBarMinMax = function(f)
+	-- 		return 0, f:GetParent().parent:GetPowerMax()
+	-- 	end
+	-- elseif barMaxValueType == DB.BAR_MAXVALUE_TYPE_POWER then
+	-- 	f.GetBarMinMax = function(f)
+	-- 		return 0, f:GetParent().parent:GetPowerMax()
+	-- 	end
+	-- else
 	f.bar:SetSplitPoints(f.spell.barSplitPoints, f.spell.barSplitPointType)
 	self:UpdateBarMinMaxValue(f)
 end
@@ -1855,7 +1878,6 @@ function HDH_TRACKER:InitIcons()
 	local needEquipmentEvent = false
 
 	self.frame.pointer = {}
-	self.unit = unit or "player"
 	self.aura_filter = aura_filter
 	self.aura_caster = aura_caster
 	self.talentId = HDH_AT_UTIL.GetSpecialization()

@@ -464,7 +464,9 @@ function HDH_C_TRACKER:UpdateIconAndBar(index) -- HDH_TRACKER override
 				self:UpdateBarMinMaxValue(f)
 			else
 				if f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
-					self:UpdateBarMinMaxValue(f, 0, 1, 1)
+					local minV, maxV = f:GetBarMinMax()
+					self:UpdateBarMinMaxValue(f, nil, nil, maxV)
+					-- self:UpdateBarMinMaxValue(f, 0, 1, 1)
 				else
 					self:UpdateBarMinMaxValue(f)
 				end

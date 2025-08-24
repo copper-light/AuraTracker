@@ -108,13 +108,8 @@ CONFIG.BAR_VALUE_TYPE_TIME = 1
 CONFIG.BAR_VALUE_TYPE_COUNT = 2
 CONFIG.BAR_VALUE_TYPE_VALUE = 3
 
-CONFIG.BAR_MAXVALUE_TYPE_CUSTOM = 1
-CONFIG.BAR_MAXVALUE_TYPE_TIME = 2
-CONFIG.BAR_MAXVALUE_TYPE_COUNT = 3
-CONFIG.BAR_MAXVALUE_TYPE_VALUE = 4
-CONFIG.BAR_MAXVALUE_TYPE_HEALTH = 5
-CONFIG.BAR_MAXVALUE_TYPE_MANA = 6
-CONFIG.BAR_MAXVALUE_TYPE_POWER = 7
+CONFIG.BAR_MAXVALUE_TYPE_MANUAL = 1
+CONFIG.BAR_MAXVALUE_TYPE_AUTO = 2
 
 local DEFAULT_DISPLAY = { 
 
@@ -1066,33 +1061,33 @@ function HDH_AT_ConfigDB:GetDefaultBarInfo(trackerType)
     local barValueType, barMaxValueType, barMaxValue, splitType 
     if className =="HDH_AURA_TRACKER" or className =="HDH_C_TRACKER" or className =="HDH_TT_TRACKER" then
         barValueType = CONFIG.BAR_VALUE_TYPE_TIME
-        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_TIME
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_AUTO
 
     elseif className =="HDH_COMBO_POINT_TRACKER" or className=="HDH_ESSENCE_TRACKER" then
         barValueType = CONFIG.BAR_VALUE_TYPE_VALUE
-        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_CUSTOM
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_AUTO
         barMaxValue = 1
         splitType = CONFIG.BAR_SPLIT_FIXED_VALUE
 
     elseif className =="HDH_HEALTH_TRACKER" then
         barValueType = CONFIG.BAR_VALUE_TYPE_VALUE
-        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_HEALTH
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_AUTO
 
     elseif className =="HDH_DK_RUNE_TRACKER" then
         barValueType = CONFIG.BAR_VALUE_TYPE_TIME
-        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_TIME
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_AUTO
 
     elseif className =="HDH_ENH_MAELSTROM_TRACKER" then
         barValueType = CONFIG.BAR_VALUE_TYPE_COUNT
-        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_CUSTOM
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_AUTO
         
     elseif className =="HDH_POWER_TRACKER" then
         barValueType = CONFIG.BAR_VALUE_TYPE_VALUE
-        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_POWER
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_AUTO
 
     elseif className == "HDH_STAGGER_TRACKER" then
         barValueType = CONFIG.BAR_VALUE_TYPE_VALUE
-        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_HEALTH
+        barMaxValueType = CONFIG.BAR_MAXVALUE_TYPE_AUTO
     end
 
     return barValueType, barMaxValueType, barMaxValue, {}, splitType or CONFIG.BAR_SPLIT_RATIO

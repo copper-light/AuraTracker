@@ -203,10 +203,10 @@ function HDH_POWER_TRACKER:UpdateSpellInfo(index) -- HDH_TRACKER override
 	local f = self.frame.icon[1]
 	if f and f.spell then
 		f.spell.v1 = self:GetPower()
-		f.spell.max = self:GetPowerMax()
-		f.spell.count = (f.spell.v1/f.spell.max * 100)
+		f.spell.valueMax = self:GetPowerMax()
+		f.spell.count = (f.spell.v1/f.spell.valueMax * 100)
 		if self.power_info and self.power_info.regen then
-			f.spell.isUpdate = (f.spell.max ~= f.spell.v1 and not UnitIsDead("player"))
+			f.spell.isUpdate = (f.spell.valueMax ~= f.spell.v1 and not UnitIsDead("player"))
 		else
 			f.spell.isUpdate = (f.spell.v1 > 0)
 		end

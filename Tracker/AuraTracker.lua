@@ -21,6 +21,10 @@ do
 	StaggerID[124275] = true
 	StaggerID[124274] = true
 	StaggerID[124273] = true
+
+	function HDH_AURA_TRACKER:GetPowerMax()
+		return 1
+	end
 	
 	function HDH_AURA_TRACKER:GetAuras()
 		local aura, f, spell
@@ -223,7 +227,7 @@ do
 				if display_mode ~= DB.DISPLAY_ICON and f.bar then
 					f.bar:SetText(f.spell.name)
 					if f.spell.duration == 0 and f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
-						self:UpdateBarMinMaxValue(f, 0, 1, 0)
+						self:UpdateBarMinMaxValue(f, nil, nil, 0)
 					else
 						self:UpdateBarMinMaxValue(f)
 					end
@@ -243,7 +247,8 @@ do
 							f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType].r, DebuffTypeColor[f.spell.dispelType].g, DebuffTypeColor[f.spell.dispelType].b, 1)
 						end
 						if f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
-							self:UpdateBarMinMaxValue(f, 0, 1, 1)
+							local minV, maxV = f:GetBarMinMax()
+							self:UpdateBarMinMaxValue(f, nil, nil, maxV)
 						else
 							self:UpdateBarMinMaxValue(f, nil, nil, 0)
 						end
@@ -352,7 +357,7 @@ function HDH_AURA_TRACKER:OnEvent(event, ...)
 			self:UNIT_AURA()
 		end
 	elseif event =="PLAYER_TARGET_CHANGED" then
-		HDH_AT_UTIL.RunTimer(self, "PLAYER_TARGET_CHANGED", 0.02, self.UNIT_AURA, {self}) 
+		HDH_AT_UTIL.RunTimer(self, "PLAYER_TARGET_CHANGED", 0.005, self.UNIT_AURA, {self})
 	elseif event == 'PLAYER_FOCUS_CHANGED' then
 		self:UNIT_AURA()
 	elseif event == 'INSTANCE_ENCOUNTER_ENGAGE_UNIT' then

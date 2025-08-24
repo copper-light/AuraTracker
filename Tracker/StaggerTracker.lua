@@ -41,9 +41,9 @@ local function STAGGER_TRACKER_OnUpdate(self, elapsed)
 	self.spell.curTime = GetTime()
 	if self.spell.curTime - (self.spell.delay or 0) < HDH_TRACKER.BAR_UP_ANI_TERM then return end 
 	self.spell.delay = self.spell.curTime
-	self.spell.healthMax = self:GetParent().parent:GetPowerMax()
+	self.spell.valueMax = self:GetParent().parent:GetPowerMax()
 	self.spell.v1 = self:GetParent().parent:GetPower()
-	self.spell.per = self.spell.v1 / self.spell.healthMax
+	self.spell.per = self.spell.v1 / self.spell.valueMax
 	self.spell.count = math.ceil(self.spell.per * 100)
 	if self.spell.count == math.huge then self.spell.count = 0; end
 	self.counttext:SetText(format("%d%%", math.ceil(self.spell.count or 0))); 
@@ -72,9 +72,9 @@ local function STAGGER_TRACKER_OnUpdate(self, elapsed)
 		end
 	end
 	if self.bar then
-		if self.spell.healthMax ~= self.spell.preHealthMax then
+		if self.spell.valueMax ~= self.spell.preValueMax then
 			self:GetParent().parent:UpdateBarMinMaxValue(self)
-			self.spell.preHealthMax = self.spell.healthMax
+			self.spell.preValueMax = self.spell.valueMax
 		else
 		-- self.bar:SetValue(self.spell.v1, true)
 			self:GetParent().parent:UpdateBarValue(self, nil, true)
@@ -99,7 +99,7 @@ function HDH_STAGGER_TRACKER:CreateData()
 	local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
 	DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 	DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_COUNT, DB.CONDITION_GT_OR_EQ, STAGGER_RED_TRANSITION*100)
-	DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_VALUE_TYPE_VALUE, DB.BAR_MAXVALUE_TYPE_HEALTH, nil, HDH_STAGGER_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_RATIO)
+	DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_VALUE_TYPE_VALUE, DB.BAR_MAXVALUE_TYPE_AUTO, nil, HDH_STAGGER_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_RATIO)
 
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON_AND_BAR)
