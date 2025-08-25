@@ -217,9 +217,8 @@ L.SHORT_TIME = "Time Compression (Minute)"
 L.SHORT_VALUE = "Value Compression (k,m,b)"
 L.STAGGER = "Stagger"
 L.HIDE = "Hide"
-L.DETAIL_CONIFG = "Detail Config"
+L.DETAIL_CONFIG = "Detail Config"
 L.CHANGE_ICON = "Change Icon Texture"
-L.SPLIT_POWER_BAR = "Split Bar"
 L.THIS_IS_ONLY_SPLIT_POWER_BAR = "For the configuration where the tracker type is |cffff0000Basic Power|r"
 L.SEARCH = "Search"
 L.ICON_LIST = "Etc Icon"
@@ -351,3 +350,7 @@ L.INCOMPATIBLE_CLASS = "The entered profile (|cffff0000%s|r) does not match the 
 L.DO_YOU_WANT_IMPORT_MISMATCH_CLASS_PROFILE = "|cffff0000%d profiles|r have been selected, but none match the player's specialization. Would you like to add them using the |cffff0000current specialization traits|r? (Current trackers will not be deleted, but the UI will be reloaded.)"
 L.UNSUPPORT = "Not Supported"
 L.SELECTED_COUNT = "%d Selected"
+
+
+
+L.SPLIT_POWER_BAR = "Split Bar"

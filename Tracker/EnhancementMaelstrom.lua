@@ -47,7 +47,7 @@ do
         end
         local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
 
-		DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_VALUE_TYPE_COUNT, DB.BAR_MAXVALUE_TYPE_AUTO, nil, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_FIXED_VALUE)
+		DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_TYPE_BY_COUNT , DB.BAR_MAX_TYPE_AUTO, nil, HDH_ENH_MAELSTROM_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_FIXED_VALUE)
 		DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_COUNT, DB.CONDITION_GT_OR_EQ, 5)
 		DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 		
@@ -109,7 +109,7 @@ do
 			if f.spell.isUpdate then
 				self:UpdateBarMinMaxValue(f)
 			else
-				if f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
+				if f.spell.barValueType == DB.BAR_TYPE_BY_TIME then
 					self:UpdateBarMinMaxValue(f, 0, 1, 1)
 				else
 					self:UpdateBarMinMaxValue(f, nil, nil, 0)

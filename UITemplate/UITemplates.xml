@@ -1733,7 +1733,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 		<Size x="100" y="30" />
 		<Layers>
 			<Layer level="BORDER">
-				<Texture name="$parentBorder">
+				<Texture name="$parentBorder" hidden="true">
 					<Size x="30" y="30" />
 					<Color r="0.5" g="0.8" b="0.2" />
 					<Anchors>
@@ -1746,14 +1746,15 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 					<Size x="100" y="30" />
 					<Color r="0.5" g="0.8" b="0.2" />
 					<Anchors>
-						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentBorder" x="0" y="0"/>
+						<!-- <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentBorder" x="0" y="0"/> -->
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
 						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
 					</Anchors>
 				</Texture>
 			</Layer>
 			
 			<Layer level="OVERLAY">
-				<Texture name="$parentTexture" file="Interface/ICONS/WoW_Token01" parentKey="Icon">
+				<Texture name="$parentTexture" file="Interface/ICONS/WoW_Token01" parentKey="Icon" hidden="true">
 					<Size x="28" y="28" />
 					<Anchors>
 						<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parentBorder" x="0" y="0"/>
@@ -1782,18 +1783,28 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 		</Layers>
 		<Frames>
 
-			<Button name="$parentButtonDel"  parentKey="ButtonDel" inherits="HDH_AT_ButtonTemplate" text="-">
-				<Size x="26" y="26" />
+			<Button name="$parentButtonDel"  parentKey="ButtonDel" inherits="HDH_AT_ButtonWhiteTemplate" text="-">
+				<Size x="40" y="28" />
 				<Anchors>
 					<Anchor point="RIGHT"  x="0" y="0" />
 				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetText(HDH_AT_L.DELETE)
+					</OnLoad>
+				</Scripts>
 			</Button>
 
 			<Button name="$parentButtonAdd" parentKey="ButtonAdd" inherits="HDH_AT_ButtonTemplate" text="+">
-				<Size x="26" y="26" />
+				<Size x="40" y="28" />
 				<Anchors>
 					<Anchor point="RIGHT" relativeTo="$parentButtonDel" relativePoint="LEFT" x="-5" y="0" />
 				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetText(HDH_AT_L.APPLY)
+					</OnLoad>
+				</Scripts>
 			</Button>
 			
 			<EditBox name="$parentEdit" parentKey="EditBox" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false"  >
@@ -1829,7 +1840,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 			<Button name="$parentBtnSave"  parentKey="BtnSave" inherits="HDH_AT_ButtonTemplate">
 				<Size x="40" y="28" />
 				<Anchors>
-					<Anchor point="RIGHT"  x="0" y="0" />
+					<Anchor point="RIGHT" x="0" y="0" />
 				</Anchors>
 				<Scripts>
 					<OnLoad>
@@ -1845,7 +1856,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						self:SetNumeric(true)
+						<!-- self:SetNumeric(true) -->
 						self.Desc:SetText(HDH_AT_L.PLEASE_INPUT)
 					</OnLoad>
 				</Scripts>

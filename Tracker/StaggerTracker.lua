@@ -99,7 +99,7 @@ function HDH_STAGGER_TRACKER:CreateData()
 	local elemIdx = DB:AddTrackerElement(trackerId, key, id, name, texture, display, isValue, isItem)
 	DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 	DB:UpdateTrackerElementGlow(trackerId, elemIdx, DB.GLOW_CONDITION_COUNT, DB.CONDITION_GT_OR_EQ, STAGGER_RED_TRANSITION*100)
-	DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_VALUE_TYPE_VALUE, DB.BAR_MAXVALUE_TYPE_AUTO, nil, HDH_STAGGER_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_RATIO)
+	DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_TYPE_BY_VALUE, DB.BAR_MAX_TYPE_AUTO, nil, HDH_STAGGER_TRACKER.SPLIT_BAR_VALUES, DB.BAR_SPLIT_RATIO)
 
 	DB:CopyGlobelToTracker(trackerId)
 	DB:SetTrackerValue(trackerId, 'ui.%s.common.display_mode', DB.DISPLAY_ICON_AND_BAR)

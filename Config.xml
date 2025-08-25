@@ -945,7 +945,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 														<FontString parentKey="Title2" name="$parentText2" inherits="Font_Yellow_M" text="특성 습득 시에만 아이콘 표시" justifyH="LEFT">
 															<Size x="400" y="25" />
 															<Anchors>
-																<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-125"/>
+																<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-150"/>
 															</Anchors>
 														</FontString>
 													</Layer>
@@ -991,6 +991,17 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 														</Scripts>
 													</CheckButton>
 
+													<CheckButton name="$parentCBCondition4" inherits="HDH_AT_CheckButton2Template">
+														<Size x="170" y="20" />
+														<Anchors>
+															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition3" x="0" y="-2" />
+														</Anchors>
+														<Scripts>
+															<OnLoad>self:SetText(HDH_AT_L.HIDE)</OnLoad>
+															<OnClick function="HDH_AT_OnCheck" />
+														</Scripts>
+													</CheckButton>
+
 													<Frame name="$parentSwitchHideMode" inherits="HDH_AT_SwitchFrameTemplate">
 														<Size x="200" y="20"/>
 														<Anchors>
@@ -1001,7 +1012,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 													<CheckButton name="$parentCBConditionTrait1" inherits="HDH_AT_CheckButton2Template">
 														<Size x="170" y="20" />
 														<Anchors>
-															<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="15" y="-155" />
+															<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="15" y="-180" />
 															<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 														</Anchors>
 														<Scripts>

@@ -41,12 +41,12 @@ do
 
 			if self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
 				if aura.sourceUnit == 'player' then
-					f = self.frame.pointer[tostring(aura.spellId)] or self.frame.pointer[aura.name]
+					f = self.frame.pointer[aura.spellId] or self.frame.pointer[aura.name]
 				else
 					f = nil
 				end
 			else
-				f = self.frame.pointer[tostring(aura.spellId)] or self.frame.pointer[aura.name]
+				f = self.frame.pointer[aura.spellId] or self.frame.pointer[aura.name]
 			end
 			if f and f.spell then
 				spell = f.spell
@@ -81,19 +81,20 @@ do
 					spell.duration = spell.duration - (HDH_TRACKER.startTime - spell.startTime)
 				end
 
-				spell.index = i -- 툴팁을 위해, 순서
-				spell.isUpdate = true
-
 				spell.countMax = math.max(spell.count or 0, spell.countMax or 0)
 				spell.valueMax = math.max(spell.v1 or 0, spell.valueMax or 0)
 				spell.durationMax = math.max(spell.duration or 0, spell.durationMax or 0)
 
+				spell.index = i -- 툴팁을 위해, 순서
+				spell.isUpdate = true
 				ret = ret + 1
 			end
 		end
-
 		for i = 1, #self.frame.icon do
 			if not self.frame.icon[i].spell.isUpdate then
+				if self.frame.icon[i].spell.duration ~= 0 then
+					self.frame.icon[i].spell.latestDuration = self.frame.icon[i].spell.duration
+				end
 				self.frame.icon[i].spell.duration = 0
 				self.frame.icon[i].spell.count = 0
 				self.frame.icon[i].spell.v1 = 0
@@ -144,12 +145,15 @@ do
 				spell.name = aura.name;
 				spell.dispelType = aura.dispelName
 				spell.remaining = spell.endTime - curTime
-				spell.duration = aura.duration 	
+				spell.duration = aura.duration
 				spell.startTime = aura.expirationTime - aura.duration
 				spell.icon = aura.icon
 				spell.index = i; -- 툴팁을 위해, 순서
 				spell.happenTime = curTime
 				spell.isLearned = true
+				if spell.duration == 0 then
+					spell.latestDuration = 1
+				end
 
 				if HDH_TRACKER.startTime > spell.startTime then
 					spell.startTime = HDH_TRACKER.startTime
@@ -226,8 +230,8 @@ do
 
 				if display_mode ~= DB.DISPLAY_ICON and f.bar then
 					f.bar:SetText(f.spell.name)
-					if f.spell.duration == 0 and f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
-						self:UpdateBarMinMaxValue(f, nil, nil, 0)
+					if f.spell.duration == 0 and f.spell.barValueType == DB.BAR_TYPE_BY_TIME then
+						self:UpdateBarMinMaxValue(f, 0, 1, 0)
 					else
 						self:UpdateBarMinMaxValue(f)
 					end
@@ -246,9 +250,10 @@ do
 						if self.ui.common.default_color and f.spell.dispelType then
 							f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType].r, DebuffTypeColor[f.spell.dispelType].g, DebuffTypeColor[f.spell.dispelType].b, 1)
 						end
-						if f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
-							local minV, maxV = f:GetBarMinMax()
-							self:UpdateBarMinMaxValue(f, nil, nil, maxV)
+						if f.spell.barValueType == DB.BAR_TYPE_BY_TIME then
+							-- self:UpdateBarMinMaxValue(f, 0, f.spell.latestDuration, f.spell.latestDuration)
+							-- self:UpdateBarValue()
+							self:UpdateBarFull(f)
 						else
 							self:UpdateBarMinMaxValue(f, nil, nil, 0)
 						end
@@ -269,8 +274,6 @@ do
 		local trackerId = self.id
 		local id, name, type, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
 		if not id then return 0 end
-
-		local barValueType, barMaxValueType, barMaxValue
 		local f
 		local ret = 0
 
@@ -284,7 +287,7 @@ do
 				f = self:CreateBaseIcon(i)
 				f.spell = {}
 				f.spell.barSplitPoints = {}
-				f.spell.barValueType = DB.BAR_VALUE_TYPE_TIME
+				f.spell.barValueType = DB.BAR_TYPE_BY_TIME
 				f.spell.barMaxValueType = DB.BAR_MAXVALUE_TYPE_TIME
 				f.spell.barMaxValue = nil
 				self:UpdateIconSettings(f)

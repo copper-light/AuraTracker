@@ -149,7 +149,7 @@ do
 				f = self:CreateBaseIcon(i)
 				f.spell = {}
 				f.spell.barSplitPoints = {}
-				f.spell.barValueType = DB.BAR_VALUE_TYPE_TIME
+				f.spell.barValueType = DB.BAR_TYPE_BY_TIME
 				f.spell.barMaxValueType = DB.BAR_MAXVALUE_TYPE_TIME
 				f.spell.barMaxValue = nil
 				self:UpdateIconSettings(f)

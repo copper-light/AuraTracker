@@ -65,13 +65,13 @@ function HDH_DK_RUNE_TRACKER:CreateData()
 	if select(4, GetBuildInfo()) >= 100000 then
 		for i = 1 , MAX_RUNES do
 			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, display, isValue, isItem)
-			DB:SetTrackerElementBarInfo(trackerId, i, DB.BAR_VALUE_TYPE_TIME, DB.BAR_MAXVALUE_TYPE_AUTO, nil, {}, DB.BAR_SPLIT_RATIO)
+			DB:SetTrackerElementBarInfo(trackerId, i, DB.BAR_TYPE_BY_TIME, DB.BAR_MAX_TYPE_AUTO, nil, {}, DB.BAR_SPLIT_RATIO)
 			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 		end 
 	else
 		for i = 1 , MAX_RUNES do
 			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, OLD_DK_COLOR[i].texture, display, isValue, isItem)
-			DB:SetTrackerElementBarInfo(trackerId, i, DB.BAR_VALUE_TYPE_TIME, DB.BAR_MAXVALUE_TYPE_AUTO, nil, {}, DB.BAR_SPLIT_RATIO)
+			DB:SetTrackerElementBarInfo(trackerId, i, DB.BAR_TYPE_BY_TIME, DB.BAR_MAX_TYPE_AUTO, nil, {}, DB.BAR_SPLIT_RATIO)
 			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 		end 
 	end
@@ -166,9 +166,9 @@ function HDH_DK_RUNE_TRACKER:UpdateSpellInfo(runeIndex)
 				spell.remaining = spell.endTime - GetTime()
 				spell.isUpdate = true
 				spell.v1 = 0
-				spell.count = 1
-			else
 				spell.count = 0
+			else
+				spell.count = 1
 				spell.duration = 0
 				spell.startTime = 0
 				spell.endTime = GetTime()
@@ -176,6 +176,10 @@ function HDH_DK_RUNE_TRACKER:UpdateSpellInfo(runeIndex)
 				spell.isUpdate = false
 			end
 			spell.valueMax = MAX_RUNES
+			spell.countMax = 1
+			if spell.duration > 0 then
+				spell.durationMax = math.ceil(spell.duration * 10) / 10
+			end
 		end
 	end
 
@@ -213,8 +217,8 @@ function HDH_DK_RUNE_TRACKER:UpdateIconAndBar(index)
 				end
 			else
 				if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then
-					if f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
-						self:UpdateBarMinMaxValue(f, 0, 1, 1)
+					if f.spell.barValueType == DB.BAR_TYPE_BY_TIME then
+						self:UpdateBarFull(f)
 					else
 						self:UpdateBarMinMaxValue(f)
 					end

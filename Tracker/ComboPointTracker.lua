@@ -67,7 +67,7 @@ function HDH_COMBO_POINT_TRACKER:CreateData()
 					0.25
 				}, 
 				2)
-			DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_VALUE_TYPE_COUNT, DB.BAR_MAXVALUE_TYPE_MANUAL, 1, {}, DB.BAR_SPLIT_RATIO)
+			DB:SetTrackerElementBarInfo(trackerId, elemIdx, DB.BAR_TYPE_BY_COUNT , DB.BAR_MAX_TYPE_MANUAL, 1, {}, DB.BAR_SPLIT_RATIO)
 			DB:SetReadOnlyTrackerElement(trackerId, elemIdx) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 			if elemIdx == 1 then
 				isFirstCreated = true
@@ -245,6 +245,7 @@ function HDH_COMBO_POINT_TRACKER:UpdateSpellInfo(index)
 				iconf.spell.v1 = 0
 				iconf.spell.count = 0
 			end
+			iconf.spell.countMax = 1
 			iconf.spell.valueMax = power_max
 			ret = ret + 1
 		end
@@ -322,6 +323,12 @@ end
 function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 	local ret = HDH_TRACKER.InitIcons(self)
 	if ret > 0 then
+		for i = 1, ret do
+			if self.frame.icon[i] then
+				self.frame.icon[i].spell.countMax = 1
+				self.frame.icon[i].spell.valueMax = self:GetPowerMax()
+			end
+		end
 		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE', "player")
 		self.frame:RegisterUnitEvent('UNIT_MAXPOWER', "player")
 		self:Update()

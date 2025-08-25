@@ -361,6 +361,16 @@ function HDH_C_TRACKER:UpdateSpellInfo(index)
 					spell.endTime = startTime + duration
 					spell.duration = duration
 					spell.remaining = remaining
+
+					if spell.duration > 0 then
+						spell.latestDuration = spell.duration
+					end
+					spell.countMax = math.max(spell.count or 0, spell.countMax or 0)
+					spell.valueMax = math.max(spell.v1 or 0, spell.valueMax or 0)
+					spell.durationMax = math.max(spell.duration or 0, spell.durationMax or 0)
+					if spell.durationMax > 0 then
+						spell.durationMax = math.ceil(spell.durationMax * 10) / 10
+					end
 				end
 			end
 
@@ -463,10 +473,11 @@ function HDH_C_TRACKER:UpdateIconAndBar(index) -- HDH_TRACKER override
 			if spell.remaining > HDH_C_TRACKER.EndCooldown and not spell.isGlobalCooldown then
 				self:UpdateBarMinMaxValue(f)
 			else
-				if f.spell.barValueType == DB.BAR_VALUE_TYPE_TIME then
+				if f.spell.barValueType == DB.BAR_TYPE_BY_TIME then
 					local minV, maxV = f:GetBarMinMax()
-					self:UpdateBarMinMaxValue(f, nil, nil, maxV)
-					-- self:UpdateBarMinMaxValue(f, 0, 1, 1)
+					-- self:UpdateBarMinMaxValue(f, nil, nil, maxV)
+					self:UpdateBarFull(f)
+					-- self:UpdateBarMinMaxValue(f, 0, f.spell.latestDuration, f.spell.latestDuration)
 				else
 					self:UpdateBarMinMaxValue(f)
 				end
