@@ -105,12 +105,13 @@ function HDH_C_TRACKER:GetCooldownInfo(id, name, isItem, isToy)
 	end
 	
 	if startTime ~= nil and startTime ~= 0 and (HDH_TRACKER.startTime > startTime) then
-		startTime = HDH_TRACKER.startTime
 		duration = duration - (HDH_TRACKER.startTime - startTime)
+		startTime = HDH_TRACKER.startTime
 	end
+
 	if chargeStartTime ~= nil and chargeStartTime~=0 and (HDH_TRACKER.startTime > chargeStartTime) then
-		chargeStartTime = HDH_TRACKER.startTime
 		chargeDuration = chargeDuration - (HDH_TRACKER.startTime - chargeStartTime)
+		chargeStartTime = HDH_TRACKER.startTime
 	end
 
 	return startTime or 0, 
@@ -395,6 +396,10 @@ function HDH_C_TRACKER:UpdateSpellInfo(index)
 			spell.inRange = not use_out_range_color and true or inRange
 			spell.isNotEnoughMana = use_not_enough_mana_color and isNotEnoughMana or false
 
+			if spell.charges.remaining > 0 and spell.isGlobalCooldown then
+				spell.remaining = 0
+			end
+
 			if (not spell.isGlobalCooldown) and (spell.remaining > HDH_C_TRACKER.EndCooldown) then
 				spell.isUpdate = true
 			else
@@ -417,15 +422,20 @@ function HDH_C_TRACKER:UpdateIconAndBar(index) -- HDH_TRACKER override
 		f = self.frame.icon[i]
 		spell = f.spell
 
+		-- 쿨다운 중인 스킬의 발동으로 쿨이 사라지면 쿨다운, 차징 멈춤 
+		if spell.charges.remaining == 0  then
+			f.icon:StopCharge()
+		end
+
+		if spell.remaining == 0 then
+			f.icon:Stop()
+		end
+
 		-- 쿨다운 상태 업데이트
-		if (spell.remaining > HDH_C_TRACKER.EndCooldown and not spell.isGlobalCooldown ) then
+		if (spell.remaining > HDH_C_TRACKER.EndCooldown and not spell.isGlobalCooldown) then
 			f.icon:UpdateCooldowning()
 		else -- 스킬 쿨 아닌 상태
 			f.icon:UpdateCooldowning(false)
-			-- 글쿨, 차지 상태 업데이트
-			if spell.isCharging and spell.isGlobalCooldown then
-				f.icon:ShowOnlyEdgeSpark()
-			end
 		end
 
 		-- 색상 상태 업데이트
@@ -451,15 +461,6 @@ function HDH_C_TRACKER:UpdateIconAndBar(index) -- HDH_TRACKER override
 			f.icon:SetCooldown(spell.startTime, spell.duration)
 		end
 
-		-- 쿨다운 중인 스킬의 발동으로 쿨이 사라지면 쿨다운, 차징 멈춤 
-		if spell.charges.remaining == 0  then
-			f.icon:StopCharge()
-		end
-
-		if spell.remaining == 0 then
-			f.icon:Stop()
-		end
-
 		if (spell.charges.max and (spell.charges.max >= 2)) then
 			f.counttext:SetText(spell.charges.count)
 		elseif spell.stackable or spell.count > 0 then
@@ -474,10 +475,7 @@ function HDH_C_TRACKER:UpdateIconAndBar(index) -- HDH_TRACKER override
 				self:UpdateBarMinMaxValue(f)
 			else
 				if f.spell.barValueType == DB.BAR_TYPE_BY_TIME then
-					local minV, maxV = f:GetBarMinMax()
-					-- self:UpdateBarMinMaxValue(f, nil, nil, maxV)
 					self:UpdateBarFull(f)
-					-- self:UpdateBarMinMaxValue(f, 0, f.spell.latestDuration, f.spell.latestDuration)
 				else
 					self:UpdateBarMinMaxValue(f)
 				end

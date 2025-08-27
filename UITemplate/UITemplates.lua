@@ -849,6 +849,36 @@ function HDH_AT_DialogFrameTemplateMixin:OnShow()
     end
 end
 
+------------------------------------
+--- HDH_AT_SplitPointerTemplateMixin
+------------------------------------
+HDH_AT_SplitPointerTemplateMixin = {}
+
+function HDH_AT_SplitPointerTemplateMixin:SetText(text)
+    self.TopValue:SetText(text)
+    self.BottomValue:SetText(text)
+end
+
+function HDH_AT_SplitPointerTemplateMixin:SetFontObject(object)
+    self.TopValue:SetFontObject(object)
+    self.BottomValue:SetFontObject(object)
+end
+
+function HDH_AT_SplitPointerTemplateMixin:SetTop(bool)
+    if bool then
+        self.BottomValue:Hide()
+        self.BottomAnchor:Hide()
+        self.TopValue:Show()
+        self.TopAnchor:Show()
+    else
+        self.BottomValue:Show()
+        self.BottomAnchor:Show()
+        self.TopValue:Hide()
+        self.TopAnchor:Hide()
+    end
+end
+
+
 -----------------------------------
 -- HDH_AT_SplitBarTemplateMixin
 -----------------------------------
@@ -916,39 +946,24 @@ function HDH_AT_SplitBarTemplateMixin:SetMinMaxValues(minValue, maxValue, isRati
         self.minPointer = CreateFrame("Frame", self:GetName().."splitMin", self, "HDH_AT_SplitPointerTemplate")
         self.minPointer:SetPoint("TOP", self.Bar, "TOPLEFT", 0, 0)
         self.minPointer.Line:Hide()
-        self.minPointer.TopValue:Hide()
-        self.minPointer.TopAnchor:Hide()
-        self.minPointer.TopValue:SetFontObject('Font_Yellow_S')
-        self.minPointer.BottomValue:SetFontObject('Font_Yellow_S')
+        self.minPointer:SetFontObject('Font_Yellow_S')
+        self.minPointer:SetTop(true)
     end
-    self.minPointer.BottomValue:SetText(minValue)
+    self.minPointer:SetText(self.isRatio and (minValue .. '%') or minValue)
 
     if not self.maxPointer then
         self.maxPointer = CreateFrame("Frame", self:GetName().."splitMin", self, "HDH_AT_SplitPointerTemplate")
         self.maxPointer:SetPoint("TOP", self.Bar, "TOPRIGHT", 0, 0)
         self.maxPointer.Line:Hide()
-        self.maxPointer.TopValue:Hide()
-        self.maxPointer.TopAnchor:Hide()
-        self.maxPointer.TopValue:SetFontObject('Font_Yellow_S')
-        self.maxPointer.BottomValue:SetFontObject('Font_Yellow_S')
+        self.maxPointer:SetFontObject('Font_Yellow_S')
+        self.maxPointer:SetTop(true)
     end
     local value = self.isRatio and (maxValue .. '%') or UTIL.CommaValue(maxValue)
-    self.maxPointer.TopValue:SetText(value)
-    self.maxPointer.BottomValue:SetText(value)
+    self.maxPointer:SetText(value)
     self.minValue = minValue
     self.maxValue = maxValue
 
-    if self:GetSize() ~= 0 and self:GetSize() % 2 == 0 then
-        self.maxPointer.BottomAnchor:Hide()
-        self.maxPointer.BottomValue:Hide()
-        self.maxPointer.TopValue:Show()
-        self.maxPointer.TopAnchor:Show()
-    else
-        self.maxPointer.BottomAnchor:Show()
-        self.maxPointer.BottomValue:Show()
-        self.maxPointer.TopValue:Hide()
-        self.maxPointer.TopAnchor:Hide()
-    end
+    self.maxPointer:SetTop(self:GetSize() == 0 or self:GetSize() % 2 == 1)
 end
 
 function HDH_AT_SplitBarTemplateMixin:GetMinMaxValues()
@@ -970,17 +985,7 @@ function HDH_AT_SplitBarTemplateMixin:HidePointer(index)
         end
     end
     
-    if self:GetSize() ~= 0 and self:GetSize() % 2 == 0 then
-        self.maxPointer.BottomAnchor:Hide()
-        self.maxPointer.BottomValue:Hide()
-        self.maxPointer.TopValue:Show()
-        self.maxPointer.TopAnchor:Show()
-    else
-        self.maxPointer.BottomAnchor:Show()
-        self.maxPointer.BottomValue:Show()
-        self.maxPointer.TopValue:Hide()
-        self.maxPointer.TopAnchor:Hide()
-    end
+    self.maxPointer:SetTop(self:GetSize() == 0 or self:GetSize() % 2 == 1)
 end
 
 function HDH_AT_SplitBarTemplateMixin:AddPointer(index, value)
@@ -997,29 +1002,10 @@ function HDH_AT_SplitBarTemplateMixin:AddPointer(index, value)
     split:Show()
 
     local text = self.isRatio and (split.value .. '%') or UTIL.CommaValue(split.value)
-    if index % 2 == 0 then
-        split.BottomValue:SetText(text)
-        split.BottomAnchor:Show()
-        split.TopValue:Hide()
-        split.TopAnchor:Hide()
-    else
-        split.TopValue:SetText(text)
-        split.TopAnchor:Show()
-        split.BottomAnchor:Hide()
-        split.BottomValue:Hide()
-    end
+    split:SetText(text)
+    split:SetTop(index % 2 == 0)
 
-    if self:GetSize() ~= 0 and self:GetSize() % 2 == 0 then
-        self.maxPointer.BottomAnchor:Hide()
-        self.maxPointer.BottomValue:Hide()
-        self.maxPointer.TopValue:Show()
-        self.maxPointer.TopAnchor:Show()
-    else
-        self.maxPointer.BottomAnchor:Show()
-        self.maxPointer.BottomValue:Show()
-        self.maxPointer.TopValue:Hide()
-        self.maxPointer.TopAnchor:Hide()
-    end
+    self.maxPointer:SetTop(self:GetSize() == 0 or self:GetSize() % 2 == 1)
     return true
 end
 

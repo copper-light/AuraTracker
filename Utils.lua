@@ -248,6 +248,41 @@ do
 		return nil
 	end
 
+	-- local WeaponIndex = {
+	-- 	[1] = 16,	--Main hand
+	-- 	[2] = 17,	--Off-hand
+	-- 	[3] = 18,	--Ranged
+	-- }
+	-- function HDH_AT_UTIL.GetWeaponEnchantInfo()
+	-- 	if not HDH_AT_UTIL.TmpGameToolTip then
+	-- 		HDH_AT_UTIL.TmpGameToolTip =  CreateFrame("GameTooltip", "MyScanningTooltip", nil, "GameTooltipTemplate")
+	-- 		HDH_AT_UTIL.TmpGameToolTip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	-- 	end
+
+	-- 	-- 사용 예시
+	-- 	-- local link = GetInventoryItemLink("player", 16)
+
+	-- 	HDH_AT_UTIL.TmpGameToolTip:SetInventoryItem("player", 16)
+
+	-- 	for i = HDH_AT_UTIL.TmpGameToolTip:NumLines(), 1, -1 do
+	-- 		local text = _G[HDH_AT_UTIL.TmpGameToolTip:GetName() .. "TextLeft" .. i]
+	-- 		if string.find(text:GetText(), "질풍의 무기") then
+	-- 			print(string.find(text:GetText(), "질풍의 무기"))
+	-- 		else
+	-- 			print("none")
+	-- 		end
+	-- 	end
+
+
+	-- 	-- HDH_AT_UTIL.TmpGameToolTip:SetSpellBookItem(33757)
+	-- 	-- for i = HDH_AT_UTIL.TmpGameToolTip:NumLines(), 1, -1 do
+	-- 	-- 	local text = _G[HDH_AT_UTIL.TmpGameToolTip:GetName() .. "TextLeft" .. i]
+	-- 	-- 	print(text:GetText())
+	-- 	-- 	text = _G[HDH_AT_UTIL.TmpGameToolTip:GetName() .. "TextRight" .. i]
+	-- 	-- 	print(text:GetText())
+	-- 	-- end
+	-- end
+
 	function HDH_AT_UTIL.Trim(str)
 		if not str then return nil end
 		if type(str) ~= "string" then
@@ -307,8 +342,7 @@ do
 		end
 		return dstData;
 	end
-	
-		
+
 	function HDH_AT_UTIL.CommaValue(amount)
 		if amount == nil then return nil end
 		local formatted = amount
@@ -320,7 +354,7 @@ do
 		end
 		return formatted
 	end
-	
+
 	function HDH_AT_UTIL.AbbreviateValue(amount, isShort, lengType)
 		lengType = lengType or HDH_TRACKER.LOCALE;
 		if amount == nil then return nil end
@@ -362,8 +396,6 @@ do
 			end
 		end
 	end
-
-	
 
 	function HDH_AT_UTIL.AbbreviateTime(time, isShort, lengType)
 		local lengType = lengType or HDH_TRACKER.LOCALE;

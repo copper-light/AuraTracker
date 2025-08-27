@@ -163,7 +163,7 @@ function HDH_AT_MultiStatusBarTemplateMixin:Setup(minMaxValues, points, pointTyp
         end
     })
     if not self.Text then
-        self.Text = self:CreateFontString(GetTime(), "ARTWORK")
+        self.Text = self:CreateFontString(GetTime(), "ARTWORK", "GameFontNormal")
         self.Text:SetTextColor(0,1,0,0.1)
     end
    
@@ -239,8 +239,8 @@ function HDH_AT_MultiStatusBarTemplateMixin:SetTextLocation(location, margin_lef
     self.Text:SetPoint('BOTTOMRIGHT', self, 'BOTTOMRIGHT', -margin_right, 3)
 end
 
-function HDH_AT_MultiStatusBarTemplateMixin:SetTextSize(size, fonStyle)
-    self.Text:SetFont(fonStyle or "fonts/2002.ttf", size, "OUTLINE")
+function HDH_AT_MultiStatusBarTemplateMixin:SetTextSize(size)
+    self.Text:SetFont(HDH_TRACKER.FONT_STYLE, size, "OUTLINE")
 end
 
 function HDH_AT_MultiStatusBarTemplateMixin:SetTextColor(normalTextColor, fullTextColor)
@@ -373,7 +373,7 @@ end
 
 function HDH_AT_MultiStatusBarTemplateMixin:SetInnerValue(value)
     if not value then return end
-    self.innerValue = math.floor(value)
+    self.innerValue = math.floor(value + 0.001)
     if self.targetValue then
         if self.targetValue == self.innerValue then
             self.gap  = nil
@@ -427,7 +427,7 @@ function HDH_AT_MultiStatusBarTemplateMixin:SetMinMaxValues(minValue, maxValue, 
     self.minValue = minValue
     self.maxValue = maxValue
     self.range = maxValue - minValue
-    self.innerPoints = self:UpdateSplitPoints(self.points, self.pointType, self.range, self.pointReverse )
+    self.innerPoints = self:UpdateSplitPoints(self.points, self.pointType, self.range, self.pointReverse)
     self:UpdateLayout()
     self:SetInnerValue(self.innerValue)
     return true
@@ -443,13 +443,13 @@ function HDH_AT_MultiStatusBarTemplateMixin:UpdateSplitPoints(points, pointType,
         if pointType == DB.BAR_SPLIT_RATIO then
             for i, v in ipairs(points) do
                 if v < 100 then
-                    table.insert(innerPoints, 1, math.floor((1 - (v / 100)) * self.BAR_INNER_MAX))
+                    table.insert(innerPoints, 1, math.floor(((1 - (v / 100)) * self.BAR_INNER_MAX) + 0.001))
                 end
             end
         else
             for _, v in ipairs(points) do
                 if v < range then
-                    table.insert(innerPoints, 1, math.floor((1 - (v / range)) * self.BAR_INNER_MAX))
+                    table.insert(innerPoints, 1, math.floor(((1 - (v / range)) * self.BAR_INNER_MAX) + 0.001))
                 end
             end
         end        
@@ -457,13 +457,13 @@ function HDH_AT_MultiStatusBarTemplateMixin:UpdateSplitPoints(points, pointType,
         if pointType == DB.BAR_SPLIT_RATIO then
             for i, v in ipairs(points) do
                 if v < 100 then
-                    table.insert(innerPoints, math.floor(v / 100 * self.BAR_INNER_MAX))
+                    table.insert(innerPoints, math.floor((v / 100 * self.BAR_INNER_MAX) + 0.001))
                 end
             end
         else
             for _, v in ipairs(points) do
                 if v < range then
-                    table.insert(innerPoints,  math.floor(v / range * self.BAR_INNER_MAX))
+                    table.insert(innerPoints,  math.floor((v / range * self.BAR_INNER_MAX) + 0.001))
                 end
             end
         end

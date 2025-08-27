@@ -103,11 +103,31 @@ do
             if id then addLine(self, id) end
         end)
     else
+        TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.PetAction, OnTooltipSetId)
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.UnitAura, OnTooltipSetId)
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Spell, OnTooltipSetId)
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, OnTooltipSetId)
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Toy, OnTooltipSetId)
         TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Talent, OnTooltipSetId)
+
+        hooksecurefunc(GameTooltip, "SetSpellBookItem", function(self,...)
+            if not HDH_AT_DB.show_tooltip_id then return end
+            local idx, t = ...
+            local info = UTIL.GetSpellBookItemInfo(idx, t)
+            if info then
+                local id = info.spellID
+                if t == "pet" then
+                    id = bit.band(0xFFFFFF, id)
+                end
+                if id then addLine(self, id) end
+            end
+        end)
+
+        hooksecurefunc(GameTooltip, "SetPetAction", function(self, ...)
+            local _, _, _, _, _, _, spellID = GetPetActionInfo(...)
+            if not HDH_AT_DB.show_tooltip_id then return end
+            if spellID then addLine(self, spellID) end
+        end)
     end
     
 end

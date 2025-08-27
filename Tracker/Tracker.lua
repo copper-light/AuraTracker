@@ -20,7 +20,7 @@ HDH_TRACKER.ENABLE_MOVE = false
 HDH_TRACKER.ONUPDATE_FRAME_TERM = 0.1;
 HDH_TRACKER.ANI_SHOW = 1
 HDH_TRACKER.ANI_HIDE = 2
-HDH_TRACKER.FONT_STYLE = "fonts/2002.ttf";
+HDH_TRACKER.FONT_STYLE = STANDARD_TEXT_FONT or "fonts/2002.ttf";
 HDH_TRACKER.MAX_ICONS_COUNT = 10
 HDH_TRACKER.BAR_UP_ANI_TERM = .15 -- second
 HDH_TRACKER.BAR_DOWN_ANI_TERM = .15
@@ -39,12 +39,8 @@ local function UpdateCooldown(f, elapsed)
 	local tracker = f:GetParent().parent;
 	if not spell or not tracker then return end
 	
-	-- f.elapsed = (f.elapsed or 0) + elapsed;
-	-- if f.elapsed < HDH_TRACKER.ONUPDATE_FRAME_TERM then  return end  -- 30프레임
-	-- f.elapsed = 0
-
 	f.skip = (f.skip or 0) + 1
-	if f.skip % 3 ~= 0 and elapsed < 0.03 then return end
+	if f.skip % 2 ~= 0 and elapsed < 0.03 then return end
 	f.skip = 0
 
 	spell.curTime = GetTime();
@@ -59,18 +55,18 @@ local function UpdateCooldown(f, elapsed)
 		spell.charges.remaining = math.max((spell.charges.endTime or 0) - spell.curTime, 0)
 		spell.time = spell.charges.remaining or 0 
 	end
-	
+
 	if spell.time > 0.0 then
 		tracker:UpdateTimeText(f.timetext, spell.time)
-
-		if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar and f.GetBarValue then
-			tracker:UpdateBarValue(f)
-		end
 		if f.spell.glow == DB.GLOW_CONDITION_TIME then
 			tracker:UpdateGlow(f, true)
 		end
 	else
 		f.timetext:SetText("")
+	end
+
+	if tracker.ui.common.display_mode ~= DB.DISPLAY_ICON and f.bar and f.GetBarValue and spell.duration > HDH_TRACKER.GlobalCooldown and spell.remaining > 0 then
+		tracker:UpdateBarValue(f)
 	end
 end
 
@@ -505,7 +501,7 @@ function HDH_TRACKER:UpdateBarSettings(f)
 		bar:EnableSpark(op.show_spark, op.spark_color or {1, 1, 1, 0.7})
 		bar:SetSize(op.width, op.height)
 		bar:SetTextLocation(font.name_location, font.name_margin_left, font.name_margin_right)
-		bar:SetTextSize(font.name_size, HDH_TRACKER.FONT_STYLE)
+		bar:SetTextSize(font.name_size)
 		bar:SetTextColor(font.name_color, font.name_color_off)
 
 		bar:ClearAllPoints();
@@ -528,7 +524,6 @@ function HDH_TRACKER:UpdateBarSettings(f)
 			bar:SetMouseClickEnabled(false)
 		end
 
-		self:SetupBarValue(f)
 		f.bar:Show()
 	else
 		if f.bar then
@@ -537,6 +532,7 @@ function HDH_TRACKER:UpdateBarSettings(f)
 			f.bar = nil
 		end
 	end
+	self:SetupBarValue(f)
 end
 
 function HDH_TRACKER:UpdateTimeText(text, value)
@@ -549,14 +545,6 @@ function HDH_TRACKER:UpdateTimeText(text, value)
 		text:SetText(UTIL.AbbreviateTime(value, self.ui.font.cd_abbreviate or false))
 	end
 end
-
--- function HDH_TRACKER:GetBarMinMax(f)
--- 	return f.spell.startTime, f.spell.endTime
--- end
-
--- function HDH_TRACKER:GetBarValue(f)
--- 	return GetTime()
--- end
 
 function HDH_TRACKER:UpdateBarValue(f, value, animate)
 	if value == nil then
@@ -1430,7 +1418,7 @@ end
 -------------------------------------------
 
 
-if select(4, GetBuildInfo()) <= 49999 then -- 대격변 코드
+if select(4, GetBuildInfo()) <= 49999 then -- 판다리아 코드
 
 	function HDH_TRACKER:ActionButton_SetupOverlayGlow(f)
 		f.icon.overlay = ActionButton_GetOverlayGlow();
@@ -1818,7 +1806,12 @@ function HDH_TRACKER:SetupBarValue(f)
 	if barMaxValueType == DB.BAR_MAX_TYPE_MANUAL then
 		if barValueType == DB.BAR_TYPE_BY_TIME then
 			f.GetBarMinMax = function(f)
-				return (f.spell.endTime or 0) - (f.spell.barMaxValue or 0), f.spell.endTime or 0
+				if f.spell.endTime and f.spell.endTime > 0 then
+					return (f.spell.endTime) - f.spell.barMaxValue, f.spell.endTime
+				else
+					return 0, f.spell.barMaxValue
+				end
+				
 			end
 		else
 			f.GetBarMinMax = function(f)
@@ -1828,7 +1821,12 @@ function HDH_TRACKER:SetupBarValue(f)
 	else
 		if barValueType == DB.BAR_TYPE_BY_TIME then
 			f.GetBarMinMax = function(f)
-				return f.spell.startTime or 0, f.spell.endTime or 0
+				if f.spell.startTime and f.spell.endTime and f.spell.startTime > 0 and f.spell.endTime > 0 then
+					return f.spell.startTime or 0, f.spell.endTime or 0
+				else
+					return 0, f.spell.durationMax or 0
+				end
+				
 			end
 		elseif barValueType == DB.BAR_TYPE_BY_COUNT  then
 			f.GetBarMinMax = function(f)
@@ -1840,9 +1838,11 @@ function HDH_TRACKER:SetupBarValue(f)
 			end
 		end
 	end
-
-	f.bar:SetSplitPoints(f.spell.barSplitPoints, f.spell.barSplitPointType, barValueType == DB.BAR_TYPE_BY_TIME)
-	self:UpdateBarMinMaxValue(f)
+	if f.bar then
+		f.bar:SetSplitPoints(f.spell.barSplitPoints, f.spell.barSplitPointType, barValueType == DB.BAR_TYPE_BY_TIME)
+		self:UpdateBarMinMaxValue(f)
+	end
+	
 end
 
 function HDH_TRACKER:InitIcons()
@@ -1918,11 +1918,13 @@ function HDH_TRACKER:InitIcons()
 			spell.name = elemName
 			spell.icon = texture
 			spell.id = tonumber(elemId)
+			spell.base_id = spell.id --cooldown 에서 발동으로 인한 주문 변경시, id 가 변경되기때문에 기존 아이디는 가지고 있음
 			spell.count = 0
 			spell.v1 = 0 -- 수치를 저장할 변수
 			spell.duration = 0
 			spell.remaining = 0
 			spell.overlay = 0
+			spell.startTime = 0
 			spell.endTime = 0
 			spell.isUpdate = false
 			spell.defaultImg = defaultImg
@@ -1946,7 +1948,7 @@ function HDH_TRACKER:InitIcons()
 			spell.barSplitPointType = splitPointType or DB.BAR_SPLIT_RATIO
 			spell.barValueType = barValueType
 			spell.barMaxValueType = barMaxValueType
-			spell.barMaxValue = barMaxValue and tonumber(barMaxValue)
+			spell.barMaxValue = barMaxValue and tonumber(barMaxValue) or 0
 
 			if innerSpellId then
 				spell.isInnerCDItem = true

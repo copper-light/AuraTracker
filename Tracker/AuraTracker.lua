@@ -77,8 +77,8 @@ do
 				spell.startTime = aura.expirationTime - aura.duration
 
 				if HDH_TRACKER.startTime > spell.startTime then
-					spell.startTime = HDH_TRACKER.startTime
 					spell.duration = spell.duration - (HDH_TRACKER.startTime - spell.startTime)
+					spell.startTime = HDH_TRACKER.startTime
 				end
 
 				spell.countMax = math.max(spell.count or 0, spell.countMax or 0)
@@ -322,6 +322,7 @@ do
 			elseif string.find(self.unit, 'arena') then
 				self.frame:RegisterEvent('ARENA_OPPONENT_UPDATE')
 			end
+			-- self.frame:RegisterUnitEvent('WEAPON_ENCHANT_CHANGED')
 		else
 			return 0
 		end

@@ -1684,7 +1684,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 		</Scripts>
 	</Button>
 
-	<Frame name="HDH_AT_SplitPointerTemplate" virtual="true" >
+	<Frame name="HDH_AT_SplitPointerTemplate" mixin="HDH_AT_SplitPointerTemplateMixin" virtual="true" >
 		<Size x="31" y="60" />
 		<Layers>
 			<Layer level="ARTWORK">
@@ -1784,7 +1784,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 		<Frames>
 
 			<Button name="$parentButtonDel"  parentKey="ButtonDel" inherits="HDH_AT_ButtonWhiteTemplate" text="-">
-				<Size x="40" y="28" />
+				<Size x="50" y="28" />
 				<Anchors>
 					<Anchor point="RIGHT"  x="0" y="0" />
 				</Anchors>
@@ -1796,7 +1796,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 			</Button>
 
 			<Button name="$parentButtonAdd" parentKey="ButtonAdd" inherits="HDH_AT_ButtonTemplate" text="+">
-				<Size x="40" y="28" />
+				<Size x="50" y="28" />
 				<Anchors>
 					<Anchor point="RIGHT" relativeTo="$parentButtonDel" relativePoint="LEFT" x="-5" y="0" />
 				</Anchors>
@@ -1838,7 +1838,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 		</Layers>
 		<Frames>
 			<Button name="$parentBtnSave"  parentKey="BtnSave" inherits="HDH_AT_ButtonTemplate">
-				<Size x="40" y="28" />
+				<Size x="50" y="28" />
 				<Anchors>
 					<Anchor point="RIGHT" x="0" y="0" />
 				</Anchors>
