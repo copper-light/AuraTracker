@@ -26,76 +26,68 @@ do -- HDH_HEALTH_TRACKER class
 
 	HDH_HEALTH_TRACKER.POWER_INFO = POWER_INFO;
 
-	b = true
-	a = 0
-	function HDH_HEALTH_TRACKER:UpdateBarValue(f, elapsed, non_animate)
-		super.UpdateBarValue(self, f, elapsed, non_animate)
-		
+	local function OnUpdateAbsorbBarValue(f, elapsed)
 		if f.bar and f.bar.absorb_f and elapsed then
-			if a % 1 == 0 then
-				b = not b
+			if (f.absorbsGlowPoint or 0) % 1 == 0 then
+				f.incrValue = not f.incrValue
 			end
-			if b then
-				a = max(a - elapsed*2, 0)
+			if f.incrValue then
+				f.absorbsGlowPoint = math.max((f.absorbsGlowPoint or 0) - elapsed * 2, 0)
 			else
-				a = min(a + elapsed*2, 1)
+				f.absorbsGlowPoint = math.min((f.absorbsGlowPoint or 0) + elapsed * 2, 1)
 			end
-			f.bar.absorb_f.texture:SetVertexColor(1,1,1, 0.6 * a +0.4);
+			f.bar.absorb_f.texture:SetVertexColor(1, 1, 1, f.absorbsGlowPoint * 0.4 + 0.6);
 		end
 
-		absorbs_value = UnitGetTotalAbsorbs('player') or 0;
-		if f.absorbs_value ~= absorbs_value or absorbs_value > 0 then
-			self:UpdateAbsorb(f, absorbs_value)
-			f.absorbs_value = absorbs_value
+		f.absorbs_value = f:GetParent().parent:GetAbsorbs()
+		if f.absorbs_value ~= f.prev_absorbs_value or f.absorbs_value > 0 then
+			f:GetParent().parent:UpdateAbsorb(f, f.absorbs_value)
+			f.prev_absorbs_value = f.absorbs_value
 		end
 	end
-			
-	-- function HDH_HEALTH_TRACKER:CreateData(spec)
-		
-	-- end
 	
 	function HDH_HEALTH_TRACKER:GetPower()
-		return UnitHealth("player") or 0;
+		return UnitHealth(self.unit) or 0;
 	end
 
 	function HDH_HEALTH_TRACKER:GetPowerMax()
-		return UnitHealthMax("player");
+		return UnitHealthMax(self.unit);
 	end
 
+	function HDH_HEALTH_TRACKER:GetAbsorbs()
+		return UnitGetTotalAbsorbs(self.unit) or 0 
+	end
 
-	function HDH_HEALTH_TRACKER:UpdateArtBar(f) 
-		super.UpdateArtBar(self, f)
+	function HDH_HEALTH_TRACKER:UpdateBarSettings(f)
+		super.UpdateBarSettings(self, f)
 
 		if f.bar and not f.bar.absorb_f then
-			local healthBar = f.bar.bar[1]
-			local absorb_f = CreateFrame("StatusBar", nil, healthBar);
+			local healthBar = f.bar
+			local absorb_f = CreateFrame("Frame", nil, healthBar);
+			-- absorb_f:SetFrameLevel(10)
 			local absorb = absorb_f:CreateTexture(nil, "OVERLAY"); 
 			absorb:SetTexture([[Interface\RaidFrame\Shield-Fill.blp]]);
 			-- absorb:SetTexture("Interface/AddOns/HDH_AuraTracker/Texture/normTex");
-			absorb:SetVertexColor(1,1,1, 0.4);
+			absorb:SetVertexColor(1, 1, 1, 0.4);
 			absorb:SetPoint("TOPLEFT", absorb_f, "TOPLEFT", 0, 0);
 			absorb:SetPoint("BOTTOMRIGHT", absorb_f, "BOTTOMRIGHT", 0, 0);
-			absorb:SetBlendMode("ADD");
+			absorb:SetBlendMode("ADD")
 
-			local overlay = absorb_f:CreateTexture(nil, "OVERLAY",nil, 7); 
-			overlay:SetTexture("Interface/RaidFrame/Shield-Overlay",true,true);
+			local overlay = absorb_f:CreateTexture(nil, "OVERLAY", nil, 7); 
+			overlay:SetTexture("Interface/RaidFrame/Shield-Overlay", true, true);
 			overlay:SetVertTile(true) 
 			overlay:SetHorizTile(true)
 			overlay:SetPoint("TOPLEFT", absorb_f, "TOPLEFT", 1, -1);
 			overlay:SetPoint("BOTTOMRIGHT", absorb_f, "BOTTOMRIGHT", -1, 1);
-			overlay:SetAlpha(1);
+			overlay:SetAlpha(1)
+			overlay:SetVertexColor(1,1,1)
 
 			f.bar.absorb_f = absorb_f
 			f.bar.absorb_f.texture = absorb
 		end
-		
+	end
 
-	end
-	
-	function HDH_HEALTH_TRACKER:ChangeCooldownType(f, cooldown_type) -- 호출되지 말라고 빈함수
-	end
-	
-	local s2 = sqrt(2);
+	local s2 = math.sqrt(2);
 	local cos, sin, rad = math.cos, math.sin, math.rad;
 	local function CalculateCorner(angle)
 		local r = rad(angle);
@@ -111,14 +103,15 @@ do -- HDH_HEALTH_TRACKER class
         texture:SetTexCoord(ULx, ULy, LLx, LLy, URx, URy, LRx, LRy);
 	end
 	
+	-- 자동으로 붙는 형식으로 하자
 	function HDH_HEALTH_TRACKER:UpdateAbsorb(f, value)
 		if f.bar == nil then return end
-		local healthBar = f.bar.bar[1];
+		local healthBar = f.bar
 		local absorb_f = f.bar.absorb_f;
 		local h_max = self:GetPowerMax()
 		local h_value = healthBar:GetValue()
 		local ui = DB:GetTrackerUI(self.id)
-		-- print((totalAbsorb/health_max) * self.bar:GetWidth())
+		value = math.min(value, h_max)
 		if absorb_f then
 			if value == 0 then 
 				if absorb_f:IsShown() then absorb_f:Hide() end
@@ -146,43 +139,54 @@ do -- HDH_HEALTH_TRACKER class
 						absorb_f:SetPoint("TOP", healthBar, "TOP", 0, -healthBar:GetHeight() * (h_value/h_max));
 					end
 				end
-				if healthBar:GetOrientation() == "HORIZONTAL" then
+				if ui.bar.cooldown_progress == DB.COOLDOWN_LEFT or ui.bar.cooldown_progress == DB.COOLDOWN_RIGHT then
 					if absorb_f.texture.rotate ~= 0 then
-						RotateTexture(absorb_f.texture,0);
+						RotateTexture(absorb_f.texture, 0);
 						absorb_f.texture.rotate = 0
 					end
-					absorb_f:SetSize(min((value/h_max), 1) * healthBar:GetWidth(), healthBar:GetHeight());
+					absorb_f:SetSize(math.min((value/h_max), 1) * healthBar:GetWidth(), healthBar:GetHeight());
 				else
 					if absorb_f.texture.rotate ~= 90 then
-						RotateTexture(absorb_f.texture,90)
+						RotateTexture(absorb_f.texture, 90)
 						absorb_f.texture.rotate = 90
 					end
-					absorb_f:SetSize(healthBar:GetWidth(), min((value/h_max), 1) * healthBar:GetHeight());
+					absorb_f:SetSize(healthBar:GetWidth(), math.min((value/h_max), 1) * healthBar:GetHeight());
 				end
 			end
-			
 		end
 	end
+
+	-- 항상 보호막이 있는 애가 있는지 확인 후 활성할 할것
+	-- function HDH_HEALTH_TRACKER:UpdateSpellInfo(index) -- HDH_TRACKER override
+	-- 	super.UpdateSpellInfo(self, index)
+	-- 	if self:GetAbsorbs()  > 0 then
+	-- 		self.frame.icon[1].spell.isUpdate = true
+	-- 	end
+	-- end
 	
+    -- UNIT_ABSORB_AMOUNT_CHANGED
+	-- UNIT_HEALTH
 	function HDH_HEALTH_TRACKER:InitIcons() -- HDH_TRACKER override
-		super.InitIcons(self)
-		if self.frame then
-			self.frame:SetScript("OnEvent", OnEventTracker)
+		local ret = super.InitIcons(self)
+		if ret and self.frame then
 			self.frame:UnregisterAllEvents()
+			if self.frame.icon and self.frame.icon[1] then
+				self.frame.icon[1]:HookScript('OnUpdate', function(f, elapsed)
+					OnUpdateAbsorbBarValue(f, elapsed)
+				end)
+				self.frame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", self.unit)
+				self.frame:RegisterUnitEvent("UNIT_HEALTH", self.unit)
+			else
+				self.frame.icon[1]:HookScript('OnUpdate', nil)
+			end
 		end
-	end
-	
-	function HDH_HEALTH_TRACKER:ACTIVE_TALENT_GROUP_CHANGED()
-		self:InitIcons()
-		-- self:UpdateBar(self.frame.icon[1]);
-	end
-	
-	function HDH_HEALTH_TRACKER:PLAYER_ENTERING_WORLD()
 	end
 	
 	function HDH_HEALTH_TRACKER:OnEvent(event, unit, powerType)
-		if self == nil or self.parent == nil then return end
-		if (event == 'UNIT_MAXHEALTH')then  -- (event == "UNIT_POWER")
+		local self = self.parent
+		if not self then return end
+		if (event == 'UNIT_ABSORB_AMOUNT_CHANGED') or (event == 'UNIT_HEALTH') then  -- (event == "UNIT_POWER")
+			self:Update()
 		end
 	end
 ------------------------------------

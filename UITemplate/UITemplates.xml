@@ -1,122 +1,8 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
-..\FrameXML\UI.xsd">
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Blizzard_SharedXML/UI.xsd">
 	<Script file="UITemplates.lua"/>
 
-	<Texture name="HDH_AT_Texture_White_A" virtual="true"> 
-		<Color r="1" g="1" b="1" a="0.15"/>
-	</Texture>
-
-	<Texture name="HDH_AT_Texture_Gray_A" virtual="true"> 
-		<Color r="0.3" g="0.3" b="0.3" a="0.35"/>
-	</Texture>
-
-	<Texture name="HDH_AT_Texture_Gray" virtual="true"> 
-		<Color r="0.3" g="0.3" b="0.3"/>
-	</Texture>
-
-	<Texture name="HDH_AT_Texture_Yellow" virtual="true"> 
-		<Color r="0.9" g="0.7" b="0" a="0.8"/>
-	</Texture>
-
-	<Texture name="HDH_AT_Texture_Yellow_A" virtual="true"> 
-		<Color r="0.9" g="0.7" b="0" a="0.35"/>
-	</Texture>
-
-    <Font name="Font_Yellow_L" inherits="GameFontNormalLarge" virtual="true">
-		<Color r="0.9" g="0.7" b="0"/>
-		<Shadow>
-			<Offset x="1" y="-1"/>
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-	
-	<Font name="Font_Yellow_M" inherits="GameFontNormal"  virtual="true">
-		<Color r="0.9" g="0.7" b="0"/>
-		<Shadow>
-			<Offset x="1" y="-1"/>
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-
-	<Font name="Font_Yellow_S_B" inherits="GameFontNormalSmall" outline="NORMAL" virtual="true">
-		<Color r="0.9" g="0.7" b="0"/>
-		<Shadow>
-			<Offset x="1" y="-1"/>
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-
-    <Font name="Font_Yellow_S" inherits="GameFontNormalSmall" virtual="true">
-		<Color r="0.9" g="0.7" b="0"/>
-		<Shadow>
-			<Offset x="1" y="-1"/>
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-
-	<Font name="Font_Gray_S" inherits="GameFontNormalSmall" virtual="true">
-		<Color r="0.4" g="0.4" b="0.4"/>
-		<Shadow>
-			<Offset x="1" y="-1"/>
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-
-	<Font name="Font_Gray_XS" inherits="GameFontNormalTiny2" virtual="true">
-		<Color r="0.6" g="0.6" b="0.6"/>
-		<Shadow>
-			<Offset x="1" y="-1"/>
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-
-	<Font name="Font_Disable_S" inherits="GameFontNormalSmall" virtual="true">
-		<Color r="0.2" g="0.2" b="0.2"/>
-		<Shadow>
-			<Offset x="1" y="-1"/>
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-
-	<Font name="Font_Red_S" inherits="GameFontNormalSmall" virtual="true">
-		<Color r="0.9" g="0.1" b="0.1"/>
-		<Shadow>
-			<Offset x="1" y="-1"/>
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-	
-	<Font name="Font_White_M" inherits="GameFontNormal" virtual="true">
-		<Color r="0.85" g="0.85" b="0.85"/>
-		<Shadow>
-			<Offset x="1" y="-1"/>
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-	
-	<Font name="Font_White_S" inherits="GameFontNormalSmall"  virtual="true">
-		<Color r="0.85" g="0.85" b="0.85"/>
-		<Shadow x="1" y="-1">
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-
-	<Font name="Font_White_XS" inherits="GameFontNormalTiny2" virtual="true">
-		<Color r="0.85" g="0.85" b="0.85"/>
-		<Shadow x="1" y="-1">
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-	
-	<Font name="Font_Black_S" inherits="GameFontNormalSmall" virtual="true">
-		<Color r="0" g="0" b="0"/>
-		<Shadow>
-			<Offset x="1" y="-1"/>
-			<Color r="0" g="0" b="0"/>
-		</Shadow>
-	</Font>
-
-	<Frame name="HDH_AT_DialogFrame" frameStrata="Dialog" virtual="true" enableMouse="true" hidden = "true" >
+	<Frame name="HDH_AT_DialogFrame" frameStrata="DIALOG" virtual="true" enableMouse="true" hidden = "true" >
 		<Anchors>
 			<Anchor point="TOPLEFT" />
 			<Anchor point="BOTTOMRIGHT" />
@@ -125,7 +11,6 @@
 			<Layer level="BACKGROUND">
 				<Texture >
 					<Color r="0" g="0" b="0" a="0.9"/>
-					<Size><AbsDimension x="40" y="40" /></Size>
 					<Anchors>
 						<Anchor point="TOPLEFT" x="0" y="0"/>
 						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
@@ -159,14 +44,14 @@
 				<FontString name ="$parentText" parentKey="DescIconText" inherits="Font_Yellow_S" justifyV="TOP" text="※ 아이콘 이미지는 '추적 설정 > 주문별 상세설정 > 아이콘 변경' 메뉴에서 변경 가능합니다.">
 					<Size x="160"  />
 					<Anchors>
-						<Anchor point="LEFTTOP" relativePoint="CENTER" relativeTo="$parent" x="-180" y="20"/>
+						<Anchor point="TOPLEFT" relativePoint="CENTER" relativeTo="$parent" x="-180" y="20"/>
 					</Anchors>
 				</FontString>
 
 				<FontString name ="$parentText" parentKey="DescBarText" inherits="Font_Yellow_S" justifyV="TOP" text="※ 바 텍스처와 색상은 'UI 설정 > 바' 메뉴에서 변경 가능합니다.">
 					<Size x="160"  />
 					<Anchors>
-						<Anchor point="LEFTTOP" relativePoint="CENTER" relativeTo="$parent" x="20" y="20"/>
+						<Anchor point="TOPLEFT" relativePoint="CENTER" relativeTo="$parent" x="20" y="20"/>
 					</Anchors>
 				</FontString>
 
@@ -218,7 +103,7 @@
 					</Anchors>
 				</Texture>
 
-				<Texture name="$parentTexture1" file="Interface/ICONS/INV_Misc_Gem_Pearl_04" desaturated="True" parentKey="Icon1">
+				<Texture name="$parentTexture1" file="Interface/ICONS/INV_Misc_Gem_Pearl_04" desaturated="true" parentKey="Icon1">
 					<Size x="25" y="25" />
 					<Color  r="1" g="1" b="1" a="0.5" />
 					<Anchors>
@@ -227,7 +112,7 @@
 					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
 				</Texture>
 
-				<Texture name="$parentTexture2" file="Interface/ICONS/INV_Misc_Gem_Pearl_04" desaturated="True" parentKey="Icon2">
+				<Texture name="$parentTexture2" file="Interface/ICONS/INV_Misc_Gem_Pearl_04" desaturated="true" parentKey="Icon2">
 					<Size x="25" y="25" />
 					<Color  r="1" g="1" b="1" a="0.5"/>
 					<Anchors>
@@ -310,23 +195,23 @@
 		</Layers>
 		<Frames>
 
-			<CheckButton parentKey="CheckButton1" inherits="HDH_AT_CheckButton2Template" >
+			<CheckButton parentKey="CheckButton1" inherits="HDH_AT_CheckButtonTemplate" >
 				<Size x="160" y="20" />
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="CENTER" relativeTo="$parent" x="-20" y="40"/>
 				</Anchors>
 				<Scripts>
-					<OnLoad>self.Text:SetText(HDH_AT_L.USE_DISPLAY_ICON)</OnLoad>
+					<OnLoad>self:SetText(HDH_AT_L.USE_DISPLAY_ICON)</OnLoad>
 				</Scripts>
 			</CheckButton>
 
-			<CheckButton parentKey="CheckButton2"  inherits="HDH_AT_CheckButton2Template" >
+			<CheckButton parentKey="CheckButton2"  inherits="HDH_AT_CheckButtonTemplate" >
 				<Size x="160" y="20" />
 				<Anchors>
 					<Anchor point="LEFT" relativePoint="CENTER" relativeTo="$parent" x="20" y="40"/>
 				</Anchors>
 				<Scripts>
-					<OnLoad>self.Text:SetText(HDH_AT_L.USE_DISPLAY_BAR)</OnLoad>
+					<OnLoad>self:SetText(HDH_AT_L.USE_DISPLAY_BAR)</OnLoad>
 				</Scripts>
 			</CheckButton>
 
@@ -489,282 +374,105 @@
 		</Scripts>
 	</Frame>
 
-	<Button name="HDH_AT_TrackerTapBtnTemplate" mixin="HDH_AT_TrackerTapBtnTemplateMixin" virtual="true" >
-		<Size><AbsDimension x="100" y="40" /></Size>
-		<Layers>
-			<Layer level="BACKGROUND">
-				<Texture name="$parentBg" parentKey="BG">
-					<Color r="0" g="0" b="0" a=".3"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="1" y="-1" />
-						<Anchor point="BOTTOMRIGHT" x="-5" y="1" />
-					</Anchors>
-				</Texture>
-				
-				<Texture name="$parentOn" parentKey="Active" alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight"  hidden="true">
-					<TexCoords left="0.5" right="0" top="0.1" bottom="0.5" />
-					<Anchors>
-						<Anchor point="TOPLEFT" x="2" y="-2"/>
-						<Anchor point="BOTTOMRIGHT" x="2" y="2"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-			<Layer level="OVERLAY">
-				<Texture name="$parentBgLine2" hidden="true" inherits="HDH_AT_Texture_Yellow">
-					<Size><AbsDimension x="2" y="33" /></Size>
-					<Anchors>
-						<Anchor point="TOPRIGHT" x="-2" y="-2" relativePoint="TOPRIGHT" />
-						<Anchor point="BOTTOMRIGHT" x="-2" y="2" relativePoint="BOTTOMRIGHT" />
-
-						<!-- <Anchor point="TOPLEFT" x="2" y="-2" relativePoint="TOPLEFT" />
-						<Anchor point="BOTTOMLEFT" x="2" y="2" relativePoint="BOTTOMLEFT" /> -->
-					</Anchors>
-				</Texture>
-
-				<FontString parentKey="Tracker" inherits="Font_Gray_XS" maxLines="1" justifyH="RIGHT" text="">
-					<Anchors>
-						<Anchor point="TOPLEFT" x="5" y="-12"/>
-						<Anchor point="BOTTOMRIGHT" x="-10" y="0"/>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-		<Frames>
-			<Button name="$parentConfig" parentKey="ConfigBtn" hidden="true">
-				<Size x="20" y="20"/>
-				<Anchors>
-					<Anchor point="LEFT" relativePoint="LEFT" x="5" y="0" />
-				</Anchors>
-				<NormalTexture file="Interface\AddOns\HDH_AuraTracker\Texture\config" alphaMode="ADD">
-					<Color r="0.25" g="0.25" b="0.25" a="0.65"/>
-				</NormalTexture>
-				<HighlightTexture file="Interface\AddOns\HDH_AuraTracker\Texture\config" alphaMode="ADD">
-					<Color r="1" g="0.8" b="0.1" a="0.65"/>
-				</HighlightTexture>
-
-				<PushedTexture file="Interface\AddOns\HDH_AuraTracker\Texture\config">
-					<Color r="1" g="0.8" b="0.1" a="0.65"/>
-					<TexCoords left="-0.1" right="1.1" top="-0.1" bottom="1.1" />
-				</PushedTexture>
-				
-				<Scripts>
-					<OnLeave>
-						if not self:GetParent():IsMouseOver() then
-							self:Hide()
-						end
-					</OnLeave>
-				</Scripts>
-			</Button>
-		</Frames>
-
-		<Scripts>
-			<OnEnter>
-				if not self.isAddBtn then
-					self.ConfigBtn:Show()
-				end
-			</OnEnter>
-			<OnLeave>
-				if not self.ConfigBtn:IsMouseOver() then
-					self.ConfigBtn:Hide()
-				end
-			</OnLeave>
-		</Scripts>
-
-		<ButtonText name="$parentText" parentKey="Text" maxLines="1" justifyH="CENTER">
-			<Anchors>
-				<Anchor point="TOPLEFT" x="5" y="0"/>
-				<Anchor point="BOTTOMRIGHT" x="-5" y="0"/>
-			</Anchors>
-		</ButtonText>
-		<NormalFont style="Font_White_S"/>
-		<HighlightFont style="Font_Yellow_S"/>
-		<DisabledFont style="Font_Gray_S"/>
-	</Button>
-
-    <Frame name="HDH_AT_BackgroundTemplate" virtual="true">
-		<Layers>
-			<Layer level="BACKGROUND">
-				<Texture>
-					<Color r="0" g="0" b="0" a="0.8"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="1" y="-1" />
-						<Anchor point="BOTTOMRIGHT" x="-1" y="1" />
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-	</Frame>
-
-	<CheckButton name="HDH_AT_CheckButtonTemplate" virtual="true" inherits="OptionsBaseCheckButtonTemplate">
-		<Layers>
-			<Layer level="ARTWORK">
-				<FontString name="$parentText" parentKey="Text" inherits="Font_Yellow_S">
-					<Anchors>
-						<Anchor point="LEFT" relativePoint="RIGHT">
-							<Offset>
-								<AbsDimension x="0" y="1"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-	</CheckButton>
-
-	<Button name="HDH_AT_BottomTapTemplate" mixin="HDH_AT_BottomTapMixin" virtual="true">
-		<Size x="142" y="35"/>
-		<Anchors>
-			<Anchor point="TOP" relativePoint="BOTTOM" x="0" y="0" />
-		</Anchors>
-		<Layers>
-			<Layer level="BACKGROUND">
-
-				<Texture name="$parentLeftDisabled" parentKey="LeftActive" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
-					<Size>
-						<AbsDimension x="20" y="35"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT">
-							<Offset>
-								<AbsDimension x="0" y="0"/>
-							</Offset>
-						</Anchor>
-					</Anchors>
-					<TexCoords left="0" right="0.15625" top="0.05" bottom="0.546875"/>
-				</Texture>
-
-				<Texture name="$parentRightDisabled" parentKey="RightActive" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
-					<Size>
-						<AbsDimension x="20" y="35"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPRIGHT" />
-					</Anchors>
-					<TexCoords left="0.84375" right="1.0" top="0.05" bottom="0.546875"/>
-				</Texture>
-
-				<Texture name="$parentMiddleDisabled" parentKey="MiddleActive" file="Interface\PaperDollInfoFrame\UI-Character-ActiveTab">
-					<Size>
-						<AbsDimension x="88" y="35"/>
-					</Size>
-					<Anchors>
-						<Anchor point="LEFT" relativeTo="$parentLeftDisabled" relativePoint="RIGHT"/>
-						<Anchor point="RIGHT" relativeTo="$parentRightDisabled" relativePoint="LEFT"/>
-					</Anchors>
-					<TexCoords left="0.15625" right="0.84375" top="0.05" bottom="0.546875"/>
-				</Texture>
-
-				<Texture name="$parentLeft" parentKey="Left" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
-					<Size>
-						<AbsDimension x="20" y="32"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="0"/>
-					</Anchors>
-					<TexCoords left="0" right="0.15625" top="0.05" bottom="1.0"/>
-				</Texture>
-
-				<Texture name="$parentRight" parentKey="Right" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
-					<Size>
-						<AbsDimension x="20" y="32"/>
-					</Size>
-					<Anchors>
-						<Anchor point="TOPRIGHT" x="0" y="0"/>
-					</Anchors>
-					<TexCoords left="0.84375" right="1.0" top="0.05" bottom="1.0"/>
-				</Texture>
-
-				<Texture name="$parentMiddle" parentKey="Middle" file="Interface\PaperDollInfoFrame\UI-Character-InActiveTab">
-					<Size>
-						<AbsDimension x="88" y="32"/>
-					</Size>
-					<Anchors>
-						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
-						<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
-					</Anchors>
-					<TexCoords left="0.15625" right="0.84375" top="0.05" bottom="1.0"/>
-				</Texture>
-
-			</Layer>
-		</Layers>
-		<Scripts>
-			<OnShow>
-				self.Text:SetWidth(self.Text:GetStringWidth())
-				self:SetWidth(math.max(94, self.Text:GetStringWidth() + 44))
-			</OnShow>
-		</Scripts>
-		<NormalFont style="Font_Yellow_S"/>
-		<HighlightFont style="Font_White_S"/>
-		<DisabledFont style="Font_White_S"/>
-		<ButtonText name="$parentText" parentKey="Text" >
-			<Size x="50" y="10"/>
-			<Anchors>
-				<Anchor point="CENTER" x="0" y="0"/>
-				<Anchor point="LEFT" x="0" y="0"/>
-				<Anchor point="RIGHT" x="0" y="0"/>
-			</Anchors>
-		</ButtonText>
-	</Button>
-
 	<Button name="HDH_AT_RowTemplate" mixin="HDH_AT_AuraRowMixin" virtual="true">
-		<Size><AbsDimension x="100" y="26"/></Size>
+		<Size x="100" y="26"/>
 		<Anchors>
 			<Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT" x='0' y='0' />
 			<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT" x='0' y='0' />
 		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBG">
+					<Color r="1" g="1" b="1" a="0.1" />
+					<Size x="0" y="1"/>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="-10" y="1" />
+						<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$parent" x="0" y="0" />
+					</Anchors>
+				</Texture>
+			</Layer>
+
+			<Layer level="ARTWORK">
+
+				<FontString name="$parentTextNum" inherits="Font_Yellow_S"  justifyV="MIDDLE">
+					<Size x="20" y="20" />
+					<Color r="1" g="1" b="1"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT" x="0" y="0" />
+					</Anchors>
+				</FontString>
+
+				<Texture name="$parentIcon" parentKey="Icon">
+					<Size x="20" y="20"/>
+					<Color r="0.8" g="0.6" b="0" a="1"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT" x="25" y="0" />
+					</Anchors>
+				</Texture>
+				
+				<FontString name="$parentTextName" inherits="Font_Yellow_S" justifyH="LEFT" justifyV="MIDDLE">
+					<Size x="150" y="20"/>
+					<Color r="1" g="1" b="1"/>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentIcon" x="13" y="0" />
+					</Anchors>
+				</FontString>
+				
+				<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT"  justifyV="MIDDLE" text="(추가하려면 행을 클릭하세요)">
+					<Color r="0.5" g="0.5" b="0.5" />
+					<Size x="250" y="20"/>
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parentTextNum" x="56" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
 		<Frames>
-			<Button name="$parentButtonIcon" enableMouse="false">
+			<Frame name="$parentAddIcon">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT" x="25" y="0" />
+				</Anchors>
 				<Layers>
 					<Layer>
-						<Texture parentKey="Top">
-							<Size x="22" y="1"/>
-							<!-- <Color r="0.3" g="0.3" b="0.3" a="0.5"/> -->
-							<Color r="0" g="0" b="0" a="0.4"/>
+						<Texture inherits="HDH_AT_Texture_Gray_A">
+							<Size x="12" y="4"/>
 							<Anchors>
-								<Anchor point="BOTTOM" relativePoint="TOP" relativeKey="$parent" x="0" y="0"/>
+								<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER" x="0" y="0" />
 							</Anchors>
 						</Texture>
 
-						<Texture parentKey="Bottom">
-							<Size x="22" y="1"/>
-							<!-- <Color r="0.3" g="0.3" b="0.3" a="0.5"/> -->
-							<Color r="0" g="0" b="0" a="0.4"/>
+						<Texture inherits="HDH_AT_Texture_Gray_A">
+							<Size x="4" y="12"/>
 							<Anchors>
-								<Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent" x="0" y="-0"/>
+								<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER" x="0" y="0" />
 							</Anchors>
 						</Texture>
 
-						<Texture parentKey="Left">
-							<Size x="1" y="22"/>
-							<!-- <Color r="0.3" g="0.3" b="0.3" a="0.5"/> -->
-							<Color r="0" g="0" b="0" a="0.4"/>
+						<Texture >
+							<Size x="10" y="2"/>
+							<Color r="0.8" g="0.6" b="0" a="1"/>
 							<Anchors>
-								<Anchor point="RIGHT" relativePoint="LEFT" relativeKey="$parent" x="-0" y="0"/>
+								<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER" x="0" y="0" />
 							</Anchors>
 						</Texture>
 
-						<Texture parentKey="Right">
-							<Size x="1" y="22"/>
-							<!-- <Color r="0.3" g="0.3" b="0.3" a="0.5"/> -->
-							<Color r="0" g="0" b="0" a="0.4"/>
+						<Texture >
+							<Size x="2" y="10"/>
+							<Color r="0.8" g="0.6" b="0" a="1"/>
 							<Anchors>
-								<Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent" x="0" y="0"/>
+								<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER" x="0" y="0" />
 							</Anchors>
 						</Texture>
 					</Layer>
 				</Layers>
-				<Size x="20" y="20"/>
-				<Anchors>
-					<Anchor point="LEFT" relativePoint="LEFT" x="25" y="0"/>
-				</Anchors>
-			</Button>
+			</Frame>
 			
 			<EditBox name="$parentEditBoxID" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false" hidden="true">
-				<Size>
-					<AbsDimension x="110" y="20"/>
-				</Size>
+				<Size x="110" y="20"/>
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentButtonIcon" relativePoint="RIGHT" x="8" y="0" />
+					<Anchor point="LEFT" relativeTo="$parentIcon" relativePoint="RIGHT" x="8" y="0" />
 				</Anchors>
 				<Scripts>
 					<OnLoad>
@@ -787,14 +495,10 @@
 				</Scripts>
 			</EditBox>
 
-			<Button name="$parentButtonSet">
-				<Size>
-					<AbsDimension x="20" y="20"/>
-				</Size>
+			<Button name="$parentButtonConfig">
+				<Size x="20" y="20"/>
 				<Anchors>
-					<Anchor point="RIGHT" relativePoint="RIGHT">
-						<Offset><AbsDimension x="0" y="0"/></Offset>
-					</Anchor>
+					<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0"/>
 				</Anchors>
 				<NormalTexture file="Interface\AddOns\HDH_AuraTracker\Texture\config" alphaMode="ADD">
 					<Color r="0.25" g="0.25" b="0.25" a="0.65"/>
@@ -809,17 +513,12 @@
 				</PushedTexture>
 			</Button>
 
-			<CheckButton name="$parentCheckButtonValue" inherits="HDH_AT_CheckButton2Template">
+			<CheckButton name="$parentCheckButtonValue" inherits="HDH_AT_CheckButtonTemplate">
 				<Size x="20" y="20" />
 				<Anchors>
-					<Anchor point="RIGHT" relativeTo="$parentButtonSet" relativePoint="LEFT">
-					<Offset><AbsDimension x="-20" y="0"/></Offset>
-					</Anchor>
+					<Anchor point="RIGHT" relativeTo="$parentButtonConfig" relativePoint="LEFT" x="-20" y="0"/>
 				</Anchors>
 				<Scripts>
-					<OnLoad>
-						self:HiddenBackground(true)
-					</OnLoad>
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 						GameTooltip:AddLine(HDH_AT_L.SHOW_VALUE_TOOLTIP);
@@ -831,17 +530,12 @@
 				</Scripts>
 			</CheckButton>
 
-			<CheckButton name="$parentCheckButtonGlow" inherits="HDH_AT_CheckButton2Template">
+			<CheckButton name="$parentCheckButtonGlow" inherits="HDH_AT_CheckButtonTemplate">
 				<Size x="20" y="20" />
 				<Anchors>
-					<Anchor point="RIGHT" relativeTo="$parentCheckButtonValue" relativePoint="LEFT">
-					<Offset><AbsDimension x="-35" y="0"/></Offset>
-					</Anchor>
+					<Anchor point="RIGHT" relativeTo="$parentCheckButtonValue" relativePoint="LEFT" x="-35" y="0"/>
 				</Anchors>
 				<Scripts>
-					<OnLoad>
-						self:HiddenBackground(true)
-					</OnLoad>
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 						GameTooltip:AddLine(HDH_AT_L.GLOW_TOOLTIP);
@@ -853,17 +547,12 @@
 				</Scripts>
 			</CheckButton>
 		
-			<CheckButton name="$parentCheckButtonAlways" inherits="HDH_AT_CheckButton2Template">
+			<CheckButton name="$parentCheckButtonAlways" inherits="HDH_AT_CheckButtonTemplate">
 				<Size x="20" y="20" />
 				<Anchors>
-					<Anchor point="RIGHT" relativeTo="$parentCheckButtonGlow" relativePoint="LEFT">
-					<Offset><AbsDimension x="-35" y="0"/></Offset>
-					</Anchor>
+					<Anchor point="RIGHT" relativeTo="$parentCheckButtonGlow" relativePoint="LEFT" x="-35" y="0"/>
 				</Anchors>
 				<Scripts>
-					<OnLoad>
-						self:HiddenBackground(true)
-					</OnLoad>
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
 						GameTooltip:AddLine(HDH_AT_L.ALWAYS_SHOW_TOOLTIP);
@@ -876,13 +565,9 @@
 			</CheckButton>
 
 			<Button name="$parentButtonDel" inherits="HDH_AT_ButtonTemplate2" text="삭제" hidden="true">
-				<Size>
-					<AbsDimension x="70" y="22"/>
-				</Size>
+				<Size x="70" y="22"/>
 				<Anchors>
-					<Anchor point="RIGHT" relativePoint="RIGHT">
-					<Offset><AbsDimension x="0" y="0"/></Offset>
-					</Anchor>
+					<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>self:SetText(HDH_AT_L.DELETE)</OnLoad>
@@ -890,13 +575,9 @@
 			</Button>
 		
 			<Button name="$parentButtonAdd" inherits="HDH_AT_ButtonTemplate2" text="추가" hidden="true">
-				<Size>
-					<AbsDimension x="70" y="22"/>
-				</Size>
+				<Size x="70" y="22"/>
 				<Anchors>
-					<Anchor point="RIGHT" relativeTo="$parentButtonDel" relativePoint="LEFT">
-					<Offset><AbsDimension x="0" y="0"/></Offset>
-					</Anchor>
+					<Anchor point="RIGHT" relativeTo="$parentButtonDel" relativePoint="LEFT" x="0" y="0"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>self:SetText(HDH_AT_L.ADD)</OnLoad>
@@ -905,13 +586,9 @@
 			</Button>
 
 			<Button name="$parentButtonCancel" inherits="HDH_AT_ButtonTemplate2" text="취소" hidden="true">
-				<Size>
-					<AbsDimension x="70" y="22"/>
-				</Size>
+				<Size x="70" y="22"/>
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentButtonAdd" relativePoint="RIGHT">
-					<Offset><AbsDimension x="0" y="0"/></Offset>
-					</Anchor>
+					<Anchor point="LEFT" relativeTo="$parentButtonAdd" relativePoint="RIGHT" x="0" y="0"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>self:SetText(HDH_AT_L.CANCEL)</OnLoad>
@@ -919,15 +596,14 @@
 				</Scripts>
 			</Button>
 			
-			<CheckButton name="$parentCheckButtonIsItem" inherits="HDH_AT_CheckButton2Template" hidden="true">
+			<CheckButton name="$parentCheckButtonIsItem" inherits="HDH_AT_CheckButtonTemplate" hidden="true">
 				<Size x="70" y="20" />
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentButtonAdd" x="-5" y="0" />
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						self.Text:SetText(HDH_AT_L.ITEM)
-						self:HiddenBackground(true)
+						self:SetText(HDH_AT_L.ITEM)
 					</OnLoad>
 					<OnEnter>
 						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
@@ -942,112 +618,12 @@
 			</CheckButton>
 			
 		</Frames>
-		<Layers>
-			<Layer level="ARTWORK">
-				<Texture name="$parentIconAdd" useAtlasSize="true">
-					<Size x="20" y="20"/>
-					<Anchors>
-						<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parentButtonIcon" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-
-				
-				<Texture inherits="HDH_AT_Texture_Gray_A">
-					<Size x="12" y="4"/>
-					<Anchors>
-						<Anchor point="CENTER" relativeTo="$parentIconAdd"/>
-					</Anchors>
-				</Texture>
-				<Texture inherits="HDH_AT_Texture_Gray_A">
-					<Size x="4" y="12"/>
-					<Anchors>
-						<Anchor point="CENTER" relativeTo="$parentIconAdd" />
-					</Anchors>
-				</Texture>
-
-				<Texture >
-					<Size x="10" y="2"/>
-					<Color r="0.8" g="0.6" b="0" a="1"/>
-					<Anchors>
-						<Anchor point="CENTER" relativeTo="$parentIconAdd"/>
-					</Anchors>
-				</Texture>
-				<Texture >
-					<Size x="2" y="10"/>
-					<Color r="0.8" g="0.6" b="0" a="1"/>
-					<Anchors>
-						<Anchor point="CENTER" relativeTo="$parentIconAdd" />
-					</Anchors>
-				</Texture>
-
-				<FontString name="$parentTextNum" inherits="Font_Yellow_S">
-					<Size>
-						<AbsDimension x="20" y="25"/>
-					</Size>
-					<Color r="1" g="1" b="1"/>
-					<Anchors>
-						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
-							<Offset><AbsDimension x="0" y="0"/></Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-				
-				<FontString name="$parentTextID" inherits="Font_Yellow_S" justifyH="CENTER" text="0000000"  hidden="true">
-					<Size>
-						<AbsDimension x="65" y="25"/>
-					</Size>
-					<Color r="1" g="1" b="1"/>
-					<Anchors>
-						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentButtonAdd">
-							<Offset><AbsDimension x="-10" y="0"/></Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-				
-				<FontString name="$parentTextName" inherits="Font_Yellow_S" justifyH="LEFT">
-					<Size>
-						<AbsDimension x="150" y="25"/>
-					</Size>
-					<Color r="1" g="1" b="1"/>
-					<Anchors>
-						<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentButtonIcon">
-							<Offset><AbsDimension x="13" y="0"/></Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-				
-				<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT" text="(추가하려면 행을 클릭하세요)">
-					<Color r="0.5" g="0.5" b="0.5" />
-					<Size>
-						<AbsDimension x="250" y="25"/>
-					</Size>
-					<Anchors>
-						<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parentTextNum">
-							<Offset><AbsDimension x="56" y="0"/></Offset>
-						</Anchor>
-					</Anchors>
-				</FontString>
-			</Layer>
-			<Layer level="BACKGROUND">
-				<Texture name="$parentBG">
-					<Color r="1" g="1" b="1" a="0.1" />
-					<Size x="0" y="1"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent"  x="-10" y="1" />
-						<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$parent" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
+		
 		<Scripts>
 			<OnLoad>
 				_G[self:GetName().."RowDesc"]:SetText(HDH_AT_L.CLICK_TO_ADD)
 			</OnLoad>
 			<OnClick function="HDH_AT_OnClickRowFrame" />
-			<OnEnter>
-			</OnEnter>
-			<OnLeave>
-			</OnLeave>
 		</Scripts>
 		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_White_A">
 			<Anchors>
@@ -1055,421 +631,276 @@
 				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="0" y="1"/>
 			</Anchors>
 		</HighlightTexture>
-		<!-- <HighlightTexture alphaMode="ADD" file="Interface\HELPFRAME\HelpFrameButton-Highlight">
-			<Color r="1" g="1" b="1" a="0.8"/>
-			<TexCoords left="0.04" right="1.00" top="0.0" bottom="0.56" />
-		</HighlightTexture> -->
 	</Button>
 
-	<Button name="HDH_AT_UITabBtnTemplate" mixin="HDH_AT_UITabBtnMixin" virtual="true">
-		<Size><AbsDimension x="90" y="30" /></Size>
-		<Layers>
-			<Layer level="BORDER" textureSubLevel="0">
-				<Texture name="$parentBgLine1" hidden="true">
-					<Color r="0" g="0" b="0" a="0.5"/>
-					<Size><AbsDimension x="3" y="35" /></Size>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="-2" y="0"/>
-						<Anchor point="BOTTOMLEFT" x="-2" y="0"/>
-					</Anchors>
-				</Texture>
-				<Texture alphaMode="ADD" parentKey="Active2"  hidden="true"  file="Interface\HELPFRAME\HelpFrameButton-Highlight">
-					<TexCoords left="0.5" right="0.9" top="0.1" bottom="0.5" />
-					<Anchors>
-						<Anchor point="TOPLEFT" x="1" y="-1"/>
-						<Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-			<Layer level="BORDER" textureSubLevel="1">
-				<Texture name="$parentLine2" parentKey="Active1" hidden="true" inherits="HDH_AT_Texture_Yellow">
-					<Size><AbsDimension x="2" y="33" /></Size>
-					<Anchors>
-						<Anchor point="TOPRIGHT" x="-1" y="-1"/>
-						<Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
-						<!-- <Anchor point="TOPLEFT" x="1" y="-1" relativePoint="TOPLEFT" />
-						<Anchor point="BOTTOMLEFT" x="1" y="1" relativePoint="BOTTOMLEFT" /> -->
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<ButtonText name="$parentText" justifyH="LEFT">
-			<Anchors>
-				<Anchor point="TOPLEFT" x="8" y="0"/>
-				<Anchor point="BOTTOMRIGHT" x="-8" y="0"/>
-			</Anchors>
-		</ButtonText>
-		<NormalFont style="Font_White_S"/>
-		<HighlightFont style="Font_White_S"/>
-		<DisabledFont style="Font_Gray_S"/>
-		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_White_A" >
-			<Anchors>
-				<Anchor point="TOPLEFT" x="1" y="-1"/>
-				<Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
-			</Anchors>
-		</HighlightTexture>
-	</Button>
-
-	<Button name="HDH_AT_UITabBtnTemplate2" mixin="HDH_AT_BottomTapMixin" virtual="true">
-		<Size><AbsDimension x="90" y="30" /></Size>
+	<Button name="HDH_AT_RowTemplate2" mixin="HDH_AT_AuraRowMixin" virtual="true">
+		<Size x="100" y="36"/>
+		<Anchors>
+			<Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT" x='0' y='0' />
+			<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT" x='0' y='0' />
+		</Anchors>
 		<Layers>
 			<Layer level="BACKGROUND">
-				<Texture parentKey="BG" >
-					<Color r="0" g="0" b="0" a="0.8"/>
+				<Texture name="$parentBG">
+					<Color r="1" g="1" b="1" a="0.2" />
+					<Size x="0" y="1"/>
 					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="0" />
-						<Anchor point="BOTTOMRIGHT" x="0" y="0" />
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="1" />
+						<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$parent" x="0" y="0" />
 					</Anchors>
 				</Texture>
 			</Layer>
 
-			<Layer level="BORDER">
-				<Texture parentKey="Left" >
-					<Size x="4"/>
-					<Color r="0.2" g="0.2" b="0.2" a="1" />
+			<Layer level="ARTWORK">
+
+				<FontString name="$parentTextNum" inherits="Font_Yellow_S"  justifyV="MIDDLE">
+					<Size x="20" y="20" />
+					<Color r="1" g="1" b="1"/>
 					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="0" />
-						<Anchor point="BOTTOMLEFT" x="0" y="0" />
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT" x="0" y="0" />
+					</Anchors>
+				</FontString>
+
+				<Texture name="$parentIcon" parentKey="Icon">
+					<Size x="24" y="24"/>
+					<Color r="0.8" g="0.6" b="0" a="1"/>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT" x="0" y="0" />
 					</Anchors>
 				</Texture>
-				<Texture parentKey="Right" >
-					<Size x="4"/>
-					<Color r="0.2" g="0.2" b="0.2" a="1" />
+				
+				<FontString name="$parentTextName" inherits="Font_Yellow_M" justifyH="LEFT" justifyV="MIDDLE">
+					<Size x="150" y="16"/>
 					<Anchors>
-						<Anchor point="TOPRIGHT" x="0" y="0" />
-						<Anchor point="BOTTOMRIGHT" x="0" y="0" />
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentIcon" x="5" y="3" />
 					</Anchors>
-				</Texture>
-				<Texture parentKey="Middle" >
-					<Size y="4"/>
-					<Color r="0.2" g="0.2" b="0.2" a="1" />
+				</FontString>
+				
+				<FontString name="$parentRowDesc" inherits="Font_Yellow_S" justifyH="LEFT"  justifyV="MIDDLE" text="(추가하려면 행을 클릭하세요)">
+					<Color r="0.5" g="0.5" b="0.5" />
+					<Size x="250" y="20"/>
 					<Anchors>
-						<Anchor point="BOTTOMLEFT" x="0" y="0" />
-						<Anchor point="BOTTOMRIGHT" x="0" y="0" />
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="LeftActive" inherits="HDH_AT_Texture_Yellow">
-					<Size x="4"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="0" />
-						<Anchor point="BOTTOMLEFT" x="0" y="-4" />
-					</Anchors>
-				</Texture>
-				<Texture parentKey="RightActive"  inherits="HDH_AT_Texture_Yellow">
-					<Size x="4"/>
-					<Anchors>
-						<Anchor point="TOPRIGHT" x="0" y="0" />
-						<Anchor point="BOTTOMRIGHT" x="0" y="-4" />
-					</Anchors>
-				</Texture>
-				<Texture parentKey="MiddleActive"  inherits="HDH_AT_Texture_Yellow">
-					<Size y="4"/>
-					<Anchors>
-						<Anchor point="BOTTOMLEFT" x="0" y="-4" />
-						<Anchor point="BOTTOMRIGHT" x="0" y="-4" />
-					</Anchors>
-				</Texture>
-			</Layer>
-
-			<Layer level="OVERLAY">
-				<Texture name="$parentBgLine1" hidden="true">
-					<Color r="0" g="0" b="0" a="0.5"/>
-					<Size><AbsDimension x="3" y="35" /></Size>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="-2" y="0"/>
-						<Anchor point="BOTTOMLEFT" x="-2" y="0"/>
-					</Anchors>
-				</Texture>
-				<Texture name="$parentLine2" parentKey="Active1" hidden="true" inherits="HDH_AT_Texture_Yellow">
-					<Size><AbsDimension x="5" y="5" /></Size>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="0"/>
-						<Anchor point="TOPRIGHT" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-				<Texture alphaMode="ADD" parentKey="Active2"  hidden="true" file="Interface\HELPFRAME\HelpFrameButton-Highlight" >
-					<TexCoords left="0.1" right="0.9" top="0.1" bottom="0.5" />
-					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" x="-1" y="0"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<ButtonText name="$parentText" parentKey="Text" justifyH="CENTER">
-			<Anchors>
-				<Anchor point="TOPLEFT" x="8" y="0"/>
-				<Anchor point="BOTTOMRIGHT" x="-8" y="0"/>
-			</Anchors>
-		</ButtonText>
-
-		<NormalFont style="Font_Yellow_S"/>
-		<HighlightFont style="Font_Yellow_S"/>
-		<DisabledFont style="Font_White_S"/>
-
-		<NormalTexture>
-			<Color r="0" g="0" b="0" a="0.5"/>
-			<Anchors>
-				<Anchor point="TOPLEFT" x="4" y="0"/>
-				<Anchor point="BOTTOMRIGHT" x="-4" y="0"/>
-			</Anchors>
-		</NormalTexture>
-		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_Yellow">
-		</HighlightTexture>
-		<DisabledTexture>
-			<Color r="1" g="0.8" b="0" a="0.3"/>
-			<Anchors>
-				<Anchor point="TOPLEFT" x="0" y="-2"/>
-				<Anchor point="BOTTOMRIGHT" x="-1" y="2"/>
-			</Anchors>
-		</DisabledTexture>
-	</Button>
-
-	<Button name="HDH_AT_UITabBtnLabelTemplate" inherits="HDH_AT_UITabBtnTemplate" virtual="true">
-		<Layers>
-			<Layer  level="OVERLAY">
-				<Texture parentKey="Texture" hidden="true" file="Interface\Addons\HDH_AuraTracker\Texture\icon">
-					<Color r="0.8" g="0.6" b="0"/>
-					<Size x="12" y="12"/>
-					<Anchors>
-						<Anchor point="LEFT" x="6" y="0"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<NormalFont style="Font_White_S"/>
-		<HighlightFont style="Font_Yellow_S"/>
-		<DisabledFont style="Font_Yellow_S"/>
-		<NormalTexture>
-			<Color r="0" g="0" b="0" a="0.5"/>
-			<Anchors>
-				<Anchor point="TOPLEFT" x="0" y="0"/>
-				<Anchor point="BOTTOMRIGHT" x="-1" y="0"/>
-			</Anchors>
-		</NormalTexture>
-		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_Yellow_A">
-		</HighlightTexture>
-		<DisabledTexture>
-			<Color r="0.2" g="0.2" b="0.2" a="0.5"/>
-			<Anchors>
-				<Anchor point="TOPLEFT" x="0" y="-2"/>
-				<Anchor point="BOTTOMRIGHT" x="-1" y="2"/>
-			</Anchors>
-		</DisabledTexture>
-	</Button>
-
-    <Button name="HDH_AT_ButtonTemplate" virtual="true">
-		<Size><AbsDimension x="90" y="22" /></Size>
-		<Layers>
-			<Layer level="BORDER">
-				<Texture name="$parentBgLine1" hidden="true">
-					<Color r="0" g="0" b="0" a="0.5"/>
-					<Size><AbsDimension x="3" y="35" /></Size>
-					<Anchors>
-						<Anchor point="TOPRIGHT" x="-2" y="0"/>
-						<Anchor point="BOTTOMRIGHT" x="-2" y="0"/>
-					</Anchors>
-				</Texture>
-				<Texture name="$parentBgLine2" hidden="true" inherits="HDH_AT_Texture_Yellow">
-					<Size><AbsDimension x="5" y="33" /></Size>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="2" y="-2"/>
-						<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<ButtonText name="$parentText"/>
-		<NormalFont style="Font_White_S"/>
-		<DisabledFont style="Font_Disable_S"/>
-		<NormalTexture inherits="HDH_AT_Texture_Yellow">
-			<Anchors>
-				<Anchor point="TOPLEFT" x="2" y="-2"/>
-				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-			</Anchors>					
-		</NormalTexture>
-		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_White_A">
-			<Anchors>
-				<Anchor point="TOPLEFT" x="2" y="-2"/>
-				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-			</Anchors>
-		</HighlightTexture>
-		<DisabledTexture>
-			<Color r="0.2" g="0.2" b="0.2" a="0.5"/>
-			<Anchors>
-				<Anchor point="TOPLEFT" x="2" y="-2"/>
-				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-			</Anchors>
-		</DisabledTexture>
-	</Button>
-
-	<Button name="HDH_AT_ButtonWhiteTemplate" inherits="HDH_AT_ButtonTemplate" virtual="true">
-		<NormalTexture>
-			<Color r="0.3" g="0.3" b="0.3" a="0.8"/>
-			<Anchors>
-				<Anchor point="TOPLEFT" x="2" y="-2"/>
-				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-			</Anchors>					
-		</NormalTexture>
-	</Button>
-
-	<Button name="HDH_AT_ButtonTemplate2" virtual="true">
-		<Size><AbsDimension x="90" y="22" /></Size>
-		<Layers>
-			<Layer level="BACKGROUND">
-				<Texture name="$parentBgLine1" hidden="true">
-					<Color r="0" g="0" b="0" a="0.5"/>
-					<Size><AbsDimension x="3" y="35" /></Size>
-					<Anchors>
-						<Anchor point="TOPRIGHT" x="-2" y="0"/>
-						<Anchor point="BOTTOMRIGHT" x="-2" y="0"/>
-					</Anchors>
-				</Texture>
-				<Texture name="$parentBgLine2" hidden="true" inherits="HDH_AT_Texture_Yellow">
-					<Size><AbsDimension x="5" y="33" /></Size>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="2" y="-2"/>
-						<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<ButtonText name="$parentText"/>
-		<NormalFont style="Font_White_S"/>
-		<DisabledFont style="Font_Gray_S"/>
-		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_White_A">
-			<Anchors>
-				<Anchor point="TOPLEFT" x="1" y="-1"/>
-				<Anchor point="BOTTOMRIGHT" x="-1" y="1"/>
-			</Anchors>
-		</HighlightTexture>
-		<DisabledTexture>
-			<Color r="0.4" g="0.4" b="0.4" a="0.8"/>
-			<Anchors>
-				<Anchor point="TOPLEFT" x="2" y="-2"/>
-				<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-			</Anchors>
-		</DisabledTexture>
-	</Button>
-
-	<Frame name="HDH_AT_ConfigFrameTemplate" virtual="true">
-		<Layers>
-            <Layer level="BORDER" textureSubLevel="1">
-                <Texture parentKey="Top" >
-					<Color r="0.2" g="0.2" b="0.2" a="1" />
-					<Size x="1" y="2" />
-                    <Anchors>
-						<Anchor point="TOPLEFT" x="-1" y="1"/>
-						<Anchor point="TOPRIGHT" x="1" y="1"/>
-                    </Anchors>
-                </Texture>
-				<Texture parentKey="Left">
-					<Color r="0.2" g="0.2" b="0.2" a="1" />
-					<Size x="2" y="1" />
-                    <Anchors>
-                        <Anchor point="TOPLEFT" x="-1" y="0"/>
-						<Anchor point="BOTTOMLEFT" x="-1" y="0"/>
-                    </Anchors>
-                </Texture>
-				<Texture parentKey="Right">
-					<Color r="0.2" g="0.2" b="0.2" a="1" />
-					<Size x="2" y="1" />
-                    <Anchors>
-                        <Anchor point="TOPRIGHT" x="1" y="0"/>
-						<Anchor point="BOTTOMRIGHT" x="1" y="0"/>
-                    </Anchors>
-                </Texture>
-				<Texture parentKey="Bottom" >
-					<Color r="0.2" g="0.2" b="0.2" a="1" />
-					<Size x="1" y="2" />
-                    <Anchors>
-                        <Anchor point="BOTTOMLEFT" x="-1" y="-1"/>
-						<Anchor point="BOTTOMRIGHT" x="1" y="-1"/>
-                    </Anchors>
-                </Texture>
-			</Layer>
-
-			<Layer level="BORDER" textureSubLevel="0">
-				<Texture parentKey="Top2" >
-					<Color r="0" g="0" b="0" a="0.3" />
-					<Size x="1" y="2" />
-                    <Anchors>
-						<Anchor point="TOPLEFT" x="-2" y="2"/>
-						<Anchor point="TOPRIGHT" x="2" y="2"/>
-                    </Anchors>
-                </Texture>
-
-				<Texture parentKey="Left2">
-					<Color r="0" g="0" b="0" a="0.3" />
-					<Size x="2" y="1" />
-                    <Anchors>
-                        <Anchor point="TOPLEFT" x="-2" y="0"/>
-						<Anchor point="BOTTOMLEFT" x="-2" y="0"/>
-                    </Anchors>
-                </Texture>
-
-				<Texture parentKey="Right2">
-					<Color r="0" g="0" b="0" a="0.3" />
-					<Size x="2" y="1" />
-                    <Anchors>
-                        <Anchor point="TOPRIGHT" x="2" y="0"/>
-						<Anchor point="BOTTOMRIGHT" x="2" y="0"/>
-                    </Anchors>
-                </Texture>
-
-				<Texture parentKey="Bottom2">
-					<Color r="0" g="0" b="0" a="0.3" />
-					<Size x="1" y="2" />
-                    <Anchors>
-                        <Anchor point="BOTTOMLEFT" x="-2" y="-2"/>
-						<Anchor point="BOTTOMRIGHT" x="2" y="-2"/>
-                    </Anchors>
-                </Texture>
-			</Layer>
-		</Layers>
-	</Frame>
-
-	<CheckButton name="HDH_AT_TalentCheckButtonTemplate" inherits="HDH_AT_ConfigFrameTemplate" mixin="HDH_AT_TalentCheckButtonMixin"  virtual="true">
-		<Size x="70" y="70" />
-		<Layers>
-
-			<Layer level="ARTWORK" textureSubLevel="1">
-				<Texture name="$parentIcon" parentKey="Icon" hidden="false">
-					<Anchors>
-						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="2" y="-2"/>
-						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="-2" y="2" />
-					</Anchors>
-					<TexCoords left="0.08" right="0.92" top="0.22" bottom="0.78" /> 
-				</Texture>
-			</Layer>
-
-			<Layer level="ARTWORK" textureSubLevel="5">
-				<Texture name="$parentActive" parentKey="Active">
-					<Size x="1" y="12" />
-					<Color r="0" g="0" b="0" a="0.5"/>
-					<Anchors>
-						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIcon" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parentIcon" x="0" y="0" />
-					</Anchors>
-				</Texture>
-			</Layer>
-
-			<Layer level="ARTWORK" textureSubLevel="3">
-				<FontString name="$parentName" parentKey="Name" inherits="Font_Yellow_S" text="텍스트 입력" justifyH="CENTER" justifyV="MIDDLE" hidden="false">
-					<Size x="1" y="15" />
-					<Anchors>
-						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parent" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="0" y="0" />
+						<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parentTextNum" x="56" y="0"/>
 					</Anchors>
 				</FontString>
 			</Layer>
 		</Layers>
 
+		<Frames>
+			<Frame name="$parentAddIcon">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT" x="25" y="0" />
+				</Anchors>
+				<Layers>
+					<Layer>
+						<Texture inherits="HDH_AT_Texture_Gray_A">
+							<Size x="12" y="4"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER" x="0" y="0" />
+							</Anchors>
+						</Texture>
+
+						<Texture inherits="HDH_AT_Texture_Gray_A">
+							<Size x="4" y="12"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER" x="0" y="0" />
+							</Anchors>
+						</Texture>
+
+						<Texture >
+							<Size x="10" y="2"/>
+							<Color r="0.8" g="0.6" b="0" a="1"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER" x="0" y="0" />
+							</Anchors>
+						</Texture>
+
+						<Texture >
+							<Size x="2" y="10"/>
+							<Color r="0.8" g="0.6" b="0" a="1"/>
+							<Anchors>
+								<Anchor point="CENTER" relativeTo="$parent" relativePoint="CENTER" x="0" y="0" />
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			
+			<EditBox name="$parentEditBoxID" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false" hidden="true">
+				<Size>
+					<AbsDimension x="110" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentIcon" relativePoint="RIGHT" x="8" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self.BG1:Hide()
+						self.BG2:Hide()
+						self.BG3:Hide()
+						self.Desc:SetText(HDH_AT_L.PLEASE_INPUT_SPELL)
+					</OnLoad>
+					<OnEscapePressed>HDH_AT_OnEditEscape(self)</OnEscapePressed>
+					<OnEditFocusGained>HDH_AT_OnEditFocusGained(self)</OnEditFocusGained>
+					<OnEditFocusLost>HDH_AT_OnEditFocusLost(self)</OnEditFocusLost>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+						GameTooltip:AddLine(HDH_AT_L.INPUT_ID_TOOLTIP);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip_Hide();
+					</OnLeave>
+				</Scripts>
+			</EditBox>
+
+			<Button name="$parentButtonConfig">
+				<Size x="20" y="20"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0"/>
+				</Anchors>
+				<NormalTexture file="Interface\AddOns\HDH_AuraTracker\Texture\config" alphaMode="ADD">
+					<Color r="0.25" g="0.25" b="0.25" a="0.65"/>
+				</NormalTexture>
+				<HighlightTexture file="Interface\AddOns\HDH_AuraTracker\Texture\config" alphaMode="ADD">
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
+				</HighlightTexture>
+
+				<PushedTexture file="Interface\AddOns\HDH_AuraTracker\Texture\config">
+					<Color r="1" g="0.8" b="0.1" a="0.65"/>
+					<TexCoords left="-0.1" right="1.1" top="-0.1" bottom="1.1" />
+				</PushedTexture>
+			</Button>
+
+			<CheckButton name="$parentCheckButtonAlways" inherits="HDH_AT_CheckButton3Template">
+				<Size x="85" y="20" />
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentTextName" relativePoint="BOTTOMLEFT" x="-2" y="4" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetText(HDH_AT_L.ALWAYS_SHOW)
+					</OnLoad>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+						GameTooltip:AddLine(HDH_AT_L.ALWAYS_SHOW_TOOLTIP);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip_Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="$parentCheckButtonGlow" inherits="HDH_AT_CheckButton3Template">
+				<Size x="85" y="20" />
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentCheckButtonAlways" relativePoint="RIGHT" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetText(HDH_AT_L.GLOW)
+					</OnLoad>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+						GameTooltip:AddLine(HDH_AT_L.GLOW_TOOLTIP);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip_Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="$parentCheckButtonValue" inherits="HDH_AT_CheckButton3Template">
+				<Size x="85" y="20" />
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentCheckButtonGlow" relativePoint="RIGHT" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetText(HDH_AT_L.DISPLAY_VALUE)
+					</OnLoad>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+						GameTooltip:AddLine(HDH_AT_L.SHOW_VALUE_TOOLTIP);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip_Hide();
+					</OnLeave>
+				</Scripts>
+			</CheckButton>
+			
+			<Button name="$parentButtonDel" inherits="HDH_AT_ButtonTemplate2" text="삭제" hidden="true">
+				<Size x="70" y="22"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>self:SetText(HDH_AT_L.DELETE)</OnLoad>
+				</Scripts>
+			</Button>
+		
+			<Button name="$parentButtonAdd" inherits="HDH_AT_ButtonTemplate2" text="추가" hidden="true">
+				<Size x="70" y="22"/>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentButtonDel" relativePoint="LEFT" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>self:SetText(HDH_AT_L.ADD)</OnLoad>
+					<OnClick></OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentButtonCancel" inherits="HDH_AT_ButtonTemplate2" text="취소" hidden="true">
+				<Size x="70" y="22"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentButtonAdd" relativePoint="RIGHT" x="0" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>self:SetText(HDH_AT_L.CANCEL)</OnLoad>
+					<OnClick></OnClick>
+				</Scripts>
+			</Button>
+			
+			<CheckButton name="$parentCheckButtonIsItem" inherits="HDH_AT_CheckButtonTemplate" hidden="true">
+				<Size x="70" y="20" />
+				<Anchors>
+					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentButtonAdd" x="-5" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetText(HDH_AT_L.ITEM)
+					</OnLoad>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+						GameTooltip:AddLine(HDH_AT_L.ITEM_TOOLTIP);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip_Hide();
+					</OnLeave>
+					<OnClick function="HDH_AT_OnClickIsItem" inherit="prepend"/>
+				</Scripts>
+			</CheckButton>
+			
+		</Frames>
+		
 		<Scripts>
-			<OnClick inherits="prepend">HDH_AT_TalentCheckButton_OnClick(self)</OnClick>
+			<OnLoad>
+				_G[self:GetName().."RowDesc"]:SetText(HDH_AT_L.CLICK_TO_ADD)
+			</OnLoad>
+			<OnClick function="HDH_AT_OnClickRowFrame" />
 		</Scripts>
-	</CheckButton>
+		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_White_A">
+			<Anchors>
+				<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent"  x="0" y="0" />
+				<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeTo="$parent" x="0" y="1"/>
+			</Anchors>
+		</HighlightTexture>
+	</Button>
 
 	<EditBox name="HDH_AT_EditBoxTemplate" inherits="InputBoxScriptTemplate" virtual="true">
 		<Size x="120" y="20" />
@@ -1509,7 +940,7 @@
 					</Anchors>
 				</Texture>
 			</Layer>
-			<Layer level="OVERAY">
+			<Layer level="OVERLAY">
 				<FontString name="$parentDesc" parentKey="Desc" inherits="Font_Yellow_S" text="텍스트 입력" justifyH="LEFT" hidden="false">
 					<Size x="1" y="1" />
 					<Color r="0.3" g="0.3" b="0.3" a="1"/>
@@ -1535,9 +966,9 @@
 					self.Desc:Show()
 				end
 			</OnTextSet>
-			<OnLeave inherits="prepend">self.Active:Hide()</OnLeave>
-			<OnEnter inherits="prepend">self.Active:Show()</OnEnter>
-			<OnEditFocusLost inherits="prepend">
+			<OnLeave inherit="prepend">self.Active:Hide()</OnLeave>
+			<OnEnter inherit="prepend">if self:IsEnabled() then self.Active:Show() end</OnEnter>
+			<OnEditFocusLost inherit="prepend">
 				local value = HDH_AT_UTIL.Trim(self:GetText()) or ""
 				if string.len(value) > 0 then
 					self.Desc:Hide()
@@ -1547,7 +978,17 @@
 				end
 			</OnEditFocusLost>
 			<OnTextChanged>HDH_AT_OnTextChanged(self)</OnTextChanged>
-			<OnEditFocusGained inherits="prepend">self.Desc:Hide(); EditBox_HighlightText(self);</OnEditFocusGained>
+			<OnEditFocusGained inherit="prepend">self.Desc:Hide(); EditBox_HighlightText(self);</OnEditFocusGained>
+			<OnEnable>
+				self:SetFontObject("Font_White_S")
+				self.BG2:Show()
+				self.BG1:SetColorTexture(0.8, 0.8, 0.8, 0.2)
+			</OnEnable>
+			<OnDisable>
+				self:SetFontObject("Font_Gray_S")
+				self.BG2:Hide()
+				self.BG1:SetColorTexture(0.06, 0.06, 0.06, 1)
+			</OnDisable>
 		</Scripts>
 	</EditBox>
 
@@ -1590,7 +1031,7 @@
 				</Texture>
 			</Layer>
 
-			<Layer level="OVERAY">
+			<Layer level="OVERLAY">
 				<FontString name="$parentDesc" parentKey="Desc" inherits="Font_Yellow_S" text="텍스트 입력" justifyH="LEFT" hidden="false">
 					<Size x="1" y="1" />
 					<Color r="0.3" g="0.3" b="0.3" a="1"/>
@@ -1624,7 +1065,7 @@
 							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeTo="$parent" x="-10" y="0" />
 						</Anchors>
 						<Layers>
-							<Layer level="OVERAY">
+							<Layer level="OVERLAY">
 								<FontString name="$parentDesc" parentKey="Desc" inherits="Font_Yellow_S" text="텍스트 입력" justifyH="LEFT" hidden="false">
 									<Size x="1" y="1" />
 									<Color r="0.3" g="0.3" b="0.3" a="1"/>
@@ -1650,9 +1091,9 @@
 									self.Desc:Show()
 								end
 							</OnTextSet>
-							<OnLeave inherits="prepend">self:GetParent():GetParent().Active:Hide()</OnLeave>
-							<OnEnter inherits="prepend">self:GetParent():GetParent().Active:Show()</OnEnter>
-							<OnEditFocusLost inherits="prepend">
+							<OnLeave inherit="prepend">self:GetParent():GetParent().Active:Hide()</OnLeave>
+							<OnEnter inherit="prepend">self:GetParent():GetParent().Active:Show()</OnEnter>
+							<OnEditFocusLost inherit="prepend">
 								local value = HDH_AT_UTIL.Trim(self:GetText()) or ""
 								if string.len(value) > 0 then
 									self.Desc:Hide()
@@ -1669,15 +1110,15 @@
 							<OnUpdate>
 								ScrollingEdit_OnUpdate(self, elapsed, self:GetParent());
 							</OnUpdate>
-							<OnEditFocusGained inherits="prepend">self.Desc:Hide(); EditBox_HighlightText(self);</OnEditFocusGained>
+							<OnEditFocusGained inherit="prepend">self.Desc:Hide(); EditBox_HighlightText(self);</OnEditFocusGained>
 							<OnShow>self:SetFocus(true)</OnShow>
 							<!-- <OnMouseDown>EditBox_HighlightText(self);</OnMouseDown> -->
 						</Scripts>
 					</EditBox>
 				</ScrollChild>
 				<Scripts>
-					<OnLeave inherits="prepend">self:GetParent().Active:Hide()</OnLeave>
-					<OnEnter inherits="prepend">self:GetParent().Active:Show()</OnEnter>
+					<OnLeave inherit="prepend">self:GetParent().Active:Hide()</OnLeave>
+					<OnEnter inherit="prepend">self:GetParent().Active:Show()</OnEnter>
 					<OnMouseDown>
 						self.EditBox:SetFocus(true)
 					</OnMouseDown>
@@ -1860,10 +1301,10 @@
 			<OnLoad function="HDH_AT_DropDown_OnLoad" />
             <OnLeave function="HDH_AT_DropDown_OnLeave" />
             <OnClick function="HDH_AT_DropDown_OnClick" />
-			<OnEnable inherits="append">
+			<OnEnable inherit="append">
 				self.Text:SetFontObject("Font_Yellow_S")
 			</OnEnable>
-			<OnDisable inherits="append">
+			<OnDisable inherit="append">
 				self.Text:SetFontObject("Font_Gray_S")
 			</OnDisable>
 		</Scripts>
@@ -1883,7 +1324,7 @@
 
 	<Button  name="HDH_AT_DropDownMultiSeletorAlwayShowTemplate" inherits="HDH_AT_DropDownTemplate" virtual="true">
 		<Scripts>
-			<OnLoad inherits="append">
+			<OnLoad inherit="append">
 				self.always_show_list = true
 				self.Text:Hide()
 				self.List:Show()
@@ -1907,7 +1348,7 @@
                     </Anchors>
                 </Texture>
             </Layer>
-            <Layer level="artwork" textureSubLevel="1">
+            <Layer level="ARTWORK" textureSubLevel="1">
 				<Texture parentKey="DownEnableTexture" file="Interface/AddOns/HDH_AuraTracker/Texture/Up">
 					<TexCoords left="0" right="1" top="1" bottom="0" />
 					<Color r="1" g="0.8" b="0"/>
@@ -1988,7 +1429,7 @@
                 </Texture>
             </Layer>
 
-            <Layer level="artwork">
+            <Layer level="ARTWORK">
 				<Texture parentKey="DownEnableTexture" file="Interface/AddOns/HDH_AuraTracker/Texture/Up">
 					<TexCoords left="0" right="1" top="1" bottom="0" />
 					<Color r="1" g="0.8" b="0"/>
@@ -2009,7 +1450,7 @@
         </Layers>
 
 		<Scripts>
-			<OnLoad inherits="append">
+			<OnLoad inherit="append">
 				self.Texture:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 0))
 			</OnLoad>
 			<OnShow>
@@ -2025,7 +1466,7 @@
 		<HighlightFont style="Font_Yellow_L"/>
     </Button>
 
-	<Frame name="HDH_AT_CheckButtonItemTemplate" virtual="true">
+	<Frame name="HDH_AT_DropDownOptionCheckButtonItemTemplate" virtual="true">
 		<Size x="110" y="22" />
 
 		<Layers>
@@ -2048,7 +1489,7 @@
 			</Layer>
 		</Layers>
 		<Frames>
-			<CheckButton parentKey="CheckButton" inherits="HDH_AT_CheckButton2Template" >
+			<CheckButton parentKey="CheckButton" inherits="HDH_AT_CheckButtonTemplate" >
 				<Size x="110" y="20" />
 				<Anchors>
 					<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parent" x="2" y="1"/>
@@ -2058,12 +1499,12 @@
 		</Frames>
 		<Scripts>
 			<OnLoad>
-				self.Text = self.CheckButton.Text
+				self.Text = self.CheckButton:GetFontString()
 			</OnLoad>
 		</Scripts>
 	</Frame>
 
-	<Button name="HDH_AT_SplitItemTemplate" virtual="true">
+	<Button name="HDH_AT_DropDownOptionSplitItemTemplate" virtual="true">
 		<Size x="100" y="30" />
 		<Layers>
 			<Layer level="BACKGROUND"  textureSubLevel="1">
@@ -2185,12 +1626,22 @@
 		<Frames>
 			<EditBox name="$parentEdit" parentKey="EditBox" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false"  >
 				<Size x="1" y="20" />
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="Font_White_S" justifyH="LEFT" text="#">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="LEFT" x="4" y="0" />
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
 				<Anchors>
 					<Anchor point="LEFT" relativeTo="$parentOff" relativePoint="RIGHT" x="2" y="0"/>
 					<Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT" x="0" y="0"/>
 				</Anchors>
+				<TextInsets left="14" right="5" bottom="0" top="0"/>
 				<Scripts>
-					<OnLoad>self:SetFontObject("Font_White_S")</OnLoad>
+					<OnLoad>self:SetFontObject("Font_White_S") self.Desc:SetText("   "..self.Desc:GetText())</OnLoad>
 					<OnEnterPressed>
 						local r, g, b, a = HDH_AT_UTIL.StringToColor(self:GetText())
 						if r ~= nil then
@@ -2233,107 +1684,7 @@
 		</Scripts>
 	</Button>
 
-	<Button name="HDH_AT_PrevNextButtonTemplate" virtual="true" enableMouse="false">	
-		<Size><AbsDimension x="90" y="22" /></Size>
-		<Layers> 
-			<Layer level="ARTWORK">
-				<FontString name="$parentTextValue" parentKey="Value" inherits="Font_Yellow_S" justifyH="CENTER" text="1">
-					<Anchors>
-						<Anchor point="CENTER" relativePoint="CENTER" x="0" y="0" />
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-		<Frames>
-			<Button parentKey="BtnPrev" inherits="HDH_AT_TextureButtonTemplate">
-				<Size><AbsDimension x="22" y="22" /></Size>
-				<Layers>
-					<Layer level="ARTWORK" textureSubLevel="2">
-						<Texture parentKey="Texture" file="Interface/AddOns/HDH_AuraTracker/Texture/Left">
-							<TexCoords left="0" right="1" top="0" bottom="1" />
-							<Size x="8" y="10" />
-							<Anchors>
-								<Anchor point="CENTER" x="0" y="0"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-					<Layer level="ARTWORK" textureSubLevel="1">
-						<Texture file="Interface/AddOns/HDH_AuraTracker/Texture/Left">
-							<TexCoords left="0" right="1" top="0" bottom="1" />
-							<Size x="8" y="10" />
-							<Color r="0" g="0" b="0" a="0.5"/>
-							<Anchors>
-								<Anchor point="CENTER" relativeKey="$parent.Texture" relativePoint="CENTER" x="1" y="-1"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-				<Anchors>
-					<Anchor point="LEFT" relativePoint="LEFT" x="0" y="0"/>
-				</Anchors>
-			</Button>
-
-			<Button parentKey="BtnNext" inherits="HDH_AT_TextureButtonTemplate">
-				<Size><AbsDimension x="22" y="22" /></Size>
-				<Layers>
-					<Layer level="ARTWORK" textureSubLevel="2">
-						<Texture parentKey="Texture" file="Interface/AddOns/HDH_AuraTracker/Texture/Left">
-							<TexCoords left="1" right="0" top="0" bottom="1" />
-							<Size x="8" y="10" />
-							<Anchors>
-								<Anchor point="CENTER" x="0" y="0"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-					<Layer level="ARTWORK" textureSubLevel="1">
-						<Texture file="Interface/AddOns/HDH_AuraTracker/Texture/Left">
-							<TexCoords left="1" right="0" top="0" bottom="1" />
-							<Size x="8" y="10" />
-							<Color r="0" g="0" b="0" a="0.5"/>
-							<Anchors>
-								<Anchor point="CENTER" relativeKey="$parent.Texture" relativePoint="CENTER" x="1" y="-1"/>
-							</Anchors>
-						</Texture>
-					</Layer>
-				</Layers>
-				<Anchors>
-					<Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0"/>
-				</Anchors>
-			</Button>
-		</Frames>
-		<Scripts>
-			<OnEnable>
-				self.BtnPrev:Show()
-				self.BtnNext:Show()
-			</OnEnable>
-			<OnDisable>
-				self.BtnPrev:Hide()
-				self.BtnNext:Hide()
-			</OnDisable>
-		</Scripts>
-	</Button>
-
-	<Button name="HDH_AT_TextureButtonTemplate" inherits="HDH_AT_ButtonTemplate" virtual="true" >
-		<Size><AbsDimension x="22" y="22" /></Size>
-		<Scripts>
-			<OnMouseDown>
-				if self.Texture then
-					self.Texture:SetPoint("CENTER", 1, -1)
-				end
-			</OnMouseDown>
-			<OnMouseUp>
-				if self.Texture then
-					self.Texture:SetPoint("CENTER", 0, 0)
-				end
-			</OnMouseUp>
-			<OnLeave>
-			</OnLeave>
-			<OnEnter>
-			</OnEnter>
-		</Scripts>
-	</Button>
-
-	<Frame name="HDH_AT_SplitPointerTemplate" virtual="true" >
+	<Frame name="HDH_AT_SplitPointerTemplate" mixin="HDH_AT_SplitPointerTemplateMixin" virtual="true" >
 		<Size x="31" y="60" />
 		<Layers>
 			<Layer level="ARTWORK">
@@ -2382,7 +1733,7 @@
 		<Size x="100" y="30" />
 		<Layers>
 			<Layer level="BORDER">
-				<Texture name="$parentBorder">
+				<Texture name="$parentBorder" hidden="true">
 					<Size x="30" y="30" />
 					<Color r="0.5" g="0.8" b="0.2" />
 					<Anchors>
@@ -2395,14 +1746,15 @@
 					<Size x="100" y="30" />
 					<Color r="0.5" g="0.8" b="0.2" />
 					<Anchors>
-						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentBorder" x="0" y="0"/>
+						<!-- <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentBorder" x="0" y="0"/> -->
+						<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0"/>
 						<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0"/>
 					</Anchors>
 				</Texture>
 			</Layer>
 			
 			<Layer level="OVERLAY">
-				<Texture name="$parentTexture" file="Interface/ICONS/WoW_Token01" parentKey="Icon">
+				<Texture name="$parentTexture" file="Interface/ICONS/WoW_Token01" parentKey="Icon" hidden="true">
 					<Size x="28" y="28" />
 					<Anchors>
 						<Anchor point="CENTER" relativePoint="CENTER" relativeTo="$parentBorder" x="0" y="0"/>
@@ -2430,10 +1782,36 @@
 			</Layer>
 		</Layers>
 		<Frames>
+
+			<Button name="$parentButtonDel"  parentKey="ButtonDel" inherits="HDH_AT_ButtonWhiteTemplate" text="-">
+				<Size x="50" y="28" />
+				<Anchors>
+					<Anchor point="RIGHT"  x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetText(HDH_AT_L.DELETE)
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentButtonAdd" parentKey="ButtonAdd" inherits="HDH_AT_ButtonTemplate" text="+">
+				<Size x="50" y="28" />
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentButtonDel" relativePoint="LEFT" x="-5" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetText(HDH_AT_L.APPLY)
+					</OnLoad>
+				</Scripts>
+			</Button>
+			
 			<EditBox name="$parentEdit" parentKey="EditBox" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false"  >
 				<Size x="60" y="26" />
 				<Anchors>
 					<Anchor point="LEFT"  relativePoint="RIGHT" relativeTo="$parentText" x="0" y="0"/>
+					<Anchor point="RIGHT"  relativePoint="LEFT" relativeTo="$parentButtonAdd" x="-5" y="0"/>
 				</Anchors>
 				<Scripts>
 					<OnLoad>
@@ -2443,19 +1821,55 @@
 				</Scripts>
 			</EditBox>
 
-			<Button name="$parentButtonAdd" parentKey="ButtonAdd" inherits="HDH_AT_ButtonTemplate" text="+">
-				<Size x="26" y="26" />
+		</Frames>
+	</Frame>
+
+	<Frame name="HDH_AT_MaxValueEdtiboxTemplate" virtual="true" >
+		<Size x="100" y="30" />
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentText" parentKey="Text" inherits="Font_Yellow_S" text="" justifyH="LEFT">
+					<Size x="70" y="26" />
+					<Anchors>
+						<Anchor point="LEFT" relativePoint="LEFT" x="5" y="0"/>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentBtnSave"  parentKey="BtnSave" inherits="HDH_AT_ButtonTemplate">
+				<Size x="50" y="28" />
 				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentEdit" relativePoint="RIGHT" x="5" y="0" />
+					<Anchor point="RIGHT" x="0" y="0" />
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetText(HDH_AT_L.APPLY)
+					</OnLoad>
+				</Scripts>
+			</Button>
+
+			<EditBox name="$parentEdit" parentKey="EditBox" inherits="HDH_AT_EditBoxTemplate" enableMouse="true" autoFocus="false"  >
+				<Size x="70" y="26" />
+				<Anchors>
+					<Anchor point="RIGHT"  relativePoint="LEFT" relativeTo="$parentBtnSave" x="-5" y="0"/>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						<!-- self:SetNumeric(true) -->
+						self.Desc:SetText(HDH_AT_L.PLEASE_INPUT)
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+
+			<Button name="$parentDDMaxValueType"  parentKey="DDMaxValueType" inherits="HDH_AT_DropDownOptionTemplate">
+				<Size x="100" y="26" />
+				<Anchors>
+					<Anchor point="LEFT"  relativePoint="RIGHT" relativeTo="$parentText" x="0" y="0"/>
+					<Anchor point="RIGHT"  relativePoint="LEFT" relativeTo="$parentEdit" x="-5" y="0"/>
 				</Anchors>
 			</Button>
-			
-			<Button name="$parentButtonDel"  parentKey="ButtonDel" inherits="HDH_AT_ButtonTemplate" text="-">
-				<Size x="26" y="26" />
-				<Anchors>
-					<Anchor point="LEFT" relativeTo="$parentButtonAdd" relativePoint="RIGHT" x="5" y="0" />
-				</Anchors>
-			</Button>
+
 		</Frames>
 	</Frame>
 
@@ -2519,21 +1933,21 @@
 		</Layers>
 
 		<Frames>
-			<CheckButton parentKey="CheckButton1" inherits="HDH_AT_CheckButton2Template" >
+			<CheckButton parentKey="CheckButton1" inherits="HDH_AT_CheckButtonTemplate" >
 				<Size x="20" y="20" />
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTexture1" x="-5" y="0"/>
 				</Anchors>
 			</CheckButton>
 
-			<CheckButton parentKey="CheckButton2" inherits="HDH_AT_CheckButton2Template" >
+			<CheckButton parentKey="CheckButton2" inherits="HDH_AT_CheckButtonTemplate" >
 				<Size x="20" y="20" />
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBar1" x="-5" y="0"/>
 				</Anchors>
 			</CheckButton>
 
-			<CheckButton parentKey="CheckButton3" inherits="HDH_AT_CheckButton2Template" >
+			<CheckButton parentKey="CheckButton3" inherits="HDH_AT_CheckButtonTemplate" >
 				<Size x="20" y="20"/>
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentTexture2" x="-5" y="0"/>
@@ -2759,8 +2173,8 @@
 				</Layers>
 				<Size x="17" y="20"/>
 				<Anchors>
-					<Anchor point="Right" x="0" y="0"/>
-					<Anchor point="Right" x="0" y="0"/>
+					<Anchor point="RIGHT" x="0" y="0"/>
+					<Anchor point="RIGHT" x="0" y="0"/>
 				</Anchors>
 				<Scripts>
 					<OnClick function="HDH_AT_SliderTemplateMixin_OnClick"/>
@@ -2931,273 +2345,6 @@
 		</HighlightTexture>
 	</Button>
 
-	<Button name="HDH_AT_CheckButton2Template" mixin="HDH_AT_CheckButton2TemplateMixin" virtual="true">
-		<Size x="110" y="20" />
-		<Layers>
-			<Layer level="BACKGROUND">
-
-				<Texture parentKey="DeactiveBorderTop" hidden="false">
-					<Size y="2" />
-					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="0"/>
-						<Anchor point="TOPRIGHT" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="DeactiveBorderLeft" hidden="false">
-					<Size x="2" />
-					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="0" y="-2"/>
-						<Anchor point="BOTTOMLEFT" x="0" y="2"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="DeactiveBorderBottom" hidden="false">
-					<Size y="2" />
-					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
-					<Anchors>
-						<Anchor point="BOTTOMLEFT" x="0" y="0"/>
-						<Anchor point="BOTTOMRIGHT" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="DeactiveBorderRight" hidden="false">
-					<Size x="2" />
-					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
-					<Anchors>
-						<Anchor point="TOPRIGHT" x="0" y="-2"/>
-						<Anchor point="BOTTOMRIGHT" x="0" y="2"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="Deactive1" hidden="false">
-					
-					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="18" y="-2"/>
-						<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-					</Anchors>
-				</Texture>
-
-				<Texture name="$parentActiveCheckBox" parentKey="Active2" hidden="false">
-					<Size x="16" y="16" />
-					<Color r="0.3" g="0.3" b="0.3" a="0.0"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="2" y="-2"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="DeactiveCheckBoxTop" hidden="true">
-					<Size x="16" y="2" />
-					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="2" y="-2"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="DeactiveCheckBoxLeft" hidden="true">
-					<Size x="2" y="12" />
-					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="2" y="-4"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="DeactiveCheckBoxRight" hidden="true">
-					<Size x="2" y="12" />
-					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" x="16" y="-4"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="DeactiveCheckBoxBottom" hidden="true">
-					<Size x="16" y="2" />
-					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeKey="$parent.DeactiveCheckBoxLeft" relativePoint="BOTTOMLEFT" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-
-			</Layer>
-
-			<Layer level="BORDER">
-				<Texture parentKey="ActiveBorderTop" hidden="true" inherits="HDH_AT_Texture_Yellow">
-					<Size x="16" y="2" />
-					<Anchors>
-						<Anchor point="TOPLEFT" x="2" y="-2"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="ActiveBorderLeft" hidden="true" inherits="HDH_AT_Texture_Yellow">
-					<Size x="2" y="12" />
-					<Anchors>
-						<Anchor point="TOPLEFT" x="2" y="-4"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="ActiveBorderBottom" hidden="true" inherits="HDH_AT_Texture_Yellow">
-					<Size x="2" y="12" />
-					<Anchors>
-						<Anchor point="TOPLEFT" x="16" y="-4"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="ActiveBorderRight" hidden="true" inherits="HDH_AT_Texture_Yellow">
-					<Size x="16" y="2" />
-					<Anchors>
-						<Anchor point="TOPLEFT" relativeKey="$parent.ActiveBorderLeft" relativePoint="BOTTOMLEFT" x="0" y="0"/>
-					</Anchors>
-				</Texture>
-				
-				<Texture name="$parentBg" parentKey="Active1" hidden="true" inherits="HDH_AT_Texture_Yellow">
-					<Anchors>
-						<Anchor point="TOPLEFT" x="18" y="-2"/>
-						<Anchor point="BOTTOMRIGHT" x="-2" y="2"/>
-					</Anchors>
-				</Texture>
-
-				<Texture name="$parentActiveCheckBox" parentKey="Active2" hidden="true" inherits="HDH_AT_Texture_Yellow">
-					<Size x="16" y="16" />
-					<Anchors>
-						<Anchor point="TOPLEFT" x="2" y="-2"/>
-					</Anchors>
-				</Texture>
-				
-			</Layer>
-
-			<Layer level="OVERLAY">
-
-				<Texture parentKey="CheckMarker" file="Interface/AddOns/HDH_AuraTracker/Texture/check" hidden="true">
-					<Size x="8" y="10" />
-					<Color r="1" g="0.8" b="0"/>
-					<Anchors>
-						<Anchor point="LEFT" relativePoint="LEFT" x="6" y="0"/>
-					</Anchors>
-				</Texture>
-
-				<FontString parentKey="Text" inherits="Font_White_S" text="" justifyH="LEFT"  justifyV="CENTER">
-					<Size  y="20" />
-					<Anchors>
-						<Anchor point="LEFT" relativePoint="LEFT" x="24" y="0"/>
-						<Anchor point="RIGHT" relativePoint="RIGHT" x="-2" y="0"/>
-					</Anchors>
-				</FontString>
-			</Layer>
-		</Layers>
-
-		<HighlightTexture alphaMode="ADD" inherits="HDH_AT_Texture_White_A">
-		</HighlightTexture>
-
-		<Scripts>
-			<OnClick function="HDH_AT_CheckButton2_OnClick" />
-			<OnEnable>self.Text:SetFontObject("Font_White_S")</OnEnable>
-			<OnDisable>self.Text:SetFontObject("Font_Gray_S")</OnDisable>
-			<OnEnter>
-				local visibleWidth = self.Text:GetWidth()
-				local fullWidth = self.Text:GetUnboundedStringWidth()
-				if fullWidth > visibleWidth then
-					GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
-					GameTooltip:AddLine(self.Text:GetText());
-					GameTooltip:Show();
-				end
-			</OnEnter>
-			<OnLeave>
-				if GameTooltip:IsShown() then
-					GameTooltip:Hide()
-				end
-			</OnLeave>
-		</Scripts>
-
-	</Button>
-
-	<Button name="HDH_AT_CheckButtonImageTemplate" inherits="HDH_AT_CheckButton2Template" virtual="true">
-		<Layers>
-			<Layer level="ARTWORK">
-				<Texture name="$parentIcon" parentKey="Icon" file="Interface\ICONS\INV_Misc_QuestionMark">
-					<Size x="20" y="20"/>
-					<Anchors>
-						<Anchor point="LEFT" relativePoint="RIGHT" x="5" y="0"/>
-					</Anchors>
-					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
-				</Texture>
-
-				<Texture parentKey="Top">
-					<Size x="24" y="1"/>
-					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
-					<Anchors>
-						<Anchor point="BOTTOM" relativePoint="TOP" relativeKey="$parent.Icon" x="0" y="1"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="Bottom">
-					<Size x="24" y="1"/>
-					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
-					<Anchors>
-						<Anchor point="TOP" relativePoint="BOTTOM" relativeKey="$parent.Icon" x="0" y="-1"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="Left">
-					<Size x="1" y="22"/>
-					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
-					<Anchors>
-						<Anchor point="RIGHT" relativePoint="LEFT" relativeKey="$parent.Icon" x="-1" y="0"/>
-					</Anchors>
-				</Texture>
-
-				<Texture parentKey="Right">
-					<Size x="1" y="22"/>
-					<Color r="0.3" g="0.3" b="0.3" a="0.5"/>
-					<Anchors>
-						<Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.Icon" x="1" y="0"/>
-					</Anchors>
-				</Texture>
-			</Layer>
-		</Layers>
-		<HitRectInsets left="0" right="-30" top="0" bottom="0"/>
-	</Button>
-
-	<Button name="HDH_AT_CheckButtonForExportTemplate" inherits="HDH_AT_CheckButton2Template" virtual="true">
-		<Layers>
-			<Layer level="ARTWORK">
-				<Texture name="$parentIcon1" parentKey="Icon1" file="Interface\ICONS\INV_Misc_QuestionMark">
-					<Size x="14" y="14" />
-					<Anchors>
-						<Anchor point="RIGHT" relativePoint="RIGHT" x="-3" y="0"/>
-					</Anchors>
-					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
-				</Texture>
-
-				<Texture name="$parentIcon2" parentKey="Icon2" file="Interface\ICONS\INV_Misc_QuestionMark">
-					<Size x="14" y="14" />
-					<Anchors>
-						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentIcon1" x="-1" y="0"/>
-					</Anchors>
-					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
-				</Texture>
-
-				<Texture name="$parentIcon3" parentKey="Icon3" file="Interface\ICONS\INV_Misc_QuestionMark">
-					<Size x="14" y="14" />
-					<Anchors>
-						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentIcon2" x="-1" y="0"/>
-					</Anchors>
-					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
-				</Texture>
-
-				<Texture name="$parentIcon4" parentKey="Icon4" file="Interface\ICONS\INV_Misc_QuestionMark">
-					<Size x="14" y="14" />
-					<Anchors>
-						<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentIcon3" x="-1" y="0"/>
-					</Anchors>
-					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
-				</Texture>
-			</Layer>
-		</Layers>
-	</Button>
-
 	<Frame name="HDH_AT_SpellSearchEditBoxTemplate" mixin="HDH_AT_SpellSearchEditBoxTemplateMixin"  virtual="true">
 		<Size x="110" y="20" />
 		<Layers>
@@ -3247,7 +2394,7 @@
 					<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92" /> 
 				</Texture>
 
-				<FontString parentKey="Name" inherits="Font_White_S" text="" justifyH="LEFT" justifyV="CENTER">
+				<FontString parentKey="Name" inherits="Font_White_S" text="" justifyH="LEFT" justifyV="MIDDLE">
 					<Size x="100" y="20" />
 					<Anchors>
 						<Anchor point="LEFT" relativeTo="$parentIconBackground" relativePoint="RIGHT" x="6" y="0" />
@@ -3255,7 +2402,7 @@
 					</Anchors>
 				</FontString>
 
-				<FontString parentKey="Desc" inherits="Font_Gray_S" text="" justifyH="LEFT" justifyV="CENTER">
+				<FontString parentKey="Desc" inherits="Font_Gray_S" text="" justifyH="LEFT" justifyV="MIDDLE">
 					<Size x="100" y="20" />
 					<Anchors>
 						<Anchor point="LEFT" relativeTo="$parentIconBackground" relativePoint="RIGHT" x="6" y="0" />
@@ -3304,15 +2451,14 @@
 				</Scripts>
 			</Button>
 
-			<CheckButton name="$parentCheckButtonIsItem" parentKey="CBIsItem" inherits="HDH_AT_CheckButton2Template" hidden="true">
+			<CheckButton name="$parentCheckButtonIsItem" parentKey="CBIsItem" inherits="HDH_AT_CheckButtonTemplate" hidden="true">
 				<Size x="65" y="20" />
 				<Anchors>
 					<Anchor point="RIGHT" relativeTo="$parentCancel" relativePoint="LEFT" x="-2" y="0" />
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						self.Text:SetText(HDH_AT_L.ITEM)
-						self:HiddenBackground(true)
+						self:SetText(HDH_AT_L.ITEM)
 					</OnLoad>
 					<OnEnter>
 						self.overMouse = true
@@ -3501,4 +2647,5 @@
 			</OnLoad>
 		</Scripts>
 	</ScrollFrame>
+
 </Ui> 

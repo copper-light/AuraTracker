@@ -65,11 +65,13 @@ function HDH_DK_RUNE_TRACKER:CreateData()
 	if select(4, GetBuildInfo()) >= 100000 then
 		for i = 1 , MAX_RUNES do
 			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, display, isValue, isItem)
+			DB:SetTrackerElementBarInfo(trackerId, i, DB.BAR_TYPE_BY_TIME, DB.BAR_MAX_TYPE_AUTO, nil, {}, DB.BAR_SPLIT_RATIO)
 			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 		end 
 	else
 		for i = 1 , MAX_RUNES do
 			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, OLD_DK_COLOR[i].texture, display, isValue, isItem)
+			DB:SetTrackerElementBarInfo(trackerId, i, DB.BAR_TYPE_BY_TIME, DB.BAR_MAX_TYPE_AUTO, nil, {}, DB.BAR_SPLIT_RATIO)
 			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 		end 
 	end
@@ -103,335 +105,166 @@ function HDH_DK_RUNE_TRACKER:CreateData()
 	self:UpdateSetting();
 end
 
-function HDH_DK_RUNE_TRACKER:IsHaveData()
+function HDH_DK_RUNE_TRACKER:GetElementCount()
 	for i = 1 , MAX_RUNES do
 		local key = DB:GetTrackerElement(self.id, i)
 		if (self.POWER_INFO[self.type].power_type .. i) ~= key then
-			return false
+			return 0
 		end
 	end 
 
-	return true
+	return MAX_RUNES
 end
 
-function HDH_DK_RUNE_TRACKER:UpdateIcon(f)
-	if not f then return end
-	if not f.spell then return end
+function HDH_DK_RUNE_TRACKER:UpdateBarSettings(f)
+	super.UpdateBarSettings(self, f)
+	if self.ui.common.display_mode == DB.DISPLAY_ICON then return end
 
-	self:UpdateRune(f.spell.no)
-	if f.spell.remaining > 0.1 then
-		HDH_AT_UTIL.CT_StartTimer(f)
-		if not f.icon:IsDesaturated() then f.icon:SetDesaturated(1) end
-		if f.spell.count == 0 then f.counttext:SetText(nil)
-								else f.counttext:SetText(f.spell.count) end
-		f.cd:Show()
-		f.icon:SetAlpha(self.ui.icon.off_alpha)
-		f.border:SetAlpha(self.ui.icon.off_alpha)
-		f.border:SetVertexColor(0,0,0)
-		f.iconSatCooldown:Show()
-		if self.ui.icon.cooldown == DB.COOLDOWN_CIRCLE or self.ui.icon.cooldown == DB.COOLDOWN_NONE then
-			f.cd:SetCooldown(f.spell.startTime, f.spell.duration)
+	if f.spell then
+		local op = self.ui.bar
+		local r, g, b, a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
+		local fr, fg, fb, fa = adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color)
+		local normalColor = {r, g, b, a}
+		local fullColor = {fr, fg, fb, fa}
+
+		if select(4, GetBuildInfo()) >= 100000 then
+			normalColor = self.ui.bar.color
+			fullColor = self.ui.bar.full_color
+		end
+
+		if op.use_full_color then
+			f.bar:UseChangedStatusColor(normalColor, fullColor)
 		else
-			f.cd:SetMinMaxValues(f.spell.startTime, f.spell.endTime)
-			f.cd:SetValue(f.spell.endTime - (GetTime() - f.spell.startTime))
-		end
-		self:UpdateGlow(f, false)
-		f:Show()
-		if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then
-			self:UpdateBarValue(f, HDH_TRACKER.ENABLE_MOVE)
-		end
-	else
-		if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then self:UpdateBarValue(f, true); end
-		f.icon:SetDesaturated(nil)
-		f.timetext:SetText("");
-		if self.ui.display_mode ~= DB.DISPLAY_BAR and (f.spell.display == DB.SPELL_ALWAYS_DISPLAY)then 
-			f.icon:SetAlpha(self.ui.icon.on_alpha)
-			f.border:SetAlpha(self.ui.icon.on_alpha)
-
-			if select(4, GetBuildInfo()) >= 100000 then
-				f.border:SetVertexColor(unpack(self.ui.icon.active_border_color)) 
-			else
-				r,g,b,a = adjuistColor(self.ui.icon.active_border_color, OLD_DK_COLOR[f.spell.no].color)
-				f.border:SetVertexColor(r,g,b,a) 
-			end
-
-			f.counttext:SetText(nil)
-			f.iconSatCooldown:Hide()
-			f.iconSatCooldown.spark:Hide()
-			f.cd:Hide() 
-			self:UpdateGlow(f, true)
-			f:Show()
-		else
-			f:Hide()
-		end
-	end
-	self:UpdateLayout()
-end
-
-if select(4, GetBuildInfo()) < 100000 then
-
-	function HDH_DK_RUNE_TRACKER:UpdateBarValue(f, isEnding)
-		if f.bar and f.name then
-			local r,g,b,a 
-			if self.ui.bar.to_fill then
-				if isEnding then
-					f.bar:SetMinMaxValues(0,1); 
-					f.bar:SetValue(1); 
-					f.name:SetTextColor(unpack(self.ui.font.name_color_off));
-					f.bar.spark:Hide();
-
-					if self.ui.bar.use_full_color then
-						r,g,b,a = adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color)
-					else
-						r,g,b,a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
-					end
-					f.bar:SetStatusBarColor(r,g,b,a);
-
-				else
-					r,g,b,a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
-					f.bar:SetStatusBarColor(r,g,b,a);
-					local maxV = f.spell.endTime - f.spell.startTime;
-					f.bar:SetMinMaxValues(0, maxV); 
-					f.bar:SetValue(maxV-f.spell.remaining);
-					f.name:SetTextColor(unpack(self.ui.font.name_color));
-					if self.ui.bar.show_spark and f.spell.duration > 0 then f.bar.spark:Show(); 
-					else f.bar.spark:Hide(); end
-				end
-			else
-				if isEnding then
-					r,g,b,a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
-
-					f.bar:SetMinMaxValues(0,1); 
-					f.bar:SetValue(0); 
-					f.name:SetTextColor(unpack(self.ui.font.name_color_off));
-					f.bar:SetStatusBarColor(r,g,b,a);
-					f.bar.spark:Hide();
-				else
-					local maxV = f.spell.endTime - f.spell.startTime;
-					f.bar:SetMinMaxValues(0, maxV); 
-					-- f.bar:SetMinMaxValues(f.spell.startTime, f.spell.endTime); 
-					f.bar:SetValue(f.spell.remaining); 
-					
-					if self.ui.bar.use_full_color and maxV == f.spell.remaining  then
-						r,g,b,a = adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color)
-					else
-						r,g,b,a = adjuistColor(self.ui.bar.color, OLD_DK_COLOR[f.spell.no].color)
-					end
-					f.bar:SetStatusBarColor(r,g,b,a);
-					
-					f.name:SetTextColor(unpack(self.ui.font.name_color));
-					if self.ui.bar.show_spark and f.spell.duration > 0 then f.bar.spark:Show(); 
-					else f.bar.spark:Hide(); end
-				end
-			end
+			f.bar:UseChangedStatusColor(nil)
+			f.bar:SetStatusBarColor(unpack(normalColor))
 		end
 	end
 end
 
-function HDH_DK_RUNE_TRACKER:UpdateAllIcons()
-	for k,v in pairs(self.frame.icon) do
-		self:UpdateIcon(v)
-	end
-	-- self:UpdateLayout()
-end
-
-function HDH_DK_RUNE_TRACKER:UpdateLayout()
-	if not self.ui or not self.frame.icon then return end
-	local f, spell
-	local ret = 0 -- 쿨이 도는 스킬의 갯수를 체크하는것
-	local line = self.ui.common.column_count or 10-- 한줄에 몇개의 아이콘 표시
-	local margin_h = self.ui.common.margin_h
-	local margin_v = self.ui.common.margin_v
-	local reverse_v = self.ui.common.reverse_v -- 상하반전
-	local reverse_h = self.ui.common.reverse_h -- 좌우반전
-	local show_index = 0 -- 몇번째로 아이콘을 출력했는가?
-	local col = 0  -- 열에 대한 위치 좌표값 = x
-	local row = 0  -- 행에 대한 위치 좌표값 = y
-	local cnt = #self.frame.icon;
-	local reorder = {};
-	local tmp;
-
-	local size_w, size_h
-	if self.ui.common.display_mode == DB.DISPLAY_BAR then
-		size_w = self.ui.bar.width
-		size_h = self.ui.bar.height
-	elseif self.ui.common.display_mode == DB.DISPLAY_ICON_AND_BAR then
-		if self.ui.bar.location == DB.BAR_LOCATION_R or self.ui.bar.location == DB.BAR_LOCATION_L then
-			size_w = self.ui.bar.width + self.ui.icon.size
-			size_h = max(self.ui.bar.height, self.ui.icon.size)
-		else
-			size_h = self.ui.bar.height + self.ui.icon.size
-			size_w = max(self.ui.bar.width, self.ui.icon.size)
-		end
-		
-	else
-		size_w = self.ui.icon.size -- 아이콘 간격 띄우는 기본값
-		size_h = self.ui.icon.size
-	end
-
-	if self.OrderFunc then self:OrderFunc(self) end 
-	for i = 1 , cnt do
-		f = self.frame.icon[i]
-		if f and f.spell then
-			if HDH_TRACKER.ENABLE_MOVE or f:IsShown() then
-				f:ClearAllPoints()
-				f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-				show_index = show_index + 1
-				if i % line == 0 then row = row + size_h + margin_v; col = 0
-									else col = col + size_w + margin_h end
-				if f.spell.remaining > 0 then ret = ret + 1 end -- 비전투라도 쿨이 돌고 잇는 스킬이 있으면 화면에 출력하기 위해서 체크함
-			else
-				if (f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE or f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE) and self.ui.common.order_by == DB.ORDERBY_REG then
-					show_index = show_index + 1
-					f:ClearAllPoints()
-					f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-					if show_index % line == 0 then 
-						row = row + size_h + margin_v
-						col = 0
-					else 
-						col = col + size_w + margin_h
-					end
-				end
-			end
-		end
-	end
-
-	if  (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
-			and (HDH_TRACKER.ENABLE_MOVE or ret > 0 or UnitAffectingCombat("player") or self.ui.common.always_show) then
-		self:ShowTracker();
-	else
-		self:HideTracker();
-	end
-end
-
-function HDH_DK_RUNE_TRACKER:UpdateRune(runeIndex, isEnergize)
+function HDH_DK_RUNE_TRACKER:UpdateSpellInfo(runeIndex)
 	local ret = false
-	local start, duration, runeReady = GetRuneCooldown(runeIndex);
-	if select(4, GetBuildInfo()) < 100000 then
-		runeIndex = RUN_INDEX[runeIndex]
-	end
-	if self and self.frame.pointer[runeIndex] then
-		local spell = self.frame.pointer[runeIndex].spell
-		if start~= 0 and start and spell then
-			if HDH_TRACKER.startTime < start then
-				spell.duration = duration
+	local start, duration, runeReady
+	local startIndex = runeIndex or 1
+	local endIndex = runeIndex or MAX_RUNES
+	local spell
+	for i = startIndex , endIndex do
+		start, duration, runeReady = GetRuneCooldown(i)
+		if select(4, GetBuildInfo()) < 100000 then
+			i = RUN_INDEX[i]
+		end
+		if self.frame.pointer[i] then
+			spell = self.frame.pointer[i].spell
+			if start ~= 0 and start and spell then
+				if HDH_TRACKER.startTime < start then
+					spell.duration = duration
+					spell.startTime = start
+				else
+					spell.duration = duration - (HDH_TRACKER.startTime-start)
+					spell.startTime = HDH_TRACKER.startTime
+				end
+				spell.endTime = start + duration
+				spell.remaining = spell.endTime - GetTime()
+				spell.isUpdate = true
+				spell.v1 = 0
+				spell.count = 0
 			else
-				spell.duration = duration - (HDH_TRACKER.startTime-start)
+				spell.count = 1
+				spell.duration = 0
+				spell.startTime = 0
+				spell.endTime = GetTime()
+				spell.remaining = 0
+				spell.isUpdate = false
 			end
-			spell.startTime = start
-			spell.endTime = start + duration
-			spell.remaining = spell.endTime - GetTime()
-		else
-			spell.duration = 0
-			spell.startTime = 0
-			spell.endTime = 0
-			spell.remaining = 0 
+			spell.valueMax = MAX_RUNES
+			spell.countMax = 1
+			if spell.duration > 0 then
+				spell.durationMax = math.ceil(spell.duration * 10) / 10
+			end
+		end
+	end
+
+	self.power = 0
+	for i = 1, #self.frame.icon do
+		if self.frame.icon[i] and not self.frame.icon[i].spell.isUpdate then
+			self.power = self.power + 1
+			self.frame.icon[1].spell.v1 = (not self.frame.icon[1].spell.isUpdate) and self.power or 0
+			self.frame.icon[2].spell.v1 = (not self.frame.icon[2].spell.isUpdate) and self.power or 0
+			self.frame.icon[3].spell.v1 = (not self.frame.icon[3].spell.isUpdate) and self.power or 0
+			self.frame.icon[4].spell.v1 = (not self.frame.icon[4].spell.isUpdate) and self.power or 0
+			self.frame.icon[5].spell.v1 = (not self.frame.icon[5].spell.isUpdate) and self.power or 0
+			self.frame.icon[6].spell.v1 = (not self.frame.icon[6].spell.isUpdate) and self.power or 0
 		end
 	end
 	return ret;
 end
 
-function HDH_DK_RUNE_TRACKER:Update() -- HDH_TRACKER override
-	if not self.frame or HDH_TRACKER.ENABLE_MOVE then return end
-	-- for i = 1 , MAX_RUNES do
-	-- 	self:UpdateRune(i)
-	-- 	--self:UpdateRuneType(i)
-	-- end
-	self:UpdateAllIcons()
+
+function HDH_DK_RUNE_TRACKER:UpdateIconAndBar(index)
+	local startIndex = index or 1
+	local endIndex = index or #self.frame.icon
+	local f
+	for i = startIndex, endIndex do
+		f = self.frame.pointer[i]
+		if f then
+			if f.spell.remaining > HDH_TRACKER.EndCooldown then
+				f.counttext:SetText((f.spell.count ~= 0) and f.spell.count or nil)
+				f.icon:UpdateCooldowning()
+				f.icon:SetCooldown(f.spell.startTime, f.spell.duration)
+
+				f.v1:SetText("")
+				if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then
+					self:UpdateBarMinMaxValue(f)
+				end
+			else
+				if self.ui.display_mode ~= DB.DISPLAY_ICON and f.bar then
+					if f.spell.barValueType == DB.BAR_TYPE_BY_TIME then
+						self:UpdateBarFull(f)
+					else
+						self:UpdateBarMinMaxValue(f)
+					end
+					if select(4, GetBuildInfo()) < 100000 then
+						f.bar:SetStatusBarColor(adjuistColor(self.ui.bar.full_color, OLD_DK_COLOR[f.spell.no].color))
+					end
+				end
+				
+				f.v1:SetText((f.spell.showValue and f.spell.v1) and f.spell.v1 or nil)
+				f.timetext:SetText("")
+				if self.ui.display_mode ~= DB.DISPLAY_BAR then 
+					f.icon:UpdateCooldowning(false)
+					f.icon:Stop()
+					if select(4, GetBuildInfo()) < 100000 then
+						f.icon:SetBorderColor(adjuistColor(self.ui.icon.active_border_color, OLD_DK_COLOR[f.spell.no].color))
+					end
+
+					f.counttext:SetText(nil)
+				end
+			end
+			self:UpdateGlow(f, true)
+		end
+	end
 end
 
 function HDH_DK_RUNE_TRACKER:InitIcons()
-	-- if HDH_TRACKER.ENABLE_MOVE then return end
-	local trackerId = self.id
-	local id, name, _, unit, aura_filter, aura_caster = DB:GetTrackerInfo(trackerId)
-	self.aura_filter = aura_filter
-	self.aura_caster = aura_caster
-	if not id then 
-		return 
-	end
-
-	local elemKey, elemId, elemName, texture, display, glowType, isValue, isItem, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec
-	
-	local spell 
-	local f
-	local iconIdx = 0
+	self.power = 0
+	local ret = HDH_TRACKER.InitIcons(self)
 	self.frame.pointer = {}
-	self.frame:UnregisterAllEvents()
-	self.talentId = HDH_AT_UTIL.GetSpecialization()
-
-	if not self:IsHaveData() then
-		self:CreateData()
+	for i = 1 , ret do
+		-- 룬은 순서가 보장되지 않는다. 
+		-- 만약 쿨 도는 와중에 아이콘 순서 변경이 일어나면, 순간적으로 깜박이는 현상이 발생됨
+		-- 그래서 한번 지정한 아이콘을 쿨 마지막까지 유지하기 위해서 pointer 사용
+		self.frame.pointer[i] = self.frame.icon[i] 
+		self.frame.icon[i].spell.power_index = self.POWER_INFO[self.type].power_index
 	end
-
-	local elemSize = DB:GetTrackerElementSize(trackerId)
-
-	for i = 1 , elemSize do
-		elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, i)
-		glowType, glowCondition, glowValue, glowEffectType, glowEffectColor, glowEffectPerSec = DB:GetTrackerElementGlow(trackerId, i)
-			
-		iconIdx = iconIdx + 1
-		f = self.frame.icon[iconIdx]
-		if f:GetParent() == nil then f:SetParent(self.frame) end
-		self.frame.pointer[iconIdx] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
-		spell = {}
-		spell.glow = glowType
-		spell.glowCondtion = glowCondition
-		spell.glowValue = (glowValue and tonumber(glowValue)) or 0
-		spell.glowEffectType = glowEffectType
-		spell.glowEffectColor = glowEffectColor
-		spell.glowEffectPerSec = glowEffectPerSec
-		spell.showValue = isValue
-		spell.display = display
-		spell.v1 = 0 -- 수치를 저장할 변수
-		spell.no = i
-		spell.name = elemName
-		spell.icon = texture
-		spell.power_index = self.POWER_INFO[self.type].power_index
-		spell.id = tonumber(elemId)
-		spell.count = 0
-		spell.duration = 0
-		spell.remaining = 0
-		spell.overlay = 0
-		spell.endTime = 0
-		spell.startTime = 0
-		spell.is_buff = isBuff;
-		spell.isUpdate = false
-		spell.isItem =  isItem
-		spell.charges = {};
-		spell.charges.duration = 0;
-		spell.charges.count = 0
-		spell.charges.remaining = 0
-		spell.charges.startTime = 0
-		spell.charges.endTime = 0
-
-		f.spell = spell
-		f.icon:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-		f.iconSatCooldown:SetTexture(texture or "Interface/ICONS/INV_Misc_QuestionMark")
-
-		self:UpdateGlow(f, false)
-		f:Hide()
-	end
-
-	self.frame:SetScript("OnEvent", self.OnEvent)
-	self.frame:RegisterEvent("RUNE_POWER_UPDATE");
-	self.frame:RegisterEvent("RUNE_TYPE_UPDATE");
-	self.frame:RegisterEvent('UNIT_MAXPOWER')
+	self.frame:RegisterEvent("RUNE_POWER_UPDATE")
+	self.frame:RegisterEvent("RUNE_TYPE_UPDATE")
 	self:Update()
-	self:LoadOrderFunc();
-
-	for i = #self.frame.icon, iconIdx+1 , -1 do
-		self:ReleaseIcon(i)
-	end
-	return iconIdx;
+	return ret
 end
 
 function HDH_DK_RUNE_TRACKER:OnEvent(event, ...)
 	if not self.parent then return end
-	if ( event == "RUNE_POWER_UPDATE" ) then	
-		local runeIndex, isEnergize = ...;
-		if runeIndex and runeIndex >= 1 and runeIndex <= MAX_RUNES then
-			self.parent:Update();
-		end
+	if ( event == "RUNE_POWER_UPDATE" ) then
+		self.parent:Update()
 	elseif ( event == "RUNE_TYPE_UPDATE" ) then
 		local runeIndex = ...;
 		if ( runeIndex and runeIndex >= 1 and runeIndex <= MAX_RUNES ) then

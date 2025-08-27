@@ -254,7 +254,7 @@ do
 		if self:IsHaveData() > 0 then
 			elemKey, elemId, elemName, texture, display, glowType, isValue, isItem = DB:GetTrackerElement(trackerId, 1)
 			glowType, glowCondition, glowValue = DB:GetTrackerElementGlow(trackerId, 1)
-			splitValues = DB:GetTrackerElementSplitValues(trackerId, 1)
+			splitValues = DB:GetTrackerElementBarInfo(trackerId, 1)
 
 			f = self.frame.icon[1]
 			if f:GetParent() == nil then f:SetParent(self.frame) end

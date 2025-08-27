@@ -2,8 +2,6 @@
 
 HDH_ESSENCE_TRACKER = {}
 local DB = HDH_AT_ConfigDB
-local POWRE_BAR_SPLIT_MARGIN = 5;
-local MyClassKor, MyClass = UnitClass("player");
 local POWER_INFO = {}
 
 ------------------------------------
@@ -22,18 +20,21 @@ POWER_INFO[HDH_TRACKER.TYPE.POWER_ESSENCE] 	= {power_type="ESSENCE", 	power_inde
 
 HDH_ESSENCE_TRACKER.POWER_INFO = POWER_INFO;
 
-function OnUpdate(self)
+local function OnUpdate(self)
 	self.spell.curTime = GetTime()
 	
 	if self.spell.curTime - (self.spell.delay or 0) < HDH_TRACKER.ONUPDATE_FRAME_TERM then return end 
 	self.spell.delay = self.spell.curTime
 	
-	if self.spell.v1 <= 1.0 and self.spell.no == 1 then
-		self:GetParent().parent:Update();
+	if self.spell.count <= 1.0 and self.spell.no == 1 then
+		self:GetParent().parent:Update()
 	end
 	
 	self:GetParent().parent:UpdateGlow(self, true);
-	self:GetParent().parent:UpdateBarValue(self);
+
+	if self.bar then
+		self:GetParent().parent:UpdateBarValue(self, nil, true)
+	end
 	
 	if self.spell.remaining > 0 then
 		self:GetParent().parent:UpdateTimeText(self.timetext, self.spell.remaining)
@@ -42,23 +43,50 @@ function OnUpdate(self)
 	end
 end
 
-function HDH_ESSENCE_TRACKER:OnUpdateBarValue()
-	-- empty
-end
+-- function HDH_ESSENCE_TRACKER:OnUpdateBarValue()
+-- 	-- empty
+-- end
 
-function HDH_ESSENCE_TRACKER:UpdateBarValue(f)
-	if f.bar then
-		f.bar:SetValue(f:GetParent().parent:GetAnimatedValue(f.bar, not f:GetParent().parent.ui.bar.to_fill and 1 - f.spell.v1 or f.spell.v1))
-		f:GetParent().parent:MoveSpark(f.bar)
-		if f:GetParent().parent.ui.bar.use_full_color then 
-			if f.bar:GetValue() == 1 then
-				f.bar:SetStatusBarColor(unpack(f:GetParent().parent.ui.bar.full_color))
-			else
-				f.bar:SetStatusBarColor(unpack(f:GetParent().parent.ui.bar.color))
-			end
-		end
+-- function HDH_ESSENCE_TRACKER:UpdateBarValue(f)
+-- 	if f.bar then
+-- 		f.bar:SetValue(f:GetParent().parent:GetAnimatedValue(f.bar, not f:GetParent().parent.ui.bar.to_fill and 1 - f.spell.v1 or f.spell.v1))
+-- 		f:GetParent().parent:MoveSpark(f.bar)
+-- 		if f:GetParent().parent.ui.bar.use_full_color then 
+-- 			if f.bar:GetValue() == 1 then
+-- 				f.bar:SetStatusBarColor(unpack(f:GetParent().parent.ui.bar.full_color))
+-- 			else
+-- 				f.bar:SetStatusBarColor(unpack(f:GetParent().parent.ui.bar.color))
+-- 			end
+-- 		end
+-- 	end
+-- end
+
+function HDH_ESSENCE_TRACKER:GetEssenceFillingProgress(index)
+	if EssencePlayerFrame.classResourceButtonTable[index] then 
+		return EssencePlayerFrame.classResourceButtonTable[index].EssenceFilling.FillingAnim:GetProgress()
+	else
+		return 0
 	end
 end
+
+function HDH_ESSENCE_TRACKER:IsEssenceFull(index)
+	local f = EssencePlayerFrame.classResourceButtonTable[index]
+	if f then
+		return f.EssenceFull:IsShown()
+	else
+		return false
+	end
+end
+
+function HDH_ESSENCE_TRACKER:IsEssenceFilling(index)
+	local f = EssencePlayerFrame.classResourceButtonTable[index]
+	if f then
+		return f.EssenceFilling.FillingAnim:IsPlaying() or f.EssenceDepleting.AnimIn:IsPlaying()
+	else
+		return false
+	end
+end
+
 
 function HDH_ESSENCE_TRACKER:CreateData()
 	local trackerId = self.id
@@ -70,15 +98,24 @@ function HDH_ESSENCE_TRACKER:CreateData()
 	local isValue = false
 	local isItem = false
 	local r,g,b,a = unpack(self.POWER_INFO[self.type].color)
-	local max_power = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
+	local max_power = self:GetPowerMax()
 	local isFirstCreated = false
 	if DB:GetTrackerElementSize(trackerId) > max_power then
 		DB:TrancateTrackerElements(trackerId)
 	end
 
 	for i = 1 , max_power do
-		if not self:IsHaveData(i) then
+		if self:GetElementCount(i) == 0 then
 			DB:AddTrackerElement(trackerId, key .. i, id, name .. i, texture, display, isValue, isItem)
+			DB:UpdateTrackerElementGlow(trackerId, i, DB.GLOW_CONDITION_VALUE, DB.CONDITION_GT_OR_EQ, max_power, DB.GLOW_EFFECT_COLOR_SPARK, 
+				{
+					self.POWER_INFO[self.type].color[1],
+					self.POWER_INFO[self.type].color[2],
+					self.POWER_INFO[self.type].color[3],
+					0.25
+				}, 
+				2)
+			DB:SetTrackerElementBarInfo(trackerId, i, DB.BAR_TYPE_BY_COUNT , DB.BAR_MAX_TYPE_AUTO, 1, {}, DB.BAR_SPLIT_RATIO)
 			DB:SetReadOnlyTrackerElement(trackerId, i) -- 사용자가 삭제하지 못하도록 수정 잠금을 건다
 			if i == i then
 				isFirstCreated = true
@@ -104,7 +141,7 @@ function HDH_ESSENCE_TRACKER:CreateData()
 		DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_location', DB.FONT_LOCATION_TR)
 		DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_format', DB.TIME_TYPE_CEIL)
 		DB:SetTrackerValue(trackerId, 'ui.%s.font.count_location', DB.FONT_LOCATION_HIDE)
-		DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_BAR_R)
+		DB:SetTrackerValue(trackerId, 'ui.%s.font.v1_location', DB.FONT_LOCATION_C)
 		DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_color_5s', {1,1,0, 1})
 		DB:SetTrackerValue(trackerId, 'ui.%s.font.cd_color', {1,1,0, 1})
 		DB:SetTrackerValue(trackerId, 'ui.%s.icon.size', 40)
@@ -114,112 +151,94 @@ function HDH_ESSENCE_TRACKER:CreateData()
 	end
 end
 
-function HDH_ESSENCE_TRACKER:IsHaveData(index)
+function HDH_ESSENCE_TRACKER:GetElementCount(index)
 	if index then
 		local key = DB:GetTrackerElement(self.id, index)
 		if (self.POWER_INFO[self.type].power_type .. index) ~= key then
-			return false
+			return 0
 		end
+		return 1
 	else
-		for i = 1 , UnitPowerMax('player', self.POWER_INFO[self.type].power_index) do
+		for i = 1 , self:GetPowerMax() do
 			local key = DB:GetTrackerElement(self.id, i)
 			if (self.POWER_INFO[self.type].power_type .. i) ~= key then
-				return false
+				return 0
 			end
 		end 
+		return DB:GetTrackerElementSize(self.id)
 	end
-	
-	return true
 end
 
-function HDH_ESSENCE_TRACKER:Update() -- HDH_TRACKER override
-	if not self.frame or not self.frame.icon or HDH_TRACKER.ENABLE_MOVE then return end
-	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-	local power =  UnitPower('player', self.POWER_INFO[self.type].power_index)
-	local v1 = UnitPartialPower('player', self.POWER_INFO[self.type].power_index)
-	local duration, interrupted  = GetPowerRegenForPowerType(self.POWER_INFO[self.type].power_index)
+function HDH_ESSENCE_TRACKER:UpdateSpellInfo(index)
+	local power_max = self:GetPowerMax()
+	local power =  self:GetPower()
+	-- local partPower = UnitPartialPower('player', self.POWER_INFO[self.type].power_index)
+	local powerTick, _  = GetPowerRegenForPowerType(self.POWER_INFO[self.type].power_index)
+	local progress = self:GetEssenceFillingProgress(power + 1) 
 	local spell
 	local curTime = GetTime() 
-	self.pre_power = self.pre_power or -1
-	if (duration == nil or duration == 0) then
-		duration = 0.2;
+	if (powerTick == nil or powerTick == 0) then
+		powerTick = 0.2;
 	end
-	self.v1 = v1 / 1000.0
-	self.duration =  (1 / duration)
-	self.new_startTime = (curTime - (self.v1 * self.duration))
-	self.gap = math.abs((self.startTime or 0) - self.new_startTime)
-	if self.gap >= 0.05 then
-		self.startTime = self.new_startTime
-		self.endTime = self.startTime + self.duration	
+	if not self:IsEssenceFilling(power + 1) and progress == 0 then
+		self.remaining = 0
+	else
+		self.remaining = (1 - progress) / powerTick
 	end
-	self.remaining = (self.endTime or 0) - curTime
-
+	powerTick = powerTick * ((curTime - (self.curTime or (curTime - 0.01))) / 1)
+	
 	for i = 1, power_max do
 		spell = self.frame.icon[i].spell
-		if power < i then
-			if spell then
-				if (power + 1) == i then
-					spell.duration = self.duration
-					spell.startTime = self.startTime 
-					spell.endTime = self.endTime
-					spell.remaining = self.remaining
-					spell.v1 = self.v1-- 1 - (spell.remaining / spell.duration)
-					spell.isUpdate = true
-					spell.count = 0
-				else
-					spell.duration = 0
-					spell.v1 = 0
-					spell.remaining = 0
-					spell.count = 0
-					spell.startTime = 0
-					spell.isUpdate = false
-				end
-			end
-			
-		else
-			spell.isUpdate = true
+		if not spell then break end
+		if power >= i then
+			spell.isUpdate = false
 			spell.duration = 0
-			spell.v1 = 1
-			spell.count = i
+			spell.count = 1
+			spell.v1 = power
 			spell.remaining = 0
 			spell.startTime = 0
+			spell.endTime = 0
+		else
+			if (power + 1) == i then
+				spell.duration = self.duration
+				spell.startTime = self.startTime 
+				spell.endTime = self.endTime
+				spell.remaining = self.remaining
+				if self.power ~= power then
+					spell.count = progress
+				else
+					spell.count = spell.count + powerTick
+				end
+				spell.isUpdate = false
+				spell.v1 = 0
+			else
+				spell.duration = 0
+				spell.count = 0
+				spell.remaining = 0
+				spell.v1 = 0
+				spell.startTime = 0
+				spell.endTime = 0
+				spell.isUpdate = true
+			end
 		end
+		spell.valueMax = power_max
 	end
-
-	self:UpdateAllIcons();
-
-	if (not (self.ui.common.hide_in_raid == true and IsInRaid())) 
-			and (UnitAffectingCombat("player") or power < power_max or self.ui.common.always_show) then
-		self:ShowTracker();
-		local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-		for i = 1, power_max do
-			self.frame.icon[i]:SetScript("OnUpdate", OnUpdate)
-		end
-	else
-		self:HideTracker();
-		local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-		for i = 1, power_max do
-			self.frame.icon[i]:SetScript("OnUpdate", nil)
-		end
-	end
-	return ret;
+	self.power = power
+	self.curTime = curTime
 end
 
 function HDH_ESSENCE_TRACKER:InitIcons()
-	super.InitIcons(self)
-	local power_max = UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
-	for i = 1, power_max do
+	local ret = super.InitIcons(self)
+	for i = 1, ret do
 		self.frame.icon[i]:SetScript("OnUpdate", OnUpdate)
 	end
 end
 
-function HDH_ESSENCE_TRACKER:PLAYER_ENTERING_WORLD()
-	-- empty
-end
-
-function HDH_ESSENCE_TRACKER:OnEvent(event, unit, powerType)
-	-- empty
-end
 ------------------------------------
 -- HDH_ESSENCE_TRACKER class
 ------------------------------------
+
+function HDH_ESSENCE_TRACKER:UNIT_POWER_UPDATE()
+	self.power = nil
+	self:Update()
+end

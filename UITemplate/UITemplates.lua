@@ -11,55 +11,6 @@ local function hasValue (tab, val)
     return false
 end
 
-
----------------------------
----------------------------
-
-HDH_AT_UITabBtnMixin = {}
-function HDH_AT_UITabBtnMixin:SetActivate(bool)
-    if bool then
-        self.Active1:Show()
-        self.Active2:Show()
-    else
-        self.Active1:Hide()
-        self.Active2:Hide()
-    end
-end
-
-HDH_AT_BottomTapMixin = {}
-
-function HDH_AT_BottomTapMixin:SetActivate(bool)
-    -- HDH_AT_ConfigFrame.Bottom:Hide()
-    -- HDH_AT_ConfigFrame.Bottom2:Hide()
-
-    -- self.Top:Hide()
-    -- self.Top2:Hide()
-
-    if bool then
-        self:Disable()
-        self.Left:Hide()
-        self.Middle:Hide()
-        self.Right:Hide()
-        self.LeftActive:Show()
-        self.MiddleActive:Show()
-        self.RightActive:Show()
-        -- self:SetHeight(32)
-        self.Text:SetPoint("TOP",0, -11)
-    else
-        self:Enable()
-        self.Left:Show()
-        self.Middle:Show()
-        self.Right:Show()
-        self.LeftActive:Hide()
-        self.MiddleActive:Hide()
-        self.RightActive:Hide()
-        -- self.AtiveBorder:Hide()
-        -- self.Border:Show()
-        -- self:SetHeight(25)
-        self.Text:SetPoint("TOP",0, -7)
-    end
-end
-
 -------------------------------------------------------------
 -- Aura List
 -------------------------------------------------------------
@@ -74,26 +25,25 @@ function HDH_AT_AuraRowMixin:SetOnClickHandler(handler)
 end
 
 function HDH_AT_AuraRowMixin:Set(no, key, id, name, texture, display, glow, value, isItem, readOnly)
-	_G[self:GetName().."ButtonIcon"]:SetNormalTexture(texture or 0)
-    _G[self:GetName().."ButtonIcon"]:GetNormalTexture():SetTexCoord(0.08, 0.92, 0.08, 0.92)
-    _G[self:GetName().."ButtonIcon"]:Show()
-    _G[self:GetName().."IconAdd"]:Hide()
+	_G[self:GetName().."Icon"]:SetTexture(texture or 0)
+    _G[self:GetName().."Icon"]:SetTexCoord(0.08, 0.92, 0.08, 0.92)
+    _G[self:GetName().."Icon"]:Show()
+    _G[self:GetName().."AddIcon"]:Hide()
 	_G[self:GetName().."TextNum"]:SetText(no)
 	_G[self:GetName().."TextName"]:SetText(name)
-	_G[self:GetName().."TextID"]:SetText(id.."")
     _G[self:GetName().."CheckButtonValue"]:SetChecked(value)
 	_G[self:GetName().."CheckButtonAlways"]:SetChecked(display)
     _G[self:GetName().."CheckButtonGlow"]:SetChecked(glow)
 	_G[self:GetName().."EditBoxID"]:SetText(id or key or "")
 	_G[self:GetName().."CheckButtonIsItem"]:SetChecked(isItem)
-    self.tmp_id = id
-	self.tmp_chk = isItem
 	_G[self:GetName().."EditBoxID"]:ClearFocus() -- ButtonAddAndDel 의 값때문에 순서 굉장히 중요함
 	_G[self:GetName().."RowDesc"]:Hide()
     _G[self:GetName().."CheckButtonAlways"]:Show()
     _G[self:GetName().."CheckButtonGlow"]:Show()
     _G[self:GetName().."CheckButtonValue"]:Show()
-    _G[self:GetName().."ButtonSet"]:Show()
+    _G[self:GetName().."ButtonConfig"]:Show()
+    self.tmp_id = id
+	self.tmp_chk = isItem
     self.readOnly = readOnly or false
     self.mode = HDH_AT_AuraRowMixin.MODE.DATA
 end
@@ -108,23 +58,19 @@ function HDH_AT_AuraRowMixin:Get()
     local value = _G[self:GetName().."CheckButtonValue"]:GetChecked()
 	local always = _G[self:GetName().."CheckButtonAlways"]:GetChecked()
 	local glow = _G[self:GetName().."CheckButtonGlow"]:GetChecked()
-	--local showValue = _G[rowFrame:GetName().."CheckButtonShowValue"]:GetChecked()
     local name = _G[self:GetName().."TextName"]:GetName()
-    local texture = _G[self:GetName().."ButtonIcon"]:GetNormalTexture()
+    local texture = _G[self:GetName().."Icon"]:GetTexture()
     local isItem = _G[self:GetName().."CheckButtonIsItem"]:GetChecked()
-    local id = _G[self:GetName().."TextID"]:GetText()
 
-    return row_idx, key, id, name, texture, always, glow, value, isItem
+    return row_idx, key, self.tmp_id, name, texture, always, glow, value, isItem
 end
 
 function HDH_AT_AuraRowMixin:Clear()
-	_G[self:GetName().."ButtonIcon"]:SetNormalTexture(0)
-    _G[self:GetName().."ButtonIcon"]:Hide()
-    _G[self:GetName().."IconAdd"]:Show()
+	_G[self:GetName().."Icon"]:SetTexture(0)
+    _G[self:GetName().."Icon"]:Hide()
 	_G[self:GetName().."TextNum"]:SetText(nil)
 	_G[self:GetName().."TextName"]:SetText(nil)
 	_G[self:GetName().."RowDesc"]:Show()
-	_G[self:GetName().."TextID"]:SetText(nil)
 	_G[self:GetName().."CheckButtonAlways"]:SetChecked(true)
     _G[self:GetName().."CheckButtonGlow"]:SetChecked(false)
     _G[self:GetName().."CheckButtonValue"]:SetChecked(false)
@@ -135,7 +81,8 @@ function HDH_AT_AuraRowMixin:Clear()
     _G[self:GetName().."CheckButtonAlways"]:Hide()
     _G[self:GetName().."CheckButtonGlow"]:Hide()
     _G[self:GetName().."CheckButtonValue"]:Hide()
-    _G[self:GetName().."ButtonSet"]:Hide()
+    _G[self:GetName().."ButtonConfig"]:Hide()
+    _G[self:GetName().."AddIcon"]:Show()
     self.mode = HDH_AT_AuraRowMixin.MODE.EMPTY
     self.tmp_id = nil
 	self.tmp_chk = false
@@ -147,13 +94,12 @@ function HDH_AT_AuraRowMixin:ChangeReadMode()
         self.timer:Cancel()
     end
     _G[self:GetName().."EditBoxID"]:Hide()
-    _G[self:GetName().."TextID"]:Hide()
 
     if self.mode == HDH_AT_AuraRowMixin.MODE.DATA then
         _G[self:GetName().."CheckButtonAlways"]:Show()
         _G[self:GetName().."CheckButtonGlow"]:Show()
         _G[self:GetName().."CheckButtonValue"]:Show()
-        _G[self:GetName().."ButtonSet"]:Show()
+        _G[self:GetName().."ButtonConfig"]:Show()
         _G[self:GetName().."TextName"]:Show()
     else
         self:SetText("")
@@ -186,13 +132,12 @@ function HDH_AT_OnEditFocusGained(self)
 	else
 		btn:SetText(L.EDIT)
 	end
-	--self:SetWidth(EDIT_WIDTH_L)
-    
+
     if self:GetParent().mode == HDH_AT_AuraRowMixin.MODE.DATA then
         _G[self:GetParent():GetName().."CheckButtonAlways"]:Hide()
         _G[self:GetParent():GetName().."CheckButtonGlow"]:Hide()
         _G[self:GetParent():GetName().."CheckButtonValue"]:Hide()
-        _G[self:GetParent():GetName().."ButtonSet"]:Hide()
+        _G[self:GetParent():GetName().."ButtonConfig"]:Hide()
         _G[self:GetParent():GetName().."ButtonDel"]:Show()
     else
         _G[self:GetParent():GetName().."ButtonCancel"]:Show() 
@@ -229,16 +174,14 @@ end
 
 function HDH_AT_OnClickRowFrame(self)
     if not self.readOnly then
-        _G[self:GetName().."TextID"]:Hide()
         _G[self:GetName().."TextName"]:Hide()
         _G[self:GetName().."CheckButtonIsItem"]:Show()
         _G[self:GetName().."EditBoxID"]:Show()
         _G[self:GetName().."EditBoxID"]:SetFocus()
-        if self.onClickHandler then
-            self.onClickHandler(self)
-        end
     end
-    
+     if self.onClickHandler then
+        self.onClickHandler(self)
+    end
 end
 
 -------------------------------------------------------------
@@ -749,6 +692,11 @@ function HDH_AT_ColorPickerMixin:SetEnableAlpha(enable)
     self.enableAlpha = enable
 end
 
+function HDH_AT_ColorPickerMixin:Cancel()
+    local r, g, b, a = unpack(self.rgba)
+    self:SetColorRGBA(r, g, b, a)
+end
+
 function HDH_AT_ColorPickerMixin:SetHandler(handler, errorHandler)
     self.handler = handler
     self.errorHandler = errorHandler
@@ -762,7 +710,6 @@ local function OnSelectedColorPicker()
     self.handler(self, r, g, b, ColorPickerFrame:GetColorAlpha())
     ColorPickerFrame.buttonFrame = nil
     ColorPickerFrame:Hide()
-
 end
 
 local function OnOKColorPicker()
@@ -773,7 +720,7 @@ local function OnOKColorPicker()
 end
 
 local function OnCancelColorPicker()
-    self = ColorPickerFrame.buttonFrame
+    local self = ColorPickerFrame.buttonFrame
     local r, g, b, a  = ColorPickerFrame:GetPreviousValues()
     self:SetColorRGBA(r, g, b, a)
     self.handler(self, r, g, b, a)
@@ -817,27 +764,6 @@ function HDH_AT_OnClickColorPicker(self)
 
 	ColorPickerFrame:SetupColorPickerAndShow(info);
 end
-
-------------------------------------------------------------------------
---
-------------------------------------------------------------------------
-
-HDH_AT_TrackerTapBtnTemplateMixin = {}
-
-function HDH_AT_TrackerTapBtnTemplateMixin:SetActivate(bool)
-    if bool then
-        _G[self:GetName().."BgLine2"]:Show()
-        _G[self:GetName().."On"]:Show()
-        self.BG:SetColorTexture(0,0,0,0.5)
-        self.Text:SetTextColor(1,0.8,0)
-    else
-        _G[self:GetName().."BgLine2"]:Hide()
-        _G[self:GetName().."On"]:Hide()
-        self.BG:SetColorTexture(0,0,0,0.3)
-        self.Text:SetTextColor(0.8,0.8,0.8)
-    end
-end
-
 
 -----------------------------------
 -- dlalog
@@ -923,11 +849,43 @@ function HDH_AT_DialogFrameTemplateMixin:OnShow()
     end
 end
 
+------------------------------------
+--- HDH_AT_SplitPointerTemplateMixin
+------------------------------------
+HDH_AT_SplitPointerTemplateMixin = {}
+
+function HDH_AT_SplitPointerTemplateMixin:SetText(text)
+    self.TopValue:SetText(text)
+    self.BottomValue:SetText(text)
+end
+
+function HDH_AT_SplitPointerTemplateMixin:SetFontObject(object)
+    self.TopValue:SetFontObject(object)
+    self.BottomValue:SetFontObject(object)
+end
+
+function HDH_AT_SplitPointerTemplateMixin:SetTop(bool)
+    if bool then
+        self.BottomValue:Hide()
+        self.BottomAnchor:Hide()
+        self.TopValue:Show()
+        self.TopAnchor:Show()
+    else
+        self.BottomValue:Show()
+        self.BottomAnchor:Show()
+        self.TopValue:Hide()
+        self.TopAnchor:Hide()
+    end
+end
+
+
 -----------------------------------
 -- HDH_AT_SplitBarTemplateMixin
 -----------------------------------
 
 HDH_AT_SplitBarTemplateMixin = {}
+
+
 
 local function HDH_AT_SplitBar_OnDragging(self)
     local x, y, w, h = self:GetBoundsRect()
@@ -958,6 +916,19 @@ local function HDH_AT_SplitBar_OnDragStop(self)
     self.Value:SetText(math.ceil((x - p_x) + math.floor( w / 2 )))
 end
 
+function HDH_AT_SplitBarTemplateMixin:SetSplitPoints(values)
+    self.size = 0
+    if values then
+        for i=1, #values do
+            self:AddPointer(i, values[i])
+        end
+    end
+
+    for i = #self.splitList, self.size + 1, -1 do
+        self:HidePointer(i)
+    end
+end
+
 function HDH_AT_SplitBarTemplateMixin:GetValue()
     local value = self.EditBox:GetText()
     if string.len(value) > 0 then
@@ -967,45 +938,32 @@ function HDH_AT_SplitBarTemplateMixin:GetValue()
     end
 end
 
-function HDH_AT_SplitBarTemplateMixin:SetMinMaxValues(minValue, maxValue)
+function HDH_AT_SplitBarTemplateMixin:SetMinMaxValues(minValue, maxValue, isRatio)
     self.splitList = self.splitList or {}
+    self.isRatio = isRatio
     
     if not self.minPointer then
         self.minPointer = CreateFrame("Frame", self:GetName().."splitMin", self, "HDH_AT_SplitPointerTemplate")
         self.minPointer:SetPoint("TOP", self.Bar, "TOPLEFT", 0, 0)
         self.minPointer.Line:Hide()
-        self.minPointer.TopValue:Hide()
-        self.minPointer.TopAnchor:Hide()
-        self.minPointer.TopValue:SetFontObject('Font_Yellow_S')
-        self.minPointer.BottomValue:SetFontObject('Font_Yellow_S')
+        self.minPointer:SetFontObject('Font_Yellow_S')
+        self.minPointer:SetTop(true)
     end
-    self.minPointer.BottomValue:SetText(minValue)
+    self.minPointer:SetText(self.isRatio and (minValue .. '%') or minValue)
 
     if not self.maxPointer then
         self.maxPointer = CreateFrame("Frame", self:GetName().."splitMin", self, "HDH_AT_SplitPointerTemplate")
         self.maxPointer:SetPoint("TOP", self.Bar, "TOPRIGHT", 0, 0)
         self.maxPointer.Line:Hide()
-        self.maxPointer.TopValue:Hide()
-        self.maxPointer.TopAnchor:Hide()
-        self.maxPointer.TopValue:SetFontObject('Font_Yellow_S')
-        self.maxPointer.BottomValue:SetFontObject('Font_Yellow_S')
+        self.maxPointer:SetFontObject('Font_Yellow_S')
+        self.maxPointer:SetTop(true)
     end
-    self.maxPointer.TopValue:SetText(maxValue)
-    self.maxPointer.BottomValue:SetText(maxValue)
+    local value = self.isRatio and (maxValue .. '%') or UTIL.CommaValue(maxValue)
+    self.maxPointer:SetText(value)
     self.minValue = minValue
     self.maxValue = maxValue
 
-    if self:GetSize() ~= 0 and self:GetSize() % 2 == 0 then
-        self.maxPointer.BottomAnchor:Hide()
-        self.maxPointer.BottomValue:Hide()
-        self.maxPointer.TopValue:Show()
-        self.maxPointer.TopAnchor:Show()
-    else
-        self.maxPointer.BottomAnchor:Show()
-        self.maxPointer.BottomValue:Show()
-        self.maxPointer.TopValue:Hide()
-        self.maxPointer.TopAnchor:Hide()
-    end
+    self.maxPointer:SetTop(self:GetSize() == 0 or self:GetSize() % 2 == 1)
 end
 
 function HDH_AT_SplitBarTemplateMixin:GetMinMaxValues()
@@ -1013,67 +971,42 @@ function HDH_AT_SplitBarTemplateMixin:GetMinMaxValues()
 end
 
 function HDH_AT_SplitBarTemplateMixin:RemovePointer(index)
-    -- self.splitList = self.splitList or {}
-    local i
+    self:HidePointer(index)
+    self.size = self.size - 1
+end
+
+function HDH_AT_SplitBarTemplateMixin:HidePointer(index)
     for i = index, #self.splitList do
-        if self.splitList[i] and self.splitList[i].value and self.size and self.size > 0 then
-            self.size = self.size - 1
+        if self.splitList[i] and self.splitList[i].value then
             self.splitList[i].value = (self.splitList[i+1] and self.splitList[i+1].value) or nil
             if not self.splitList[i].value then
                 self.splitList[i]:Hide()
             end
         end
     end
-    if self:GetSize() ~= 0 and self:GetSize() % 2 == 0 then
-        self.maxPointer.BottomAnchor:Hide()
-        self.maxPointer.BottomValue:Hide()
-        self.maxPointer.TopValue:Show()
-        self.maxPointer.TopAnchor:Show()
-    else
-        self.maxPointer.BottomAnchor:Show()
-        self.maxPointer.BottomValue:Show()
-        self.maxPointer.TopValue:Hide()
-        self.maxPointer.TopAnchor:Hide()
-    end
+    
+    self.maxPointer:SetTop(self:GetSize() == 0 or self:GetSize() % 2 == 1)
 end
 
 function HDH_AT_SplitBarTemplateMixin:AddPointer(index, value)
+    if self.maxValue <= value then return false end
     self.splitList = self.splitList or {}
     local split
     if not self.splitList[index] then
         self.splitList[index] = CreateFrame("Frame", self:GetName().."split".. index , self, "HDH_AT_SplitPointerTemplate")
     end
-
+    self.size = self.size + 1
     split = self.splitList[index]
-    if not split.value then
-        self.size = (self.size or 0) + 1
-    end
     split.value = value 
     split:SetPoint("TOP", self.Bar, "TOPLEFT", self.Bar:GetWidth() * (value / self.maxValue), 0)
     split:Show()
-    if index % 2 == 0 then
-        split.BottomValue:SetText(split.value)
-        split.BottomAnchor:Show()
-        split.TopValue:Hide()
-        split.TopAnchor:Hide()
-    else
-        split.TopValue:SetText(split.value)
-        split.TopAnchor:Show()
-        split.BottomAnchor:Hide()
-        split.BottomValue:Hide()
-    end
 
-    if self:GetSize() ~= 0 and self:GetSize() % 2 == 0 then
-        self.maxPointer.BottomAnchor:Hide()
-        self.maxPointer.BottomValue:Hide()
-        self.maxPointer.TopValue:Show()
-        self.maxPointer.TopAnchor:Show()
-    else
-        self.maxPointer.BottomAnchor:Show()
-        self.maxPointer.BottomValue:Show()
-        self.maxPointer.TopValue:Hide()
-        self.maxPointer.TopAnchor:Hide()
-    end
+    local text = self.isRatio and (split.value .. '%') or UTIL.CommaValue(split.value)
+    split:SetText(text)
+    split:SetTop(index % 2 == 0)
+
+    self.maxPointer:SetTop(self:GetSize() == 0 or self:GetSize() % 2 == 1)
+    return true
 end
 
 function HDH_AT_SplitBarTemplateMixin:GetSize()
@@ -1084,7 +1017,6 @@ function HDH_AT_SplitBar_OnMouseUp(self)
     local w = self:GetWidth()
 
 end
-
 
 -----------------------------------
 -- HDH_AT_AddDelEdtiboxTemplateMixin
@@ -1151,6 +1083,10 @@ function HDH_AT_SwitchFrameTemplateMixin:Init(itemList, onChangedHandler)
         btn:SetText(value[2])
         btn.index = index
         btn.value = value[1]
+
+        if index == #itemList then
+            btn:SetPoint("RIGHT", self, "RIGHT", -2, 0)
+        end
     end
     self.itemList = itemList
 end
@@ -1169,15 +1105,9 @@ end
 function HDH_AT_SwitchFrameTemplateMixin:SetSelectedIndex(selectedIndex)
     for index, btn in ipairs(self.list) do
         if index == selectedIndex then
-            -- btn.Active:Show()
-            -- btn.Deactive:Hide()
             btn:Disable()
-            -- btn:SetNormalFontObject("Font_White_S")
         else
-            -- btn.Active:Hide()
-            -- btn.Deactive:Show()
             btn:Enable()
-            -- btn:SetNormalFontObject("Font_Gray_S")
         end
     end
     self.index = selectedIndex
@@ -1194,16 +1124,10 @@ end
 
 function HDH_AT_SwitchFrameTemplateMixin:Enable()
     self.DisableLayer:Hide()
-    -- for _, item in ipairs(self.list) do
-    --     item:Enable()
-    -- end
 end
 
 function HDH_AT_SwitchFrameTemplateMixin:Disable()
     self.DisableLayer:Show()
-    -- for _, item in ipairs(self.list) do
-    --     item:Disable()
-    -- end
 end
 
 ------------------------------------------
@@ -1262,7 +1186,6 @@ function HDH_AT_SliderTemplateMixin:SetValue(value)
     if self.value ~= value then
         self.value = value
         self.Bar:SetWidth(math.max((value - self.minValue) * self.tickWidth, 0.01))
-        -- self.EditBox:SetText(self.format:format(self.value))
         self.Text:SetText(self.format:format(self.value))
         return true
     else
@@ -1332,84 +1255,10 @@ function HDH_AT_LatestSpellItemTemplateMixin:SetActive(bool)
     end
 end
 
-
--------------------------------------
---  HDH_AT_CheckButton2TemplateMixin
--------------------------------------
-
-HDH_AT_CheckButton2TemplateMixin = {}
-
-function HDH_AT_CheckButton2_OnClick(self)
-    self:SetChecked(not (self.isChecked or false))
-    if self.OnClickfunc then
-        self.OnClickfunc(self)
-    end
-end
-
-function HDH_AT_CheckButton2TemplateMixin:HiddenBackground(bool)
-    self.isHideBackground = bool
-
-    if bool then
-        self.DeactiveCheckBoxTop:Show()
-        self.DeactiveCheckBoxRight:Show()
-        self.DeactiveCheckBoxLeft:Show()
-        self.DeactiveCheckBoxBottom:Show()
-        self.Deactive1:Hide()
-        self.DeactiveBorderTop:Hide()
-        self.DeactiveBorderLeft:Hide()
-        self.DeactiveBorderBottom:Hide()
-        self.DeactiveBorderRight:Hide()
-    else
-        self.DeactiveCheckBoxTop:Hide()
-        self.DeactiveCheckBoxRight:Hide()
-        self.DeactiveCheckBoxLeft:Hide()
-        self.DeactiveCheckBoxBottom:Hide()
-        self.Deactive1:Show()
-        self.DeactiveBorderTop:Show()
-        self.DeactiveBorderLeft:Show()
-        self.DeactiveBorderBottom:Show()
-        self.DeactiveBorderRight:Show()
-    end
-end
-
-function HDH_AT_CheckButton2TemplateMixin:SetChecked(bool)
-    if bool then
-        if not self.isHideBackground then
-            self.Active1:Show()
-        end
-        self.ActiveBorderTop:Show()
-        self.ActiveBorderLeft:Show()
-        self.ActiveBorderRight:Show()
-        self.ActiveBorderBottom:Show()
-        self.CheckMarker:Show()
-    else
-        self.Text:SetFontObject("Font_White_S")
-        self.Active1:Hide()
-        self.CheckMarker:Hide()
-        self.ActiveBorderTop:Hide()
-        self.ActiveBorderLeft:Hide()
-        self.ActiveBorderRight:Hide()
-        self.ActiveBorderBottom:Hide()
-        self.Active2:Hide()
-    end
-    self.isChecked = bool
-end
-
-function HDH_AT_CheckButton2TemplateMixin:GetChecked()
-    return self.isChecked or false
-end
-
-function HDH_AT_CheckButton2TemplateMixin:SetScript(scriptTypeName, func)
-    if scriptTypeName == "OnClick" then
-        self.OnClickfunc = func
-    end
-end
-
-
 -------------------------------------
 --  HDH_AT_SpellSearchEditBoxTemplateMixin
 -------------------------------------
----
+
 HDH_AT_SpellSearchEditBoxTemplateMixin = {}
 
 function HDH_AT_SpellSearchEditBoxTemplateMixin:GetValue()
@@ -1494,61 +1343,6 @@ end
 function HDH_AT_SpellSearchEditBoxTemplateMixin:SetOnClickHandler(handler)
     self.OnClickSearchHandler = handler
 end
-
----------------------------------
--- HDH_AT_TalentCheckButtonMixin
----------------------------------
-HDH_AT_TalentCheckButtonMixin = {}
-
-function HDH_AT_TalentCheckButton_OnClick(self)
-    self:SetChecked(not (self.isChecked or false))
-    if self.OnClickfunc then
-        self.OnClickfunc(self)
-    end
-end
-
-function HDH_AT_TalentCheckButtonMixin:SetChecked(bool)
-    self.isChecked = bool
-    if bool then
-        self:SetSize(100, 30)
-        self.Icon:SetDesaturated(false)
-        self.Icon:SetAlpha(1)
-        self.Name:Show()
-        self.Active:Show()
-    else
-        self:SetSize(50, 30)
-        self.Icon:SetDesaturated(true)
-        self.Icon:SetAlpha(0.4)
-        self.Name:Hide()
-        self.Active:Hide()
-    end
-end
-
-function HDH_AT_TalentCheckButtonMixin:SetActivate(bool)
-    self:SetChecked(bool)
-end
-
-function HDH_AT_TalentCheckButtonMixin:SetText(text)
-    self.Name:SetText(text)
-end
-
-function HDH_AT_TalentCheckButtonMixin:GetText()
-    return self.Name:GetText()
-end
-
-function HDH_AT_TalentCheckButtonMixin:SetValue(id)
-    self.id = id
-end
-
-function HDH_AT_TalentCheckButtonMixin:GetValue()
-    return self.id 
-end
-
-function HDH_AT_TalentCheckButtonMixin:SetUnassigned()
-    self.Icon:SetTexture([[Interface\ICONS\INV_Misc_QuestionMark]])
-    self.Name:SetText(L.UNASSIGNED)
-end
-
 
 ----------------------------------------
 -- HDH_AT_MultiLineEditBoxTemplateMixin

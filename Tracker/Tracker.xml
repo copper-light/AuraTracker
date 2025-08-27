@@ -1,0 +1,26 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Blizzard_SharedXML/UI.xsd">
+    <Script file="Tracker.lua"/>
+    <Script file="AuraTracker.lua"/>
+    <Script file="CooldownTracker.lua"/>
+    <Script file="TotemTracker.lua"/>
+    <Script file="PowerTracker.lua"/>
+    <Script file="ComboPointTracker.lua"/>
+    <Script file="DKRuneTracker.lua"/>
+    <Script file="EssenceTracker.lua"/>
+    <Script file="StaggerTracker.lua"/>
+    <Script file="EnhancementMaelstrom.lua"/>
+    <Script file="HealthTracker.lua"/>
+
+    <Frame name="HDH_AT_TrackerTemplate" mixin="HDH_TRACKER" virtual="true"/>
+    <Frame name="HDH_AT_AuraTrackerTemplate" inherits="HDH_AT_TrackerTemplate" mixin="HDH_AURA_TRACKER" virtual="true"/>
+    <Frame name="HDH_AT_CooldownTrackerTemplate" inherits="HDH_AT_TrackerTemplate" mixin="HDH_C_TRACKER" virtual="true"/>
+    <Frame name="HDH_AT_TotemTrackerTemplate" inherits="HDH_AT_CooldownTrackerTemplate" mixin="HDH_TT_TRACKER" virtual="true"/>
+    <Frame name="HDH_AT_PowerTrackerTemplate" inherits="HDH_AT_AuraTrackerTemplate" mixin="HDH_POWER_TRACKER" virtual="true"/>
+    <Frame name="HDH_AT_ComboPointTrackerTemplate" inherits="HDH_AT_AuraTrackerTemplate" mixin="HDH_COMBO_POINT_TRACKER" virtual="true"/>
+    <Frame name="HDH_AT_DKRuneTrackerTemplate" inherits="HDH_AT_CooldownTrackerTemplate" mixin="HDH_DK_RUNE_TRACKER" virtual="true"/>
+    <Frame name="HDH_AT_EssenceTrackerTemplate" inherits="HDH_AT_ComboPointTrackerTemplate" mixin="HDH_ESSENCE_TRACKER" virtual="true"/>
+    <Frame name="HDH_AT_StaggerTrackerTemplate" inherits="HDH_AT_PowerTrackerTemplate" mixin="HDH_STAGGER_TRACKER" virtual="true"/>
+    <Frame name="HDH_AT_EnhancementMaelstromTemplate" inherits="HDH_AT_PowerTrackerTemplate" mixin="HDH_ENH_MAELSTROM_TRACKER" virtual="true"/>
+    <Frame name="HDH_AT_HealthTrackerTemplate" inherits="HDH_AT_PowerTrackerTemplate" mixin="HDH_HEALTH_TRACKER" virtual="true"/>
+</Ui>

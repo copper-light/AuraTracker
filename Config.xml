@@ -1,5 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
-..\FrameXML\UI.xsd">
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Blizzard_SharedXML/UI.xsd">
 	<Script file="Config.lua"/>
 
     <!-- 설정 프레임 시작 -->
@@ -10,7 +10,7 @@
         </Anchors>
 	
 		<Layers>
-			<Layer level="artwork">
+			<Layer level="ARTWORK">
 				<FontString parentKey="Text" name="$parentText" inherits="Font_Yellow_M" text="" justifyH="LEFT">
 					<Size x="200" y="25" />
 					<Anchors>
@@ -151,7 +151,7 @@
 									<Anchor point="TOPRIGHT" x="0" y="0" />
 								</Anchors>
 								<Layers>
-									<Layer level="artwork">
+									<Layer level="ARTWORK">
 										<FontString name="$parentText" parentKey="Trasits" inherits="Font_Yellow_M" text="사용 특성" justifyH="CENTER">
 											<Size x="200" y="20" />
 											<Anchors>
@@ -175,7 +175,7 @@
 									<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentLabel" x="0" y="0" />
 								</Anchors>
 									<Layers>
-										<Layer level="artwork">
+										<Layer level="ARTWORK">
 											<FontString name="$parentText" inherits="Font_Yellow_M" text="추적창 추가" justifyH="CENTER">
 												<Size x="200" y="20" />
 												<Anchors>
@@ -242,7 +242,7 @@
 										<Size><AbsDimension x="148" y="1"/></Size>
 										<Anchors>
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
-											<Anchor point="BOTTOMRIGHT" relativePoint="" x="0" y="0" />
+											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="0" />
 										</Anchors>
 
 										<Frames>
@@ -451,7 +451,7 @@
 									<Frame name="$parentSwithConfigMode" inherits="HDH_AT_SwitchFrameTemplate">
 										<Size y="20"/>
 										<Layers>
-											<Layer level="artwork">
+											<Layer level="ARTWORK">
 												<FontString parentKey="Text" inherits="Font_Yellow_S" text="공용 설정 사용 여부" justifyH="LEFT">
 													<Size><AbsDimension x="95" y="22" /></Size>
 													<Anchors>
@@ -476,7 +476,7 @@
 									<Frame name="$parentSwithDisplayMode" inherits="HDH_AT_SwitchFrameTemplate" >
 										<Size y="20"/>
 										<Layers>
-											<Layer level="artwork">
+											<Layer level="ARTWORK">
 												<FontString parentKey="Text" inherits="Font_Yellow_S" text="디스플레이 유형" justifyH="LEFT">
 													<Size><AbsDimension x="95" y="22" /></Size>
 													<Anchors>
@@ -506,7 +506,7 @@
 											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 										</Anchors>
 										<Layers>
-											<Layer level="artwork">
+											<Layer level="ARTWORK">
 												<FontString parentKey="ConfigNmae" inherits="Font_Yellow_S" text="사용 설정" justifyH="LEFT">
 													<Size><AbsDimension x="58" y="22" /></Size>
 													<Anchors>
@@ -524,7 +524,7 @@
 											<Anchor point="RIGHT" relativePoint="RIGHT" x="-10" y="0" />
 										</Anchors>
 										<Layers>
-											<Layer level="artwork">
+											<Layer level="ARTWORK">
 												<FontString parentKey="ConfigNmae" inherits="Font_Yellow_S" text="출력 모드" justifyH="LEFT">
 													<Size><AbsDimension x="58" y="22" /></Size>
 													<Anchors>
@@ -549,10 +549,9 @@
 										<Size x="170" y="20" />
 										<Anchors>
 											<Anchor point="LEFT" relativePoint="LEFT" x="10" y="0" />
-											<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 										</Anchors>
 										<Scripts>
-											<OnLoad>self.Text:SetText(HDH_AT_L.MOVE_UI)</OnLoad>
+											<OnLoad>self:SetText(HDH_AT_L.MOVE_UI)</OnLoad>
 											<OnClick function="HDH_AT_OnCheck" inherit="prepend" />
 										</Scripts>
 									</CheckButton>
@@ -563,7 +562,7 @@
 											<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBMove" x="5" y="0" />
 										</Anchors>
 										<Scripts>
-											<OnLoad>self.Text:SetText(HDH_AT_L.DISPLAY_ID_IN_TOOPTIP)</OnLoad>
+											<OnLoad>self:SetText(HDH_AT_L.DISPLAY_ID_IN_TOOPTIP)</OnLoad>
 											<OnClick function="HDH_AT_OnCheck" inherit="prepend" />
 										</Scripts>
 									</CheckButton>
@@ -624,7 +623,7 @@
 									<Anchor point="TOPRIGHT" x="0" y="0" />
 								</Anchors>
 								<Layers>
-									<Layer level="artwork">
+									<Layer level="ARTWORK">
 										<Texture name="$parentIcon" parentKey="Icon" file="Interface\DialogFrame\UI-Dialog-Icon-AlertNew">
 											<Size x="20" y="20" />
 											<TexCoords left="0.08" right="0.92" top="0.08" bottom="0.92"/>
@@ -743,7 +742,7 @@
 											<Frame name="$parentContents" hidden="false">
 												<Size><AbsDimension x="300" y="200"/></Size>
 												<Layers>
-													<Layer level="artwork">
+													<Layer level="ARTWORK">
 														<FontString parentKey="Text" name="$parentText" inherits="Font_Yellow_M" text="반짝효과 설정 (택1)" justifyH="LEFT">
 															<Size x="400" y="25" />
 															<Anchors>
@@ -770,7 +769,7 @@
 															<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-40" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.OFF)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.OFF)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
 														</Scripts>
 													</CheckButton>
@@ -782,7 +781,7 @@
 															<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_ACTIVE)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.GLOW_CONDITION_ACTIVE)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend" />
 														</Scripts>
 													</CheckButton>
@@ -793,7 +792,7 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition2" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_TIME)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.GLOW_CONDITION_TIME)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
 														</Scripts>
 													</CheckButton>
@@ -804,7 +803,7 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition3" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_COUNT)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.GLOW_CONDITION_COUNT)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
 														</Scripts>
 													</CheckButton>
@@ -815,7 +814,7 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition4" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_CONDITION_VALUE)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.GLOW_CONDITION_VALUE)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
 														</Scripts>
 													</CheckButton>
@@ -879,7 +878,7 @@
 															<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_EFFECT_DEFAULT)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.GLOW_EFFECT_DEFAULT)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend" />
 														</Scripts>
 													</CheckButton>
@@ -890,7 +889,7 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBEffectType1" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.GLOW_EFFECT_COLOR)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.GLOW_EFFECT_COLOR)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" inherit="prepend"/>
 														</Scripts>
 													</CheckButton>
@@ -935,7 +934,7 @@
 												<Size><AbsDimension x="300" y="200"/></Size>
 
 												<Layers>
-													<Layer level="artwork">
+													<Layer level="ARTWORK">
 														<FontString parentKey="Title1" name="$parentText" inherits="Font_Yellow_M" text="주문 표시 설정 (택1)" justifyH="LEFT">
 															<Size x="400" y="25" />
 															<Anchors>
@@ -946,7 +945,7 @@
 														<FontString parentKey="Title2" name="$parentText2" inherits="Font_Yellow_M" text="특성 습득 시에만 아이콘 표시" justifyH="LEFT">
 															<Size x="400" y="25" />
 															<Anchors>
-																<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-125"/>
+																<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="20" y="-150"/>
 															</Anchors>
 														</FontString>
 													</Layer>
@@ -965,7 +964,7 @@
 															<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.ALWAYS_SHOW)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.ALWAYS_SHOW)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" />
 														</Scripts>
 													</CheckButton>
@@ -976,7 +975,7 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition1" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.HIDE_WHEN_TIME_OFF)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.HIDE_WHEN_TIME_OFF)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" />
 														</Scripts>
 													</CheckButton>
@@ -987,7 +986,18 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition2" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.HIDE_WHEN_TIME_ON)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.HIDE_WHEN_TIME_ON)</OnLoad>
+															<OnClick function="HDH_AT_OnCheck" />
+														</Scripts>
+													</CheckButton>
+
+													<CheckButton name="$parentCBCondition4" inherits="HDH_AT_CheckButton2Template">
+														<Size x="170" y="20" />
+														<Anchors>
+															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBCondition3" x="0" y="-2" />
+														</Anchors>
+														<Scripts>
+															<OnLoad>self:SetText(HDH_AT_L.HIDE)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" />
 														</Scripts>
 													</CheckButton>
@@ -997,20 +1007,16 @@
 														<Anchors>
 															<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCBCondition2" x="2" y="0" />
 														</Anchors>
-														<Scripts>
-															<OnShow>
-															</OnShow>
-														</Scripts>
 													</Frame>
 
 													<CheckButton name="$parentCBConditionTrait1" inherits="HDH_AT_CheckButton2Template">
 														<Size x="170" y="20" />
 														<Anchors>
-															<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="15" y="-155" />
+															<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="15" y="-180" />
 															<!-- <Anchor point="RIGHT" relativePoint="RIGHT" x="0" y="0" /> -->
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.OFF)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.OFF)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" />
 														</Scripts>
 													</CheckButton>
@@ -1021,7 +1027,7 @@
 															<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCBConditionTrait1" x="0" y="-2" />
 														</Anchors>
 														<Scripts>
-															<OnLoad>self.Text:SetText(HDH_AT_L.LEARNED_TRAIT_SPELL_INPUT)</OnLoad>
+															<OnLoad>self:SetText(HDH_AT_L.LEARNED_TRAIT_SPELL_INPUT)</OnLoad>
 															<OnClick function="HDH_AT_OnCheck" />
 														</Scripts>
 													</CheckButton>
@@ -1051,7 +1057,7 @@
 																</Texture>
 															</Layer>
 															<Layer level="OVERLAY">
-																<FontString parentKey="Text" inherits="Font_White_S" text="미습득 시 아이콘 숨김 방식" justifyH="CENTER"  justifyV="CENTER">
+																<FontString parentKey="Text" inherits="Font_White_S" text="미습득 시 아이콘 숨김 방식" justifyH="CENTER"  justifyV="MIDDLE">
 																	<Size  y="20" />
 																	<Anchors>
 																		<Anchor point="LEFT" relativePoint="LEFT" x="4" y="0"/>
@@ -1255,9 +1261,10 @@
 				</Layers>
 				<Scripts>
 					<OnClick>
-						HDH_AT_MinimumFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
-						HDH_AT_MinimumFrame:SetPoint("RIGHT", self, "LEFT", -4, 0);
-						HDH_AT_MinimumFrame:Show(); self:GetParent():Hide();
+						HDH_AT_MinimumFrame:ClearAllPoints()
+						HDH_AT_MinimumFrame:SetPoint("BOTTOMRIGHT", HDH_AT_ConfigFrame, "TOPRIGHT", -58, 4)
+						HDH_AT_MinimumFrame:Show();
+						HDH_AT_ConfigFrame:Hide();
 					</OnClick>
 				</Scripts>
 			</Button>
@@ -1266,7 +1273,6 @@
 				<Size><AbsDimension x="20" y="20"/></Size>
 				<Anchors>
 					<Anchor point="RIGHT" relativePoint="LEFT" relativeTo="$parentBtnMinMaxFrame" x="-4" y="0" />
-					<!-- <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT" relativeTo="$parent" x="0" y="4" /> -->
 				</Anchors>
 				<Layers>
 					<Layer level="BACKGROUND">
@@ -1286,13 +1292,6 @@
 							</Anchors>
 							<TexCoords left="0.05" right="0.95" top="0.05" bottom="0.95"/> 
 						</Texture>
-
-						<!-- <FontString name="$parentText" inherits="GAMEFONTNORMAL" justifyH ="LEFT" justifyV="MIDDLE" text="Auratracker">
-							<Anchors>
-								<Anchor point="LEFT" relativePoint="RIGHT" x="4" y="0" relativeTo="$parentIcon"/>
-								<Anchor point="RIGHT" relativePoint="RIGHT" x="-2" y="0" relativeTo="$parent"/>
-							</Anchors>
-						</FontString> -->
 					</Layer>
 				</Layers>
 			</Frame>
@@ -1312,7 +1311,7 @@
 							<Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="0" y="0"/>
 						</Anchors>
 						<Layers>
-							<Layer level="artwork">
+							<Layer level="ARTWORK">
 								<FontString name="$parentText" parentKey="Title" inherits="Font_Yellow_M" text="최근 사용된 주문" justifyH="CENTER">
 									<Size y="20" />
 									<Anchors>
@@ -1337,7 +1336,7 @@
 
 						<Layers>
 							<Layer level="BACKGROUND">
-								<FontString name="$parentText" parentKey="Desc" inherits="Font_Yellow_S" text="주문 목록으로 드래그하여 주문 추가 가능" justifyH="CENTER" justifyV="CENTER">
+								<FontString name="$parentText" parentKey="Desc" inherits="Font_Yellow_S" text="주문 목록으로 드래그하여 주문 추가 가능" justifyH="CENTER" justifyV="MIDDLE">
 									<Size y="20" />
 									<Color r="1" g="0.8" b="0" a="0.25"/>
 									<Anchors>
@@ -1362,10 +1361,6 @@
 											<Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="0" />
 											<Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" x="0" y="5" />
 										</Anchors>
-
-										<Frames>
-											
-										</Frames>
 									</Frame>
 								</ScrollChild>
 							</ScrollFrame>
@@ -1376,7 +1371,7 @@
 									<Anchor point="RIGHT" relativePoint="RIGHT" x="-5" y="5" />
 								</Anchors>
 								<Scripts>
-									<OnLoad>self.Text:SetText(HDH_AT_L.AUTO_POPUP)</OnLoad>
+									<OnLoad>self:SetText(HDH_AT_L.AUTO_POPUP)</OnLoad>
 									<OnClick function="HDH_AT_OnCheck" inherit="prepend" />
 								</Scripts>
 							</CheckButton>
@@ -1428,10 +1423,7 @@
     </Frame>
 
 	<Frame name="HDH_AT_MinimumFrame" movable="true" toplevel="true" parent="UIParent" frameStrata="HIGH" hidden="true" enableMouse="true" inherits="HDH_AT_ConfigFrameTemplate">
-		<Size><AbsDimension x="155" y="20"/></Size>
-		<Anchors>
-			<Anchor point="CENTER" x="0" y="0"/>
-		</Anchors>
+		<Size><AbsDimension x="170" y="20"/></Size>
 		<Layers>
 			<Layer level="BACKGROUND">
 				<Texture name="$parentBG">
@@ -1443,7 +1435,6 @@
 				</Texture>
 			</Layer>
 			<Layer level="OVERLAY">
-
 				<Texture name="$parentIcon" file="Interface\Addons\HDH_AuraTracker\Texture\logo">
 					<Size><AbsDimension x="18" y="18"/></Size>
 					<Anchors>
@@ -1461,7 +1452,6 @@
 			</Layer>
 		</Layers>
 		<Frames>
-		
 			<Button name="$parentBtnMinMaxFrame" inherits="HDH_AT_TextureButtonTemplate, HDH_AT_ConfigFrameTemplate">
 				<Size><AbsDimension x="25" y="20"/></Size>
 				<Anchors>
@@ -1490,8 +1480,6 @@
 				</Layers>
 				<Scripts>
 					<OnClick>
-						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
-						HDH_AT_ConfigFrame:SetPoint("TOPRIGHT", self:GetParent().Close,"BOTTOMRIGHT", 0, -4);
 						HDH_AT_ConfigFrame:Show(); self:GetParent():Hide();
 					</OnClick>
 				</Scripts>
@@ -1504,8 +1492,6 @@
 				</Anchors>
 				<Scripts>
 					<OnClick>
-						HDH_AT_ConfigFrame:ClearAllPoints(); self:GetParent():ClearAllPoints();
-						HDH_AT_ConfigFrame:SetPoint("TOPRIGHT",self:GetParent(),"TOPRIGHT");
 						self:GetParent():Hide(); 
 					</OnClick>
 				</Scripts>
@@ -1514,15 +1500,25 @@
 		</Frames>
 		<Scripts>
 			<OnShow>
-				_G[self:GetName().."Text"]:SetText("AuraTracker v"..C_AddOns.GetAddOnMetadata("HDH_AuraTracker", "Version"))
+				_G[self:GetName().."Text"]:SetText("AuraTracker |cffffffff"..C_AddOns.GetAddOnMetadata("HDH_AuraTracker", "Version"))
 			</OnShow>
 			<OnHide>
 				if not HDH_AT_ConfigFrame:IsShown() then
 					HDH_AT_ConfigFrame_OnHide(HDH_AT_ConfigFrame)
 				end
 			</OnHide>
-			<OnMouseDown>self:StartMoving()</OnMouseDown>
-			<OnMouseUp>self:StopMovingOrSizing()</OnMouseUp>
+			<OnMouseDown>
+				self:StartMoving()
+				self.x = self:GetLeft()
+				self.y = self:GetBottom()
+			</OnMouseDown>
+			<OnMouseUp>
+				self:StopMovingOrSizing()
+				local newX = HDH_AT_ConfigFrame:GetLeft() + self:GetLeft() - self.x
+				local newY = HDH_AT_ConfigFrame:GetBottom() + self:GetBottom() - self.y
+				HDH_AT_ConfigFrame:ClearAllPoints()
+				HDH_AT_ConfigFrame:SetPoint("BOTTOMLEFT", UIParent, "BOTTOMLEFT", newX, newY)
+			</OnMouseUp>
 		</Scripts>
 	</Frame>
 

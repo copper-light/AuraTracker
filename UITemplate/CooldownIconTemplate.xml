@@ -1,0 +1,167 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Blizzard_SharedXML/UI.xsd">
+	<Script file="CooldownIconTemplate.lua"/>
+	
+	<Frame name="HDH_AT_BaseCooldownTemplate" mixin="HDH_AT_BaseCooldownTemplateMixin" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture parentKey="Icon" setAllPoints="true">
+					<TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93" />
+				</Texture>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Frame name="HDH_AT_BaseLinearCooldownTemplate" clipChildren="true" inherits="HDH_AT_BaseCooldownTemplate" mixin="HDH_AT_BaseLinearCooldownTemplateMixin" virtual="true">
+		<Frames>
+			<Frame parentKey="Progress" clipChildren="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Texture" >
+							<TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93" />
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+
+		<Scripts>
+			<OnSizeChanged function="HDH_AT_BaseLinearCooldownTemplate_OnSizeChanged"/>
+		</Scripts>
+	</Frame>
+
+	<Frame name="HDH_AT_LinearCooldownTemplate"  clipChildren="true" inherits="HDH_AT_BaseCooldownTemplate" mixin="HDH_AT_LinearCooldownTemplateMixin" virtual="true">
+		<Frames>
+			<Frame parentKey="Progress" setAllPoints="true" inherits="HDH_AT_BaseLinearCooldownTemplate">
+				<!-- <Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Texture" file="Interface/ICONS/TEMP">
+							<TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93" />
+						</Texture>
+					</Layer>
+				</Layers> -->
+			</Frame>
+
+			<Frame parentKey="Charge" setAllPoints="true" inherits="HDH_AT_BaseLinearCooldownTemplate">
+				<!-- <Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Texture" file="Interface/ICONS/TEMP">
+							<TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93" />
+						</Texture>
+					</Layer>
+				</Layers> -->
+			</Frame>
+
+			<Frame parentKey="Overlay" setAllPoints="true" hidden="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Texture" setAllPoints="true">
+							<TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93" />
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Frame parentKey="Spark" hidden="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Texture" alphaMode="ADD" setAllPoints="true">
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Frame parentKey="ChargeSpark" hidden="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Texture" alphaMode="ADD" setAllPoints="true">
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+
+		<Scripts>
+			<OnSizeChanged function="HDH_AT_LinearCooldownTemplate_OnSizeChanged"/>
+		</Scripts>
+	</Frame>
+
+	<Frame name="HDH_AT_CircleCooldownTemplate" inherits="HDH_AT_BaseCooldownTemplate" mixin="HDH_AT_CircleCooldownTemplateMixin" virtual="true">
+		<Frames>
+			<Frame parentKey="Overlay" setAllPoints="true" hidden="true">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Texture" setAllPoints="true">
+							<TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93" />
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			
+			<Cooldown parentKey="Progress" inherits="CooldownFrameTemplate" setAllPoints="true" hideCountdownNumbers ="true" drawEdge="false" drawSwipe="true" drawBling="false">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="Texture" file="Interface/ICONS/TEMP" setAllPoints="true">
+							<TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93" />
+						</Texture>
+					</Layer>
+				</Layers>	
+			</Cooldown>
+
+			<Cooldown parentKey="Charge" inherits="CooldownFrameTemplate" setAllPoints="true" hideCountdownNumbers ="true" drawEdge="true" drawSwipe="false" drawBling="false">
+			</Cooldown>
+		</Frames>
+	</Frame>
+
+	<Frame name="HDH_AT_CooldownIconTemplate" mixin="HDH_AT_CooldownIconTemplateMixin" virtual="true">
+		<Frames>
+			<Frame parentKey="Icon">
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture parentKey="Texture" file="Interface/ICONS/TEMP" setAllPoints="true" >
+							<TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93" />
+						</Texture>
+					</Layer>
+				</Layers>
+				<Anchors>
+					<Anchor point="CENTER" />
+				</Anchors>
+				<!-- <Frames>
+					<Frame parentKey="LinearCooldown" inherits="HDH_AT_LinearCooldownTemplate" setAllPoints="true">
+					</Frame>
+
+					<Frame parentKey="CircleCooldown" inherits="HDH_AT_CircleCooldownTemplate" setAllPoints="true">
+					</Frame>
+				</Frames> -->
+			</Frame>
+
+			<Frame parentKey="Border" setAllPoints="true">
+				<Layers>
+					<Layer level="BORDER">
+						<Texture parentKey="Texture" file="Interface/AddOns/HDH_AuraTracker/Texture/border2" setAllPoints="true">
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+			
+			<Frame parentKey="Glow" setAllPoints="true" hidden="true">
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture parentKey="Color" file="Interface/AddOns/HDH_AuraTracker/Texture/spark_rect">
+						</Texture>
+					</Layer>
+
+					<Layer level="BORDER">
+						<Texture parentKey="Border" file="Interface/AddOns/HDH_AuraTracker/Texture/border2">
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+
+		</Frames>
+		<Scripts>
+			<OnSizeChanged function="HDH_AT_CooldownIconTemplate_OnSizeChanged"/>
+		</Scripts>
+	</Frame>
+    
+</Ui>

@@ -4,7 +4,7 @@ HDH_AT_UTIL = {}
 do -- 애드온 버전 호환성
 ----------------------------------
     ------------------------------------------------------
-	if select(4, GetBuildInfo()) <= 59999 then -- 대격변
+	if select(4, GetBuildInfo()) <= 59999 then -- 판다리아
 	------------------------------------------------------
 		HDH_AT_UTIL.GetSpecialization = function()
 			return GetPrimaryTalentTree() or 5
@@ -196,8 +196,7 @@ do
 	function HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(id, name, isItem) -- 특성 스킬의 변경에 따른 스킬 표시 여부를 결정하기 위함
 		if not id or id == 0 then return false end
 		if isItem then 
-			local equipSlot = select(9,GetItemInfo(id)) -- 착용 가능한 장비인가요? (착용 불가능이면, nil, INVTYPE_NON_EQUIP_IGNORE)
-			if equipSlot and equipSlot ~= "" and equipSlot ~= "INVTYPE_NON_EQUIP_IGNORE" then 
+			if C_Item.IsEquippableItem(id) then 
 				return IsEquippedItem(id) -- 착용중인가요?
 			else
 				return true
@@ -235,7 +234,7 @@ do
 	function HDH_AT_UTIL.GetInfo(value, isItem) -- name, id, texture, isItem
 		if not value then return nil end
 		if not isItem and HDH_AT_UTIL.GetCacheSpellInfo(value) then
-			local spell = HDH_AT_UTIL.GetCacheSpellInfo(value) 
+			local spell = HDH_AT_UTIL.GetCacheSpellInfo(value)
 			return spell.name, spell.spellID, spell.iconID, false
 		elseif C_Item.GetItemInfo(value) then
 			local name, link, quality, iLevel, reqLevel, class, subclass, maxStack, equipSlot, texture, vendorPrice = GetItemInfo(value)
@@ -248,6 +247,41 @@ do
 		end
 		return nil
 	end
+
+	-- local WeaponIndex = {
+	-- 	[1] = 16,	--Main hand
+	-- 	[2] = 17,	--Off-hand
+	-- 	[3] = 18,	--Ranged
+	-- }
+	-- function HDH_AT_UTIL.GetWeaponEnchantInfo()
+	-- 	if not HDH_AT_UTIL.TmpGameToolTip then
+	-- 		HDH_AT_UTIL.TmpGameToolTip =  CreateFrame("GameTooltip", "MyScanningTooltip", nil, "GameTooltipTemplate")
+	-- 		HDH_AT_UTIL.TmpGameToolTip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	-- 	end
+
+	-- 	-- 사용 예시
+	-- 	-- local link = GetInventoryItemLink("player", 16)
+
+	-- 	HDH_AT_UTIL.TmpGameToolTip:SetInventoryItem("player", 16)
+
+	-- 	for i = HDH_AT_UTIL.TmpGameToolTip:NumLines(), 1, -1 do
+	-- 		local text = _G[HDH_AT_UTIL.TmpGameToolTip:GetName() .. "TextLeft" .. i]
+	-- 		if string.find(text:GetText(), "질풍의 무기") then
+	-- 			print(string.find(text:GetText(), "질풍의 무기"))
+	-- 		else
+	-- 			print("none")
+	-- 		end
+	-- 	end
+
+
+	-- 	-- HDH_AT_UTIL.TmpGameToolTip:SetSpellBookItem(33757)
+	-- 	-- for i = HDH_AT_UTIL.TmpGameToolTip:NumLines(), 1, -1 do
+	-- 	-- 	local text = _G[HDH_AT_UTIL.TmpGameToolTip:GetName() .. "TextLeft" .. i]
+	-- 	-- 	print(text:GetText())
+	-- 	-- 	text = _G[HDH_AT_UTIL.TmpGameToolTip:GetName() .. "TextRight" .. i]
+	-- 	-- 	print(text:GetText())
+	-- 	-- end
+	-- end
 
 	function HDH_AT_UTIL.Trim(str)
 		if not str then return nil end
@@ -308,8 +342,7 @@ do
 		end
 		return dstData;
 	end
-	
-		
+
 	function HDH_AT_UTIL.CommaValue(amount)
 		if amount == nil then return nil end
 		local formatted = amount
@@ -321,7 +354,7 @@ do
 		end
 		return formatted
 	end
-	
+
 	function HDH_AT_UTIL.AbbreviateValue(amount, isShort, lengType)
 		lengType = lengType or HDH_TRACKER.LOCALE;
 		if amount == nil then return nil end
@@ -364,8 +397,6 @@ do
 		end
 	end
 
-	
-
 	function HDH_AT_UTIL.AbbreviateTime(time, isShort, lengType)
 		local lengType = lengType or HDH_TRACKER.LOCALE;
 		if lengType == "koKR" then
@@ -399,8 +430,8 @@ do
 		end
 	end
 
-	local COLOR_RGB_CODE_STR = "#|cffff9999%02x|cff99ff99%02x|cff9999ff%02x"
-	local COLOR_RGBA_CODE_STR = "#|cffff9999%02x|r|cff99ff99%02x|r|cff9999ff%02x|r%02x"
+	local COLOR_RGB_CODE_STR = "|cffff9999%02x|cff99ff99%02x|cff9999ff%02x"
+	local COLOR_RGBA_CODE_STR = "|cffff9999%02x|r|cff99ff99%02x|r|cff9999ff%02x|r%02x"
 	function HDH_AT_UTIL.ColorToString(r, g, b, a)
 		if a then
 			return string.upper(COLOR_RGBA_CODE_STR:format(r * 255, g *255, b*255, a*255))
@@ -440,24 +471,39 @@ do
 		return x, y
 	end
 
-	function HDH_AT_UTIL.RunTimer(obj, timerName, time, func, ...)
+	function HDH_AT_UTIL.RunTimer(obj, timerName, time, func, args)
 		if not obj.timer then obj.timer = {} end
 		if obj.timer[timerName] then
-			obj.timer[timerName]:Cancel()
+			obj.timer[timerName].args = args
+			if (GetTime() - obj.timer[timerName].startTime) <= time then
+				return
+			end
 		end
-		obj.timer[timerName] = C_Timer.NewTimer(time, function(timer) 
-			if timer.parent then 
-				timer.func(timer.args) 
+		obj.timer[timerName] = C_Timer.NewTimer(time, function(timer)
+			if timer.parent then
+				if timer.args and #timer.args >= 1 then
+					timer.func(unpack(timer.args)) 
+				else
+					timer.func() 
+				end
 				timer.parent[timer.timerName] = nil
 				timer.timerName = nil
 				timer.args = nil
 			end 
 		end)
+		obj.timer[timerName].startTime = GetTime()
 		obj.timer[timerName].tracker = obj
 		obj.timer[timerName].parent = obj.timer
 		obj.timer[timerName].timerName = timerName
 		obj.timer[timerName].func = func
-		obj.timer[timerName].args = ...
+		obj.timer[timerName].args = args
+	end
+
+	function HDH_AT_UTIL.StopTimer(obj, timerName)
+		if obj.timer and obj.timer[timerName] then
+			obj.timer[timerName]:Cancel()
+			obj.timer[timerName] = nil
+		end
 	end
 
 	function HDH_AT_UTIL.CT_Timer_Func(self)
@@ -576,7 +622,9 @@ do
 	end
 
 	function HDH_AT_UTIL.LogScale(value)
-		return ((math.log(value* 0.85 + 0.15) - math.log(0.15)) / (math.log(1) - math.log(0.15)))
+		-- return ((math.log(value* 0.85 + 0.15) - math.log(0.15)) / (math.log(1) - math.log(0.15)))
+		return	 (1 - math.min(1, (math.log(value or 0.01)) / (math.log(.01))))	
+		-- return value
 	end
 
 	function HDH_AT_UTIL.GetDecimalPlaces(num)
@@ -607,7 +655,7 @@ do
 		ok, v = pcall(C_EncodingUtil.CompressString, v, 0, 2)
 		if not ok then return nil end
 
-		ok, v = pcall(C_EncodingUtil.EncodeBase64, v)
+		ok, v = pcall(C_EncodingUtil.EncodeBase64, v, 1)
 		if not ok then return nil end
 		
 		return v

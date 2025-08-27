@@ -2,7 +2,7 @@
 ## Title: AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
-## Version: 11.1.7.12
+## Version: 11.1.7.13
 ## SavedVariablesPerCharacter: HDH_AT_DB
 ## AllowLoadGameType: mists
 
@@ -11,21 +11,17 @@ Locale\locale_koKR.lua
 Locale\locale_ruRU.lua
 
 Utils.lua
-UITemplates.xml
-Tooltip.lua
 ConfigDB.lua
 
-Tracker\Tracker.lua
-Tracker\AuraTracker.lua
-Tracker\CooldownTracker.lua
-Tracker\TotemTracker.lua
-Tracker\PowerTracker.lua
-Tracker\ComboPointTracker.lua
-Tracker\DKRuneTracker.lua
-Tracker\EssenceTracker.lua
-Tracker\StaggerTracker.lua
-Tracker\EnhancementMaelstrom.lua
-Tracker\HealthTracker.lua
-# Tracker\ShadowTracking.lua
+UITemplate\CommonTemplate.xml
+UITemplate\CheckButtonTemplate.xml
+UITemplate\ButtonTemplate.xml
+UITemplate\UITemplates.xml
+UITemplate\CooldownIconTemplate.xml
+UITemplate\StatusBarTemplate.xml
+Tooltip.lua
+
+Tracker\Tracker.xml
+HDH_AuraTracker.lua
 
 Config.xml
