@@ -159,7 +159,7 @@ function HDH_DK_RUNE_TRACKER:UpdateSpellInfo(runeIndex)
 					spell.duration = duration
 					spell.startTime = start
 				else
-					spell.duration = duration - (HDH_TRACKER.startTime-start)
+					spell.duration = math.max(0, duration - (HDH_TRACKER.startTime-start))
 					spell.startTime = HDH_TRACKER.startTime
 				end
 				spell.endTime = start + duration

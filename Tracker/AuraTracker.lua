@@ -76,7 +76,7 @@ do
 				spell.duration = aura.duration
 				spell.startTime = aura.expirationTime - aura.duration
 
-				if HDH_TRACKER.startTime > spell.startTime then
+				if aura.duration > 0 and HDH_TRACKER.startTime > spell.startTime then
 					spell.duration = spell.duration - (HDH_TRACKER.startTime - spell.startTime)
 					spell.startTime = HDH_TRACKER.startTime
 				end
@@ -155,13 +155,13 @@ do
 					spell.latestDuration = 1
 				end
 
-				if HDH_TRACKER.startTime > spell.startTime then
+				if spell.duration > 0 and HDH_TRACKER.startTime > spell.startTime  then
 					spell.startTime = HDH_TRACKER.startTime
 					spell.duration = spell.duration - (HDH_TRACKER.startTime - spell.startTime)
 				end
 
 				f.icon:SetTexture(aura.icon)
-				
+
 				self.updateCount = i
 			end
 		end
@@ -251,8 +251,6 @@ do
 							f.bar:SetStatusBarColor(DebuffTypeColor[f.spell.dispelType].r, DebuffTypeColor[f.spell.dispelType].g, DebuffTypeColor[f.spell.dispelType].b, 1)
 						end
 						if f.spell.barValueType == DB.BAR_TYPE_BY_TIME then
-							-- self:UpdateBarMinMaxValue(f, 0, f.spell.latestDuration, f.spell.latestDuration)
-							-- self:UpdateBarValue()
 							self:UpdateBarFull(f)
 						else
 							self:UpdateBarMinMaxValue(f, nil, nil, 0)

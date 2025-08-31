@@ -103,7 +103,7 @@ function HDH_C_TRACKER:GetCooldownInfo(id, name, isItem, isToy)
 			chargeDuration = 0
 		end
 	end
-	
+
 	if startTime ~= nil and startTime ~= 0 and (HDH_TRACKER.startTime > startTime) then
 		duration = duration - (HDH_TRACKER.startTime - startTime)
 		startTime = HDH_TRACKER.startTime
@@ -257,7 +257,7 @@ function HDH_C_TRACKER:CreateDummySpell(count)
 	local ui = self.ui
 	local curTime = GetTime()
 	local f, spell
-	
+
 	if icons then
 		if #icons > 0 then count = #icons end
 	end

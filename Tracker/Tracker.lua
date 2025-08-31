@@ -1496,7 +1496,7 @@ else -- 용군단 코드
 		if not  f.icon.SpellActivationAlert then
 			self:ActionButton_SetupOverlayGlow(f)
 		end
-		if not f.icon.SpellActivationAlert:IsShown() or (not  f.icon.SpellActivationAlert.ProcStartAnim:IsPlaying() and not  f.icon.SpellActivationAlert.ProcLoop:IsPlaying()) then
+		if not f.icon.SpellActivationAlert:IsShown() or (not f.icon.SpellActivationAlert.ProcStartAnim:IsPlaying() and not f.icon.SpellActivationAlert.ProcLoop:IsPlaying()) then
 			f.icon.SpellActivationAlert:Show()
 			f.icon.SpellActivationAlert.ProcStartAnim:Play()
 		end
@@ -1690,6 +1690,7 @@ function HDH_TRACKER:UpdateLayout()
 	local reverse_v = self.ui.common.reverse_v -- 상하반전
 	local reverse_h = self.ui.common.reverse_h -- 좌우반전
 	local activedCount = 0 -- 몇번째로 아이콘을 출력했는가?
+	local colAlignCount = 0
 	local col = 0  -- 열에 대한 위치 좌표값 = x
 	local row = 0  -- 행에 대한 위치 좌표값 = y
 	local useSpace = false
@@ -1724,6 +1725,7 @@ function HDH_TRACKER:UpdateLayout()
 					else
 						if not f:IsShown() then f:Show() end
 						activedCount = activedCount + 1
+						colAlignCount = colAlignCount + 1
 					end
 				else
 					if f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE then
@@ -1733,7 +1735,7 @@ function HDH_TRACKER:UpdateLayout()
 						useSpace = false
 					else
 						if not f:IsShown() then f:Show() end
-						activedCount = activedCount + 1
+						colAlignCount = colAlignCount + 1
 					end	
 				end
 			else
@@ -1744,7 +1746,7 @@ function HDH_TRACKER:UpdateLayout()
 		if useSpace then
 			f:ClearAllPoints()
 			f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-			if activedCount % line == 0 then
+			if colAlignCount % line == 0 then
 				row = row + size_h + margin_v
 				col = 0
 			else
