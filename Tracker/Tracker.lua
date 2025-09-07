@@ -33,12 +33,14 @@ HDH_TRACKER.startTime = 0
 -- EVENT SCRIPT
 -------------------------------------------
 
+-- f:GetParent().parent 가 없는 경우가 있음
+-- "지역 섹션 이동" 또는 "전투중 설정 변경"할 때 발생하는 듯
 local function UpdateCooldown(f, elapsed)
-	if not f then return end
-	local spell = f.spell;
-	local tracker = f:GetParent().parent;
-	if not spell or not tracker then return end
-	
+	if not f or not f:GetParent() or not f:GetParent().parent or not f.spll then return end
+
+	local spell = f.spell
+	local tracker = f:GetParent().parent
+
 	f.skip = (f.skip or 0) + 1
 	if f.skip % 2 ~= 0 and elapsed < 0.03 then return end
 	f.skip = 0
@@ -46,7 +48,7 @@ local function UpdateCooldown(f, elapsed)
 	spell.curTime = GetTime();
 	spell.remaining = (spell.endTime or 0) - spell.curTime
 	spell.time = spell.remaining
-	
+
 	if spell.duration <= HDH_TRACKER.GlobalCooldown then
 		spell.time = 0
 	end
@@ -78,7 +80,7 @@ local function OnUpdateGlowColor(self, elapsed)
 	self.p = HDH_AT_UTIL.LogScale(math.max(math.min((1.25 - (GetTime() % (1/self:GetParent().spell.glowEffectPerSec) + .001) / (1/self:GetParent().spell.glowEffectPerSec*0.8)), 1.), 0.3))
 	self.p_c = math.max(self.p, 0.5)
 	self.icon_size = self:GetParent():GetParent().parent.ui.icon.size
-	
+
 	if (math.min(1.4, self.playing / 0.25)) == 1.4 then
 		self.color:SetSize(self.icon_size * 1.31, self.icon_size * 1.31)
 		self.spot:SetVertexColor(self.p, self.p, self.p, 0.74)
@@ -198,9 +200,9 @@ function HDH_TRACKER.InitVaribles(trackerId)
 			id, name, type, unit = DB:GetTrackerInfo(trackerId)
 			tracker = HDH_TRACKER.Get(id)
 			if not tracker then
-				HDH_TRACKER.New(id, name, type, unit);
+				HDH_TRACKER.New(id, name, type, unit)
 			else
-				tracker:Init(id, name, type, unit);
+				tracker:Init(id, name, type, unit)
 			end
 		end
 	end
@@ -337,7 +339,7 @@ function HDH_TRACKER:Init(id, name, type, unit)
 	self.name = name
 	self.id = id
 	self.type = type
-	
+
 	if self.frame == nil then
 		self.frame = CreateFrame("Frame", HDH_AT_ADDON_FRAME:GetName()..id, HDH_AT_ADDON_FRAME)
 		self.frame:SetFrameStrata('MEDIUM')
