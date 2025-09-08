@@ -311,7 +311,7 @@ do
 				self.frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 			elseif self.unit == 'focus' then
 				self.frame:RegisterEvent('PLAYER_FOCUS_CHANGED')
-			elseif string.find(self.unit, "boss") then 
+			elseif string.find(self.unit, "boss") then
 				self.frame:RegisterEvent('INSTANCE_ENCOUNTER_ENGAGE_UNIT')
 			elseif string.find(self.unit, "party") then
 				self.frame:RegisterEvent('GROUP_ROSTER_UPDATE')

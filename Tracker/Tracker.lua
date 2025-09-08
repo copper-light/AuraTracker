@@ -36,7 +36,10 @@ HDH_TRACKER.startTime = 0
 -- f:GetParent().parent 가 없는 경우가 있음
 -- "지역 섹션 이동" 또는 "전투중 설정 변경"할 때 발생하는 듯
 local function UpdateCooldown(f, elapsed)
-	if not f or not f:GetParent() or not f:GetParent().parent or not f.spll then return end
+	if not f or not f:GetParent() or not f:GetParent().parent or not f.spell then 
+		-- print("HDH_AuraTracker: UpdateCooldown - invalid frame", f, f:GetParent() , f:GetParent().parent,  f.spell )
+		return 
+	end
 
 	local spell = f.spell
 	local tracker = f:GetParent().parent
@@ -341,10 +344,9 @@ function HDH_TRACKER:Init(id, name, type, unit)
 	self.type = type
 
 	if self.frame == nil then
-		self.frame = CreateFrame("Frame", HDH_AT_ADDON_FRAME:GetName()..id, HDH_AT_ADDON_FRAME)
+		self.frame = CreateFrame("Frame", HDH_AT_ADDON_FRAME:GetName()..id.."-"..math.random(), HDH_AT_ADDON_FRAME)
 		self.frame:SetFrameStrata('MEDIUM')
 		self.frame:SetClampedToScreen(true)
-		self.frame.parent = self
 		self.frame.icon = {}
 		self.frame.pointer = {}
 		-- setmetatable(self.frame.icon, {
@@ -358,40 +360,45 @@ function HDH_TRACKER:Init(id, name, type, unit)
 	else
 		self:UpdateSetting()
 	end
-
+	
+	self.frame.parent = self
 	self.frame:SetFrameLevel(tonumber(self.id)*10)
 	self.frame:Hide();
 	self.frame:ClearAllPoints()
 	self.frame:SetPoint("CENTER", UIParent, "CENTER" , self.location.x, self.location.y)
 	self.frame:SetSize(self.ui.icon.size, self.ui.icon.size)
 
-	
 	self:InitIcons()
 end
 
 function HDH_TRACKER:ReleaseIcon(idx)
-	local spell = self.frame.icon[idx].spell
+	-- local spell = self.frame.icon[idx].spell
 	-- if spell.key then
 	-- 	self.frame.pointer[spell.key] = nil
 	-- 	if tonumber(spell.key) then
 	-- 		self.frame.pointer[tonumber(spell.key)] = nil
 	-- 	end
 	-- end
-	
+	if self.frame.icon[idx].icon.spark then
+		self.frame.icon[idx].icon.spark:SetScript("OnUpdate", nil)
+		self.frame.icon[idx].icon.spark:Hide()
+	end
+
+	self.frame.icon[idx]:UnregisterAllEvents()
+	self.frame.icon[idx]:Hide()
 	self.frame.icon[idx]:SetScript('OnDragStart', nil)
 	self.frame.icon[idx]:SetScript('OnDragStop', nil)
 	self.frame.icon[idx]:SetScript('OnMouseDown', nil)
 	self.frame.icon[idx]:SetScript('OnMouseUp', nil)
 	self.frame.icon[idx]:SetScript('OnUpdate', nil)
 	self.frame.icon[idx]:RegisterForDrag()
-	self.frame.icon[idx]:EnableMouse(false);
-	if self.frame.icon[idx].bar then 
-		self.frame.icon[idx].bar:Hide();
+	self.frame.icon[idx]:EnableMouse(false)
+	if self.frame.icon[idx].bar then
+		self.frame.icon[idx].bar:Hide()
 		self.frame.icon[idx].bar:SetParent(nil)
-		self.frame.icon[idx].bar = nil;
+		self.frame.icon[idx].bar = nil
 	end
 	self:ActionButton_ReleaseOverlayGlow(self.frame.icon[idx])
-	self.frame.icon[idx]:Hide()
 	self.frame.icon[idx]:SetParent(nil)
 	self.frame.icon[idx].spell = nil
 	self.frame.icon[idx] = nil
@@ -406,6 +413,7 @@ end
 
 function HDH_TRACKER:Release()
 	self:ReleaseIcons()
+	self.frame:UnregisterAllEvents()
 	self.frame:Hide()
 	self.frame:SetParent(nil)
 	self.frame.parent = nil
@@ -987,8 +995,8 @@ end
 local function OnUpdate_MoveFrame(self)
 	local t = HDH_TRACKER.Get(self:GetParent().id)
 	if not t then return end
+	local x, y
 	if self.isDragging then
-		local x, y
 		if t.ui.common.reverse_h then
 			x = self:GetRight() - (t.ui.icon.size / 2)
 		else
