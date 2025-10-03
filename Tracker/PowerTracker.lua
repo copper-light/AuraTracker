@@ -182,15 +182,15 @@ function HDH_POWER_TRACKER:Release() -- HDH_TRACKER override
 	super.Release(self)
 end
 
-function HDH_POWER_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
-	local icon = self.frame.icon[idx]
-	--icon:SetScript("OnEvent", nil)
-	icon:Hide()
-	icon:SetParent(nil)
-	icon.spell = nil
-	icon:SetScript("OnUpdate",nil);
-	self.frame.icon[idx] = nil
-end
+-- function HDH_POWER_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
+-- 	local icon = self.frame.icon[idx]
+-- 	--icon:SetScript("OnEvent", nil)
+-- 	icon:Hide()
+-- 	icon:SetParent(nil)
+-- 	icon.spell = nil
+-- 	icon:SetScript("OnUpdate",nil);
+-- 	self.frame.icon[idx] = nil
+-- end
 
 function HDH_POWER_TRACKER:UpdateIconSettings(f) -- HDH_TRACKER override
 	super.UpdateIconSettings(self, f)

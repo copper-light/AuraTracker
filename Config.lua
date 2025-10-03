@@ -1608,7 +1608,7 @@ function HDH_AT_OnClick_Button(self, button)
 		F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON.Icon.isItem = isItem
 
 		if F.BODY.CONFIG_DETAIL.ETC.CUSTOM_CBICON:GetChecked() and spell then
-			DB:SetTrackerElementImage(trackerId, elemIdx, texture, key, isItem)
+			DB:SetTrackerElementImage(trackerId, elemIdx, texture, spell, isItem)
 			HDH_TRACKER.InitVaribles(trackerId)
 		end
 	
@@ -2373,7 +2373,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(true)
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB3:SetChecked(false)
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB4:SetChecked(false)
-				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetSelectedIndex(2)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetSelectedIndex(1)
 				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetPoint("LEFT", F.BODY.CONFIG_DETAIL.DISPLAY.CB2,"RIGHT", 2,0)
 				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Show()
 			elseif display == DB.SPELL_HIDE_TIME_ON then
@@ -2389,7 +2389,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB2:SetChecked(false)
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB3:SetChecked(true)
 				F.BODY.CONFIG_DETAIL.DISPLAY.CB4:SetChecked(false)
-				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetSelectedIndex(2)
+				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetSelectedIndex(1)
 				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:SetPoint("LEFT", F.BODY.CONFIG_DETAIL.DISPLAY.CB3,"RIGHT", 2,0)
 				F.BODY.CONFIG_DETAIL.DISPLAY.SW_HIDE_MODE:Show()
 			else -- display == DB.SPELL_HIDE_ALWAYS

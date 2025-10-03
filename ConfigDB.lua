@@ -3,7 +3,7 @@ local L = HDH_AT_L
 local CONFIG = HDH_AT_ConfigDB
 local UTIL = HDH_AT_UTIL
 
-CONFIG.VERSION = 2.9
+CONFIG.VERSION = 3.1
 
 CONFIG.ANI_HIDE = 1
 CONFIG.ANI_SHOW = 2
@@ -454,7 +454,7 @@ function HDH_AT_ConfigDB:VersionUpdateDB()
 		end
 		DB:SetVersion(3.0)
 	end
-    DB:SetVersion(3.0)
+    DB:SetVersion(3.1) -- 3.1 으로 업데이트 했다가 롤백한적인 있는데, 그 사이에 업데이트한 사용자가 있으므로 버전은 3.1로 올림
 
 	-- if DB:GetVersion() == 3.0 then
 	-- 	for _, trackerId in ipairs(DB:GetTrackerIds()) do
@@ -1045,9 +1045,7 @@ function HDH_AT_ConfigDB:VaildationProfile(data)
     if not data.version then
         return -1
     end
-
-    print(tonumber(HDH_AT_DB.version),  tonumber(data.version), tonumber(HDH_AT_DB.version) < tonumber(data.version))
-
+    
     if tonumber(HDH_AT_DB.version) < tonumber(data.version) then
         return -1
     end

@@ -25,7 +25,6 @@ local function PLAYER_ENTERING_WORLD()
 		HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_CONFIG_DELETED') -- 특성 빌드 설정 변경 완료 됐을때
 		HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_TREE_CURRENCY_INFO_UPDATED') -- 특성 빌드 설정 변경 완료 됐을때
 	end
-
 	HDH_TRACKER.InitVaribles()
 	local trackerList = HDH_TRACKER.GetList()
 	for _, t in pairs(trackerList) do
@@ -71,8 +70,11 @@ local function OnEvent(self, event, ...)
 		end
 
 	elseif event == "PLAYER_ENTERING_WORLD" then
-		print("PLAYER_ENTERING_WORLD")
-		C_Timer.After(3, PLAYER_ENTERING_WORLD)
+		if not HDH_TRACKER.IsLoaded then
+			C_Timer.After(3, PLAYER_ENTERING_WORLD)
+		else
+			PLAYER_ENTERING_WORLD()
+		end
     end
 end
 

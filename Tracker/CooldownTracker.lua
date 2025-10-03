@@ -220,17 +220,12 @@ function HDH_C_TRACKER:GetSlot(id)
 	return self.frame.pointer[id].slot;
 end
 
-function HDH_C_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
-	local icon = self.frame.icon[idx]
-	icon:UnregisterAllEvents()
-	icon:Hide()
-	HDH_AT_UTIL.CT_StopTimer(icon)
-	icon:SetParent(nil)
-	icon.spell = nil
-	self.frame.icon[idx] = nil
-end
+-- function HDH_C_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
+-- 	local icon = self.frame.icon[idx]
+-- 	super.ReleaseIcon(self, idx)
+-- end
 
-function HDH_C_TRACKER:IsSwitchByRemining(icon1, icon2, desc) 
+function HDH_C_TRACKER:IsSwitchByRemining(icon1, icon2, desc)
 	if not icon1.spell and not icon2.spell then return end
 	local s1 = icon1.spell
 	local s2 = icon2.spell

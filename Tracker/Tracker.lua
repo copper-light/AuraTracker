@@ -37,7 +37,6 @@ HDH_TRACKER.startTime = 0
 -- "지역 섹션 이동" 또는 "전투중 설정 변경"할 때 발생하는 듯
 local function UpdateCooldown(f, elapsed)
 	if not f or not f:GetParent() or not f:GetParent().parent or not f.spell then 
-		-- print("HDH_AuraTracker: UpdateCooldown - invalid frame", f, f:GetParent() , f:GetParent().parent,  f.spell )
 		return 
 	end
 
@@ -278,7 +277,7 @@ function HDH_TRACKER:CreateBaseIcon(index)
 		if self.frame.icon[index]:GetParent() == nil then
 			self.frame.icon[index]:SetParent(self.frame)
 		end
-		return self.frame.icon[index] 
+		return self.frame.icon[index]
 	end
 
 	local f = CreateFrame('Button', self.frame:GetName()..k, self.frame)
@@ -372,34 +371,38 @@ function HDH_TRACKER:Init(id, name, type, unit)
 end
 
 function HDH_TRACKER:ReleaseIcon(idx)
-	local spell = self.frame.icon[idx].spell
-	if spell and spell.key and spell.id then
-		self.frame.pointer[spell.key] = nil
-		self.frame.pointer[spell.id] = nil
-	end
+	local f = self.frame.icon[idx]
+	if not f then return end
+	HDH_AT_UTIL.CT_StopTimer(icon)
+
+	local spell = f.spell
+	-- if spell and spell.key and spell.id then
+	-- 	self.frame.pointer[spell.key] = nil
+	-- 	self.frame.pointer[spell.id] = nil
+	-- end
+	f.icon:Hide()
 	
-	if self.frame.icon[idx].icon.spark then
-		self.frame.icon[idx].icon.spark:SetScript("OnUpdate", nil)
-		self.frame.icon[idx].icon.spark:Hide()
+	if f.icon.spark then
+		f.icon.spark:SetScript("OnUpdate", nil)
+		f.icon.spark:Hide()
 	end
 
-	self.frame.icon[idx]:UnregisterAllEvents()
-	self.frame.icon[idx]:Hide()
-	self.frame.icon[idx]:SetScript('OnDragStart', nil)
-	self.frame.icon[idx]:SetScript('OnDragStop', nil)
-	self.frame.icon[idx]:SetScript('OnMouseDown', nil)
-	self.frame.icon[idx]:SetScript('OnMouseUp', nil)
-	self.frame.icon[idx]:SetScript('OnUpdate', nil)
-	self.frame.icon[idx]:RegisterForDrag()
-	self.frame.icon[idx]:EnableMouse(false)
-	if self.frame.icon[idx].bar then
-		self.frame.icon[idx].bar:Hide()
-		self.frame.icon[idx].bar:SetParent(nil)
-		self.frame.icon[idx].bar = nil
+	f:UnregisterAllEvents()
+	f:Hide()
+	f:SetScript('OnDragStart', nil)
+	f:SetScript('OnDragStop', nil)
+	f:SetScript('OnMouseDown', nil)
+	f:SetScript('OnMouseUp', nil)
+	f:SetScript('OnUpdate', nil)
+	f:RegisterForDrag()
+	f:EnableMouse(false)
+	if f.bar then
+		f.bar:Hide()
+		f.bar:SetParent(nil)
+		f.bar = nil
 	end
-	self:ActionButton_ReleaseOverlayGlow(self.frame.icon[idx])
-	self.frame.icon[idx]:SetParent(nil)
-	self.frame.icon[idx].spell = nil
+	self:ActionButton_ReleaseOverlayGlow(f)
+	f:SetParent(nil)
 	self.frame.icon[idx] = nil
 end
 
@@ -1608,7 +1611,7 @@ function HDH_TRACKER:UpdateGlow(f, bool)
 	end
 end
 
-function HDH_TRACKER:GetAni(f, ani_type) -- row 이동 애니
+function HDH_TRACKER:GetAni(f, ani_type) 
 	if ani_type == HDH_TRACKER.ANI_HIDE then
 		if not f.aniHide then
 			local ag = f:CreateAnimationGroup()
@@ -1643,21 +1646,31 @@ function HDH_TRACKER:GetAni(f, ani_type) -- row 이동 애니
 	end
 end
 
-function HDH_TRACKER:ShowTracker()
+function HDH_TRACKER:ShowTracker(immediately)
 	HDH_AT_UTIL.StopTimer(self, "HideTracker")
-	self:StartAni(self.frame, HDH_TRACKER.ANI_SHOW)
+	if not immediately then
+		self:StartAni(self.frame, HDH_TRACKER.ANI_SHOW)
+	else
+		local hideAni = self:GetAni(self.frame, HDH_TRACKER.ANI_HIDE)
+		if hideAni:IsPlaying() then
+			hideAni:Stop()
+		end
+		if not self.frame:IsShown() then
+			self.frame:Show()
+		end
+	end
 end
 
 function HDH_TRACKER:HideTracker()
 	-- self:StartAni(self.frame, HDH_TRACKER.ANI_HIDE);
-	HDH_AT_UTIL.RunTimer(self, "HideTracker", 5, HDH_C_TRACKER.StartAni, {self, self.frame, HDH_TRACKER.ANI_HIDE}) 
+	HDH_AT_UTIL.RunTimer(self, "HideTracker", 5, HDH_C_TRACKER.StartAni, {self, self.frame, HDH_TRACKER.ANI_HIDE})
 end
 
 function HDH_TRACKER:IsShown()
 	return self.frame:IsShown()
 end
 
-function HDH_TRACKER:StartAni(f, ani_type) -- row 이동 실행
+function HDH_TRACKER:StartAni(f, ani_type) 
 	if ani_type == HDH_TRACKER.ANI_HIDE then
 		if self:GetAni(f, HDH_TRACKER.ANI_SHOW):IsPlaying() then self:GetAni(f, HDH_TRACKER.ANI_SHOW):Stop() end
 		if f:IsShown() and not self:GetAni(f, ani_type):IsPlaying() then
@@ -1728,6 +1741,7 @@ function HDH_TRACKER:UpdateLayout()
 				if f.spell.isUpdate then
 					if f.spell.display == DB.SPELL_HIDE_TIME_ON_AS_SPACE then
 						if f:IsShown() then f:Hide() end
+						colAlignCount = colAlignCount + 1
 					elseif f.spell.display == DB.SPELL_HIDE_TIME_ON then
 						if f:IsShown() then f:Hide() end
 						useSpace = false
@@ -1739,6 +1753,7 @@ function HDH_TRACKER:UpdateLayout()
 				else
 					if f.spell.display == DB.SPELL_HIDE_TIME_OFF_AS_SPACE then
 						if f:IsShown() then f:Hide() end
+						colAlignCount = colAlignCount + 1
 					elseif f.spell.display == DB.SPELL_HIDE_TIME_OFF then
 						if f:IsShown() then f:Hide() end
 						useSpace = false
@@ -1755,13 +1770,14 @@ function HDH_TRACKER:UpdateLayout()
 		if useSpace then
 			f:ClearAllPoints()
 			f:SetPoint('RIGHT', self.frame, 'RIGHT', reverse_h and -col or col, reverse_v and row or -row)
-			if colAlignCount % line == 0 then
+			if colAlignCount ~= 0 and colAlignCount % line == 0 then
 				row = row + size_h + margin_v
 				col = 0
 			else
 				col = col + size_w + margin_h
 			end
 		end
+		
 	end
 
 	return activedCount
@@ -1784,15 +1800,9 @@ function HDH_TRACKER:Update(index)
 				or activedCount > 0 
 				or self.ui.common.always_show 
 				or UnitAffectingCombat("player")) then
-		if self.unit == "player" then
-			self:ShowTracker()
-		else
-			if not self.frame:IsShown() then
-				self.frame:Show()
-			end
-		end
+		self:ShowTracker(self.unit ~= "player")
 	else
-		self:HideTracker();
+		self:HideTracker()
 	end
 end
 
@@ -1890,7 +1900,6 @@ function HDH_TRACKER:InitIcons()
 		display, connectedId, connectedIsItem, unlearnedHideMode                              = DB:GetTrackerElementDisplay(trackerId, i)
 		innerTrackingType, innerSpellId, innerCooldown                                        = DB:GetTrackerElementInnerCooldown(trackerId, i)
 		defaultImg                                                                            = DB:GetTrackerElementDefaultImage(trackerId, i)
-
 		
 		if display == DB.SPELL_HIDE_ALWAYS then
 			isShown = false

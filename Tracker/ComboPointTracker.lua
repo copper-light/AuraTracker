@@ -132,14 +132,6 @@ function HDH_COMBO_POINT_TRACKER:Release() -- HDH_TRACKER override
 	super.Release(self)
 end
 
-function HDH_COMBO_POINT_TRACKER:ReleaseIcon(idx) -- HDH_TRACKER override
-	local icon = self.frame.icon[idx]
-	icon:Hide()
-	icon:SetParent(nil)
-	icon.spell = nil
-	self.frame.icon[idx] = nil
-end
-
 function HDH_COMBO_POINT_TRACKER:CreateDummySpell(count)
 	local iconf
 	local power_max = self:GetPowerMax()
