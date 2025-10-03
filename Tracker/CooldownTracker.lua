@@ -339,8 +339,10 @@ function HDH_C_TRACKER:UpdateSpellInfo(index)
 				-- 와우 기본 쿨다운 시스템의 경우, 스킬 쿨다운 끝자락에서 글로벌 쿨다운이 들어오면 글쿨을 우선 표시하도록 구현됨.
 				-- 하지만, 쿨다운 여부를 흑백으로 처리하는 입장에서 보면 글쿨 때문에 의도치 않게 흑백으로 표시되는 문제를 야기함. 
 				-- 그래서 스킬 쿨다운 종료 전에 모든 글쿨은 무시하도록 구현함 (글쿨이 들어왔을때, startTime > spell.endTime 인 경우만 글쿨로 인식)
-				-- 이로 인하여, 쿨다운이 끝나고 스킬을 사용가능한것으로 보이나 글쿨로 인해서 스킬을 바로 사용하지 못하는 텀이 발생할 수 있으나
-				-- 글쿨보다 적은 시간이기 때문에 사용성 측면에서 용인 가능한 수준으로 판단됨
+				-- 이로 인하여, 쿨다운이 끝나고 스킬을 사용 가능한 것으로 보이지만 글쿨로 인해서 스킬을 바로 사용하지 못하는 텀이 발생할 수 있음
+				-- 그러나,
+				-- 글쿨보다 적은 시간임과 동시에 쿨이 끝나가는 스킬은 사용이 될때까지 연타하는 것이 사용자들의 일반적인 패턴이기 때문에,
+				-- 해당 문제로 인한 텀은 용인 가능한 수준으로 판단됨
 				if isGlobalCooldown then
 					if show_global_cooldown and (startTime >= spell.endTime or spell.endTime > (startTime + duration)) then
 						spell.startTime = startTime
@@ -709,6 +711,7 @@ function HDH_C_TRACKER:ACTIVE_TALENT_GROUP_CHANGED()
 end
 
 function HDH_C_TRACKER:PLAYER_ENTERING_WORLD()
+	-- 2025.09.01
 	-- 항상 표시 옵션일때, 시작하자마자 ShowTracker 애니메이션(alpha 0 -> 1)이 동작하는데,
 	-- 이 때, 바 이름 알파값 관련 초기화가 동시에 이뤄지면서 애니메이션의 알파값에 영향을 받아서 제대로 설정이 적용되지 않는 문제 발생
 	-- 그래서 애니메이션이 끝나는 지점에서 다시한번 세팅값을 로딩함

@@ -372,13 +372,12 @@ function HDH_TRACKER:Init(id, name, type, unit)
 end
 
 function HDH_TRACKER:ReleaseIcon(idx)
-	-- local spell = self.frame.icon[idx].spell
-	-- if spell.key then
-	-- 	self.frame.pointer[spell.key] = nil
-	-- 	if tonumber(spell.key) then
-	-- 		self.frame.pointer[tonumber(spell.key)] = nil
-	-- 	end
-	-- end
+	local spell = self.frame.icon[idx].spell
+	if spell and spell.key and spell.id then
+		self.frame.pointer[spell.key] = nil
+		self.frame.pointer[spell.id] = nil
+	end
+	
 	if self.frame.icon[idx].icon.spark then
 		self.frame.icon[idx].icon.spark:SetScript("OnUpdate", nil)
 		self.frame.icon[idx].icon.spark:Hide()
@@ -1910,12 +1909,6 @@ function HDH_TRACKER:InitIcons()
 		if isShown and (unlearnedHideMode ~= DB.SPELL_HIDE or isLearned) then
 			iconIdx = iconIdx + 1
 			f = self:CreateBaseIcon(iconIdx)
-			if isLearned and elemKey then
-				self.frame.pointer[elemKey] = f -- GetSpellInfo 에서 spellID 가 nil 일때가 있다.
-				if tonumber(elemKey) then
-					self.frame.pointer[tonumber(elemKey)] = f
-				end
-			end
 			
 			spell = {}
 			f.spell = spell
@@ -1925,6 +1918,7 @@ function HDH_TRACKER:InitIcons()
 			else
 				spell.key = elemKey
 			end
+
 			spell.isLearned = isLearned
 			spell.no = iconIdx
 			spell.name = elemName
@@ -1967,6 +1961,11 @@ function HDH_TRACKER:InitIcons()
 				spell.innerSpellId = tonumber(innerSpellId)
 				spell.innerCooldown = tonumber(innerCooldown)
 				spell.innerTrackingType = innerTrackingType
+			end
+
+			if isLearned and spell.key and spell.id then -- GetSpellInfo 에서 spellID 가 nil 일때가 있다 -> 데이터 로드전
+				self.frame.pointer[spell.key] = f -- 토템 또는 파워 등의 애드온 내부 키값을 쓰는 경우를 위해
+				self.frame.pointer[spell.id] = f -- 버프, 쿨다운 등 와우 아이디를 쓰는 경우를 위해
 			end
 			
 			-- self:UpdateBarSettings(f)

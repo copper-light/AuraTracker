@@ -1536,7 +1536,7 @@ function HDH_AT_OnClick_Button(self, button)
 			end
 			local size = DB:VaildationProfile(data)
 			if size == -1 then
-				local adoon_version = data.adoon_version or "Unknown"
+				local adoon_version = data.adoon_version or "(Under 11.1.7.5)"
 				main.Dialog:AlertShow(L.INCOMPATIBLE_DB_VERSION:format(adoon_version))
 				return 
 			end

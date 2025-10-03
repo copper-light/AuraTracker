@@ -71,6 +71,7 @@ local function OnEvent(self, event, ...)
 		end
 
 	elseif event == "PLAYER_ENTERING_WORLD" then
+		print("PLAYER_ENTERING_WORLD")
 		C_Timer.After(3, PLAYER_ENTERING_WORLD)
     end
 end

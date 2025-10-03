@@ -1046,9 +1046,12 @@ function HDH_AT_ConfigDB:VaildationProfile(data)
         return -1
     end
 
-    if HDH_AT_DB.version ~= data.version then
+    print(tonumber(HDH_AT_DB.version),  tonumber(data.version), tonumber(HDH_AT_DB.version) < tonumber(data.version))
+
+    if tonumber(HDH_AT_DB.version) < tonumber(data.version) then
         return -1
     end
+
     for _, config in ipairs(data) do
         if not config.ui or not config.tracker then
             return -1
