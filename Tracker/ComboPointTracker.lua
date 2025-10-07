@@ -244,6 +244,10 @@ function HDH_COMBO_POINT_TRACKER:UpdateSpellInfo(index)
 	end
 end
 
+-- f.v1:SetText((f.spell.showValue and f.spell.v1 >= 1) and k or "")
+-- 수치 표시 시 활성화된 아이콘의 순서 번호가 표시되도록 수정
+-- 합계로 표시하는 것이 더 직관적이지만, 기존 사용자들의 혼란을 막기 위해 순서 번호로 표시하도록 함
+-- 내부적으로는 합계로 반짝임 처리함
 function HDH_COMBO_POINT_TRACKER:UpdateIconAndBar(index)
 	local ret = 0 -- 결과 리턴 몇개의 아이콘이 활성화 되었는가?
 	local icons = self.frame.icon
