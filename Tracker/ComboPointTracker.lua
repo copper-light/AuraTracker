@@ -275,6 +275,8 @@ function HDH_COMBO_POINT_TRACKER:UpdateIconAndBar(index)
 				end
 				self:UpdateGlow(f, true)
 				f.counttext:SetText(nil)
+
+				f.v1:SetText((f.spell.showValue and f.spell.v1 >= 1) and k or "")
 			else
 				if f.spell.count < 1.0  then
 					if self.ui.common.display_mode ~= DB.DISPLAY_BAR then
@@ -298,7 +300,8 @@ function HDH_COMBO_POINT_TRACKER:UpdateIconAndBar(index)
 				else
 					f.counttext:SetText("")
 				end
-				f.v1:SetText((f.spell.showValue and f.spell.v1 >= 1) and f.spell.v1 or "")
+
+				f.v1:SetText((f.spell.showValue and f.spell.count == 1 and f.spell.v1 >= 1) and k or "")
 			end
 		end
 	end
