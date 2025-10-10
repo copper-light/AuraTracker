@@ -1,12 +1,16 @@
-﻿## Interface: 40402
+﻿## Interface: 11402
 ## Title: AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
-## Version: 11.2.0.5
+## Version: 11.2.0.5.beta
 ## SavedVariablesPerCharacter: HDH_AT_DB
-## AllowLoadGameType: cata
+## AllowLoadGameType: vanilla
 
 Const.lua
+
+Vanilla\LibStub\LibStub.lua
+Vanilla\CallbackHandler-1.0\CallbackHandler-1.0.lua
+Vanilla\LibClassicDurations\LibClassicDurations.xml
 
 Locale\locale.lua
 Locale\locale_koKR.lua

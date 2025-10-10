@@ -36,7 +36,7 @@ do
 		end
 		
 		for i = 1, 40 do 
-			aura = C_UnitAuras.GetAuraDataByIndex(self.unit, i, self.filter)
+			aura = HDH_AT_UTIL.GetAuraDataByIndex(self.unit, i, self.filter)
 			if not aura then break end
 
 			if self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
@@ -113,7 +113,7 @@ do
 		local f
 		self.prevUpdateCount = self.updateCount
 		for i = 1, 40 do 
-			aura = C_UnitAuras.GetAuraDataByIndex(self.unit, i, self.filter)
+			aura = HDH_AT_UTIL.GetAuraDataByIndex(self.unit, i, self.filter)
 			if not aura then
 				break
 			end

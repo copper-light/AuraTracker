@@ -6,6 +6,8 @@
 ## SavedVariablesPerCharacter: HDH_AT_DB
 ## IconTexture: Interface\AddOns\HDH_AuraTracker\Texture\logo.blp
 
+Const.lua
+
 Locale\locale.lua
 Locale\locale_koKR.lua
 Locale\locale_ruRU.lua

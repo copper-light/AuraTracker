@@ -6,6 +6,8 @@
 ## SavedVariablesPerCharacter: HDH_AT_DB
 ## AllowLoadGameType: mists
 
+Const.lua
+
 Locale\locale.lua
 Locale\locale_koKR.lua
 Locale\locale_ruRU.lua

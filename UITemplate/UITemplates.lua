@@ -466,7 +466,9 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
                 local t = _G[itemFrame:GetName().."Texture"]
                 if frame.useAtlasSize then
                     t:SetAtlas(texture)
-                    t:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 1))
+                    if HDH_AT.LE ~= HDH_AT.LE_CLASSIC then
+                        t:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 1))
+                    end
                 elseif frame.useFullSizeTexture then
                     t:SetTexture(texture) 
                 else
@@ -475,7 +477,9 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
                     t:SetPoint("LEFT", itemFrame,"LEFT", 1, 0)
                     t:SetSize(itemFrame:GetHeight()-2, itemFrame:GetHeight()-2)
                     t:SetTexCoord(0.1,0.9,0.1,0.9)
-	                t:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 0))
+                    if HDH_AT.LE ~= HDH_AT.LE_CLASSIC then
+	                    t:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 0))
+                    end
                 end
             end
             
@@ -576,7 +580,9 @@ function HDH_AT_DropDown_OnClick(self)
                 table.insert(UISpecialFrames, self:GetName())
                 self:EnableKeyboard(1)
             end)
-            self.hiddenBG:SetPropagateMouseClicks(true)
+            if HDH_AT.LE >= HDH_AT.LE_WAR_WITHIN then
+                self.hiddenBG:SetPropagateMouseClicks(true)
+            end
             self.hiddenBG.list = list
 
             self.hiddenBG2 = CreateFrame("Frame", self:GetName().."HiddenBG2", self.hiddenBG)

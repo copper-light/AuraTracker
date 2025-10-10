@@ -538,18 +538,27 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	end
 
 	if ret > 0 then
-		self.frame:RegisterEvent('PLAYER_TALENT_UPDATE')
+		if HDH_AT.LE == HDH_AT.LE_CLASSIC then
+			self.frame:RegisterEvent('CHARACTER_POINTS_CHANGED')
+		else
+			self.frame:RegisterEvent('PLAYER_TALENT_UPDATE')
+			self.frame:RegisterEvent('COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED')
+			self.frame:RegisterEvent("ACTION_RANGE_CHECK_UPDATE")
+		end
 		self.frame:RegisterEvent('ACTIONBAR_SLOT_CHANGED')
 		self.frame:RegisterEvent('ACTIONBAR_UPDATE_STATE')
-		self.frame:RegisterEvent('CURSOR_CHANGED')
-		self.frame:RegisterEvent('COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED')
+
+		if HDH_AT.LE >= HDH_AT.LE_SHADOWLANDS then
+			self.frame:RegisterEvent('CURSOR_CHANGED')
+		end
+		
 		self.frame:RegisterEvent("ACTIONBAR_UPDATE_USABLE")
 		self.frame:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
 		self.frame:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW")
 		self.frame:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE")
 		self.frame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 		self.frame:RegisterEvent("PLAYER_TARGET_CHANGED")
-		self.frame:RegisterEvent("ACTION_RANGE_CHECK_UPDATE")
+		
 		self.frame:RegisterEvent('UNIT_PET')
 		
 		if needEquipmentEvent then
@@ -848,7 +857,7 @@ function HDH_C_TRACKER:OnEvent(event, ...)
 	elseif event == 'ARENA_OPPONENT_UPDATE' then
 		HDH_AT_UTIL.RunTimer(tracker, "ARENA_OPPONENT_UPDATE", 0.5, HDH_C_TRACKER.Update, {tracker})
 
-	elseif event == 'PLAYER_TALENT_UPDATE' then
+	elseif event == 'PLAYER_TALENT_UPDATE' or event == 'CHARACTER_POINTS_CHANGED' then
 		HDH_AT_UTIL.RunTimer(tracker, "PLAYER_TALENT_UPDATE", 0.5, HDH_C_TRACKER.InitIcons, {tracker})
 
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then
