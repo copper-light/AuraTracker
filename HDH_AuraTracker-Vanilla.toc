@@ -8,15 +8,16 @@
 
 Const.lua
 
-Vanilla\LibStub\LibStub.lua
-Vanilla\CallbackHandler-1.0\CallbackHandler-1.0.lua
-Vanilla\LibClassicDurations\LibClassicDurations.xml
+VanillaLib\LibStub\LibStub.lua
+VanillaLib\CallbackHandler-1.0\CallbackHandler-1.0.lua
+VanillaLib\LibClassicDurations\LibClassicDurations.xml
 
 Locale\locale.lua
 Locale\locale_koKR.lua
 Locale\locale_ruRU.lua
 
 Utils.lua
+Utils_Vanilla.lua
 ConfigDB.lua
 
 UITemplate\CommonTemplate.xml
@@ -28,6 +29,7 @@ UITemplate\StatusBarTemplate.xml
 Tooltip.lua
 
 Tracker\Tracker.xml
+Tracker\Tracker_Vanilla.xml
 HDH_AuraTracker.lua
 
 Config.xml

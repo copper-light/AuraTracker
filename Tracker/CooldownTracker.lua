@@ -15,40 +15,28 @@ HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.COOLDOWN, HDH_C_TRACKER)
 -- OnUpdate icon
 -----------------------------------
 
-
 local function HDH_AT_CooldownIconTemplate_OnCooldownFinished(cooldown)
 	local tracker = cooldown:GetParent():GetParent().parent
 	tracker:Update(cooldown:GetParent().spell.no)
 end
 
-
-
 ------- HDH_C_TRACKER member function -----------	
 
--- function HDH_C_TRACKER:UpdateState(id, name, isItem, isToy)
--- 	local inRange, isAble, isNotEnoughMana
--- 	if isItem then
--- 		inRange = C_Item.IsItemInRange(id, "target")
--- 		if not isToy then
--- 			isAble = C_Item.IsUsableItem(id)
--- 		else
--- 			isAble = true
--- 		end
--- 		isNotEnoughMana = false
--- 	else
--- 		inRange = HDH_AT_UTIL.IsSpellInRange(name, "target")
--- 		isAble, isNotEnoughMana = HDH_AT_UTIL.IsSpellUsable(id)
--- 		isAble = isAble or isNotEnoughMana
--- 	end
--- end
 
--- function HDH_C_TRACKER:UpdateCount(id, name, isItem, isToy)
-
--- end
-
--- function HDH_C_TRACKER:UpdateCooldown(id, name, isItem, isToy)
-
--- end
+local function OnUpdate_CheckRange(frame, elapsed)
+	frame.needUpdate = false
+	if frame:IsShown() then
+		for i= 1, #frame.icon do
+			if frame.icon[i].spell.inRange ~= HDH_AT_UTIL.IsSpellInRange(frame.icon[i].spell.name, "target") then
+				frame.needUpdate = true
+			end
+		end
+		if frame.needUpdate and frame.parent then
+			frame.parent:ACTION_RANGE_CHECK_UPDATE()
+			print("Range Check Update")
+		end
+	end
+end
 
 function HDH_C_TRACKER:GetCooldownInfo(id, name, isItem, isToy)
 	local startTime, duration, count, remaining
@@ -57,7 +45,7 @@ function HDH_C_TRACKER:GetCooldownInfo(id, name, isItem, isToy)
 	local curTime = GetTime()
 
 	if isItem then
-		startTime, duration = C_Container.GetItemCooldown(id)
+		startTime, duration = HDH_AT_UTIL.GetItemCooldown(id)
 		count = C_Item.GetItemCount(id, false, true) or 0
 		inRange = C_Item.IsItemInRange(id, "target")
 		if not isToy then
@@ -141,7 +129,7 @@ function HDH_C_TRACKER:UpdateAuras(f)
 	local spell = f.spell
 
 	for i = 1, 40 do 
-		aura = C_UnitAuras.GetAuraDataByIndex('player', i, 'HELPFUL')
+		aura = HDH_AT_UTIL.GetAuraDataByIndex('player', i, 'HELPFUL')
 		if not aura then break end
 		if f.spell.innerSpellId == aura.spellId then
 			if spell.innerSpellEndtime ~= aura.expirationTime or aura.expirationTime == 0 then
@@ -725,7 +713,13 @@ function HDH_C_TRACKER:PLAYER_ENTERING_WORLD()
 			HDH_C_TRACKER.UpdateSetting(self)
 			HDH_C_TRACKER.Update(self)
 		end, {self})
-	end	
+	end
+
+	if (HDH_AT.LE == HDH_AT.LE_CLASSIC) and self.frame then
+		if not self.frame:GetScript("OnUpdate") then
+			self.frame:SetScript("Onupdate", OnUpdate_CheckRange)
+		end
+	end
 end
 
 function HDH_C_TRACKER:ACTION_RANGE_CHECK_UPDATE(slot, isInRange, checksRange)
