@@ -82,6 +82,12 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 		</Frames>
 
 		<Scripts>
+			<OnLoad>
+				local baselevel = self.Charge:GetFrameLevel()
+				self.Overlay:SetFrameLevel(baselevel + 1)
+				self.Spark:SetFrameLevel(baselevel + 2)
+				self.ChargeSpark:SetFrameLevel(baselevel + 3)
+			</OnLoad>
 			<OnSizeChanged function="HDH_AT_LinearCooldownTemplate_OnSizeChanged"/>
 		</Scripts>
 	</Frame>
@@ -111,6 +117,13 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 			<Cooldown parentKey="Charge" inherits="CooldownFrameTemplate" setAllPoints="true" hideCountdownNumbers ="true" drawEdge="true" drawSwipe="false" drawBling="false">
 			</Cooldown>
 		</Frames>
+		<Scripts>
+			<OnLoad>
+				local baselevel = self.Overlay:GetFrameLevel()
+				self.Progress:SetFrameLevel(baselevel + 1)
+				self.Charge:SetFrameLevel(baselevel + 2)
+			</OnLoad>
+		</Scripts>
 	</Frame>
 
 	<Frame name="HDH_AT_CooldownIconTemplate" mixin="HDH_AT_CooldownIconTemplateMixin" virtual="true">
