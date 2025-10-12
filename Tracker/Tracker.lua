@@ -63,7 +63,11 @@ local function UpdateCooldown(f, elapsed)
 	if spell.time > 0.0 then
 		tracker:UpdateTimeText(f.timetext, spell.time)
 		if f.spell.glow == DB.GLOW_CONDITION_TIME then
-			tracker:UpdateGlow(f, true)
+			if spell.isAble ~= nil then
+				tracker:UpdateGlow(f, spell.isAble ~= nil and spell.isAble)
+			else
+				tracker:UpdateGlow(f, true)
+			end
 		end
 	else
 		f.timetext:SetText("")
@@ -1429,31 +1433,16 @@ end
 -- 애니메이션 관련
 -------------------------------------------
 
-if HDH_AT.LE == HDH_AT.LE_CLASSIC then -- 판다리아 코드
+if HDH_AT.LE == HDH_AT.LE_CLASSIC then -- 클래식 코드
 	
 	function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
-		self = f.icon
-		if ( self.overlay ) then
-			if ( self.overlay.animOut:IsPlaying() ) then
-				self.overlay.animOut:Stop();
-				self.overlay.animIn:Play();
-			end
-		else
-			self.overlay = ActionButton_GetOverlayGlow();
-			local frameWidth, frameHeight = self:GetSize();
-			self.overlay:SetParent(f);
-			self.overlay:ClearAllPoints();
-			--Make the height/width available before the next frame:
-			self.overlay:SetSize(frameWidth * 1.4, frameHeight * 1.4);
-			self.overlay:SetFrameLevel(self:GetFrameLevel() + 4)
-			self.overlay:SetPoint("TOPLEFT", self, "TOPLEFT", -frameWidth * 0.3, frameHeight * 0.3);
-			self.overlay:SetPoint("BOTTOMRIGHT", self, "BOTTOMRIGHT", frameWidth * 0.3, -frameHeight * 0.3);
-			self.overlay.animIn:Play();
-		end
+		ActionButton_ShowOverlayGlow(f.icon.Border.Glow)
 	end
 
 	function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
-		ActionButton_HideOverlayGlow(f.icon)
+		if ( f.icon.Border.Glow.overlay ) then
+			ActionButton_HideOverlayGlow(f.icon.Border.Glow)
+		end
 	end
 
 	function HDH_TRACKER:ActionButton_ResizeOverlayGlow(f)
@@ -1466,6 +1455,7 @@ if HDH_AT.LE == HDH_AT.LE_CLASSIC then -- 판다리아 코드
 
 elseif HDH_AT.LE <= HDH_AT.LE_MISTS then -- 판다리아 코드
 
+	-- 검토사항 2025.10.12: 기본 오버레이 글로우 소스코드로 활용하는 방안 구상할 것
 	function HDH_TRACKER:ActionButton_SetupOverlayGlow(f)
 		f.icon.overlay = ActionButton_GetOverlayGlow();
 		local frameWidth, frameHeight = f.icon:GetSize();
@@ -1506,6 +1496,7 @@ elseif HDH_AT.LE <= HDH_AT.LE_MISTS then -- 판다리아 코드
 
 else -- 용군단 코드
 
+	-- 검토사항 2025.10.12: 기본 오버레이 글로우 소스코드로 활용하는 방안 구상할 것
 	function HDH_TRACKER:ActionButton_SetupOverlayGlow(f)
 		if f.icon.SpellActivationAlert then
 			return
@@ -1539,7 +1530,7 @@ else -- 용군단 코드
 	end
 	
 	function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
-		if not  f.icon.SpellActivationAlert then
+		if not f.icon.SpellActivationAlert then
 			self:ActionButton_SetupOverlayGlow(f)
 		end
 		if not f.icon.SpellActivationAlert:IsShown() or (not f.icon.SpellActivationAlert.ProcStartAnim:IsPlaying() and not f.icon.SpellActivationAlert.ProcLoop:IsPlaying()) then
@@ -1553,7 +1544,7 @@ else -- 용군단 코드
 			return
 		end
 	
-		if  f.icon:IsVisible() then
+		if f.icon:IsVisible() then
 			f.icon.SpellActivationAlert:Hide()
 		end
 	end

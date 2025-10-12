@@ -143,3 +143,6 @@ HDH_AT_UTIL.GetSpellCastCount = function(spell)
 end
 
 HDH_AT_UTIL.GetItemCooldown = C_Container.GetItemCooldown
+HDH_AT_UTIL.GetItemCount = C_Item.GetItemCount
+HDH_AT_UTIL.IsItemInRange = C_Item.IsItemInRange
+HDH_AT_UTIL.IsUsableItem = C_Item.IsUsableItem

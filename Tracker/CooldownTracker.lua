@@ -22,19 +22,19 @@ end
 
 ------- HDH_C_TRACKER member function -----------	
 
-
+-- 1.14.1 버전 기준 거리체크 기능이 없어서 백그라운드로 돌림 
 local function OnUpdate_CheckRange(frame, elapsed)
+	frame.elapsed = (frame.elapsed or 0) + elapsed
+	if frame.elapsed < 0.05 and frame:IsShown() then return end
+	frame.elapsed = 0
 	frame.needUpdate = false
-	if frame:IsShown() then
-		for i= 1, #frame.icon do
-			if frame.icon[i].spell.inRange ~= HDH_AT_UTIL.IsSpellInRange(frame.icon[i].spell.name, "target") then
-				frame.needUpdate = true
-			end
+	for i= 1, #frame.icon do
+		if frame.icon[i].spell.inRange ~= HDH_AT_UTIL.IsSpellInRange(frame.icon[i].spell.name, "target") then
+			frame.needUpdate = true
 		end
-		if frame.needUpdate and frame.parent then
-			frame.parent:ACTION_RANGE_CHECK_UPDATE()
-			print("Range Check Update")
-		end
+	end
+	if frame.needUpdate and frame.parent then
+		frame.parent:ACTION_RANGE_CHECK_UPDATE()
 	end
 end
 
@@ -46,10 +46,10 @@ function HDH_C_TRACKER:GetCooldownInfo(id, name, isItem, isToy)
 
 	if isItem then
 		startTime, duration = HDH_AT_UTIL.GetItemCooldown(id)
-		count = C_Item.GetItemCount(id, false, true) or 0
-		inRange = C_Item.IsItemInRange(id, "target")
+		count = HDH_AT_UTIL.GetItemCount(id, false, true) or 0
+		inRange = HDH_AT_UTIL.IsItemInRange(id, "target")
 		if not isToy then
-			isAble = C_Item.IsUsableItem(id)
+			isAble = HDH_AT_UTIL.IsUsableItem(id)
 		else
 			isAble = true
 		end
@@ -466,7 +466,7 @@ function HDH_C_TRACKER:UpdateIconAndBar(index) -- HDH_TRACKER override
 				end
 			end
 		end
-		self:UpdateGlow(f, true)
+		self:UpdateGlow(f, spell.isAble)
 	end
 end
 
@@ -502,7 +502,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			else
 				spell.stackable = false
 			end
-			if C_ToyBox.GetToyInfo(spell.id) then
+			if C_ToyBox and C_ToyBox.GetToyInfo(spell.id) then
 				spell.isToy = true
 			end
 

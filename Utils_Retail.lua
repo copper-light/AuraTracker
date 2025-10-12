@@ -28,3 +28,7 @@ HDH_AT_UTIL.IsSpellUsable = C_Spell.IsSpellUsable
 HDH_AT_UTIL.GetSpellInfo = C_Spell.GetSpellInfo
 
 HDH_AT_UTIL.GetSpellBookItemInfo = C_SpellBook.GetSpellBookItemInfo
+
+HDH_AT_UTIL.GetItemCount = C_Item.GetItemCount
+HDH_AT_UTIL.IsItemInRange = C_Item.IsItemInRange
+HDH_AT_UTIL.IsUsableItem = C_Item.IsUsableItem

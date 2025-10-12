@@ -173,3 +173,7 @@ HDH_AT_UTIL.GetSpellLink = GetSpellLink
 HDH_AT_UTIL.GetSpellCastCount = function(spell) 
 	return 0
 end
+
+HDH_AT_UTIL.GetItemCount = GetItemCount
+HDH_AT_UTIL.IsItemInRange = IsItemInRange
+HDH_AT_UTIL.IsUsableItem = IsUsableItem

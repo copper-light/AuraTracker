@@ -55,7 +55,11 @@ do -- HDH_HEALTH_TRACKER class
 	end
 
 	function HDH_HEALTH_TRACKER:GetAbsorbs()
-		return UnitGetTotalAbsorbs(self.unit) or 0 
+		if UnitGetTotalAbsorbs then
+			return UnitGetTotalAbsorbs(self.unit) or 0 
+		else
+			return 0
+		end
 	end
 
 	function HDH_HEALTH_TRACKER:UpdateBarSettings(f)
@@ -174,7 +178,9 @@ do -- HDH_HEALTH_TRACKER class
 				self.frame.icon[1]:HookScript('OnUpdate', function(f, elapsed)
 					OnUpdateAbsorbBarValue(f, elapsed)
 				end)
-				self.frame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", self.unit)
+				if HDH_AT.LE >= HDH_AT.LE_MISTS then
+					self.frame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", self.unit)
+				end
 				self.frame:RegisterUnitEvent("UNIT_HEALTH", self.unit)
 			else
 				self.frame.icon[1]:HookScript('OnUpdate', nil)
