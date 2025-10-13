@@ -79,30 +79,42 @@ AddTrackerList(HDH_TRACKER.TYPE.HEALTH, L.HEALTH)
 if MyClass == "MAGE" then 
 	-- totemName = L.MAGE_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, L.POWER_ARCANE_CHARGES)
+	if HDH_AT.LE > HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, L.POWER_ARCANE_CHARGES)
+	end
 elseif MyClass == "PALADIN" then 
 	totemName = L.PALADIN_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_HOLY_POWER, L.POWER_HOLY_POWER)
+	if HDH_AT.LE > HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_HOLY_POWER, L.POWER_HOLY_POWER)
+	end
 elseif MyClass == "WARRIOR" then 
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE)
 elseif MyClass == "DRUID" then 
 	-- totemName = L.DRUID_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_LUNAR, L.POWER_LUNAR)
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE)
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_COMBO_POINTS, L.POWER_COMBO_POINTS)
+	if HDH_AT.LE > HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_LUNAR, L.POWER_LUNAR)
+	end
 elseif MyClass == "DEATHKNIGHT" then 
 	totemName = L.DK_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_RUNIC, L.POWER_RUNIC)
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_RUNE, L.POWER_RUNE)
 elseif MyClass == "HUNTER" then 
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_FOCUS, L.POWER_FOCUS)
+	if HDH_AT.LE == HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	else
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_FOCUS, L.POWER_FOCUS)
+	end
 elseif MyClass == "PRIEST" then 
 	totemName = L.PRIEST_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_INSANITY, L.POWER_INSANITY)
+	if HDH_AT.LE > HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_INSANITY, L.POWER_INSANITY)
+	end
 	-- addTrackerList(HDH_TRACKER.TYPE.PRIEST_SHADOWY_APPARITION, L.PRIEST_SHADOWY_APPARITION})
 elseif MyClass == "ROGUE" then
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
@@ -110,11 +122,15 @@ elseif MyClass == "ROGUE" then
 elseif MyClass == "SHAMAN" then 
 	totemName = L.SHAMAN_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_MAELSTROM, L.POWER_ELE_MAELSTROM)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM, L.POWER_ENH_MAELSTROM)
+	if HDH_AT.LE > HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_MAELSTROM, L.POWER_ELE_MAELSTROM)
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM, L.POWER_ENH_MAELSTROM)
+	end
 elseif MyClass == "WARLOCK" then 
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_SOUL_SHARDS, L.POWER_SOUL_SHARDS)
+	if HDH_AT.LE > HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_SOUL_SHARDS, L.POWER_SOUL_SHARDS)
+	end
 elseif MyClass == "MONK" then 
 	totemName = L.MONK_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
@@ -362,6 +378,23 @@ local ICON_PRESET_LIST = {
 	"Interface/Icons/inv_misc_enchantedpearlB",
 	"Interface/Icons/ability_evoker_powernexus"
 }
+
+if HDH_AT.LE == HDH_AT.LE_CLASSIC then
+	ICON_PRESET_LIST = {
+		"Interface/Icons/INV_Misc_Gem_Pearl_04",
+		"Interface/Icons/INV_Misc_Gem_Pearl_05",
+		"Interface/Icons/INV_Misc_Gem_Pearl_06",
+		"Interface/Icons/Spell_Shadow_SoulGem",
+		"Interface/Icons/Spell_Nature_WispSplode",
+		"Interface/Icons/INV_Misc_Orb_05",
+		"Interface/Icons/Inv_Misc_SummerFest_BrazierGreen",
+		"Interface/Icons/Inv_Misc_SummerFest_BrazierBlue",
+		"Interface/Icons/Inv_Misc_SummerFest_BrazierRed",
+		"Interface/Icons/Spell_Holy_PrayerOfFortitude",
+		"Interface/Icons/SPELL_NATURE_HEALINGTOUCH",
+		"Interface/Icons/Spell_Shadow_Teleport",
+	}
+end
 
 local BODY_TRACKER_NEW = 1
 local BODY_TRACKER_EDIT = 2
@@ -1512,7 +1545,7 @@ function HDH_AT_OnClick_Button(self, button)
 			end
 		end
 		exportTracker.version = DB:GetVersion()
-		exportTracker.adoon_version = C_AddOns.GetAddOnMetadata("HDH_AuraTracker", "Version")
+		exportTracker.adoon_version = HDH_AT_UTIL.GetAddOnMetadata("HDH_AuraTracker", "Version")
 		exportTracker.class = MyClass
 
 		if #exportTracker > 0 then

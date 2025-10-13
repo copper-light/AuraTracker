@@ -177,3 +177,16 @@ end
 HDH_AT_UTIL.GetItemCount = GetItemCount
 HDH_AT_UTIL.IsItemInRange = IsItemInRange
 HDH_AT_UTIL.IsUsableItem = IsUsableItem
+
+HDH_AT_UTIL.GetAddOnMetadata = GetAddOnMetadata
+
+
+function HDH_AT_UTIL.ObjectToString(object)
+	local v = WeakAuraLib_TableToString(object, true)
+	return v
+end
+
+function HDH_AT_UTIL.StringToObject(str)
+	local v = WeakAuraLib_StringToTable(str, true)
+	return v
+end

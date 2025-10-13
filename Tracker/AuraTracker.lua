@@ -112,6 +112,7 @@ do
 		local curTime = GetTime()
 		local f
 		self.prevUpdateCount = self.updateCount
+		self.updateCount = 0
 		for i = 1, 40 do 
 			aura = HDH_AT_UTIL.GetAuraDataByIndex(self.unit, i, self.filter)
 			if not aura then
@@ -168,6 +169,7 @@ do
 		for i = (self.updateCount or 0) + 1, self.prevUpdateCount or 0 do
 			self.frame.icon[i].spell.isLearned = false
 			self.frame.icon[i].spell.isUpdate = false
+			self.frame.icon[i].spell.duration = 0
 		end
 	end
 	
