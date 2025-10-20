@@ -40,7 +40,7 @@ do
 			if not aura then break end
 
 			if self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
-				if aura.sourceUnit == 'player' then
+				if aura.sourceUnit == 'player' or aura.sourceUnit == 'pet' then
 					f = self.frame.pointer[aura.spellId] or self.frame.pointer[aura.name]
 				else
 					f = nil
@@ -125,7 +125,7 @@ do
 					f = nil
 				end
 			elseif self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
-				if aura.sourceUnit == 'player' then
+				if aura.sourceUnit == 'player' or aura.sourceUnit == 'pet' then
 					f = self.frame.icon[i]
 				else
 					f = nil
@@ -309,6 +309,7 @@ do
 		end
 		if #(self.frame.icon) > 0 or aura_filter == DB.AURA_FILTER_ALL then
 			self.frame:RegisterUnitEvent('UNIT_AURA', self.unit)
+			
 			if self.unit == 'target' then
 				self.frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 			elseif self.unit == 'focus' then
@@ -357,7 +358,7 @@ function HDH_AURA_TRACKER:OnEvent(event, ...)
 	if not self then return end
 	if event == 'UNIT_AURA' then
 		local unit = select(1,...)
-		if self and unit == self.unit then
+		if self and (unit == self.unit) then
 			self:UNIT_AURA()
 		end
 	elseif event =="PLAYER_TARGET_CHANGED" then
