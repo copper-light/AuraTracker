@@ -43,7 +43,7 @@ do
 
         hooksecurefunc(GameTooltip, "SetUnitAura", function(self,...)
             if not HDH_AT_DB.show_tooltip_id then return end
-            local aura = C_UnitAuras.GetAuraDataByIndex(...)
+            local aura = HDH_AT_UTIL.GetAuraDataByIndex(...)
             if aura then addLine(self, aura.spellId) end
         end)
 

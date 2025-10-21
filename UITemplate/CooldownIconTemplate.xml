@@ -139,13 +139,6 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 				<Anchors>
 					<Anchor point="CENTER" />
 				</Anchors>
-				<!-- <Frames>
-					<Frame parentKey="LinearCooldown" inherits="HDH_AT_LinearCooldownTemplate" setAllPoints="true">
-					</Frame>
-
-					<Frame parentKey="CircleCooldown" inherits="HDH_AT_CircleCooldownTemplate" setAllPoints="true">
-					</Frame>
-				</Frames> -->
 			</Frame>
 
 			<Frame parentKey="Border" setAllPoints="true">
@@ -155,20 +148,13 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 						</Texture>
 					</Layer>
 				</Layers>
-			</Frame>
-			
-			<Frame parentKey="Glow" setAllPoints="true" hidden="true">
-				<Layers>
-					<Layer level="BACKGROUND">
-						<Texture parentKey="Color" file="Interface/AddOns/HDH_AuraTracker/Texture/spark_rect">
-						</Texture>
-					</Layer>
-
-					<Layer level="BORDER">
-						<Texture parentKey="Border" file="Interface/AddOns/HDH_AuraTracker/Texture/border2">
-						</Texture>
-					</Layer>
-				</Layers>
+				<Frames>
+					<Frame parentKey="Glow" hidden="false">
+						<Anchors>
+							<Anchor point="CENTER" />
+						</Anchors>
+					</Frame>
+				</Frames>
 			</Frame>
 
 		</Frames>

@@ -2,10 +2,6 @@
 * [Curseforge (In English)](https://www.curseforge.com/wow/addons/auratracker)
 * [WoW Inven (In Korean)](https://wow.inven.co.kr/dataninfo/addonpds/detail.php?idx=9396&rurl=%2Fdataninfo%2Faddonpds%2Flist.php%3F)
 
-# 앞으로 해야될 것들..
-* 아이콘 꿀렁거림 -> 게임 내 픽셀 스케일 문제임. 근본적으로 불가능함을 확인
-* 불필요한 소스코드 정리
-
 # AuraTracker (구 AuraTracking)
 오라,스킬,토템,HP,MP,직업자원에 대한 쿨다운 및 수치를 별도의 아이콘(바)으로 만들어 표시
 
@@ -41,6 +37,11 @@
 - 설정창 팝업 명령어는 /at , /auratracker , /ㅁㅅ
 
 ## 업데이트 사항
+
+#### [2025.10.21] v11.2.5.0
+- 클래식 1.15.8 버전 호환성 업데이트
+- 판다리아 5.5.1 버전 호환성 업데이트
+- 내부전쟁 11.2.5 버전 호환성 업데이트
 
 #### [2025.10.07] v11.2.0.5
 - [기능수정] 콤보(연계포인트) 추적에서 수치 표시 시 기존 연계포인트의 합계가 표시되던 것을 활성화된 아이콘 순서 번호가 표시되도록 수정

@@ -1451,7 +1451,9 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 
 		<Scripts>
 			<OnLoad inherit="append">
-				self.Texture:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 0))
+				if HDH_AT.LE ~= HDH_AT.LE_CLASSIC then
+					self.Texture:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 0))
+				end
 			</OnLoad>
 			<OnShow>
 			</OnShow>

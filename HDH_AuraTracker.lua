@@ -14,17 +14,32 @@ local function PLAYER_ENTERING_WORLD()
     DB:VersionUpdateDB()
 
 	if not HDH_TRACKER.IsLoaded then 
-		print('|cffffff00Loaded : AuraTracker |cffffffff(Settings: /at, /auratracker, /ㅁㅅ)')
-		HDH_TRACKER.startTime = GetTime();
+		HDH_TRACKER.startTime = GetTime()
 		HDH_AT_ADDON_FRAME:RegisterEvent('PLAYER_REGEN_DISABLED')  -- 전투 시작
 		HDH_AT_ADDON_FRAME:RegisterEvent('PLAYER_REGEN_ENABLED')   -- 전투 종료
-		HDH_AT_ADDON_FRAME:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')    -- 특성 빌드 변경 변환
-		HDH_AT_ADDON_FRAME:RegisterEvent('PLAYER_SPECIALIZATION_CHANGED')  -- 전문화 변환
+
+		if HDH_AT.LE == HDH_AT.LE_CLASSIC then
+			HDH_AT_ADDON_FRAME:RegisterEvent('CHARACTER_POINTS_CHANGED')
+		end
+
+		if HDH_AT.LE >= HDH_AT.LE_LICH_KING then
+			HDH_AT_ADDON_FRAME:RegisterEvent('ACTIVE_TALENT_GROUP_CHANGED')    -- 특성 빌드 변경 변환
+		end
+
+		if HDH_AT.LE >= HDH_AT.LE_MISTS then
+			HDH_AT_ADDON_FRAME:RegisterEvent('PLAYER_SPECIALIZATION_CHANGED')  -- 전문화 변환
+		end
+		
+		if HDH_AT.LE >= HDH_AT.LE_DRAGONFLIGHT then
+			HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_CONFIG_UPDATED') -- 특성 빌드 설정 변경 완료 됐을때
+			HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_CONFIG_DELETED') -- 특성 빌드 설정 변경 완료 됐을때
+			HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_TREE_CURRENCY_INFO_UPDATED') -- 특성 빌드 설정 변경 완료 됐을때
+		end
+
 		HDH_AT_ADDON_FRAME:RegisterEvent('GROUP_ROSTER_UPDATE')  -- 파티 구성
-		HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_CONFIG_UPDATED') -- 특성 빌드 설정 변경 완료 됐을때
-		HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_CONFIG_DELETED') -- 특성 빌드 설정 변경 완료 됐을때
-		HDH_AT_ADDON_FRAME:RegisterEvent('TRAIT_TREE_CURRENCY_INFO_UPDATED') -- 특성 빌드 설정 변경 완료 됐을때
+		print('|cffffff00Loaded : AuraTracker |cffffffff(Settings: /at, /auratracker, /ㅁㅅ)')
 	end
+
 	HDH_TRACKER.InitVaribles()
 	local trackerList = HDH_TRACKER.GetList()
 	for _, t in pairs(trackerList) do
@@ -37,7 +52,11 @@ end
 
 -- 이벤트 콜백 함수
 local function OnEvent(self, event, ...)
-	if event =='ACTIVE_TALENT_GROUP_CHANGED' or (event =='PLAYER_SPECIALIZATION_CHANGED' and 'player' == select(1, ...)) then
+
+	if event == 'CHARACTER_POINTS_CHANGED' then
+		HDH_AT_UTIL.RunTimer(self, "ACTIVE_TALENT_GROUP_CHANGED", 1, ACTIVE_TALENT_GROUP_CHANGED)
+
+	elseif event =='ACTIVE_TALENT_GROUP_CHANGED' or (event =='PLAYER_SPECIALIZATION_CHANGED' and 'player' == select(1, ...)) then
 		HDH_AT_UTIL.RunTimer(self, "ACTIVE_TALENT_GROUP_CHANGED", 1, ACTIVE_TALENT_GROUP_CHANGED)
         
 	elseif event == 'PLAYER_REGEN_ENABLED' then

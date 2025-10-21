@@ -12,7 +12,6 @@ local FRAME_MAX_H = 1000
 local FRAME_MIN_H = 260
 local STR_TRAIT_FORMAT = "|cffffc800%s\r\n|cffaaaaaa%s"
 local STR_TRACKER_FORMAT = "%s%s"
-local MAX_TALENT_TABS = 4
 local GRID_SIZE = 30;
 local ROW_HEIGHT = 26 -- 오라 row 높이
 local DDM_TRACKER_ALL = 0
@@ -80,30 +79,42 @@ AddTrackerList(HDH_TRACKER.TYPE.HEALTH, L.HEALTH)
 if MyClass == "MAGE" then 
 	-- totemName = L.MAGE_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, L.POWER_ARCANE_CHARGES)
+	if HDH_AT.LE > HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, L.POWER_ARCANE_CHARGES)
+	end
 elseif MyClass == "PALADIN" then 
 	totemName = L.PALADIN_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_HOLY_POWER, L.POWER_HOLY_POWER)
+	if HDH_AT.LE > HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_HOLY_POWER, L.POWER_HOLY_POWER)
+	end
 elseif MyClass == "WARRIOR" then 
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE)
 elseif MyClass == "DRUID" then 
 	-- totemName = L.DRUID_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_LUNAR, L.POWER_LUNAR)
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_RAGE, L.POWER_RAGE)
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_COMBO_POINTS, L.POWER_COMBO_POINTS)
+	if HDH_AT.LE > HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_LUNAR, L.POWER_LUNAR)
+	end
 elseif MyClass == "DEATHKNIGHT" then 
 	totemName = L.DK_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_RUNIC, L.POWER_RUNIC)
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_RUNE, L.POWER_RUNE)
 elseif MyClass == "HUNTER" then 
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_FOCUS, L.POWER_FOCUS)
+	if HDH_AT.LE == HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
+	else
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_FOCUS, L.POWER_FOCUS)
+	end
 elseif MyClass == "PRIEST" then 
 	totemName = L.PRIEST_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_INSANITY, L.POWER_INSANITY)
+	if HDH_AT.LE > HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_INSANITY, L.POWER_INSANITY)
+	end
 	-- addTrackerList(HDH_TRACKER.TYPE.PRIEST_SHADOWY_APPARITION, L.PRIEST_SHADOWY_APPARITION})
 elseif MyClass == "ROGUE" then
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_ENERGY, L.POWER_ENERGY)
@@ -111,11 +122,15 @@ elseif MyClass == "ROGUE" then
 elseif MyClass == "SHAMAN" then 
 	totemName = L.SHAMAN_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_MAELSTROM, L.POWER_ELE_MAELSTROM)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM, L.POWER_ENH_MAELSTROM)
+	if HDH_AT.LE > HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_MAELSTROM, L.POWER_ELE_MAELSTROM)
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_ENH_MAELSTROM, L.POWER_ENH_MAELSTROM)
+	end
 elseif MyClass == "WARLOCK" then 
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
-	AddTrackerList(HDH_TRACKER.TYPE.POWER_SOUL_SHARDS, L.POWER_SOUL_SHARDS)
+	if HDH_AT.LE > HDH_AT.LE_CLASSIC then
+		AddTrackerList(HDH_TRACKER.TYPE.POWER_SOUL_SHARDS, L.POWER_SOUL_SHARDS)
+	end
 elseif MyClass == "MONK" then 
 	totemName = L.MONK_TOTEM
 	AddTrackerList(HDH_TRACKER.TYPE.POWER_MANA, L.POWER_MANA)
@@ -364,6 +379,23 @@ local ICON_PRESET_LIST = {
 	"Interface/Icons/ability_evoker_powernexus"
 }
 
+if HDH_AT.LE == HDH_AT.LE_CLASSIC then
+	ICON_PRESET_LIST = {
+		"Interface/Icons/INV_Misc_Gem_Pearl_04",
+		"Interface/Icons/INV_Misc_Gem_Pearl_05",
+		"Interface/Icons/INV_Misc_Gem_Pearl_06",
+		"Interface/Icons/Spell_Shadow_SoulGem",
+		"Interface/Icons/Spell_Nature_WispSplode",
+		"Interface/Icons/INV_Misc_Orb_05",
+		"Interface/Icons/Inv_Misc_SummerFest_BrazierGreen",
+		"Interface/Icons/Inv_Misc_SummerFest_BrazierBlue",
+		"Interface/Icons/Inv_Misc_SummerFest_BrazierRed",
+		"Interface/Icons/Spell_Holy_PrayerOfFortitude",
+		"Interface/Icons/SPELL_NATURE_HEALINGTOUCH",
+		"Interface/Icons/Spell_Shadow_Teleport",
+	}
+end
+
 local BODY_TRACKER_NEW = 1
 local BODY_TRACKER_EDIT = 2
 local BODY_ELEMENTS = 3
@@ -384,7 +416,7 @@ local function GetTalentIdByTraits(searchTraitsId)
 	local ret = {}
 	local traitIds, talentId
 	if not searchTraitsId then return nil end
-	for i = 1, MAX_TALENT_TABS do
+	for i = 1, HDH_AT_UTIL.MAX_TALENT_TABS do
 		talentId, _, _, _ = HDH_AT_UTIL.GetSpecializationInfo(i)
 		if talentId == nil then
 			break
@@ -1513,7 +1545,7 @@ function HDH_AT_OnClick_Button(self, button)
 			end
 		end
 		exportTracker.version = DB:GetVersion()
-		exportTracker.adoon_version = C_AddOns.GetAddOnMetadata("HDH_AuraTracker", "Version")
+		exportTracker.adoon_version = HDH_AT_UTIL.GetAddOnMetadata("HDH_AuraTracker", "Version")
 		exportTracker.class = MyClass
 
 		if #exportTracker > 0 then
@@ -1752,7 +1784,7 @@ function HDH_AT_ConfigFrameMixin:GetTalentList(bigImage)
 	if bigImage == nil then
 		bigImage = false
 	end
-	for i = 1, MAX_TALENT_TABS do
+	for i = 1, HDH_AT_UTIL.MAX_TALENT_TABS do
         id, name, _, icon = HDH_AT_UTIL.GetSpecializationInfo(i)
 		if id == nil then
 			break
@@ -1899,7 +1931,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 		if name == nil then break end
 		itemValues[#itemValues+1] = {-1, name, icon}
 		itemTemplates[#itemTemplates+1] = "HDH_AT_DropDownOptionSplitItemTemplate"
-		itemValues[#itemValues+1] = {id, L.COMMON_SPEC , nil}
+		itemValues[#itemValues+1] = {id, L.COMMON_SPEC, nil}
 		itemTemplates[#itemTemplates+1] = "HDH_AT_DropDownOptionCheckButtonItemTemplate"
 		for _, trait in ipairs(self:GetTraits(id)) do
 			itemValues[#itemValues+1] = trait
@@ -1908,6 +1940,7 @@ function HDH_AT_ConfigFrameMixin:LoadTraits()
 	end
 	ddm:UseAtlasSize(useAtlas)
 	HDH_AT_DropDown_Init(ddm, itemValues, HDH_AT_OnSelected_Dropdown, nil, itemTemplates, true, true)
+
 end
 
 function HDH_AT_ConfigFrameMixin:UpdateTraitsSelector(idx)
@@ -2504,6 +2537,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 				maxV = valueMax
 			end
 		end
+		print(barValueType == DB.BAR_TYPE_BY_COUNT, maxV)
 
 		DB:GetTrackerElementBarMaxValues(trackerId, elemIdx)
 
@@ -2713,7 +2747,12 @@ function HDH_AT_ConfigFrameMixin:LoadTrackerConfig(value)
 		F.DD_TRACKER_UNIT:SelectClear()
 		F.DD_TRACKER_AURA_CASTER:SelectClear()
 		F.DD_TRACKER_AURA_FILTER:SelectClear()
-		F.DD_TRACKER_TRAIT:SelectClear()
+		if HDH_AT.LE <= HDH_AT.LE_CLASSIC and #F.DD_TRACKER_TRAIT.item == 2 then 
+			F.DD_TRACKER_TRAIT.item[2].CheckButton:SetChecked(true)
+			F.DD_TRACKER_TRAIT.item[2].CheckButton:Disable()
+		else
+			F.DD_TRACKER_TRAIT:SelectClear()
+		end
 		F.DD_TRACKER_AURA_CASTER:Enable()
 		F.DD_TRACKER_AURA_FILTER:Enable()
 		F.DD_TRACKER_UNIT:Enable()
@@ -3020,7 +3059,7 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 	for _, unit in pairs(unitList) do
 		if UnitExists(unit) then
 			for i = 1, 40 do 
-				aura = C_UnitAuras.GetAuraDataByIndex(unit, i, "HELPFUL")
+				aura = HDH_AT_UTIL.GetAuraDataByIndex(unit, i, "HELPFUL")
 				if not aura then break end
 				if f.buffQueue.activeSpell[aura.spellId] == nil then
 					if f.buffQueue.cache[aura.spellId] then
@@ -3043,7 +3082,7 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 	for _, unit in pairs(unitList) do
 		if UnitExists(unit) then
 			for i = 1, 40 do 
-				aura = C_UnitAuras.GetAuraDataByIndex(unit, i, "HARMFUL")
+				aura = HDH_AT_UTIL.GetAuraDataByIndex(unit, i, "HARMFUL")
 				if not aura then break end
 				if f.debuffQueue.activeSpell[aura.spellId] == nil then
 					if f.debuffQueue.cache[aura.spellId] then
@@ -3182,8 +3221,6 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 			value = f.queue:Get(size - (idx -1))
 			if not list[idx] then
 				item = CreateFrame("Button", "nil"..idx, f, "HDH_AT_LatestSpellItemTemplate")
-				list[idx] = item
-
 				item:SetScript("OnMouseDown", OnMouseDown_LatestSpellItem)
 				item:SetScript("OnMouseUp", OnMouseUp_LatestSpellItem)
 				item:EnableMouse(true);
@@ -3191,19 +3228,28 @@ function HDH_AT_ConfigFrameMixin:UpdateLatest()
 					local id = self.ID:GetText()
 					if id then
 						local isItem = self.isItem or false
-						local link = isItem and select(2,GetItemInfo(id)) or UTIL.GetSpellLink(id)
+						local link = isItem and select(2, GetItemInfo(id)) or UTIL.GetSpellLink(id)
 						if not link then return end
 						GameTooltip:SetOwner(self, "ANCHOR_BOTTOMRIGHT");
 						if self.unit then
 							GameTooltip:SetUnitAura(self.unit, self.auraIndex, self.filter);
 						else
-							GameTooltip:SetHyperlink(link)
+							if HDH_AT.LE <= HDH_AT.LE_CLASSIC then 
+								if isItem then
+									GameTooltip:SetSpellByID(link)
+								else
+									GameTooltip:SetSpellByID(id)
+								end
+							else
+								GameTooltip:SetHyperlink(link)
+							end
 						end
 					end
 				end)
 				item:SetScript("OnLeave", function()
 					GameTooltip:Hide()
 				end)
+				list[idx] = item
 			end
 			item = list[idx]
 			if not item:IsShown() then item:Show() end
@@ -3873,10 +3919,10 @@ function HDH_AT_ConfigFrameMixin:OnEvent(event, ...)
 	elseif event == "BAG_UPDATE_COOLDOWN" then
 		local info, startTime, duration, enable, itemId
 		for bag = BACKPACK_CONTAINER, NUM_TOTAL_EQUIPPED_BAG_SLOTS or 0 do
-			for slot = 1, C_Container.GetContainerNumSlots(bag) do
-				info = C_Container.GetContainerItemInfo(bag, slot)
+			for slot = 1, HDH_AT_UTIL.GetContainerNumSlots(bag) do
+				info = HDH_AT_UTIL.GetContainerItemInfo(bag, slot)
 				if info then
-					startTime, duration = C_Container.GetItemCooldown(info.itemID)
+					startTime, duration = HDH_AT_UTIL.GetItemCooldown(info.itemID)
 					if duration > 1.5 and (GetTime() - startTime) < 1 then
 						table.insert(self.cacheUesdItem, info.itemID)
 					end
@@ -3940,11 +3986,17 @@ function HDH_AT_ConfigFrame_OnShow(self)
 end
 
 function HDH_AT_ConfigFrame_OnLoad(self)
-	if select(4, GetBuildInfo()) <= 49999 then -- 대격변
+	if HDH_AT.LE <= HDH_AT.LE_CATACLYSM then
 		self.maxTabWidth = 18
 	end
 
-    self:SetResizeBounds(FRAME_WIDTH, FRAME_MIN_H, FRAME_WIDTH, FRAME_MAX_H) 
+	if self.SetMaxResize then
+		self:SetMaxResize(FRAME_WIDTH, FRAME_MAX_H)
+		self:SetMinResize(FRAME_WIDTH, FRAME_MIN_H)
+	else
+		self:SetResizeBounds(FRAME_WIDTH, FRAME_MIN_H, FRAME_WIDTH, FRAME_MAX_H)
+	end
+
     self:SetupCommend()
     self:InitFrame()
 end

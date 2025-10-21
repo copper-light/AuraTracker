@@ -1,16 +1,29 @@
-## Interface: 110200, 110500
+﻿## Interface: 11507, 11508
 ## Title: AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
-## Version: 11.2.0.5
+## Version: 11.2.5.0
 ## SavedVariablesPerCharacter: HDH_AT_DB
-## IconTexture: Interface\AddOns\HDH_AuraTracker\Texture\logo.blp
+## AllowLoadGameType: vanilla
+
+Const.lua
+
+# 오라 지속시간 데이터
+VanillaLib\LibStub\LibStub.lua
+VanillaLib\CallbackHandler-1.0\CallbackHandler-1.0.lua
+VanillaLib\LibClassicDurations\LibClassicDurations.xml
+
+# 프로필 내보내기/불러오기 문자열 생성
+VanillaLib\LibCompress\LibCompress.lua
+VanillaLib\AceSerializer-3.0\AceSerializer-3.0.xml
+VanillaLib\WeakAuraLib\Transmission.lua
 
 Locale\locale.lua
 Locale\locale_koKR.lua
 Locale\locale_ruRU.lua
 
 Utils.lua
+Utils_Vanilla.lua
 ConfigDB.lua
 
 UITemplate\CommonTemplate.xml
@@ -22,6 +35,7 @@ UITemplate\StatusBarTemplate.xml
 Tooltip.lua
 
 Tracker\Tracker.xml
+Tracker\Tracker_Vanilla.xml
 HDH_AuraTracker.lua
 
 Config.xml

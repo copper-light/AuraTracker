@@ -1500,7 +1500,11 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
 		</Frames>
 		<Scripts>
 			<OnShow>
-				_G[self:GetName().."Text"]:SetText("AuraTracker |cffffffff"..C_AddOns.GetAddOnMetadata("HDH_AuraTracker", "Version"))
+				if HDH_AT.LE == HDH_AT.LE_CLASSIC then
+					_G[self:GetName().."Text"]:SetText("AuraTracker |cffffffff"..GetAddOnMetadata("HDH_AuraTracker", "Version"))
+				else
+					_G[self:GetName().."Text"]:SetText("AuraTracker |cffffffff"..C_AddOns.GetAddOnMetadata("HDH_AuraTracker", "Version"))
+				end
 			</OnShow>
 			<OnHide>
 				if not HDH_AT_ConfigFrame:IsShown() then

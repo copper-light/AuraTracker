@@ -37,6 +37,7 @@ do
 			if self.aura_filter ~= DB.AURA_FILTER_ALL then
 				for i = 1, #self.frame.icon do
 					self.frame.icon[i].spell.isUpdate = false
+					self.frame.icon[i].spell.duration = 0
 				end
 			end
 
@@ -87,6 +88,7 @@ do
 			if self.aura_filter ~= DB.AURA_FILTER_ALL then
 				for i = 1, #self.frame.icon do
 					self.frame.icon[i].spell.isUpdate = false
+					self.frame.icon[i].spell.duration = 0
 				end
 			end
 			self.prevUpdateCount = self.updateCount or 0

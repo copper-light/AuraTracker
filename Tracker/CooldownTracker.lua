@@ -15,40 +15,28 @@ HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.COOLDOWN, HDH_C_TRACKER)
 -- OnUpdate icon
 -----------------------------------
 
-
 local function HDH_AT_CooldownIconTemplate_OnCooldownFinished(cooldown)
 	local tracker = cooldown:GetParent():GetParent().parent
 	tracker:Update(cooldown:GetParent().spell.no)
 end
 
-
-
 ------- HDH_C_TRACKER member function -----------	
 
--- function HDH_C_TRACKER:UpdateState(id, name, isItem, isToy)
--- 	local inRange, isAble, isNotEnoughMana
--- 	if isItem then
--- 		inRange = C_Item.IsItemInRange(id, "target")
--- 		if not isToy then
--- 			isAble = C_Item.IsUsableItem(id)
--- 		else
--- 			isAble = true
--- 		end
--- 		isNotEnoughMana = false
--- 	else
--- 		inRange = HDH_AT_UTIL.IsSpellInRange(name, "target")
--- 		isAble, isNotEnoughMana = HDH_AT_UTIL.IsSpellUsable(id)
--- 		isAble = isAble or isNotEnoughMana
--- 	end
--- end
-
--- function HDH_C_TRACKER:UpdateCount(id, name, isItem, isToy)
-
--- end
-
--- function HDH_C_TRACKER:UpdateCooldown(id, name, isItem, isToy)
-
--- end
+-- 1.14.1 버전 기준 거리체크 기능이 없어서 백그라운드로 돌림 
+local function OnUpdate_CheckRange(frame, elapsed)
+	frame.elapsed = (frame.elapsed or 0) + elapsed
+	if frame.elapsed < 0.05 and frame:IsShown() then return end
+	frame.elapsed = 0
+	frame.needUpdate = false
+	for i= 1, #frame.icon do
+		if frame.icon[i].spell.inRange ~= HDH_AT_UTIL.IsSpellInRange(frame.icon[i].spell.name, "target") then
+			frame.needUpdate = true
+		end
+	end
+	if frame.needUpdate and frame.parent then
+		frame.parent:ACTION_RANGE_CHECK_UPDATE()
+	end
+end
 
 function HDH_C_TRACKER:GetCooldownInfo(id, name, isItem, isToy)
 	local startTime, duration, count, remaining
@@ -57,11 +45,11 @@ function HDH_C_TRACKER:GetCooldownInfo(id, name, isItem, isToy)
 	local curTime = GetTime()
 
 	if isItem then
-		startTime, duration = C_Container.GetItemCooldown(id)
-		count = C_Item.GetItemCount(id, false, true) or 0
-		inRange = C_Item.IsItemInRange(id, "target")
+		startTime, duration = HDH_AT_UTIL.GetItemCooldown(id)
+		count = HDH_AT_UTIL.GetItemCount(id, false, true) or 0
+		inRange = HDH_AT_UTIL.IsItemInRange(id, "target")
 		if not isToy then
-			isAble = C_Item.IsUsableItem(id)
+			isAble = HDH_AT_UTIL.IsUsableItem(id)
 		else
 			isAble = true
 		end
@@ -141,7 +129,7 @@ function HDH_C_TRACKER:UpdateAuras(f)
 	local spell = f.spell
 
 	for i = 1, 40 do 
-		aura = C_UnitAuras.GetAuraDataByIndex('player', i, 'HELPFUL')
+		aura = HDH_AT_UTIL.GetAuraDataByIndex('player', i, 'HELPFUL')
 		if not aura then break end
 		if f.spell.innerSpellId == aura.spellId then
 			if spell.innerSpellEndtime ~= aura.expirationTime or aura.expirationTime == 0 then
@@ -478,7 +466,7 @@ function HDH_C_TRACKER:UpdateIconAndBar(index) -- HDH_TRACKER override
 				end
 			end
 		end
-		self:UpdateGlow(f, true)
+		self:UpdateGlow(f, spell.isAble)
 	end
 end
 
@@ -514,7 +502,7 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 			else
 				spell.stackable = false
 			end
-			if C_ToyBox.GetToyInfo(spell.id) then
+			if C_ToyBox and C_ToyBox.GetToyInfo(spell.id) then
 				spell.isToy = true
 			end
 
@@ -538,18 +526,27 @@ function HDH_C_TRACKER:InitIcons() -- HDH_TRACKER override
 	end
 
 	if ret > 0 then
-		self.frame:RegisterEvent('PLAYER_TALENT_UPDATE')
+		if HDH_AT.LE == HDH_AT.LE_CLASSIC then
+			self.frame:RegisterEvent('CHARACTER_POINTS_CHANGED')
+		else
+			self.frame:RegisterEvent('PLAYER_TALENT_UPDATE')
+			self.frame:RegisterEvent('COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED')
+			self.frame:RegisterEvent("ACTION_RANGE_CHECK_UPDATE")
+		end
 		self.frame:RegisterEvent('ACTIONBAR_SLOT_CHANGED')
 		self.frame:RegisterEvent('ACTIONBAR_UPDATE_STATE')
-		self.frame:RegisterEvent('CURSOR_CHANGED')
-		self.frame:RegisterEvent('COOLDOWN_VIEWER_SPELL_OVERRIDE_UPDATED')
+
+		if HDH_AT.LE >= HDH_AT.LE_SHADOWLANDS then
+			self.frame:RegisterEvent('CURSOR_CHANGED')
+		end
+		
 		self.frame:RegisterEvent("ACTIONBAR_UPDATE_USABLE")
 		self.frame:RegisterEvent("ACTIONBAR_UPDATE_COOLDOWN")
 		self.frame:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_SHOW")
 		self.frame:RegisterEvent("SPELL_ACTIVATION_OVERLAY_GLOW_HIDE")
 		self.frame:RegisterEvent("UPDATE_MOUSEOVER_UNIT")
 		self.frame:RegisterEvent("PLAYER_TARGET_CHANGED")
-		self.frame:RegisterEvent("ACTION_RANGE_CHECK_UPDATE")
+		
 		self.frame:RegisterEvent('UNIT_PET')
 		
 		if needEquipmentEvent then
@@ -716,7 +713,13 @@ function HDH_C_TRACKER:PLAYER_ENTERING_WORLD()
 			HDH_C_TRACKER.UpdateSetting(self)
 			HDH_C_TRACKER.Update(self)
 		end, {self})
-	end	
+	end
+
+	if (HDH_AT.LE == HDH_AT.LE_CLASSIC) and self.frame then
+		if not self.frame:GetScript("OnUpdate") then
+			self.frame:SetScript("Onupdate", OnUpdate_CheckRange)
+		end
+	end
 end
 
 function HDH_C_TRACKER:ACTION_RANGE_CHECK_UPDATE(slot, isInRange, checksRange)
@@ -848,7 +851,7 @@ function HDH_C_TRACKER:OnEvent(event, ...)
 	elseif event == 'ARENA_OPPONENT_UPDATE' then
 		HDH_AT_UTIL.RunTimer(tracker, "ARENA_OPPONENT_UPDATE", 0.5, HDH_C_TRACKER.Update, {tracker})
 
-	elseif event == 'PLAYER_TALENT_UPDATE' then
+	elseif event == 'PLAYER_TALENT_UPDATE' or event == 'CHARACTER_POINTS_CHANGED' then
 		HDH_AT_UTIL.RunTimer(tracker, "PLAYER_TALENT_UPDATE", 0.5, HDH_C_TRACKER.InitIcons, {tracker})
 
 	elseif event == "PLAYER_EQUIPMENT_CHANGED" then

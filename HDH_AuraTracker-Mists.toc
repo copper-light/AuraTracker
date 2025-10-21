@@ -1,16 +1,19 @@
-﻿## Interface: 50501
+﻿## Interface: 50501, 50502
 ## Title: AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)
-## Version: 11.2.0.5
+## Version: 11.2.5.0
 ## SavedVariablesPerCharacter: HDH_AT_DB
 ## AllowLoadGameType: mists
+
+Const.lua
 
 Locale\locale.lua
 Locale\locale_koKR.lua
 Locale\locale_ruRU.lua
 
 Utils.lua
+Utils_Mists.lua
 ConfigDB.lua
 
 UITemplate\CommonTemplate.xml

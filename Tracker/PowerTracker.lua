@@ -1,5 +1,6 @@
 ﻿HDH_POWER_TRACKER = {}
 local DB = HDH_AT_ConfigDB
+
 ------------------------------------
 -- HDH_POWER_TRACKER class
 ------------------------------------
@@ -17,6 +18,20 @@ HDH_TRACKER.TYPE.POWER_RUNIC = 9
 HDH_TRACKER.TYPE.POWER_FURY = 13
 HDH_TRACKER.TYPE.POWER_PAIN = 14  -- 용군단에서 삭제됨
 
+local POWER_TEXTURE = {
+	["MANA"] = "Interface/Icons/INV_Misc_Rune_03",
+	["RAGE"] = "Interface/Icons/Ability_Warrior_Rampage",
+	["FOCUS"] = "Interface/Icons/Ability_Fixated_State_Orange",
+	["ENERGY"] = "Interface/Icons/Spell_Holy_PowerInfusion",
+	["RUNIC_POWER"] = "Interface/Icons/Spell_DeathKnight_FrozenRuneWeapon",
+	["FURY"] = "Interface/Icons/Spell_Shadow_SummonVoidWalker",
+	["PAIN"] = "Interface/Icons/Ability_Warlock_FireandBrimstone"
+}
+
+if HDH_AT.LE == HDH_AT.LE_CLASSIC then
+	POWER_TEXTURE["RAGE"] = "Interface/Icons/Ability_Racial_BloodRage"
+end
+
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_MANA,      HDH_POWER_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_RAGE,      HDH_POWER_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_FOCUS,     HDH_POWER_TRACKER)
@@ -26,13 +41,13 @@ HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_FURY,      HDH_POWER_TRACKER)
 HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_PAIN,	   HDH_POWER_TRACKER)
 
 local POWER_INFO = {}
-POWER_INFO[HDH_TRACKER.TYPE.POWER_MANA]		 	= {power_type="MANA",		 	power_index =0,		color={0.25, 0.78, 0.92, 1}, 	regen=true,  texture = "Interface/Icons/INV_Misc_Rune_03"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_RAGE]			= {power_type="RAGE", 			power_index =1,		color={0.77, 0.12, 0.23, 1}, 	regen=false, texture = "Interface/Icons/Ability_Warrior_Rampage"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_FOCUS] 		= {power_type="FOCUS", 			power_index =2,		color={1.00, 0.50, 0.25, 1}, 	regen=true,  texture = "Interface/Icons/Ability_Fixated_State_Orange"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_ENERGY]		= {power_type="ENERGY",			power_index =3, 	color={1, 0.96, 0.41, 1}, 	  	regen=true,  texture = "Interface/Icons/Spell_Holy_PowerInfusion"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_RUNIC]    	= {power_type="RUNIC_POWER", 	power_index =6,		color={0, 0.82, 1, 1}, 			regen=false,  texture = "Interface/Icons/Spell_DeathKnight_FrozenRuneWeapon"};
-POWER_INFO[HDH_TRACKER.TYPE.POWER_FURY] 		= {power_type="FURY",			power_index =17, 	color={0.788, 0.259, 0.992, 1},	regen=false,  texture = "Interface/Icons/Spell_Shadow_SummonVoidWalker"};-- 17
-POWER_INFO[HDH_TRACKER.TYPE.POWER_PAIN] 		= {power_type="PAIN",			power_index =18,	color={1, 156/255, 0, 1}, 		regen=false,  texture = "Interface/Icons/Ability_Warlock_FireandBrimstone"}; -- 18
+POWER_INFO[HDH_TRACKER.TYPE.POWER_MANA]		 	= {power_type="MANA",		 	power_index =0,		color={0.25, 0.78, 0.92, 1}, 	regen=true,  texture = POWER_TEXTURE["MANA"]};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_RAGE]			= {power_type="RAGE", 			power_index =1,		color={0.77, 0.12, 0.23, 1}, 	regen=false, texture = POWER_TEXTURE["RAGE"]};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_FOCUS] 		= {power_type="FOCUS", 			power_index =2,		color={1.00, 0.50, 0.25, 1}, 	regen=true,  texture = POWER_TEXTURE["FOCUS"]};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_ENERGY]		= {power_type="ENERGY",			power_index =3, 	color={1, 0.96, 0.41, 1}, 	  	regen=true,  texture = POWER_TEXTURE["ENERGY"]};
+POWER_INFO[HDH_TRACKER.TYPE.POWER_RUNIC]    	= {power_type="RUNIC_POWER", 	power_index =6,		color={0, 0.82, 1, 1}, 			regen=false,  texture = POWER_TEXTURE["RUNIC_POWER"]}; -- 6
+POWER_INFO[HDH_TRACKER.TYPE.POWER_FURY] 		= {power_type="FURY",			power_index =17, 	color={0.788, 0.259, 0.992, 1},	regen=false,  texture = POWER_TEXTURE["FURY"]};-- 17
+POWER_INFO[HDH_TRACKER.TYPE.POWER_PAIN] 		= {power_type="PAIN",			power_index =18,	color={1, 156/255, 0, 1}, 		regen=false,  texture = POWER_TEXTURE["PAIN"]}; -- 18
 
 if select(4, GetBuildInfo()) >= 100000 then -- 용군단
 	HDH_TRACKER.TYPE.POWER_LUNAR = 10

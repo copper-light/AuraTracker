@@ -1,14 +1,12 @@
--- ##### 현재 사용하지 않는 트래커
-
-CT_VERSION = 0.1
 HDH_HEALTH_TRACKER = {}
 
 local DB = HDH_AT_ConfigDB
 
-local POWRE_BAR_SPLIT_MARGIN = 4;
-local MyClassKor, MyClass = UnitClass("player");
+local HEALTH_TEXTURE = "Interface/Icons/Ability_Malkorok_BlightofYshaarj_Green"
 
--- local POWRE_NAME = {}
+if HDH_AT.LE == HDH_AT.LE_CLASSIC then
+	HEALTH_TEXTURE = "Interface/Icons/Spell_Holy_Renew"
+end
 
 ------------------------------------
 do -- HDH_HEALTH_TRACKER class
@@ -22,7 +20,7 @@ do -- HDH_HEALTH_TRACKER class
 	HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.HEALTH,      HDH_HEALTH_TRACKER)
 
 	local POWER_INFO = {}
-	POWER_INFO[HDH_TRACKER.TYPE.HEALTH] = {power_type="HEALTH", power_index=HDH_TRACKER.TYPE.HEALTH, color={0, 1, 0}, regen=true, texture = "Interface/Icons/Ability_Malkorok_BlightofYshaarj_Green"};
+	POWER_INFO[HDH_TRACKER.TYPE.HEALTH] = {power_type="HEALTH", power_index=HDH_TRACKER.TYPE.HEALTH, color={0, 1, 0}, regen=true, texture = HEALTH_TEXTURE};
 
 	HDH_HEALTH_TRACKER.POWER_INFO = POWER_INFO;
 
@@ -55,7 +53,11 @@ do -- HDH_HEALTH_TRACKER class
 	end
 
 	function HDH_HEALTH_TRACKER:GetAbsorbs()
-		return UnitGetTotalAbsorbs(self.unit) or 0 
+		if UnitGetTotalAbsorbs then
+			return UnitGetTotalAbsorbs(self.unit) or 0 
+		else
+			return 0
+		end
 	end
 
 	function HDH_HEALTH_TRACKER:UpdateBarSettings(f)
@@ -174,7 +176,9 @@ do -- HDH_HEALTH_TRACKER class
 				self.frame.icon[1]:HookScript('OnUpdate', function(f, elapsed)
 					OnUpdateAbsorbBarValue(f, elapsed)
 				end)
-				self.frame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", self.unit)
+				if HDH_AT.LE >= HDH_AT.LE_MISTS then
+					self.frame:RegisterUnitEvent("UNIT_ABSORB_AMOUNT_CHANGED", self.unit)
+				end
 				self.frame:RegisterUnitEvent("UNIT_HEALTH", self.unit)
 			else
 				self.frame.icon[1]:HookScript('OnUpdate', nil)

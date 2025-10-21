@@ -12,7 +12,7 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
     <Script file="EnhancementMaelstrom.lua"/>
     <Script file="HealthTracker.lua"/>
 
-    <Frame name="HDH_AT_TrackerTemplate" mixin="HDH_TRACKER" virtual="true"/>
+    <!-- <Frame name="HDH_AT_TrackerTemplate" mixin="HDH_TRACKER" virtual="true"/>
     <Frame name="HDH_AT_AuraTrackerTemplate" inherits="HDH_AT_TrackerTemplate" mixin="HDH_AURA_TRACKER" virtual="true"/>
     <Frame name="HDH_AT_CooldownTrackerTemplate" inherits="HDH_AT_TrackerTemplate" mixin="HDH_C_TRACKER" virtual="true"/>
     <Frame name="HDH_AT_TotemTrackerTemplate" inherits="HDH_AT_CooldownTrackerTemplate" mixin="HDH_TT_TRACKER" virtual="true"/>
@@ -22,5 +22,5 @@ https://raw.githubusercontent.com/Gethe/wow-ui-source/live/Interface/AddOns/Bliz
     <Frame name="HDH_AT_EssenceTrackerTemplate" inherits="HDH_AT_ComboPointTrackerTemplate" mixin="HDH_ESSENCE_TRACKER" virtual="true"/>
     <Frame name="HDH_AT_StaggerTrackerTemplate" inherits="HDH_AT_PowerTrackerTemplate" mixin="HDH_STAGGER_TRACKER" virtual="true"/>
     <Frame name="HDH_AT_EnhancementMaelstromTemplate" inherits="HDH_AT_PowerTrackerTemplate" mixin="HDH_ENH_MAELSTROM_TRACKER" virtual="true"/>
-    <Frame name="HDH_AT_HealthTrackerTemplate" inherits="HDH_AT_PowerTrackerTemplate" mixin="HDH_HEALTH_TRACKER" virtual="true"/>
+    <Frame name="HDH_AT_HealthTrackerTemplate" inherits="HDH_AT_PowerTrackerTemplate" mixin="HDH_HEALTH_TRACKER" virtual="true"/> -->
 </Ui>

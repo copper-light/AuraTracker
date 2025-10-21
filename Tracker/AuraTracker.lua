@@ -36,11 +36,11 @@ do
 		end
 		
 		for i = 1, 40 do 
-			aura = C_UnitAuras.GetAuraDataByIndex(self.unit, i, self.filter)
+			aura = HDH_AT_UTIL.GetAuraDataByIndex(self.unit, i, self.filter)
 			if not aura then break end
 
 			if self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
-				if aura.sourceUnit == 'player' then
+				if aura.sourceUnit == 'player' or aura.sourceUnit == 'pet' then
 					f = self.frame.pointer[aura.spellId] or self.frame.pointer[aura.name]
 				else
 					f = nil
@@ -112,8 +112,9 @@ do
 		local curTime = GetTime()
 		local f
 		self.prevUpdateCount = self.updateCount
+		self.updateCount = 0
 		for i = 1, 40 do 
-			aura = C_UnitAuras.GetAuraDataByIndex(self.unit, i, self.filter)
+			aura = HDH_AT_UTIL.GetAuraDataByIndex(self.unit, i, self.filter)
 			if not aura then
 				break
 			end
@@ -124,7 +125,7 @@ do
 					f = nil
 				end
 			elseif self.aura_caster == DB.AURA_CASTER_ONLY_MINE then
-				if aura.sourceUnit == 'player' then
+				if aura.sourceUnit == 'player' or aura.sourceUnit == 'pet' then
 					f = self.frame.icon[i]
 				else
 					f = nil
@@ -168,6 +169,7 @@ do
 		for i = (self.updateCount or 0) + 1, self.prevUpdateCount or 0 do
 			self.frame.icon[i].spell.isLearned = false
 			self.frame.icon[i].spell.isUpdate = false
+			self.frame.icon[i].spell.duration = 0
 		end
 	end
 	
@@ -307,6 +309,7 @@ do
 		end
 		if #(self.frame.icon) > 0 or aura_filter == DB.AURA_FILTER_ALL then
 			self.frame:RegisterUnitEvent('UNIT_AURA', self.unit)
+			
 			if self.unit == 'target' then
 				self.frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 			elseif self.unit == 'focus' then
@@ -355,7 +358,7 @@ function HDH_AURA_TRACKER:OnEvent(event, ...)
 	if not self then return end
 	if event == 'UNIT_AURA' then
 		local unit = select(1,...)
-		if self and unit == self.unit then
+		if self and (unit == self.unit) then
 			self:UNIT_AURA()
 		end
 	elseif event =="PLAYER_TARGET_CHANGED" then
