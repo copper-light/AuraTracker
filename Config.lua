@@ -3989,7 +3989,7 @@ function HDH_AT_ConfigFrame_OnLoad(self)
 		self.maxTabWidth = 18
 	end
 
-	if HDH_AT.LE <= HDH_AT.LE_SHADOWLANDS then
+	if self.SetMaxResize then
 		self:SetMaxResize(FRAME_WIDTH, FRAME_MAX_H)
 		self:SetMinResize(FRAME_WIDTH, FRAME_MIN_H)
 	else

@@ -1,4 +1,4 @@
-﻿## Interface: 11402
+﻿## Interface: 11507, 11508
 ## Title: AuraTracker
 ## Author: CopperLight (gmanhdh@gmail.com)
 ## Notes: Tracking Buff/Debuff/Cooldown (Command: /at, /auratracker, /ㅁㅅ)

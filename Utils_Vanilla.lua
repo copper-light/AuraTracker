@@ -5,29 +5,35 @@ HDH_AT_UTIL.GetSpecialization = function()
 	return 1
 end
 
-HDH_AT_UTIL.GetContainerNumSlots = GetContainerNumSlots
-HDH_AT_UTIL.GetItemCooldown = GetItemCooldown
+HDH_AT_UTIL.GetContainerNumSlots = GetContainerNumSlots or C_Container.GetContainerNumSlots
+HDH_AT_UTIL.GetItemCooldown = GetItemCooldown or C_Container.GetItemCooldown
 
 
 HDH_AT_UTIL.GetContainerItemInfo = function(bag, slot)
-	local icon, itemCount, locked, quality, readable, lootable, itemLink, isFiltered, noValue, itemID, isBound = GetContainerItemInfo(bag, slot)
-	if icon then
-		return {
-			iconFileID = icon,
-			stackCount = itemCount,
-			isLocked = locked,
-			quality = quality,
-			isReadable = readable,
-			hasLoot = lootable,
-			hyperlink = itemLink,
-			isFiltered = isFiltered,
-			hasNoValue = noValue,
-			itemID = itemID,
-			isBound = isBound
-		}
+	if GetContainerItemInfo then
+		local icon, itemCount, locked, quality, readable, lootable, itemLink, isFiltered, noValue, itemID, isBound = GetContainerItemInfo(bag, slot)
+		if icon then
+			return {
+				iconFileID = icon,
+				stackCount = itemCount,
+				isLocked = locked,
+				quality = quality,
+				isReadable = readable,
+				hasLoot = lootable,
+				hyperlink = itemLink,
+				isFiltered = isFiltered,
+				hasNoValue = noValue,
+				itemID = itemID,
+				isBound = isBound
+			}
+		else
+			return nil
+		end
 	else
-		return nil
+		local info = C_Container.GetContainerItemInfo(bag, slot)
+		return info
 	end
+	
 end
 
 HDH_AT_UTIL.GetAuraDataByIndex = function(unit, i, filter)

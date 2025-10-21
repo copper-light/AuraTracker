@@ -29,15 +29,28 @@ if select(4, GetBuildInfo()) >= 100000 then
 	HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES = 19
 	HDH_TRACKER.RegClass(HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES, HDH_COMBO_POINT_TRACKER)
 	POWER_INFO[HDH_TRACKER.TYPE.POWER_ARCANE_CHARGES]	= {power_type="ARCANE_CHARGES",	power_index = 16,	color={2/255, 60/255, 189/255, 1}, texture = "Interface/Icons/Spell_Nature_WispSplode"};
-else
-	POWER_INFO[HDH_TRACKER.TYPE.POWER_COMBO_POINTS] 	= {power_type="COMBO_POINTS", 	power_index = 14,	color={0.77, 0.12, 0.23, 1}, texture = "Interface/Icons/INV_Misc_Gem_Pearl_05"};
+-- else
+-- 	POWER_INFO[HDH_TRACKER.TYPE.POWER_COMBO_POINTS] 	= {power_type="COMBO_POINTS", 	power_index = 14,	color={0.77, 0.12, 0.23, 1}, texture = "Interface/Icons/INV_Misc_Gem_Pearl_05"};
 end
 
 HDH_COMBO_POINT_TRACKER.POWER_INFO = POWER_INFO
 
-function HDH_COMBO_POINT_TRACKER:GetPower()
-	return UnitPower('player', self.POWER_INFO[self.type].power_index, true);
+if HDH_AT.LE <= HDH_AT.LE_MISTS then
+	-- UnitPower를 사용해서 정보를 불러올때, 도적 콤보 포인트가 오리지날에서는 딜레이가 있음
+	-- GetComboPoints 는 즉시 값을 가져오기 때문에 도적 콤보 포인트는 이 함수를 사용하도록 함
+	function HDH_COMBO_POINT_TRACKER:GetPower()
+		if self.POWER_INFO[self.type].power_index == 4 then
+			return GetComboPoints("player", "target")
+		else
+			return UnitPower('player', self.POWER_INFO[self.type].power_index, true)
+		end
+	end
+else
+	function HDH_COMBO_POINT_TRACKER:GetPower()
+		return UnitPower('player', self.POWER_INFO[self.type].power_index, true)
+	end
 end
+
 
 function HDH_COMBO_POINT_TRACKER:GetPowerMax()
 	return UnitPowerMax('player', self.POWER_INFO[self.type].power_index)
@@ -330,6 +343,11 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 		end
 		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE', "player")
 		self.frame:RegisterUnitEvent('UNIT_MAXPOWER', "player")
+
+		if HDH_AT.LE == HDH_AT.LE_CLASSIC then
+			self.frame:RegisterEvent('PLAYER_TARGET_CHANGED')
+		end
+
 		self:Update()
 	end
 	return ret
@@ -359,7 +377,8 @@ end
 
 function HDH_COMBO_POINT_TRACKER:OnEvent(event, unit, powerType)
 	local self = self.parent
-	if (event == "UNIT_POWER_UPDATE" ) and (self.POWER_INFO[self.type].power_type == powerType) then
+	
+	if ((event == "UNIT_POWER_UPDATE") and (self.POWER_INFO[self.type].power_type == powerType)) or (event == "PLAYER_TARGET_CHANGED" ) then
 		self:UNIT_POWER_UPDATE()
 	elseif (event == 'UNIT_MAXPOWER') and (self.POWER_INFO[self.type].power_type == powerType) then
 		self:UNIT_MAXPOWER()
