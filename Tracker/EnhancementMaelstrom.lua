@@ -125,7 +125,7 @@ do
 		if ret > 0 then
 			self.filter = "HELPFUL"
 			local f = self.frame.icon[1]
-			if f.spell.barMaxValueType == DB.BAR_MAXVALUE_TYPE_COUNT then -- 호환성 코드
+			if f.spell.barMaxValueType == DB.BAR_TYPE_BY_COUNT then -- 호환성 코드
 				if HDH_AT.LE <= HDH_AT.LE_MISTS then -- 대격변
 					f.spell.countMax = 5
 				else

@@ -2537,6 +2537,7 @@ function HDH_AT_ConfigFrameMixin:LoadDetailFrame(detailMode, trackerId, elemIdx,
 				maxV = valueMax
 			end
 		end
+		print(barValueType == DB.BAR_TYPE_BY_COUNT, maxV)
 
 		DB:GetTrackerElementBarMaxValues(trackerId, elemIdx)
 
