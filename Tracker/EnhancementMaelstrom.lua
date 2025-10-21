@@ -126,7 +126,7 @@ do
 			self.filter = "HELPFUL"
 			local f = self.frame.icon[1]
 			if f.spell.barMaxValueType == DB.BAR_MAXVALUE_TYPE_COUNT then -- 호환성 코드
-				if select(4, GetBuildInfo()) <= 59999 then -- 대격변
+				if HDH_AT.LE <= HDH_AT.LE_MISTS then -- 대격변
 					f.spell.countMax = 5
 				else
 					if HDH_AT_UTIL.IsLearnedSpellOrEquippedItem(HDH_ENH_MAELSTROM_TRACKER.TALENT_EXTEND_10, nil) then

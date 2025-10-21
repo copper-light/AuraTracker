@@ -344,7 +344,7 @@ function HDH_COMBO_POINT_TRACKER:InitIcons() -- HDH_TRACKER override
 		self.frame:RegisterUnitEvent('UNIT_POWER_UPDATE', "player")
 		self.frame:RegisterUnitEvent('UNIT_MAXPOWER', "player")
 
-		if HDH_AT.LE == HDH_AT.LE_CLASSIC then
+		if HDH_AT.LE <= HDH_AT.LE_MISTS then
 			self.frame:RegisterEvent('PLAYER_TARGET_CHANGED')
 		end
 

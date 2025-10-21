@@ -293,7 +293,7 @@ function HDH_TRACKER:CreateBaseIcon(index)
 	f.icon:Show()
 	
 	local tempf = CreateFrame("Frame", nil, f)
-	tempf:SetFrameLevel(f.icon:GetFrameLevel() + 5)
+	tempf:SetFrameLevel(f.icon:GetFrameLevel() + 6)
 	f.counttext = tempf:CreateFontString(nil, 'OVERLAY')
 	f.counttext:SetPoint('TOPLEFT', f, 'TOPLEFT', -1, 0)
 	f.counttext:SetPoint('BOTTOMRIGHT', f, 'BOTTOMRIGHT', 0, 0)
@@ -377,7 +377,7 @@ end
 function HDH_TRACKER:ReleaseIcon(idx)
 	local f = self.frame.icon[idx]
 	if not f then return end
-	HDH_AT_UTIL.CT_StopTimer(icon)
+	HDH_AT_UTIL.CT_StopTimer(f)
 
 	local spell = f.spell
 	-- if spell and spell.key and spell.id then
@@ -1457,15 +1457,15 @@ elseif HDH_AT.LE <= HDH_AT.LE_MISTS then -- 판다리아 코드
 
 	-- 검토사항 2025.10.12: 기본 오버레이 글로우 소스코드로 활용하는 방안 구상할 것
 	function HDH_TRACKER:ActionButton_SetupOverlayGlow(f)
-		f.icon.overlay = ActionButton_GetOverlayGlow();
-		local frameWidth, frameHeight = f.icon:GetSize();
-		f.icon.overlay:SetParent(f.icon);
-		f.icon.overlay:ClearAllPoints();
-		f.icon.overlay:SetFrameLevel(f.icon:GetFrameLevel() + 4)
-		-- Make the height/width available before the next frame:
-		f.icon.overlay:SetSize(frameWidth * 1.3, frameHeight * 1.3);
-		f.icon.overlay:SetPoint("TOPLEFT", f.icon, "TOPLEFT", -frameWidth * 0.3, frameHeight * 0.3)
-		f.icon.overlay:SetPoint("BOTTOMRIGHT", f.icon, "BOTTOMRIGHT", frameWidth * 0.3, -frameHeight * 0.3)
+		-- f.icon.overlay = ActionButton_GetOverlayGlow();
+		-- local frameWidth, frameHeight = f.icon:GetSize();
+		-- f.icon.overlay:SetParent(f.icon);
+		-- f.icon.overlay:ClearAllPoints();
+		-- f.icon.overlay:SetFrameLevel(f.icon:GetFrameLevel() + 4)
+		-- -- Make the height/width available before the next frame:
+		-- f.icon.overlay:SetSize(frameWidth * 1.3, frameHeight * 1.3);
+		-- f.icon.overlay:SetPoint("TOPLEFT", f.icon, "TOPLEFT", -frameWidth * 0.3, frameHeight * 0.3)
+		-- f.icon.overlay:SetPoint("BOTTOMRIGHT", f.icon, "BOTTOMRIGHT", frameWidth * 0.3, -frameHeight * 0.3)
 	end
 
 	function HDH_TRACKER:ActionButton_ResizeOverlayGlow(f)
@@ -1477,16 +1477,20 @@ elseif HDH_AT.LE <= HDH_AT.LE_MISTS then -- 판다리아 코드
 	end
 
 	function HDH_TRACKER:ActionButton_ShowOverlayGlow(f)
-		if not f.icon.overlay then
-			self:ActionButton_SetupOverlayGlow(f)
-		end
-		if ( f.icon.overlay.animOut:IsPlaying() ) then f.icon.overlay.animOut:Stop() end
-		f.icon.overlay.animIn:Play()
+		-- if not f.icon.overlay then
+		-- 	self:ActionButton_SetupOverlayGlow(f)
+		-- 	f.icon.overlay.animIn:Play()
+		-- end
+		-- if ( f.icon.overlay.animOut:IsPlaying() ) then f.icon.overlay.animOut:Stop() f.icon.overlay.animIn:Play() end
+		ActionButton_ShowOverlayGlow(f.icon.Border.Glow)
 	end
 	
 	function HDH_TRACKER:ActionButton_HideOverlayGlow(f)
-		if ( f.icon.overlay ) then
-			ActionButton_HideOverlayGlow(f.icon);
+		-- if ( f.icon.overlay ) then
+		-- 	ActionButton_HideOverlayGlow(f.icon);
+		-- end
+		if ( f.icon.Border.Glow.overlay ) then
+			ActionButton_HideOverlayGlow(f.icon.Border.Glow)
 		end
 	end
 	
