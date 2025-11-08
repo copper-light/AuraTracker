@@ -12,7 +12,15 @@ function HDH_AT_BottomTapMixin:SetActivate(bool)
         self.LeftActive:Show()
         self.MiddleActive:Show()
         self.RightActive:Show()
-        self.Text:SetPoint("TOP",0, -11)
+
+        if HDH_AT.LE == HDH_AT.LE_CLASSIC then
+            self.LeftActive:SetTexCoord(0, 0.15625, 0.15, 1.0)
+            self.MiddleActive:SetTexCoord(0.15625, 0.84375, 0.15, 1.0)
+            self.RightActive:SetTexCoord(0.84375, 1.0, 0.15, 1.0)
+            self.Text:SetPoint("TOP", 0, -9)
+        else
+            self.Text:SetPoint("TOP", 0, -11)
+        end
     else
         self:Enable()
         self.Left:Show()

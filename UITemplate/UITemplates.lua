@@ -466,7 +466,9 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
                 local t = _G[itemFrame:GetName().."Texture"]
                 if frame.useAtlasSize then
                     t:SetAtlas(texture)
-                    t:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 1))
+                    if HDH_AT.LE ~= HDH_AT.LE_CLASSIC then
+                        t:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 1))
+                    end
                 elseif frame.useFullSizeTexture then
                     t:SetTexture(texture) 
                 else
@@ -475,7 +477,9 @@ function HDH_AT_DropDown_Init(frame, itemValues, onClickHandler, onEnterHandler,
                     t:SetPoint("LEFT", itemFrame,"LEFT", 1, 0)
                     t:SetSize(itemFrame:GetHeight()-2, itemFrame:GetHeight()-2)
                     t:SetTexCoord(0.1,0.9,0.1,0.9)
-	                t:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 0))
+                    if HDH_AT.LE ~= HDH_AT.LE_CLASSIC then
+	                    t:SetGradient("HORIZONTAL", CreateColor(1, 1, 1, 1), CreateColor(1, 1, 1, 0))
+                    end
                 end
             end
             
@@ -576,7 +580,9 @@ function HDH_AT_DropDown_OnClick(self)
                 table.insert(UISpecialFrames, self:GetName())
                 self:EnableKeyboard(1)
             end)
-            self.hiddenBG:SetPropagateMouseClicks(true)
+            if HDH_AT.LE >= HDH_AT.LE_WAR_WITHIN then
+                self.hiddenBG:SetPropagateMouseClicks(true)
+            end
             self.hiddenBG.list = list
 
             self.hiddenBG2 = CreateFrame("Frame", self:GetName().."HiddenBG2", self.hiddenBG)
@@ -712,21 +718,24 @@ local function OnSelectedColorPicker()
     ColorPickerFrame:Hide()
 end
 
-local function OnOKColorPicker()
-    if ColorPickerFrame:IsShown() then 
-        ColorPickerFrame:Hide() 
-        ColorPickerFrame.buttonFrame = nil
-    end
-end
-
-local function OnCancelColorPicker()
+local function OnSelectedColorPicker_Vanilla()
+    if ColorPickerFrame.buttonFrame == nil then return end
     local self = ColorPickerFrame.buttonFrame
-    local r, g, b, a  = ColorPickerFrame:GetPreviousValues()
-    self:SetColorRGBA(r, g, b, a)
-    self.handler(self, r, g, b, a)
-
+    local r, g, b  = ColorPickerFrame:GetColorRGB()
+    self:SetColorRGBA(r, g, b, OpacitySliderFrame:GetValue())
+    self.handler(self, r, g, b, OpacitySliderFrame:GetValue())
     ColorPickerFrame.buttonFrame = nil
-end
+    ColorPickerFrame:Hide()
+end 
+
+-- local function OnCancelColorPicker()
+--     local self = ColorPickerFrame.buttonFrame
+--     local r, g, b, a  = ColorPickerFrame:GetPreviousValues()
+--     self:SetColorRGBA(r, g, b, a)
+--     self.handler(self, r, g, b, a)
+
+--     ColorPickerFrame.buttonFrame = nil
+-- end
 
 function HDH_AT_ColorPickerMixin:SetEnableAlpha(enableAlpha)
     self.hasOpacity = enableAlpha
@@ -744,25 +753,33 @@ function HDH_AT_OnClickColorPicker(self)
 		ColorPickerFrame.opacity = a
     end
 
-    ColorPickerFrame.func = HDH_OnSelectedColor
-
-    local info = {};
     ColorPickerFrame.buttonFrame = self
-    info.swatchFunc = (function () end);
-    info.cancelFunc = OnCancelColorPicker;
-	info.r = r 
-    info.g = g 
-    info.b = b
-    info.opacity = a 
-	info.hasOpacity = self.enableAlpha;
+    if ColorPickerFrame.SetupColorPickerAndShow then -- mists and retails
+        if ColorPickerFrame.Footer then
+            ColorPickerFrame.Footer.OkayButton:HookScript("OnClick", OnSelectedColorPicker)
+        else
+            ColorPickerOkayButton:HookScript("OnClick", OnSelectedColorPicker)
+        end
+        
+        local info = {};
+        info.swatchFunc = (function () end);
+        info.cancelFunc = (function () end)
+        info.r = r 
+        info.g = g 
+        info.b = b
+        info.opacity = a 
+        info.hasOpacity = self.enableAlpha;
+	    ColorPickerFrame:SetupColorPickerAndShow(info)
 
-    if ColorPickerFrame.Footer then
-        ColorPickerFrame.Footer.OkayButton:HookScript("OnClick", OnSelectedColorPicker)
-    else
-        ColorPickerOkayButton:HookScript("OnClick", OnSelectedColorPicker)
+    else -- classic
+        ColorPickerOkayButton:HookScript("OnClick", OnSelectedColorPicker_Vanilla)
+        ColorPickerFrame.func = (function () end)
+        ColorPickerFrame.cancelFunc = (function () end)
+        ColorPickerFrame:SetColorRGB(r,g,b)
+        ColorPickerFrame.opacity = a
+        ColorPickerFrame.hasOpacity = self.enableAlpha
+        ColorPickerFrame:Show()
     end
-
-	ColorPickerFrame:SetupColorPickerAndShow(info);
 end
 
 -----------------------------------

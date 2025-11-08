@@ -606,6 +606,7 @@ function HDH_AT_CooldownIconTemplateMixin:SetBorderSize(borderSize)
 	self.Border.Texture:SetTexCoord(border, 1 - border, border, 1 - border)
 	self.Icon:SetSize(self:GetWidth() * size, self:GetHeight() * size)
 	self.borderSize = borderSize
+	self.Border.Glow:SetSize(self.Icon:GetWidth() * 1.3, self.Icon:GetHeight() * 1.3)
 end
 
 function HDH_AT_CooldownIconTemplateMixin:SetBorderColor(r, g, b, a)
@@ -690,6 +691,7 @@ function HDH_AT_CooldownIconTemplateMixin:SetDesaturated()
 	self.Icon.Texture:SetAlpha(self.offAlpha)
 	self.Cooldown:SetShownProgressTexture(false)
 	self.Border.Texture:SetVertexColor(0, 0, 0, self.offAlpha)
+	self.Cooldown:SetOverlayColor(nil)
 end
 
 function HDH_AT_CooldownIconTemplateMixin:SetOverlayColor(r, g, b, a)
